@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+
+        <script src="js/lib/jquery-3.5.1.min.js"></script>
+        <script src="js/lib/pixi.min.js"></script>
+
+        <script src="js/helpers/cssHelpers.js"></script>
+        <script src="js/helpers/pixiHelpers.js"></script>
+        <script src="js/helpers/hexHelpers.js"></script>
+        
+        <script src="js/mapSettings.js"></script>
+
+        <script src="js/tooldata.js"></script>
+
+        <script src="js/iconLayer.js"></script>
+
+        <script src="js/path.js"></script>
+        <script src="js/pathLayer.js"></script>
+
+        <!--<script src="js/text.js"></script>-->
+        <script src="js/textLayer.js"></script>
+
+        <script src="js/hex/Hexfield.js"></script>
+        <!--<script src="js/hex/hexagon.js"></script>
+        <script src="js/hex/HexArray.js"></script>-->
+
+        <script src="js/selectors/HexMatrixSelector.js"></script>
+        <script src="js/selectors/BrushSelector.js"></script>
+        <script src="js/selectors/IconSelector.js"></script>
+        <script src="js/selectors/TextStyleSelector.js"></script>
+
+        <script src="main.js"></script>
+
+        <!-- Stylesheets -->
+        <link rel="stylesheet" type="text/css" href="css/toolbar.css">
+        <link rel="stylesheet" type="text/css" href="css/panels.css">
+        <link rel="stylesheet" type="text/css" href="css/maps.css">
+        <link rel="stylesheet" type="text/css" href="css/mapSettings.css">
+        <link rel="stylesheet" type="text/css" href="main.css">
+        
+        <link rel="icon" type="image/png" href="img/site/hexfriend.png">
+
+
+        <title>Hexfriend</title>
+    </head>
+
+    <body>
+
+        <div id="leftBar">
+
+            <div id="tools">
+                <!-- Note, it's important that the id of the button is the same as the changeTool id, but with the suffix 'btn_' -->
+                <button class="toolButton selectedTool" id="btn_terrain" onclick="changeTool('terrain'); updateToolButton('btn_terrain'); updateToolPanel('pnl_terrainButtons')">Terrain</button>
+                <button class="toolButton" id="btn_icon" onclick="changeTool('icon'); updateToolButton('btn_icon'); updateToolPanel('pnl_icons')">Icons</button>
+                <button class="toolButton" id="btn_path" onclick="changeTool('path'); updateToolButton('btn_path'); updateToolPanel('pnl_path')">Path</button>
+                <button class="toolButton" id="btn_text" onclick="changeTool('text'); updateToolButton('btn_text'); updateToolPanel('pnl_text')">Text</button>
+                <button class="toolButton" id="btn_eraser" onclick="changeTool('eraser'); updateToolButton('btn_eraser'); updateToolPanel(null)">Eraser</button>
+                
+            </div>
+            
+            <div id="settings">
+                <div id="save-options">
+                    <button class="toolButton hidden-save-option" id="btn_export" style="height: 25px">Export</button>
+                    <button class="toolButton" id="btn_save">Save</button>
+                </div>
+                <button class="toolButton" onclick="loadSavedMaps(); showMaps()">Maps</button>
+                <button class="toolButton" onclick="showMapSettings()">Settings</button>    
+            </div>
+        </div>
+
+        <div id="panels">
+            <!-- The terrain and Icon panels are replaced in code with selectors -->
+            <div id="pnl_terrainButtons" class="tool-panel shown-panel">
+            </div>
+            
+            <div id="pnl_icons" class="tool-panel">
+                <div id="pnl_iconButtons">
+                </div>
+                Snap to Hex <input type="checkbox" id="cb_iconSnap" onclick="primaryToolData.toggleIconSnap()">
+            </div>
+
+            <div id="pnl_path" class="tool-panel">
+                <input type="color" id="pathStroke" onchange="updatePathStyle('stroke', PIXI.utils.string2hex($('#pathStroke').val()))">
+                <input type="number" value="5" id="pathStrokeThickness" onchange="updatePathStyle('strokeThickness', Number($('#pathStrokeThickness').val()))">
+                <hr>
+                <div id="path-selected-only-controls">
+                    <button onclick="primaryPathLayer.deselectPath()">Deselect Current Path</button>
+                    <button onclick="primaryPathLayer.deleteSelectedPath()">Delete Path</button>
+                    <button onclick="primaryPathLayer.deleteLastPointOnSelectedPath()">Remove Last Point</button>
+                </div>
+                <hr>
+                <b>Saved Styles</b>
+            </div>
+            
+            <div id="pnl_text" class="tool-panel">
+                <input type="color" id="textColor" onchange="updateTextStyleFromHTML('fill', $('#textColor').val())">
+                <input type="number" value="36" id="textSize" onchange="updateTextStyleFromHTML('fontSize', Number($('#textSize').val()))">
+                <input type="color" id="textStroke" onchange="updateTextStyleFromHTML('stroke', $('#textStroke').val())">
+                <input type="number" value="0" id="textStrokeThickness" onchange="updateTextStyleFromHTML('strokeThickness', Number($('#textStrokeThickness').val()))">
+                <!--<button>Save current style</button>-->
+                <hr>
+                <div id="text-selected-only-controls" class="hidden">
+                    <button onclick="primaryTextLayer.deleteSelectedText()">Delete Selected Text</button>
+                </div>
+                <hr>
+                <b>Text Styles</b>
+                <div id="textstyle-selector"></div>
+            </div>
+
+        </div>
+
+        <!-- Pixi inserts the application part of the application here -->
+        <div id="app-canvas">
+        </div>
+
+        <div id="maps" class="hidden">
+            
+            <div id="mapsMenu">
+                <button id="closeButton" onclick="hideMaps()">X</button>
+                <button id="newButton" onclick="newMap()">New Map</button>
+                <div id="loadedMaps">Loading...</div>
+            </div>
+
+        </div>
+        
+        <div id="map-settings-container" class="hidden">
+
+            <div id="map-settings">
+                <button id="closeButton" onclick="hideMapSettings()">X</button>
+
+                Map Title: <input type="text" id="setting_map-title"><br>
+                <hr>
+                Hexes are: <select id="setting_hex-orientation" onchange="setting_updateOrientation()">
+                    <option value="flatTop">flat topped</option>
+                    <option value="pointyTop">pointy topped</option>
+                </select>(changing this rotates your map 1 face clockwise)<br>
+
+                Hex width: <input type="number" id="setting_hex-width" onchange="setting_resizeHexes()"><br>
+                Hex height: <input type="number" id="setting_hex-height" onchange="setting_resizeHexes()"><br>
+                
+                Grid: <input type="checkbox" id="setting_show-hexgrid" onchange="setting_changeHexgridVisibility()">
+                Grid Thickness: <input type="number" id="setting_hexgrid-thickness" onchange="setting_changeHexgridThickness()"> <!-- Will want to hide this if grid isnt shown -->
+
+            </div>
+        </div>
+
+    </body>
+
+</html>

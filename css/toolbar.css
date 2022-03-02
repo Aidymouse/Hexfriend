@@ -1,0 +1,56 @@
+/* CONTAINER */
+#leftBar {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+
+    position: fixed;
+
+    height: 100%;
+    width: 50px;
+
+}
+
+/* TOOLS */
+#tools {
+    height: auto;
+}
+
+.toolButton {
+    width: 50px;
+    height: 50px;
+    margin-left: 5px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    background-color: transparent;
+    color: white;
+    border: none;
+
+    background-color: #222222;
+}
+
+.toolButton:hover {
+    border: solid 1px grey;
+}
+
+#tools .selectedTool {
+    border: solid 1px grey;
+    background-color: #222222;
+}
+
+
+/* SETTINGS */
+#settings {
+    margin-top: auto;
+}
+
+#save-options .hidden-save-option {
+    width: 0;
+    visibility: hidden;
+}
+
+#save-options:hover .hidden-save-option {
+    width: 100%;
+    visibility: visible;
+    
+}

@@ -1,0 +1,8 @@
+TERRAIN is a hex. It includes acolor and potentially a SYMBOL, such as a tree. The background and icon both have a color. A hex can only have 1 terrain
+    a SYMBOL is the little picture thats drawn on the TERRAIN
+
+ICON is a little image that sits on top of a hex. A hex can have multiple icons.
+
+a TILESET is a collection of pre-made TERRAIN.
+
+an ICONSET is a collection of ICONS.
