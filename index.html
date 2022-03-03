@@ -55,21 +55,21 @@
 
             <div id="tools">
                 <!-- Note, it's important that the id of the button is the same as the changeTool id, but with the suffix 'btn_' -->
-                <button class="toolButton selectedTool" id="btn_terrain" onclick="changeTool('terrain'); updateToolButton('btn_terrain'); updateToolPanel('pnl_terrainButtons')"><img type="image/png"  src="img/tools/terrain.png"></button>
-                <button class="toolButton" id="btn_icon" onclick="changeTool('icon'); updateToolButton('btn_icon'); updateToolPanel('pnl_icons')"><img src="img/tools/icon.png"></button>
-                <button class="toolButton" id="btn_path" onclick="changeTool('path'); updateToolButton('btn_path'); updateToolPanel('pnl_path')"><img src="img/tools/path.png"></button>
-                <button class="toolButton" id="btn_text" onclick="changeTool('text'); updateToolButton('btn_text'); updateToolPanel('pnl_text')"><img src="img/tools/text.png"></button>
-                <button class="toolButton" id="btn_eraser" onclick="changeTool('eraser'); updateToolButton('btn_eraser'); updateToolPanel(null)"><img src="img/tools/eraser.png"></button>
+                <button class="toolButton selectedTool" id="btn_terrain" onclick="changeTool('terrain'); updateToolButton('btn_terrain'); updateToolPanel('pnl_terrainButtons')"><img type="image/png"  src="./img/tools/terrain.png"></button>
+                <button class="toolButton" id="btn_icon" onclick="changeTool('icon'); updateToolButton('btn_icon'); updateToolPanel('pnl_icons')"><img src="./img/tools/icon.png"></button>
+                <button class="toolButton" id="btn_path" onclick="changeTool('path'); updateToolButton('btn_path'); updateToolPanel('pnl_path')"><img src="./img/tools/path.png"></button>
+                <button class="toolButton" id="btn_text" onclick="changeTool('text'); updateToolButton('btn_text'); updateToolPanel('pnl_text')"><img src="./img/tools/text.png"></button>
+                <button class="toolButton" id="btn_eraser" onclick="changeTool('eraser'); updateToolButton('btn_eraser'); updateToolPanel(null)"><img src="./img/tools/eraser.png"></button>
                 
             </div>
             
             <div id="settings">
                 <div id="save-options">
                     <button class="toolButton hidden-save-option" id="btn_export" style="height: 25px">Export</button>
-                    <button class="toolButton" id="btn_save"><img src="img/tools/save.png"></button>
+                    <button class="toolButton" id="btn_save"><img src="./img/tools/save.png"></button>
                 </div>
-                <button class="toolButton" onclick="loadSavedMaps(); showMaps()"><img src="img/tools/maps.png"></button>
-                <button class="toolButton" onclick="showMapSettings()"><img src="img/tools/settings.png"></button>    
+                <button class="toolButton" onclick="loadSavedMaps(); showMaps()"><img src="./img/tools/maps.png"></button>
+                <button class="toolButton" onclick="showMapSettings()"><img src="./img/tools/settings.png"></button>    
             </div>
         </div>
 
