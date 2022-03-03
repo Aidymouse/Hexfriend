@@ -22,20 +22,21 @@
 // Highlight which hex is being hovered
 // Add importing
 
-// TODO //
-// Fix the memory leak :/ - got some progress
-// Exporting to PNG
-// Fix placing multiple icons on the same tile
-// Resize grid thickness
-// Undoing
-// Dynamically load tile and icon sets and text styles (line 103)
-// Add individual erasers for terrain and icons
-// Recalculate icon width and height when changing orientation of hexes.
+// TODO // ranked //
 // Font Selection
-// Save button in the settings
+// Path Styles
+// Add individual erasers for terrain and icons
 // Custom icon width and height
+// Save As
+// Save button in the settings
+// Exporting to PNG
 // Add confirmation to map deletion
 // Trash can icon on map delete button
+// Undoing
+// Fix the memory leak :/ - got some progress
+// Recalculate icon width and height when changing orientation of hexes.
+// Dynamically load tile and icon sets and text styles (line 103)
+// Fix placing multiple icons on the same tile
 
 let primaryPixiApp;
 let primaryRenderer;
@@ -751,6 +752,7 @@ function loadSave(saveData, newMap = false) {
 }
 
 function newMap() {
+    loadedMapId = -1;
     loadSave(DEFAULTSAVEDATA, true)
 }
 
