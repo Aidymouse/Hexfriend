@@ -102,6 +102,11 @@
                 <input type="number" value="36" id="textSize" onchange="updateTextStyleFromHTML('fontSize', Number($('#textSize').val()))">
                 <input type="color" id="textStroke" onchange="updateTextStyleFromHTML('stroke', $('#textStroke').val())">
                 <input type="number" value="0" id="textStrokeThickness" onchange="updateTextStyleFromHTML('strokeThickness', Number($('#textStrokeThickness').val()))">
+                <select id="text_font-family" onchange="updateTextStyleFromHTML('fontFamily', $('#text_font-family').val())">
+                    <option value="Comic Sans MS">Comic Sans MS</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                </select>
                 <!--<button>Save current style</button>-->
                 <hr>
                 <div id="text-selected-only-controls" class="hidden">

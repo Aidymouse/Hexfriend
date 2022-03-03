@@ -23,7 +23,7 @@
 // Add importing
 
 // TODO // ranked //
-// Font Selection
+// Font Selection - more fonts
 // Path Styles
 // Add individual erasers for terrain and icons
 // Custom icon width and height
@@ -37,6 +37,7 @@
 // Recalculate icon width and height when changing orientation of hexes.
 // Dynamically load tile and icon sets and text styles (line 103)
 // Fix placing multiple icons on the same tile
+// Fix the fucky gridlessness
 
 let primaryPixiApp;
 let primaryRenderer;

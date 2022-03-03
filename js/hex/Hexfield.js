@@ -210,7 +210,7 @@ class Hexagon {
 
 
 
-
+const GRIDLESSEXPANSION = 0.9;
 
 
 class Hexfield {
@@ -261,7 +261,7 @@ class Hexfield {
             }
             
             // Generate texture
-            this.tex_masterHex = generateHexTexture( generateHexPath(this.hexWidth, this.hexHeight, this.orientation, 0, 0) );
+            this.tex_masterHex = generateHexTexture(generateHexPath(this.hexWidth, this.hexHeight, this.orientation, 0, 0) );
 
             for (let q = -hexesOut; q <= hexesOut; q++) {
                 for (let r = -hexesOut; r <= hexesOut; r++) {

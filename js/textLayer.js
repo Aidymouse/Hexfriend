@@ -240,7 +240,7 @@ class TextLayer {
                     primaryToolData.worldX, primaryToolData.worldY,
 
                     {
-                        fontFamily: "Comic Sans MS", // change later lol
+                        fontFamily: $("#text_font-family").val(), // change later lol
                         fontSize: Number($('#textSize').val()),
                         fill: $('#textColor').val(),
                         stroke: $('#textStroke').val(),
@@ -386,6 +386,7 @@ class TextLayer {
         $("#textSize").val(selectedStyle.fontSize);
         $("#textStroke").val(selectedStyle.stroke);
         $("#textStrokeThickness").val(selectedStyle.strokeThickness);
+        $("#text_font-family").val(selectedStyle.fontFamily);
 
     }
 
@@ -461,6 +462,7 @@ class TextLayer {
         $("#textSize").val(textStyle.fontSize);
         $("#textStroke").val(PIXI.utils.hex2string(textStyle.stroke));
         $("#textStrokeThickness").val(textStyle.strokeThickness);
+        $("#text_font-family").val(textStyle.fontFamily);
         //$("#fontSize").val(textStyle.fontSize);
 
 
