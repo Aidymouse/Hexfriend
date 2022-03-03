@@ -27,6 +27,11 @@
     border: none;
 
     background-color: #222222;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
 }
 
 .toolButton:hover {

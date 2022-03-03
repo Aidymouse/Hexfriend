@@ -61,8 +61,11 @@ let loadedMapId = -1;
 const DEFAULTHEXCOLOR = 0xf2f2f2; // aka the background color of each hex. We'll need to save this.
 const DEFAULTOUTLINECOLOR = 0x333333; // we'll need to save this too at some stage
 
+const CURRENTSAVEDATAFORMATVERSION = 1; // Used to solve conflicts when loading earlier map versions, if it happens to change
+
 const DEFAULTSAVEDATA = {
     title: null,
+    version: CURRENTSAVEDATAFORMATVERSION,
 
     hexfield: {
         hexWidth: 50,
@@ -142,7 +145,7 @@ function initialize(saveData, usingDefaultData=false) {
     
     $("#app-canvas").empty();
     $("#app-canvas").append(primaryPixiApp.view);
-    console.log(primaryPixiApp.view.id = "mainCanvas")
+    //console.log(primaryPixiApp.view.id = "mainCanvas")
     
     primaryRenderer = primaryPixiApp.renderer;
     
@@ -602,16 +605,22 @@ function generateSave() {
 
     console.log(settingsMapTitle == "");
 
-    if (savedMapTitle == null && settingsMapTitle == "") {
+    // Figure out which name to use! //
+
+    // If there's no name, prompt for one
+    if (savedMapTitle == null && settingsMapTitle == "") { 
         mapTitle = prompt("Title: ")
     
         if (mapTitle == null) { // Cancalled saving!
             return null;
         }
     
+    // If there's a saved name and the settings is nothing, use the saved name
+    // I don't know how this could happen, because theoretically the settings name should change to the saved name always, but it's here just in case
     } else if (settingsMapTitle == "") {
         mapTitle = savedMapTitle;
     
+    // Use the name from the map settings
     } else {
         mapTitle = settingsMapTitle;
     }
@@ -619,6 +628,7 @@ function generateSave() {
 
     let saveObject = {
         title: mapTitle,
+        version: CURRENTSAVEDATAFORMATVERSION,
         preview: primaryPixiApp.renderer.plugins.extract.base64(primaryPixiApp.stage),    
         hexfield: primaryHexfield.getSaveData(),
         icons: primaryIconLayer.getSaveData(),
