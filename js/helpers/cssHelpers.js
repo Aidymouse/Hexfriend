@@ -5,12 +5,18 @@ function updateToolButton(buttonId) {
 
 function updateToolPanel(panelId) {
     $(".tool-panel").removeClass("shown-panel");
+
     if (panelId == null) {
         $("#panels").addClass("hidden");
     } else {
         $("#panels").removeClass("hidden");
         $("#" + panelId).addClass("shown-panel");
     }
+}
+
+function updateShownControls(controlsId) {
+    $(".controls-listing").addClass("hidden");
+    $("#" + controlsId).removeClass("hidden");
 }
 
 function updateSelectedBrush(terrainId){

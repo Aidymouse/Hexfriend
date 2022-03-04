@@ -205,13 +205,15 @@ class TextLayer {
     // Called from an event on the canvas
     mouseDown(e) {
 
+        console.log(this.hoveredText, this.selectedText)
+
         if (e.button == 0) {
 
             // CASE: Text object selected -> clicking on another text object
             //   OR: No text selected -> Clicking on text
             if (this.hoveredText) {
                 this.setSelectedText(this.hoveredText);
-                this.setHoveredText(null);
+                //this.setHoveredText(null);
                 this.calibrateSelectorGraphics();
                 this.detectSelectedTextStyle(this.selectedText.style);
 

@@ -1,0 +1,12 @@
+#controls {
+    position: fixed;
+    text-align: end;
+    bottom: 10px;
+    right: 10px;
+    width: 250px;
+
+    font-size: 10pt;
+    font-weight: normal;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+}
+

@@ -19,7 +19,6 @@
 
         <script src="js/iconLayer.js"></script>
 
-        <script src="js/path.js"></script>
         <script src="js/pathLayer.js"></script>
 
         <!--<script src="js/text.js"></script>-->
@@ -41,6 +40,7 @@
         <link rel="stylesheet" type="text/css" href="css/panels.css">
         <link rel="stylesheet" type="text/css" href="css/maps.css">
         <link rel="stylesheet" type="text/css" href="css/mapSettings.css">
+        <link rel="stylesheet" type="text/css" href="css/controls.css">
         <link rel="stylesheet" type="text/css" href="main.css">
         
         <link rel="icon" type="image/png" href="./assets/img/site/hexfriend.png">
@@ -55,11 +55,11 @@
 
             <div id="tools">
                 <!-- Note, it's important that the id of the button is the same as the changeTool id, but with the suffix 'btn_' -->
-                <button class="toolButton selectedTool" id="btn_terrain" onclick="changeTool('terrain'); updateToolButton('btn_terrain'); updateToolPanel('pnl_terrainButtons')"><img src="./assets/img/tools/Terrain.png"></button>
-                <button class="toolButton" id="btn_icon" onclick="changeTool('icon'); updateToolButton('btn_icon'); updateToolPanel('pnl_icons')"><img src="./assets/img/tools/Icon.png"></button>
-                <button class="toolButton" id="btn_path" onclick="changeTool('path'); updateToolButton('btn_path'); updateToolPanel('pnl_path')"><img src="./assets/img/tools/Path.png"></button>
-                <button class="toolButton" id="btn_text" onclick="changeTool('text'); updateToolButton('btn_text'); updateToolPanel('pnl_text')"><img src="./assets/img/tools/Text.png"></button>
-                <button class="toolButton" id="btn_eraser" onclick="changeTool('eraser'); updateToolButton('btn_eraser'); updateToolPanel(null)"><img src="./assets/img/tools/Eraser.png"></button>
+                <button class="toolButton selectedTool" id="btn_terrain" onclick="changeTool('terrain'); updateToolButton('btn_terrain'); updateToolPanel('pnl_terrainButtons'); updateShownControls('controls_terrain')"><img src="./assets/img/tools/Terrain.png"></button>
+                <button class="toolButton" id="btn_icon" onclick="changeTool('icon'); updateToolButton('btn_icon'); updateToolPanel('pnl_icons'); updateShownControls('controls_icon')"><img src="./assets/img/tools/Icon.png"></button>
+                <button class="toolButton" id="btn_path" onclick="changeTool('path'); updateToolButton('btn_path'); updateToolPanel('pnl_path'); updateShownControls('controls_path')"><img src="./assets/img/tools/Path.png"></button>
+                <button class="toolButton" id="btn_text" onclick="changeTool('text'); updateToolButton('btn_text'); updateToolPanel('pnl_text'); updateShownControls('controls_text')"><img src="./assets/img/tools/Text.png"></button>
+                <button class="toolButton" id="btn_eraser" onclick="changeTool('eraser'); updateToolButton('btn_eraser'); updateToolPanel(null); updateShownControls('controls_eraser')"><img src="./assets/img/tools/Eraser.png"></button>
                 
             </div>
             
@@ -85,13 +85,13 @@
             </div>
 
             <div id="pnl_path" class="tool-panel">
-                <input type="color" id="pathStroke" onchange="updatePathStyle('stroke', PIXI.utils.string2hex($('#pathStroke').val()))">
-                <input type="number" value="5" id="pathStrokeThickness" onchange="updatePathStyle('strokeThickness', Number($('#pathStrokeThickness').val()))">
+                <input type="color" id="pathStroke" onchange="primaryPathLayer.updateSelectedPathStyleFromHTML()">
+                <input type="number" value="5" id="pathStrokeThickness" onchange="primaryPathLayer.updateSelectedPathStyleFromHTML()">
                 <hr>
-                <div id="path-selected-only-controls">
+                <div id="path-selected-only-controls" class="hidden">
                     <button onclick="primaryPathLayer.deselectPath()">Deselect Current Path</button>
-                    <button onclick="primaryPathLayer.deleteSelectedPath()">Delete Path</button>
-                    <button onclick="primaryPathLayer.deleteLastPointOnSelectedPath()">Remove Last Point</button>
+                    <button onclick="primaryPathLayer.deletePath(primaryPathLayer.selectedPath)">Delete Path</button>
+                    <button onclick="primaryPathLayer.removeLastSelectedPoint()">Remove Last Point</button>
                 </div>
                 <hr>
                 <b>Saved Styles</b>
@@ -117,6 +117,42 @@
                 <div id="textstyle-selector"></div>
             </div>
 
+        </div>
+
+        <div id="controls">
+            <div class="controls-listing" id="controls_terrain">
+                Left Mouse: Paint Terrain<br>
+            </div>
+
+            <div class="controls-listing hidden" id="controls_icon">
+                Left Mouse: Place Icon<br>
+            </div>
+            
+
+            <div class="controls-listing hidden" id="controls_path-none-selected">
+                Left Mouse: Start Path<br>
+            </div>
+            
+            <div class="controls-listing hidden" id="controls_path-only-hovered">
+                Left Mouse: Select Path
+            </div>
+
+            <div class="controls-listing hidden" id="controls_path-selected">
+                Left Mouse: New Point<br>
+                XXX: Deselect Path<br>
+                XXX: Delete Last Point<br>
+                XXX: Delete Path<br>
+            </div>
+
+            <div class="controls-listing hidden" id="controls_text">
+                Left Mouse: Place Icon<br>
+            </div>
+            
+            <div class="controls-listing hidden" id="controls_eraser">
+                Left Mouse: Place Icon<br>
+            </div>
+
+            Right Mouse: Pan Canvas
         </div>
 
         <!-- Pixi inserts the application part of the application here -->

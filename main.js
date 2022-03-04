@@ -268,11 +268,11 @@ function initialize(saveData, usingDefaultData=false) {
     ///////////////////////
     // Set up path layer //
     console.log("Loading... Creating Path Layer");
-    primaryPathLayer = new PathLayer(primaryPixiApp.view.width, primaryPixiApp.view.height);
-    let cont_pathContainer = primaryPathLayer.getContainer();
+    primaryPathLayer = new PathLayer(saveData.paths); // savedata go here
+    let cont_pathContainer = primaryPathLayer.container;
 
     // Load Paths
-    primaryPathLayer.loadPaths(saveData.paths);
+    //primaryPathLayer.loadPaths(saveData.paths);
     primaryPathLayer.disableInteraction();
 
 
@@ -430,6 +430,8 @@ function initialize(saveData, usingDefaultData=false) {
         // EVENTS
         if (primaryToolData.selectedTool == "text") {
             primaryTextLayer.mouseMove();
+        } else if (primaryToolData.selectedTool == "path") {
+            primaryPathLayer.mouseMove();
         }
 
     });
