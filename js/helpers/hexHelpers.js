@@ -1,21 +1,25 @@
 function generateHexPath(width, height, orientation, centerX, centerY) {
-    if (orientation == "pointyTop") {
+
+    // The hexagon we generate is actually slightly taller than the width and height we give, because PIXI
+    // naturally draws hexes with dots in between... grrr...
+
+    if (orientation == "pointyTop") {        
         return [
             centerX, centerY - height/2,
-            centerX + width/2, centerY - height * 0.25,
-            centerX + width/2, centerY + height * 0.25,
-            centerX, centerY + height/2,
-            centerX - width/2, centerY + height * 0.25,
-            centerX - width/2, centerY - height * 0.25,
+            centerX + width / 2, centerY - height * 0.25 ,
+            centerX + width / 2, centerY + height * 0.25 ,
+            centerX, centerY + height / 2 ,
+            centerX - width / 2, centerY + height * 0.25 ,
+            centerX - width / 2, centerY - height * 0.25 ,
         ];
     } else {
         return [
             centerX - width * 0.25, centerY - height / 2,
-            centerX + width * 0.25, centerY - height / 2,
-            centerX + width / 2, centerY,
-            centerX + width * 0.25, centerY + height / 2,
-            centerX - width * 0.25, centerY + height / 2,
-            centerX - width / 2, centerY,
+            centerX + width * 0.25 , centerY - height / 2,
+            centerX + width / 2 , centerY,
+            centerX + width * 0.25 , centerY + height / 2,
+            centerX - width * 0.25 , centerY + height / 2,
+            centerX - width / 2 , centerY,
         ];
     }
 }
@@ -25,12 +29,13 @@ function generateHexTexture(hexPath) {
     console.log("generating hex texture")
     let g = new PIXI.Graphics();
 
-    g.beginFill(0xffffff)
-    g.drawPolygon(hexPath)
+    g.beginFill(0xffffff);
+    g.drawPolygon(hexPath);
     g.endFill();
 
     let t = primaryRenderer.generateTexture(g);
-    
+    t.baseTexture.scaleMode = PIXI.SCALE_MODES.LINEAR;
+
     g.destroy();
 
     return t;

@@ -21,6 +21,7 @@
 // Keybaord shortcuts
 // Highlight which hex is being hovered
 // Add importing
+// Rotate hex selectors to match hex field
 
 // TODO // ranked //
 // Font Selection - more fonts
@@ -129,6 +130,8 @@ db.version(2).stores({
 //////////////////////////////
 // Initialization Functions //
 function initialize(saveData, usingDefaultData=false) {
+    PIXI.settings.PRECISION = 'highp';
+    
     if (saveData == null) {
         console.log("No save data presented! Aborting.");
         return;
@@ -170,8 +173,6 @@ function initialize(saveData, usingDefaultData=false) {
     // Initialize Tool Data //
     console.log("Loading... Initializing Tool Data");
     primaryToolData = new ToolData(); // Remember that primary tool data will be updated when we make the offset container.
-
-
 
     ///////////////////
     // Load Textures //

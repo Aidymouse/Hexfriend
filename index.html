@@ -57,8 +57,8 @@
                 <!-- Note, it's important that the id of the button is the same as the changeTool id, but with the suffix 'btn_' -->
                 <button class="toolButton selectedTool" id="btn_terrain" onclick="changeTool('terrain'); updateToolButton('btn_terrain'); updateToolPanel('pnl_terrainButtons'); updateShownControls('controls_terrain')"><img src="./assets/img/tools/Terrain.png"></button>
                 <button class="toolButton" id="btn_icon" onclick="changeTool('icon'); updateToolButton('btn_icon'); updateToolPanel('pnl_icons'); updateShownControls('controls_icon')"><img src="./assets/img/tools/Icon.png"></button>
-                <button class="toolButton" id="btn_path" onclick="changeTool('path'); updateToolButton('btn_path'); updateToolPanel('pnl_path'); updateShownControls('controls_path')"><img src="./assets/img/tools/Path.png"></button>
-                <button class="toolButton" id="btn_text" onclick="changeTool('text'); updateToolButton('btn_text'); updateToolPanel('pnl_text'); updateShownControls('controls_text')"><img src="./assets/img/tools/Text.png"></button>
+                <button class="toolButton" id="btn_path" onclick="changeTool('path'); updateToolButton('btn_path'); updateToolPanel('pnl_path'); updateShownControls('controls_path-none-selected')"><img src="./assets/img/tools/Path.png"></button>
+                <button class="toolButton" id="btn_text" onclick="changeTool('text'); updateToolButton('btn_text'); updateToolPanel('pnl_text'); updateShownControls('controls_text-none-selected')"><img src="./assets/img/tools/Text.png"></button>
                 <button class="toolButton" id="btn_eraser" onclick="changeTool('eraser'); updateToolButton('btn_eraser'); updateToolPanel(null); updateShownControls('controls_eraser')"><img src="./assets/img/tools/Eraser.png"></button>
                 
             </div>
@@ -103,9 +103,9 @@
                 <input type="color" id="textStroke" onchange="updateTextStyleFromHTML('stroke', $('#textStroke').val())">
                 <input type="number" value="0" id="textStrokeThickness" onchange="updateTextStyleFromHTML('strokeThickness', Number($('#textStrokeThickness').val()))">
                 <select id="text_font-family" onchange="updateTextStyleFromHTML('fontFamily', $('#text_font-family').val())">
-                    <option value="Comic Sans MS">Comic Sans MS</option>
-                    <option value="Arial">Arial</option>
                     <option value="Times New Roman">Times New Roman</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Comic Sans MS">Comic Sans MS</option>
                 </select>
                 <!--<button>Save current style</button>-->
                 <hr>
@@ -120,15 +120,19 @@
         </div>
 
         <div id="controls">
+            <!-- TERRAIN CONTROLS -->
             <div class="controls-listing" id="controls_terrain">
                 Left Mouse: Paint Terrain<br>
             </div>
 
+
+            <!-- ICON CONTROLS -->
             <div class="controls-listing hidden" id="controls_icon">
                 Left Mouse: Place Icon<br>
             </div>
             
 
+            <!-- PATH CONTROLS -->
             <div class="controls-listing hidden" id="controls_path-none-selected">
                 Left Mouse: Start Path<br>
             </div>
@@ -144,15 +148,29 @@
                 XXX: Delete Path<br>
             </div>
 
-            <div class="controls-listing hidden" id="controls_text">
-                Left Mouse: Place Icon<br>
-            </div>
-            
-            <div class="controls-listing hidden" id="controls_eraser">
-                Left Mouse: Place Icon<br>
+
+            <!-- TEXT CONTROLS -->
+            <div class="controls-listing hidden" id="controls_text-none-selected">
+                Left Mouse: Place Text<br>
             </div>
 
-            Right Mouse: Pan Canvas
+            <div class="controls-listing hidden" id="controls_text-hovered">
+                Left Mouse: Select Text<br>
+            </div>
+
+
+            <div class="controls-listing hidden" id="controls_text-selected">
+                Left Mouse: Deselect Text<br>
+                Keyboard: Edit Text
+            </div>
+            
+            <!-- ERASER CONTROLS -->
+            <div class="controls-listing hidden" id="controls_eraser">
+                Left Mouse: Erase<br>
+            </div>
+
+            Right Mouse: Pan Canvas<br>
+            Mouse Wheel: Zoom
         </div>
 
         <!-- Pixi inserts the application part of the application here -->

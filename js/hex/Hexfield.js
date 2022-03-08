@@ -163,9 +163,12 @@ class Hexagon {
     get screenCoords() {
         
         if (this.orientation == "flatTop") {
+            let hx = this.q * this.width * 0.75
+            let hy = this.r * this.height / 2 - this.s * this.height / 2
+
             return {
-                x: this.q * this.width * 0.75,
-                y: this.r * this.height / 2 - this.s * this.height/2//+ (this.s % 2 == 0 ? this.height/2 : 0)
+                x: hx, //+ (hx > 0 ? -0.5 : 0.5) * this.q,
+                y: hy//+ (this.s % 2 == 0 ? this.height/2 : 0)
                 
             }
         } else if (this.orientation == "pointyTop") {
@@ -210,7 +213,7 @@ class Hexagon {
 
 
 
-const GRIDLESSEXPANSION = 0.9;
+const GRIDLESSEXPANSION = 0.5;
 
 
 class Hexfield {
@@ -231,7 +234,7 @@ class Hexfield {
             this.gridData = saveData.gridData;
 
             // Generate new master hex
-            this.tex_masterHex = generateHexTexture( generateHexPath(this.hexWidth, this.hexHeight, this.orientation, 0, 0) );
+            this.tex_masterHex = this.generateMasterHexTexture();
             
             saveData.hexes.forEach(hexData => {
                 let newHex = new Hexagon(this.tex_masterHex, this.cont_main, hexData.q, hexData.r, this.hexWidth, this.hexHeight, this.orientation);
@@ -261,7 +264,7 @@ class Hexfield {
             }
             
             // Generate texture
-            this.tex_masterHex = generateHexTexture(generateHexPath(this.hexWidth, this.hexHeight, this.orientation, 0, 0) );
+            this.tex_masterHex = this.generateMasterHexTexture();
 
             for (let q = -hexesOut; q <= hexesOut; q++) {
                 for (let r = -hexesOut; r <= hexesOut; r++) {
@@ -378,6 +381,10 @@ class Hexfield {
 
     // HEX MANIPULATION
 
+    generateMasterHexTexture() {
+        return generateHexTexture(generateHexPath(this.hexWidth, this.hexHeight, this.orientation, 0, 0));
+    }
+
     eraseHex(coordinates) {
         // This function is called from iconLayer.js. It's a work around because the eraser is meant to erase both icons and terrain in one go, but the event
         // listener will stop if it hits an icon first. Therefore, in the icons "pointerdown" and "pointerover" event listeners, we convert the world X and Y
@@ -394,7 +401,7 @@ class Hexfield {
         this.orientation = newOrientation;
 
         //console.log(this.tex_masterHex)
-        this.tex_masterHex = generateHexTexture(generateHexPath(this.hexWidth, this.hexHeight, newOrientation, 0, 0));
+        this.tex_masterHex = this.generateMasterHexTexture();
         
         //let s = new PIXI.Texture.from('img/terrain/tree.png');
         
@@ -413,7 +420,7 @@ class Hexfield {
         this.hexWidth = width;
         this.hexHeight = height;
         
-        this.tex_masterHex = generateHexTexture(generateHexPath(this.hexWidth, this.hexHeight, this.orientation, 0, 0));
+        this.tex_masterHex = this.generateMasterHexTexture();
 
         this.hexes.forEach(hex => {
             hex.texture = this.tex_masterHex;

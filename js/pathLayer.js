@@ -265,6 +265,10 @@ class PathLayer {
     calibrateSelectorGraphics() {
         this.grph_selectors.clear();
 
+        if (primaryToolData.selectedTool != "path") {
+            return;
+        }
+
         if (this.selectedPath) {
             
             this.grph_selectors.lineStyle(SELECTEDSTROKETHICKNESS, SELECTEDSTROKE);
@@ -290,7 +294,6 @@ class PathLayer {
             }
             updateShownControls("controls_path-only-hovered")
         } else {
-            
             updateShownControls("controls_path-none-selected");
         }
         
