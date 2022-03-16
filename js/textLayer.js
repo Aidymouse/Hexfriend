@@ -213,8 +213,6 @@ class TextLayer {
     // Called from an event on the canvas
     mouseDown(e) {
 
-        console.log(this.hoveredText, this.selectedText)
-
         if (e.button == 0) {
 
             // CASE: Text object selected -> clicking on another text object
@@ -459,13 +457,10 @@ class TextLayer {
             this.selectedText.style['strokeThickness'] = textStyle.strokeThickness
             this.selectedText.style['fontSize'] = textStyle.fontSize
             this.selectedText.style['fontFamily'] = textStyle.fontFamily
-            console.log(this.selectedText.style);
             
             // We calibrate because thickness could have changed
             this.calibrateSelectorGraphics();
         }
-
-        console.log('Ok')
 
         // Secondly, update the HTML to match
         $("#textColor").val(PIXI.utils.hex2string(textStyle.fill));

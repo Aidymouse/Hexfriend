@@ -34,7 +34,7 @@
 // Add confirmation to map deletion
 // Trash can icon on map delete button
 // Undoing
-// Fix the memory leak :/ - got some progress
+// Fix the memory leak :/ - got some progress - pretty sure this is done now, take a look later though
 // Recalculate icon width and height when changing orientation of hexes.
 // Dynamically load tile and icon sets and text styles (line 103)
 // Fix placing multiple icons on the same tile
@@ -441,11 +441,6 @@ function initialize() {
 
 }
 
-
-function loadMap(saveData) {
-
-}
-
 $(() => {
     
     
@@ -712,7 +707,6 @@ function loadSave(saveData, newMap = false) {
     //terrainSelectorApp.eraseAll();
     //iconSelectorApp.eraseAll();
     
-    console.log(saveData);
     
     // Erase all loaded tilesets?
     // I think we can just keep the ones we've got loaded.
@@ -724,6 +718,8 @@ function loadSave(saveData, newMap = false) {
     primaryIconLayer.loadSaveData(saveData.icons);
     primaryTextLayer.loadSaveData(saveData.text);
     primaryPathLayer.loadSaveData(saveData.paths);
+
+    primaryTextLayer.disableInteraction();
 
     console.log("\nLOADING FILE")
 

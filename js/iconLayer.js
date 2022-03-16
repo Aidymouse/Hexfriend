@@ -42,7 +42,7 @@ class Icon {
                 primaryIconLayer.deleteIcon(this)
 
                 // Check for hexagon too. Pretty fucking hacky...
-                primaryHexfield.eraseHex( primaryHexfield.coords_worldToAxial(primaryToolData.worldX, primaryToolData.worldY) )
+                //primaryHexfield.eraseHex( primaryHexfield.coords_worldToAxial(primaryToolData.worldX, primaryToolData.worldY) )
             }
         });
 
@@ -102,10 +102,8 @@ class IconLayer {
 
     deleteIcon(icon) {
         this.cont_icons.removeChild(icon.icon);
-        this.icons[this.icons.indexOf(icon)] = null;
+        this.icons.splice(this.icons.indexOf(icon));
         icon.icon.destroy();
-
-        console.log();
     }
     
     // DATA
