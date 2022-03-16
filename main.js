@@ -47,8 +47,8 @@ let primaryHexfield;
 let primaryIconLayer;
 let primaryTextLayer;
 
-let loadedTilesets = [];
-let loadedIconsets = [];
+let loadedTilesets = {};
+let loadedIconsets = {};
 
 let primaryToolData;
 
@@ -124,7 +124,7 @@ function initialize() {
         "default": defaultTileset
     }
 
-    loadedIconSets = {
+    loadedIconsets = {
         "default": defaultIconSet
     }
 
@@ -157,8 +157,8 @@ function initialize() {
 
     console.log("Initializing... Loading Iconsets");
     // Load Icon Data
-    for (const iconSetName in loadedIconSets) {
-        const iconSet = loadedIconSets[iconSetName];
+    for (const iconSetName in loadedIconsets) {
+        const iconSet = loadedIconsets[iconSetName];
 
         iconSet.forEach(icon => {
             primaryLoader.add(icon.id, icon.base64);
@@ -397,7 +397,7 @@ function initialize() {
         terrainSelectorApp.attachToHTMLById("#pnl_terrainButtons");
 
         console.log("Initializing... Creating Icon Selector");
-        iconSelectorApp = new IconSelector(loadedIconSets["default"]);
+        iconSelectorApp = new IconSelector(loadedIconsets["default"]);
         $("#pnl_iconButtons").empty();
         iconSelectorApp.attachToHTMLById("#pnl_iconButtons");
 
@@ -412,7 +412,7 @@ function initialize() {
 
         // Set default selections
         // Do this dynamically at some stage
-        primaryToolData.changeIcon(loadedIconSets["default"][0].id);
+        primaryToolData.changeIcon(loadedIconsets["default"][0].id);
         primaryToolData.changeTerrain(loadedTilesets["default"][0].id);
 
         cont_offset.addChild(primaryHexfield.container);

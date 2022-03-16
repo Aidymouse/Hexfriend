@@ -79,7 +79,7 @@ class ToolData {
 
     changeIcon(iconId) {
         let iconsetName = "default";
-        let iconData = loadedIconSets[iconsetName].find(element => element.id == iconId);
+        let iconData = loadedIconsets[iconsetName].find(element => element.id == iconId);
 
         this.icon.iconId = iconId;
 

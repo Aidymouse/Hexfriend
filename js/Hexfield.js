@@ -176,7 +176,6 @@ class Hexfield {
 
                     this.hexes[hexId].spr_symbol.texture = primaryToolData.terrain.tex_symbol;
                     this.hexes[hexId].spr_symbol.tint = primaryToolData.terrain.symbolColor;
-                    
 
                     this.hexes[hexId].spr_symbol.visible = true;
 
