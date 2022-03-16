@@ -107,7 +107,6 @@ class Hexfield {
                 //let tileName = tileId.split("_")[1];
     
                 let hexTile = loadedTilesets[tilesetName].find(tile => tile.id == tileId);
-                console.log(hexTile);
     
                 newHex.bgColor = hexTile.bgColor;
 
@@ -143,6 +142,12 @@ class Hexfield {
     pointerdown(e) {
 
         if (e.data.button == 0) { // :eft Mouse
+
+            if (primaryToolData.selectedTool == "eraser") {
+                this.applyEraser();
+                return;
+            }
+
             let clickedCoords = worldToAxial(primaryToolData.worldX, primaryToolData.worldY, this.orientation, this.hexWidth, this.hexHeight);
             let hexId = this.coordsToHexId(clickedCoords);
 
@@ -196,6 +201,19 @@ class Hexfield {
         return axialCoords.q.toString() + ":" + axialCoords.r.toString() +":"+axialCoords.s.toString();
     }
 
+    applyEraser() {
+        let hexId = this.coordsToHexId( worldToAxial(primaryToolData.worldX, primaryToolData.worldY, this.orientation, this.hexWidth, this.hexHeight) );
+
+        if (this.hexes[hexId]) {
+
+            this.hexes[hexId].bgColor = this.blankHexColor;
+            this.hexes[hexId].spr_symbol.texture = null;
+            this.hexes[hexId].spr_symbol.visible = false;
+            this.hexes[hexId].paintedTerrainId = null;
+            this.redrawHex(hexId);
+        }
+    }
+
 
     // CONFIG
     // Called from HTML
@@ -221,6 +239,11 @@ class Hexfield {
     changeOutlineVisibility(visible) {
         this.gridData.visible = visible;
         this.drawOutlines(); // will clear outlines if not visible
+    }
+
+    changeGridStroke(newColor) {
+        this.gridData.stroke = newColor;
+        this.drawOutlines();
     }
 
 

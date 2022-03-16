@@ -86,7 +86,7 @@
             <div id="pnl_icons" class="tool-panel">
                 <div id="pnl_iconButtons">
                 </div>
-                Snap to Hex <input type="checkbox" id="cb_iconSnap" onclick="primaryToolData.toggleIconSnap()">
+                Snap to Hex <input type="checkbox" id="cb_iconSnap" checked="true">
             </div>
 
             <div id="pnl_path" class="tool-panel">
@@ -207,10 +207,11 @@
                 Hex width: <input type="number" id="setting_hex-width" onchange="setting_resizeHexes()"><br>
                 Hex height: <input type="number" id="setting_hex-height" onchange="setting_resizeHexes()"><br>
                 
-                Grid: <input type="checkbox" id="setting_show-hexgrid" onchange="setting_changeHexgridVisibility()">
+                Grid: <input type="checkbox" id="setting_hexgrid-visible" onchange="setting_changeHexgridVisibility()">
                 Grid Thickness: <input type="number" id="setting_hexgrid-thickness" onchange="setting_changeHexgridThickness()"> <!-- Will want to hide this if grid isnt shown -->
+                Grid Color: <input type="color" id="setting_hexgrid-stroke" onchange="setting_changeHexgridStroke()">
 
-                Blank Hex Color: <input type="color" value="#f2f2f2" onchange="setting_changeBlankHexColor()">
+                Blank Hex Color: <input type="color" id="setting_blank-hex-color" value="#f2f2f2" onchange="setting_changeBlankHexColor()">
 
                 <hr>
                 <b>Tilesets</b><br>

@@ -480,7 +480,7 @@ $(() => {
                 loadedMap = generatedMapData
                 
                 $("#setting_map-title").val(loadedMap.title);
-                alert("saved?");
+                alert("Your made has been saved! :D");
             });
         }
 
@@ -693,6 +693,8 @@ function deleteMap(mapId) {
 function loadSave(saveData, newMap = false) {
     // Delete everything - clean up
 
+    console.log("\nLOADING FILE")
+
     loadedMap = saveData;
 
     primaryHexfield.eraseAll();
@@ -721,10 +723,19 @@ function loadSave(saveData, newMap = false) {
 
     primaryTextLayer.disableInteraction();
 
-    console.log("\nLOADING FILE")
+
+    // All the little bits on top
 
     //console.log(saveData.hexfield);
+    $("#setting_hex-orientation").val( primaryHexfield.orientation )
+    $("#setting_hex-width").val( primaryHexfield.hexWidth );
+    $("#setting_hex-height").val( primaryHexfield.hexHeight );
+    
+    $("#setting_hexgrid-visible").prop("checked", primaryHexfield.gridData.visible);
+    $("#setting_hexgrid-thickness").val(primaryHexfield.gridData.strokeThickness);
+    $("#setting_hexgrid-stroke").val( PIXI.utils.hex2string(primaryHexfield.gridData.stroke) );
 
+    $("#setting_hexgrid-blank-hex-color").val( PIXI.utils.hex2string(primaryHexfield.blankHexColor) );
 
     hideMaps();
 }
@@ -768,6 +779,7 @@ function changeTool(newTool) {
                 
         case "eraser":
             primaryToolData.selectedTool = "eraser";
+            primaryHexfield.enableInteraction();
             break;
     }
 }

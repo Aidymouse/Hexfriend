@@ -20,7 +20,11 @@ function setting_resizeHexes() {
 }
 
 function setting_changeHexgridVisibility() {
-    primaryHexfield.changeOutlineVisibility( $("#setting_show-hexgrid").is(":checked") );
+    primaryHexfield.changeOutlineVisibility( $("#setting_hexgrid-visible").is(":checked") );
+}
+
+function setting_changeHexgridStroke() {
+    primaryHexfield.changeGridStroke( PIXI.utils.string2hex($("#setting_hexgrid-stroke").val()) );
 }
 
 function setting_changeHexgridThickness() {

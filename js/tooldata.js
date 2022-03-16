@@ -67,7 +67,6 @@ class ToolData {
         
         if (terrainTileData.symbol) {
             this.terrain.tex_symbol = primaryLoader.resources[terrainTileData.id].texture;
-            console.log(primaryLoader.resources[terrainTileData.id].texture);
             //this.terrain.symbolTexName = terrainTileData.id;
             this.terrain.symbolColor = terrainTileData.symbol.color;
             //console.log("Okay");
@@ -86,12 +85,6 @@ class ToolData {
 
         this.icon.tex_icon = primaryLoader.resources[iconData.id].texture;
         this.icon.color = iconData.color;
-    }
-
-    toggleIconSnap() {
-        console.log(this.icon.snapToHex);
-        
-        this.icon.snapToHex = $("#cb_iconSnap").is(":checked");
     }
 
 }

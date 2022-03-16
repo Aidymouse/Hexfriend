@@ -1,147 +1,116 @@
-class Icon {
-    constructor(saveData) {
-        
-        if (saveData) {
-            
-            primaryToolData.changeIcon(saveData.iconId);
-            
-        }
-        
-        this.iconId = primaryToolData.icon.iconId;
-        
-        this.spr_icon = new PIXI.Sprite( primaryToolData.icon.tex_icon );
-        this.spr_icon.tint = primaryToolData.icon.color;
-        
-        if (primaryHexfield.hexWidth < primaryHexfield.hexHeight) {
-            this.spr_icon.scale.set((primaryHexfield.hexWidth * 0.8) / primaryToolData.icon.tex_icon.width);
-        } else {
-            this.spr_icon.scale.set((primaryHexfield.hexHeight * 0.8) / primaryToolData.icon.tex_icon.height);
-        }
-        
-        this.spr_icon.anchor.set(0.5);
-        
-        // Set sprites position
-        
-        if (saveData) {
-            this.spr_icon.position.set(saveData.x, saveData.y);
-            
-        } else if (primaryToolData.icon.snapToHex) {
-            let hoveredHex = primaryHexfield.hoveredHex; 
-            this.spr_icon.position.set(hoveredHex.x, hoveredHex.y);
-
-        } else {
-            this.spr_icon.position.set(primaryToolData.worldX, primaryToolData.worldY);
-        
-        }
-
-        this.spr_icon.interactive = true;
-
-        // Event Handlers
-        this.spr_icon.on("pointerdown", () => {
-            if (primaryToolData.selectedTool == "eraser") {
-                primaryIconLayer.deleteIcon(this)
-
-                // Check for hexagon too. Pretty fucking hacky...
-                //primaryHexfield.eraseHex( primaryHexfield.coords_worldToAxial(primaryToolData.worldX, primaryToolData.worldY) )
-            }
-        });
-
-        this.spr_icon.on("pointerover", () => {
-            if (primaryToolData.selectedTool == "eraser" && primaryToolData.mouseDown) {
-                primaryIconLayer.deleteIcon(this)
-            }
-        });
-
-    
-    }
-
-    get icon() {
-        return this.spr_icon;
-    }
-
-
-    getSaveData() {
-        return {
-            iconId: this.iconId,
-            x: this.spr_icon.x,
-            y: this.spr_icon.y
-        }
-    }
-
-}
-
-
 class IconLayer {
     constructor() {
-        this.cont_icons = new PIXI.Container();
 
         this.icons = [];
 
+        this.cont_iconSprites = new PIXI.Container();
+
     }
 
+
+
+    // DATA
     get container() {
-        return this.cont_icons;
+        return this.cont_iconSprites;
+    }
+
+    getSaveData() {
+        return this.icons.map(icon => { return {iconId: icon.spriteId, x: icon.x, y: icon.y} });
+    }
+
+    loadSaveData(iconData) {
+        iconData.forEach(icon => {
+
+        });
     }
 
     eraseAll() {
         this.icons.forEach(icon => {
-            this.deleteIcon(icon);
-        })
+            this.cont_iconSprites.removeChild(icon.sprite);
+        });
+
+        this.icons = [];
     }
 
-    addIcon(saveData) {
 
-        if (saveData || !(primaryToolData.icon.snapToHex && primaryHexfield.hoveredHex == undefined) ) {
-            let newIcon = new Icon(saveData);        
-    
-            this.icons.push(newIcon);
-            this.cont_icons.addChild(newIcon.icon);
+
+    // ICONS
+    addIcon() {
+
+        let iconX, iconY;
+
+        if ( $("#cb_iconSnap").is(":checked") ) {
+            let h = worldToAxial( primaryToolData.worldX, primaryToolData.worldY, primaryHexfield.orientation, primaryHexfield.hexWidth, primaryHexfield.hexHeight );
+        
+            let hexCoords = axialToWorld(h.q, h.r, h.s, primaryHexfield.orientation, primaryHexfield.hexWidth, primaryHexfield.hexHeight);
+
+            iconX = hexCoords.x;
+            iconY = hexCoords.y;
+
+        } else {
+            iconX = primaryToolData.worldX;
+            iconY = primaryToolData.worldY;
+
+        }
+
+
+        let newIcon = { x: iconX, y: iconY, spriteId: primaryToolData.icon.iconId, sprite: new PIXI.Sprite( primaryToolData.icon.tex_icon ) }
+        newIcon.sprite.position.set(iconX, iconY);
+        newIcon.sprite.tint = primaryToolData.icon.color;
+        newIcon.sprite.anchor.set(0.5);
+
+        newIcon.sprite.interactive = true;
+
+        let iconScale; 
+        
+        if (primaryHexfield.hexWidth < primaryHexfield.hexHeight) {
+            iconScale = (primaryHexfield.hexWidth * 0.8) / primaryToolData.icon.tex_icon.width;
+        } else {
+            iconScale = (primaryHexfield.hexHeight * 0.8) / primaryToolData.icon.tex_icon.height;
+        }
+
+        newIcon.sprite.scale.set(iconScale);
+        
+        //newIcon.sprite.hitArea = new PIXI.Polygon(path);
+        
+        newIcon.sprite.on("pointerdown", (e) => { this.pointerdownOnIcon(e, newIcon)} );
+
+        newIcon.sprite.on("pointerover", (e) => { this.pointermoveOnIcon(e, newIcon) });
+          
+
+        this.cont_iconSprites.addChild(newIcon.sprite);
+
+        this.icons.push( newIcon );
+    }
+
+    pointermoveOnIcon(e, icon) {
+        
+        if (primaryToolData.mouseDown) {
+            this.pointerdownOnIcon({data: {button: 0}}, icon);
         }
 
     }
 
-    deleteIcon(icon) {
-        this.cont_icons.removeChild(icon.icon);
-        this.icons.splice(this.icons.indexOf(icon));
-        icon.icon.destroy();
-    }
-    
-    // DATA
-    
-    destroy() {
-        this.cont_icons.destroy();
+    pointerdownOnIcon(e, icon) {
 
-        //this.icons.forEach(i => delete i);
+        if (e.data.button == 0 && primaryToolData.selectedTool == "eraser") {
+            // Erase Icon!
+            //console.log(icon);
+
+            this.deleteIcon(icon);
+        }
+
     }
 
-    getSaveData() {
-        return this.icons.map(icon => icon.getSaveData());
-    }
+    deleteIcon(iconObj) {
 
-    loadSaveData(iconData) {
-        iconData.forEach(iconSave => {
-            this.addIcon(iconSave);
-        });
-    }
+        let iconIndex = this.icons.indexOf(iconObj);
+        
+        this.cont_iconSprites.removeChild(iconObj.sprite);
+        iconObj.sprite.destroy();
+        
+        this.icons.splice(iconIndex, iconIndex);
 
-    // CHANGES
+    } 
 
-    handleResize(newHexWidth, newHexHeight) {
-        // Compare to old width and height
-        let oldWidth = primaryHexfield.hexWidth;
-        let oldHeight = primaryHexfield.hexHeight;
-
-        let widthChange = newHexWidth / oldWidth;
-        let heightChange = newHexHeight / oldHeight;
-
-        this.icons.forEach(icon => {
-            icon.icon.position.set(icon.icon.position.x * widthChange, icon.icon.position.y * heightChange)
-
-            if (primaryHexfield.hexWidth < primaryHexfield.hexHeight) {
-                icon.icon.scale.set((primaryHexfield.hexWidth * 0.8) / icon.icon.texture.width);
-            } else {
-                icon.icon.scale.set((primaryHexfield.hexHeight * 0.8) / icon.icon.texture.height);
-            }
-        })
-    }
 }

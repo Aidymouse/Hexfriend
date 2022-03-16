@@ -278,7 +278,7 @@ class TextLayer {
 
                     case "Delete":
                         if (this.hoveredText == this.selectedText) {
-                            this.changeHoveredText(null);
+                            this.setHoveredText(null);
                         }
                         this.deleteSelectedText();
                         break;
