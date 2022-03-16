@@ -15,7 +15,7 @@ function setting_updateOrientation() {
 function setting_resizeHexes() {
     let newHexWidth = $("#setting_hex-width").val()
     let newHexHeight =  $("#setting_hex-height").val()
-    primaryIconLayer.handleResize(newHexWidth, newHexHeight)
+    //primaryIconLayer.handleResize(newHexWidth, newHexHeight)
     primaryHexfield.setHexSize(newHexWidth, newHexHeight)
 }
 
@@ -30,4 +30,9 @@ function setting_changeHexgridStroke() {
 function setting_changeHexgridThickness() {
     let newGridThickness = $("#setting_hexgrid-thickness").val()
     primaryHexfield.changeOutlineThickness( parseInt(newGridThickness)  )
+}
+
+function setting_changeBlankHexColor() {
+    let newBlankColor = PIXI.utils.string2hex( $("#setting_blank-hex-color").val() );
+    primaryHexfield.changeBlankHexColor(newBlankColor);
 }

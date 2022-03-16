@@ -38,22 +38,6 @@ function generateHexPathWithRadius(radius, orientation, centerX, centerY) {
     return generateHexPath(w, h, orientation, centerX, centerY)
 }
 
-function generateHexTexture(hexPath) {
-    console.log("generating hex texture")
-    let g = new PIXI.Graphics();
-
-    g.beginFill(0xffffff);
-    g.drawPolygon(hexPath);
-    g.endFill();
-
-    let t = primaryRenderer.generateTexture(g);
-    t.baseTexture.scaleMode = PIXI.SCALE_MODES.LINEAR;
-
-    g.destroy();
-
-    return t;
-}
-
  // COORDINATES
 
 function AxialToCube(q, r) {
@@ -97,10 +81,6 @@ function worldToAxial(worldX, worldY, hexOrientation, hexWidth, hexHeight) {
         let r = worldY / (hexHeight*0.75)
         let q = ((2 * worldX) / hexWidth - r) / 2
 
-        console.log(q, r);
-
-        //x = this.q * hexWidth / 2 - this.r * hexWidth / 2,
-        //y = -this.s * hexHeight * 0.75 // Negative correct??
         return cube_round(AxialToCube(q, r));
 
     }

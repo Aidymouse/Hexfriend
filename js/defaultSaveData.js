@@ -38,7 +38,7 @@ for (let q = -hexesOut; q <= hexesOut; q++) {
     for (let r = -hexesOut; r <= hexesOut; r++) {
 
         if (-q - r >= -hexesOut && -q - r <= hexesOut) {
-            let hexId = q.toString() + ":" + r.toString() + ":" + (-q - r).toString();
+            //let hexId = q.toString() + ":" + r.toString() + ":" + (-q - r).toString();
 
             DEFAULTSAVEDATA.hexfield.hexes.push( {q: q, r: r, terrainId: null} );
         }

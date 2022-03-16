@@ -22,12 +22,16 @@
 // Highlight which hex is being hovered
 // Add importing
 // Rotate hex selectors to match hex field
+// Export to really niche, really useless image formats. Might be funny
 
 // TODO // ranked //
+// Tileset Creator
+// Iconset Creator
+// Map is outdated message
 // Font Selection - more fonts
 // Path Styles
 // Add individual erasers for terrain and icons
-// Custom icon width and height
+// Custom icon width and height - custom scale modifier
 // Save As
 // Save button in the settings
 // Exporting to PNG
@@ -35,10 +39,10 @@
 // Trash can icon on map delete button
 // Undoing
 // Fix the memory leak :/ - got some progress - pretty sure this is done now, take a look later though
-// Recalculate icon width and height when changing orientation of hexes.
-// Dynamically load tile and icon sets and text styles (line 103)
-// Fix placing multiple icons on the same tile
-// Fix the fucky gridlessness
+// Recalculate icon width and height when changing orientation of hexes. - dont think im gonna do this one
+// Dynamically load tile and icon sets and text styles
+// Fix placing multiple icons on the same tile - probably unnecessary
+
 
 let primaryPixiApp;
 let primaryRenderer;
@@ -116,8 +120,6 @@ function initialize() {
     $("#app-canvas").empty();
     $("#app-canvas").append(primaryPixiApp.view);
     //console.log(primaryPixiApp.view.id = "mainCanvas")
-
-    primaryRenderer = primaryPixiApp.renderer;
 
     // TODO: dynamically load sets
     loadedTilesets = {
@@ -387,7 +389,7 @@ function initialize() {
     });
 
     primaryLoader.onComplete.add(() => { // TODO
-        console.log("Initializing... Creating New Hex Array");
+        console.log("Initializing... Creating Hexfield");
         primaryHexfield = new Hexfield();
 
         // Create the selectors
@@ -735,7 +737,7 @@ function loadSave(saveData, newMap = false) {
     $("#setting_hexgrid-thickness").val(primaryHexfield.gridData.strokeThickness);
     $("#setting_hexgrid-stroke").val( PIXI.utils.hex2string(primaryHexfield.gridData.stroke) );
 
-    $("#setting_hexgrid-blank-hex-color").val( PIXI.utils.hex2string(primaryHexfield.blankHexColor) );
+    $("#setting_blank-hex-color").val( PIXI.utils.hex2string( primaryHexfield.blankHexColor ) );
 
     hideMaps();
 }

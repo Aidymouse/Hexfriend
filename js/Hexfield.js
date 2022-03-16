@@ -95,6 +95,7 @@ class Hexfield {
 
             let newHex = { q: hex.q, r: hex.r, s: -hex.q - hex.r, bgColor: this.blankHexColor, spr_symbol: new PIXI.Sprite(), paintedTerrainId: hex.terrainId };
             newHex.spr_symbol.anchor.set(0.5);
+            newHex.spr_symbol.visible = false; // Stays false until we draw it for the first time
             this.cont_symbolSprites.addChild(newHex.spr_symbol);
 
 
@@ -116,7 +117,7 @@ class Hexfield {
 
                     s.texture = tex;
                     s.tint = hexTile.symbol.color;
-                    s.visible = true;
+                    //s.visible = true;
 
                 }
 
@@ -126,7 +127,7 @@ class Hexfield {
         });
 
         this.drawOutlines();
-        this.renderAllHexes();
+        this.renderAllHexesSlow();
     }
 
     // INTERACTION CONTROL
@@ -245,6 +246,18 @@ class Hexfield {
         this.drawOutlines();
     }
 
+    changeBlankHexColor(newColor) {
+        this.blankHexColor = newColor;
+        Object.keys(this.hexes).forEach(hexId => {
+            let hex = this.hexes[hexId];
+            console.log(hex);
+            if (hex.paintedTerrainId == null) {
+                hex.bgColor = newColor;
+                this.redrawHex(hexId);
+            }
+        });
+    }
+
 
 
     // DRAW
@@ -262,12 +275,24 @@ class Hexfield {
         });
     }
 
+    renderAllHexesSlow(delay=2) {
+        this.grph_hexes.clear();
+
+        Object.keys(this.hexes).forEach( (hexId, index) => {
+
+            setTimeout(() => { this.redrawHex(hexId); }, index*delay);
+            
+
+        });
+    }
+
     renderAllHexes() {
         this.grph_hexes.clear();
 
         Object.keys(this.hexes).forEach(hexId => {
 
             this.redrawHex(hexId);
+
 
         });
     }
@@ -291,6 +316,7 @@ class Hexfield {
 
             let hexCoords = axialToWorld(hex.q, hex.r, hex.s, this.orientation, this.hexWidth, this.hexHeight);
             hex.spr_symbol.position.set(hexCoords.x, hexCoords.y);
+            hex.spr_symbol.visible = true;
         }
     }
 }
