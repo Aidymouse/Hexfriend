@@ -83,6 +83,12 @@ class IconLayer {
         return this.cont_icons;
     }
 
+    eraseAll() {
+        this.icons.forEach(icon => {
+            this.deleteIcon(icon);
+        })
+    }
+
     addIcon(saveData) {
 
         if (saveData || !(primaryToolData.icon.snapToHex && primaryHexfield.hoveredHex == undefined) ) {

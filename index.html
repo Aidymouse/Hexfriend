@@ -12,6 +12,8 @@
         <script src="js/helpers/cssHelpers.js"></script>
         <script src="js/helpers/pixiHelpers.js"></script>
         <script src="js/helpers/hexHelpers.js"></script>
+
+        <script src="js/defaultSaveData.js"></script>
         
         <script src="js/mapSettings.js"></script>
 
@@ -33,6 +35,8 @@
         <script src="js/selectors/IconSelector.js"></script>
         <script src="js/selectors/TextStyleSelector.js"></script>
 
+        <script src="js/tilesetCreator.js"></script>
+
         <script src="main.js"></script>
 
         <!-- Stylesheets -->
@@ -41,6 +45,7 @@
         <link rel="stylesheet" type="text/css" href="css/maps.css">
         <link rel="stylesheet" type="text/css" href="css/mapSettings.css">
         <link rel="stylesheet" type="text/css" href="css/controls.css">
+        <link rel="stylesheet" type="text/css" href="css/tilesetCreator.css">
         <link rel="stylesheet" type="text/css" href="main.css">
         
         <link rel="icon" type="image/png" href="./assets/img/site/hexfriend.png">
@@ -205,9 +210,69 @@
                 Grid: <input type="checkbox" id="setting_show-hexgrid" onchange="setting_changeHexgridVisibility()">
                 Grid Thickness: <input type="number" id="setting_hexgrid-thickness" onchange="setting_changeHexgridThickness()"> <!-- Will want to hide this if grid isnt shown -->
 
+                Blank Hex Color: <input type="color" value="#f2f2f2" onchange="setting_changeBlankHexColor()">
+
+                <hr>
+                <b>Tilesets</b><br>
+                Currently Loaded: Default<br>
+                Installed but not loaded: —<br>
+
+                <button onclick="openTilesetCreator()">Open Tileset Creator</button>
+
             </div>
         </div>
 
+        <div id="tileset-creator" class="hidden">
+
+            <div id="side-panel">
+                <div id="tileset-settings"></div>
+                <div id="hex-buttons">
+                    <button class="hex-button" id="new-tile" onclick="createNewTile()">+</button>
+                </div>
+            </div>
+
+            <div id="hex-preview">
+                <div id="pixi-hex-preview"></div>
+            
+                <input type="text" id="previewed-hex-name" onchange="updatePreviewedName()">
+            </div>
+
+            <div id="current-hex-controls">
+
+                <div class="hex-property-selector">
+                    <input type="color" id="hex-background" onchange="bgColorUpdated()">
+
+                    <div class="hex-property-label" id="label-bgColor">
+                        Background Color<br>
+                        #000000
+                    </div>
+
+                </div>
+                
+                <input type="file" id="symbol-image">
+
+                <div class="hex-property-selector">
+                    <input type="color" id="symbol-color">
+                
+                    <div class="hex-property-label">
+                        Symbol Color<br>
+                        #000000
+                    </div>
+                
+                </div>
+            </div>
+
+            
+            
+            
+
+            <button id="exit-tilecreator" onclick="hideTilesetCreator()">Exit</button>
+
+        </div>
+
     </body>
+        
+
+
 
 </html>

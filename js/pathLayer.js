@@ -104,7 +104,7 @@ const SELECTEDFILL = 0xffffff;
 const SELECTEDRADIUS = 3;
 
 class PathLayer {
-    constructor(savedata = null) {
+    constructor() {
         this.cont_pathLayer = new PIXI.Container();
         this.cont_paths = new PIXI.Container();
 
@@ -113,23 +113,6 @@ class PathLayer {
         this.grph_selectors = new PIXI.Graphics();
         this.selectedPath = null;
         //this.hoveredPath is a getter
-
-        // Load Paths if any data
-        if (savedata) {
-            // Do something
-            savedata.forEach(p => {
-            
-                let newPath = new Path(-1, -1);
-                newPath.loadPath(p)
-                this.cont_paths.addChild(newPath.grph_path);
-                this.paths.push(newPath);
-
-                newPath.drawSelf();
-            
-            })
-
-            // Load styles
-        }
 
         this.cont_pathLayer.addChild(this.cont_paths);
         this.cont_pathLayer.addChild(this.grph_selectors);
@@ -145,6 +128,28 @@ class PathLayer {
 
         this.grph_selectors.destroy();
         this.cont_pathLayer.destroy();
+    }
+
+    eraseAll() {
+        this.paths.forEach(p => {
+            p.destroy();
+        })
+
+        this.paths = [];
+        this.setSelectedPath(null);
+        this.calibrateSelectorGraphics();
+    }
+
+    loadSaveData(pathData) {
+        pathData.forEach(pathData => {
+            let newPath = new Path(0, 0);
+            newPath.points = [...pathData.points];
+            newPath.style = {...pathData.style};
+            
+            this.paths.push(newPath);
+            this.cont_paths.addChild(newPath.grph_path);
+            newPath.drawSelf();
+        })
     }
 
     getSaveData() {

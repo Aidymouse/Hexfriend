@@ -149,9 +149,17 @@ class TextLayer {
         this.textObjects.forEach(to => to.destroy());
         destroyPixiChildren(this.cont_textContainer);
     }
+    
+    eraseAll() {
+        this.textObjects.forEach(to => to.destroy());
+        this.setHoveredText(null);
+        this.setSelectedText(null);
+        this.calibrateSelectorGraphics();
+        this.textObjects = [];
+    }
 
     // Make a new text object out of saved JSON data
-    loadText(textSaveData) {
+    loadSaveData(textSaveData) {
 
         textSaveData.forEach(textData => {
 

@@ -58,42 +58,14 @@ let textStyleSelectorApp;
 
 let primaryLoader;
 
-let loadedMap;
+let loadedMap = {};
 let loadedMapId = -1;
 
-const DEFAULTHEXCOLOR = 0xf2f2f2; // aka the background color of each hex. We'll need to save this.
-const DEFAULTOUTLINECOLOR = 0x333333; // we'll need to save this too at some stage
 
-const CURRENTSAVEDATAFORMATVERSION = 1; // Used to solve conflicts when loading earlier map versions, if it happens to change
 
-const DEFAULTSAVEDATA = {
-    title: null,
-    version: CURRENTSAVEDATAFORMATVERSION,
-
-    hexfield: {
-        hexWidth: 50,
-        hexHeight: 45,
-        orientation: "flatTop", // or "pointyTop"
-        gridData: {
-            visible: true,
-            stroke: 0x333333,
-            strokeThickness: 2
-        }
-    },
-
-    tilesets: {
-    },
-
-    iconSets: {
-
-    },
-
-    icons: [],
-    text: [],
-    paths: []
-}
 
 // Hardcoded default tilesets - might put these in a different file
+// Tilesets should really be loaded into the database huh...
 const defaultTileset = [
     { display: "Plains", id: "default_plains", bgColor: 0xaaee44, symbol: null },
     { display: "Tree", id: "default_tree", bgColor: 0xaaee44, symbol: { color: 0x44aa44, base64: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAKVSURBVHhe7Z2LUsIwEEXBz9Lv199CV8kMlIKkZXfPJvfMdEBmSkpObl5WOZ5Op4Pg8HZ+FBAkBIaEwJAQGBICQ0JgSAiMzHXI3oKP58ehiE7I+89hIl7RCl71PigiE+JZ0DIta2WVSFRUQrytX77/vbLs9XZgGWlQ76lorJwIIZEfektZdo6NbQgixhBcK3xA+jijdcg16Y1HQm5JlSIh66RJiRAy5Irai6iEVJSSkpLILsuktOPDXhC3ZGwups9kOghPdvSgjlmAUYkSYqmw4/P3pzqENyCt1P8ntNvyTkh1GUZLd8hn8RQygowl7mK8hIwoI4ToWdYouDU4DyGzpMPlcyohMCQEhoTAkBAYHkLCN+RGwishkrIRzy7LpEhMJxFjSBMjOU8QNajbIkrbKU8QIUQiOvAWIhmdRHVZI+IyJnoKUTo2oIRsw23G6Pk79eoJSZmmKyEwPIVoIbgB74RISicRXZZJseMV9/P2Ct7aINIaUsa9vUZvoZcV1HOunbenrHCyhCy5dxFrldMrxHjmnFQRDYqQHrYIKYOmvTAkBIaEwJAQGBICo5qQclPCXpQQGBICo5KQ4bsrQwmBISEwJASGhMCoImSKAd1QQmBICAwJgVFByJ7xo9zYo4TAoAuZZnbVUEJgzCCkVMrIQqbrroxZuqwycqlCPCqwxH9Epd656HVR+DsZiQnxbCH4rosmJKLC0FJIQiIryspCiplllnUPnBSKkMyKQUkhCCFUiF0DQszsXdaSdDHZQhCtcoU0MUrIY8KlSMgttpq/PEIhbJ1kXwBqO4WQkNYSI74ozMpo5bUDBXVz0XZm93w9klX819/TWlT8O/Wh0aAOQ0JgSAgMCYEhITAkBIaEwJAQFIfDN2Shgz9c4BjXAAAAAElFTkSuQmCC" } },
@@ -129,36 +101,29 @@ db.version(2).stores({
 
 //////////////////////////////
 // Initialization Functions //
-function initialize(saveData, usingDefaultData=false) {
+function initialize() {
     PIXI.settings.PRECISION = 'highp';
-    
-    if (saveData == null) {
-        console.log("No save data presented! Aborting.");
-        return;
-    };
-
-    loadedMap = saveData;
 
     ////////////////////
     // Initialize App //
-    console.log("Loading... Making Primary Application");
+    console.log("Initializing... Making Primary Application");
     primaryPixiApp = new PIXI.Application({
         width: $("#app-canvas").width(), height: $("#app-canvas").height(),
-        antialias: false,
+        //antialias: false,
         forceCanvas: false
     });
-    
+
     $("#app-canvas").empty();
     $("#app-canvas").append(primaryPixiApp.view);
     //console.log(primaryPixiApp.view.id = "mainCanvas")
-    
+
     primaryRenderer = primaryPixiApp.renderer;
-    
+
     // TODO: dynamically load sets
     loadedTilesets = {
         "default": defaultTileset
     }
-    
+
     loadedIconSets = {
         "default": defaultIconSet
     }
@@ -168,35 +133,33 @@ function initialize(saveData, usingDefaultData=false) {
     }
 
 
-
     //////////////////////////
     // Initialize Tool Data //
-    console.log("Loading... Initializing Tool Data");
+    console.log("Initializing... Initializing Tool Data");
     primaryToolData = new ToolData(); // Remember that primary tool data will be updated when we make the offset container.
 
     ///////////////////
     // Load Textures //
     primaryLoader = new PIXI.Loader();
-    PIXI.utils.clearTextureCache();
-    
+
     //primaryLoader.reset();
-    
-    console.log("Loading... Loading Tilesets");
+
+    console.log("Initializing... Loading Tilesets");
     // Load terrain symbol data (if any)
     for (const tilesetName in loadedTilesets) {
         const tileset = loadedTilesets[tilesetName];
-        
+
         tileset.forEach(tile => {
             if (tile.symbol != null)
-            primaryLoader.add(tile.id, tile.symbol.base64);
+                primaryLoader.add(tile.id, tile.symbol.base64);
         });
     }
-    
-    console.log("Loading... Loading Iconsets");
+
+    console.log("Initializing... Loading Iconsets");
     // Load Icon Data
     for (const iconSetName in loadedIconSets) {
         const iconSet = loadedIconSets[iconSetName];
-        
+
         iconSet.forEach(icon => {
             primaryLoader.add(icon.id, icon.base64);
         });
@@ -207,69 +170,17 @@ function initialize(saveData, usingDefaultData=false) {
     //////////////////////
     // Set up hex array //
     //primaryHexArray = new HexArray(saveData.hexarray.rows, saveData.hexarray.columns, saveData.hexarray.hexWidth, saveData.hexarray.hexHeight, saveData.hexarray.orientation);
-    
-    
+
+
     // In here, do things that only work after the textures have loaded
-    primaryLoader.onComplete.add(() => { // TODO
-        console.log("Loading... Creating New Hex Array");
-        primaryHexfield = new Hexfield(saveData.hexfield, generate=usingDefaultData);
-        
-        // Create the selectors
-        console.log("Loading... Creating Brush Selector");
-        terrainSelectorApp = new BrushSelector(loadedTilesets["default"]);
-        $("#pnl_terrainButtons").empty();
-        terrainSelectorApp.attachToHTMLById("#pnl_terrainButtons");
-        
-        console.log("Loading... Creating Icon Selector");
-        iconSelectorApp = new IconSelector(loadedIconSets["default"]);
-        $("#pnl_iconButtons").empty();
-        iconSelectorApp.attachToHTMLById("#pnl_iconButtons");
-        
-        console.log("Loading... Creating Text Style Selector");
-        textStyleSelectorApp = new TextStyleSelector(loadedTextStyles["default"]);
-        $("#textstyle-selector").empty();
-        textStyleSelectorApp.attachToHTMLById("#textstyle-selector");
-        
-
-        // ICONS
-        primaryIconLayer = new IconLayer();
-        primaryIconLayer.loadSaveData(saveData.icons);
-        
-        // Set default selections
-        // Do this dynamically at some stage
-        primaryToolData.changeIcon(loadedIconSets["default"][0].id);
-        primaryToolData.changeTerrain(loadedTilesets["default"][0].id);
-        
-        cont_offset.addChild(primaryHexfield.container);
-        cont_offset.addChild(cont_pathContainer);
-        cont_offset.addChild(primaryIconLayer.container);
-        cont_offset.addChild(cont_textContainer);
-
-
-        // Tooldata was re-initialised, but the selected tool was not. Update tool to match HTML
-        let buttonId = $(".selectedTool").attr("id");
-        changeTool(buttonId.replace("btn_", ""));
-
-        console.log("Done loading!");
-
-        //console.log(saveData.hexarray);
-        
-
-
-
-        ////////////////////////////
-        // Load Hexagons (if any) //
-        //primaryHexArray.loadHexData(saveData.hexes);
-    });
     
-    primaryLoader.load();    
-    
+
 
 
     ///////////////////////
     // Set up path layer //
-    console.log("Loading... Creating Path Layer");
-    primaryPathLayer = new PathLayer(saveData.paths); // savedata go here
+    console.log("Initializing... Creating Path Layer");
+    primaryPathLayer = new PathLayer(); // savedata go here
     let cont_pathContainer = primaryPathLayer.container;
 
     // Load Paths
@@ -280,32 +191,28 @@ function initialize(saveData, usingDefaultData=false) {
 
     ///////////////////////
     // Set up text layer //
-    console.log("Loading... Creating Text Layer");
+    console.log("Initializing... Creating Text Layer");
     primaryTextLayer = new TextLayer(primaryPixiApp.view.width, primaryPixiApp.view.height);
     let cont_textContainer = primaryTextLayer.getContainer();
-    
-    // Load Text
-    primaryTextLayer.loadText(saveData.text);
-    
     primaryTextLayer.disableInteraction();
-    
+
+
 
 
     /////////////////////////////
     // Set up offset container //
-    console.log("Loading... Adding everything to the offset container");
+    console.log("Initializing... Adding everything to the offset container");
     cont_offset = new PIXI.Container();
-    
 
-    
+
     // Calculate initial offset
     cont_offset.calculateBounds()
     //let offsetBounds = primaryHexArray.cont_hexagons.getBounds();
-    let offsetBounds = {x: 0, y: 0, width: 0, height: 0}
+    let offsetBounds = { x: 0, y: 0, width: 0, height: 0 }
     //console.log(cont_offset);
 
-    let initialXOffset = primaryPixiApp.view.width/2 - offsetBounds.width/2
-    let initialYOffset = primaryPixiApp.view.height/2 - offsetBounds.height/2
+    let initialXOffset = primaryPixiApp.view.width / 2 - offsetBounds.width / 2
+    let initialYOffset = primaryPixiApp.view.height / 2 - offsetBounds.height / 2
 
     primaryToolData.pan.xOffset = initialXOffset;
     primaryToolData.pan.yOffset = initialYOffset;
@@ -316,17 +223,18 @@ function initialize(saveData, usingDefaultData=false) {
     //console.log(primaryPixiApp.view.width)
 
     primaryPixiApp.stage.addChild(cont_offset);
-    
+
 
 
     ////////
     // Extra Bits
+    /*
     console.log("Loading... All the little bits on top");
-    
-    
+
+
     /////////////////////////////////////////
     // Give relevant data to the HTML page //
-    
+
     // Update map title
     $("#setting_map-title").val(saveData.title);
 
@@ -340,11 +248,11 @@ function initialize(saveData, usingDefaultData=false) {
 
     $("#setting_show-hexgrid").prop("checked", saveData.hexfield.gridData.visible);
     $("#setting_hexgrid-thickness").val(saveData.hexfield.gridData.strokeThickness);
-
+    */
 
     //////////////////
     // Key Handlers //
-    console.log("Loading... Attaching Key Handlers");
+    console.log("Initializing... Attaching Key Handlers");
 
     // Events from the canvas propgate down into the core components
     primaryPixiApp.view.addEventListener("mousedown", e => {
@@ -427,7 +335,7 @@ function initialize(saveData, usingDefaultData=false) {
             cont_offset.y = primaryToolData.pan.yOffset;
         }
 
-        
+
         // EVENTS
         if (primaryToolData.selectedTool == "text") {
             primaryTextLayer.mouseMove();
@@ -451,7 +359,7 @@ function initialize(saveData, usingDefaultData=false) {
         }
 
         primaryToolData.zoom.scale = Math.max(primaryToolData.zoom.scale, 0.2);
-        
+
         let worldXAfterZoom = primaryToolData.worldX;
         let worldYAfterZoom = primaryToolData.worldY;
 
@@ -462,7 +370,7 @@ function initialize(saveData, usingDefaultData=false) {
         //console.log("===")
         //console.log(worldXBeforeZoom, worldYBeforeZoom);
         //console.log(worldXAfterZoom, worldYAfterZoom);
-        
+
         //console.log(dx, dy)
         //console.log("===")
 
@@ -470,22 +378,79 @@ function initialize(saveData, usingDefaultData=false) {
         primaryToolData.pan.yOffset += dy;
 
         // Container scale is set based on data in tool data
-        cont_offset.scale.set( primaryToolData.zoom.scale );
+        cont_offset.scale.set(primaryToolData.zoom.scale);
         cont_offset.x = primaryToolData.pan.xOffset;
         cont_offset.y = primaryToolData.pan.yOffset;
-        
 
-        
+
+
     });
 
+    primaryLoader.onComplete.add(() => { // TODO
+        console.log("Initializing... Creating New Hex Array");
+        primaryHexfield = new Hexfield();
 
+        // Create the selectors
+        console.log("Initializing... Creating Brush Selector");
+        terrainSelectorApp = new BrushSelector(loadedTilesets["default"]);
+        $("#pnl_terrainButtons").empty();
+        terrainSelectorApp.attachToHTMLById("#pnl_terrainButtons");
+
+        console.log("Initializing... Creating Icon Selector");
+        iconSelectorApp = new IconSelector(loadedIconSets["default"]);
+        $("#pnl_iconButtons").empty();
+        iconSelectorApp.attachToHTMLById("#pnl_iconButtons");
+
+        console.log("Initializing... Creating Text Style Selector");
+        textStyleSelectorApp = new TextStyleSelector(loadedTextStyles["default"]);
+        $("#textstyle-selector").empty();
+        textStyleSelectorApp.attachToHTMLById("#textstyle-selector");
+
+
+        // ICONS
+        primaryIconLayer = new IconLayer();
+
+        // Set default selections
+        // Do this dynamically at some stage
+        primaryToolData.changeIcon(loadedIconSets["default"][0].id);
+        primaryToolData.changeTerrain(loadedTilesets["default"][0].id);
+
+        cont_offset.addChild(primaryHexfield.container);
+        cont_offset.addChild(cont_pathContainer);
+        cont_offset.addChild(primaryIconLayer.container);
+        cont_offset.addChild(cont_textContainer);
+
+
+        // Tooldata was re-initialised, but the selected tool was not. Update tool to match HTML
+        let buttonId = $(".selectedTool").attr("id");
+        changeTool(buttonId.replace("btn_", ""));
+
+        console.log("Done initializing!");
+
+        //console.log(saveData.hexarray);
+
+        loadSave(DEFAULTSAVEDATA);
+
+
+        ////////////////////////////
+        // Load Hexagons (if any) //
+        //primaryHexArray.loadHexData(saveData.hexes);
+    });
+
+    primaryLoader.load();
+
+}
+
+
+function loadMap(saveData) {
 
 }
 
 $(() => {
     
     
-    initialize(DEFAULTSAVEDATA, usingDefaultData=true);
+    initialize();
+    
     
     /////////////////
     // Save a File //
@@ -686,7 +651,20 @@ function loadSavedMaps() {
         <div class="buttons-container">
             <button class="delete-button" onclick="deleteMap(` + item.id + `)">D</button>
         </div>
+        `
 
+        
+        if (mapData.version != CURRENTSAVEDATAFORMATVERSION) {
+            mapsMenuContent += `<div class="map-warning-container">
+
+            <div class="warning-box">!</div>
+            <div class="warning-message">This save is on an older version and may not load correctly.</div>
+
+            </div>`
+            
+        }
+
+        mapsMenuContent += `
         </div>
         `
 
@@ -719,45 +697,49 @@ function deleteMap(mapId) {
 
 function loadSave(saveData, newMap = false) {
     // Delete everything - clean up
-    primaryPixiApp.destroy();
 
-    primaryHexfield.destroy();
-    delete primaryHexfield;
-    //primaryHexArray.destroy();
-    //delete primaryHexArray;
+    loadedMap = saveData;
 
-    primaryIconLayer.destroy();
-    delete primaryIconLayer;
+    primaryHexfield.eraseAll();
+
+    primaryIconLayer.eraseAll();
+
+    primaryTextLayer.eraseAll();
+
+    primaryPathLayer.eraseAll();
+
     
-    delete primaryToolData;
+    //terrainSelectorApp.eraseAll();
+    //iconSelectorApp.eraseAll();
+    
+    console.log(saveData);
+    
+    // Erase all loaded tilesets?
+    // I think we can just keep the ones we've got loaded.
+    // Tilesets have to have a name anyway so we'll coordinate with that
 
-    primaryTextLayer.destroy();
-    delete primaryTextLayer;
+    // Need to coordinate selectorapps here too
 
-    primaryPathLayer.destroy();
-    delete primaryPathLayer;
-
-    primaryLoader.destroy();
-    delete primaryLoader;
-
-    terrainSelectorApp.destroy();
-    delete terrainSelectorApp;
-
-    iconSelectorApp.destroy();
-    delete iconSelectorApp;
+    primaryHexfield.loadSaveData(saveData.hexfield);
+    primaryIconLayer.loadSaveData(saveData.icons);
+    primaryTextLayer.loadSaveData(saveData.text);
+    primaryPathLayer.loadSaveData(saveData.paths);
 
     console.log("\nLOADING FILE")
 
     //console.log(saveData.hexfield);
 
-    initialize(saveData, newMap);
 
     hideMaps();
 }
 
 function newMap() {
     loadedMapId = -1;
-    loadSave(DEFAULTSAVEDATA, true)
+    loadedMap = {};
+
+    loadSave(DEFAULTSAVEDATA);
+
+
 }
 
 // Enable each tool, and do any setup we might need

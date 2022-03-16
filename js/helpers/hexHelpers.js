@@ -24,6 +24,19 @@ function generateHexPath(width, height, orientation, centerX, centerY) {
     }
 }
 
+function generateHexPathWithRadius(radius, orientation, centerX, centerY) {
+    let w, h;
+    if (orientation == "pointyTop") {
+        h = radius * 2; 
+        w = Math.cos(Math.PI / 6) * radius * 2;
+        
+    } else {
+        w = radius * 2;
+        h = (radius / Math.tan(Math.PI / 6));
+
+    }
+    return generateHexPath(w, h, orientation, centerX, centerY)
+}
 
 function generateHexTexture(hexPath) {
     console.log("generating hex texture")
@@ -40,6 +53,8 @@ function generateHexTexture(hexPath) {
 
     return t;
 }
+
+ // COORDINATES
 
 function AxialToCube(q, r) {
     return {q: q, r: r, s: -q-r}
@@ -66,15 +81,46 @@ function cube_round(frac) {
 }
 
 
-/**
-* Convert a screen point to a hex coordinate
-*/
-function PointToCoord(x, z) {
-    x = (x - halfHexWidth) / hexWidth;
+function worldToAxial(worldX, worldY, hexOrientation, hexWidth, hexHeight) {
+    if (hexOrientation == "flatTop") {
+        // This is the inversion of the axialToWorld
+        // Of course, substituting -q-r in as S
 
-    let t1 = z / hexRadius, t2 = Math.Floor(x + t1);
-    let r = Math.Floor((Math.Floor(t1 - x) + t2) / 3);
-    let q = Math.Floor((Math.Floor(2 * x + 1) + t2) / 3) - r;
+        let q = worldX / (hexWidth * 0.75)
+        let r = ((2 * worldY) / hexHeight - q) / 2
 
-    return new Coord(q, r);
+        return cube_round(AxialToCube(q, r));
+
+    } else if (hexOrientation == "pointyTop") {
+        // How the fuck am i gonna do this
+        
+        let r = worldY / (hexHeight*0.75)
+        let q = ((2 * worldX) / hexWidth - r) / 2
+
+        console.log(q, r);
+
+        //x = this.q * hexWidth / 2 - this.r * hexWidth / 2,
+        //y = -this.s * hexHeight * 0.75 // Negative correct??
+        return cube_round(AxialToCube(q, r));
+
+    }
+}
+
+function axialToWorld(q, r, s, hexOrientation, hexWidth, hexHeight) {
+    if (hexOrientation == "flatTop") {
+        let hx = q * hexWidth * 0.75
+        let hy = r * hexHeight / 2 - s * hexHeight / 2
+
+        return {
+            x: hx, //+ (hx > 0 ? -0.5 : 0.5) * this.q,
+            y: hy//+ (this.s % 2 == 0 ? this.height/2 : 0)
+
+        }
+    } else if (hexOrientation == "pointyTop") {
+        return {
+            x: q * hexWidth / 2 - s * hexWidth / 2,
+            y: r * hexHeight * 0.75 // Negative correct??
+        }
+
+    }
 }
