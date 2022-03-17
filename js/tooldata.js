@@ -24,6 +24,7 @@ class ToolData {
             tex_symbol: null,
             tileId: "",
             symbolColor: 0x44aa44,
+            usingEditedTile: false,
         }
 
         this.icon = {
@@ -73,7 +74,11 @@ class ToolData {
         } else {
             this.terrain.tex_symbol = null;
             this.terrain.symbolTexName = "";
+            this.terrain.symbolColor = "";
         }
+
+        this.terrain.usingEditedTile = false;
+        this.css_giveTerrainDataToPreivew();
 
     }
 
@@ -85,6 +90,38 @@ class ToolData {
 
         this.icon.tex_icon = primaryLoader.resources[iconData.id].texture;
         this.icon.color = iconData.color;
+    }
+
+
+    // TERRAIN PREVIEW EDITS
+    terrainPreview_changeBgColor() {
+        this.terrain.backgroundColor = PIXI.utils.string2hex( $("#terrain-preview-bgColor").val() );
+        this.terrain.usingEditedTile = true;
+        updateColorWrappers();
+    }
+    
+    terrainPreview_changeSymbolColor() {
+        this.terrain.symbolColor = PIXI.utils.string2hex( $("#terrain-preview-symbolColor").val() );
+        this.terrain.usingEditedTile = true;
+        updateColorWrappers();
+
+    }
+
+    css_giveTerrainDataToPreivew() { 
+        $("#terrain-preview-bgColor").val( PIXI.utils.hex2string( this.terrain.backgroundColor ) );
+
+
+        if (this.terrain.symbolColor == "") {
+            $("#terrain-preview-symbol-container").addClass("hidden");
+            
+        } else {
+            
+            $("#terrain-preview-symbolColor").val( PIXI.utils.hex2string( this.terrain.symbolColor ) );
+            $("#terrain-preview-symbol-container").removeClass("hidden");
+        }
+
+        updateColorWrappers();
+
     }
 
 }

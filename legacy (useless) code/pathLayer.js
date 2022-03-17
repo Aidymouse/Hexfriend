@@ -164,17 +164,15 @@ class PathLayer {
 
 
     css_updateShownControls() {
-        console.log(this.hoveredPath);
 
-        $(".path-sub-controls").addClass("hidden");
         if (this.selectedPath) {
-            $("#controls_path-selected").removeClass("hidden");
+            updateShownControls("path-selected");
         
         } else if (this.hoveredPath) {
-            $("#controls_path-only-hovered").removeClass("hidden");
+            updateShownControls("path-only-hovered");
             
         } else {
-            $("#controls_path-none-selected").removeClass("hidden");
+            updateShownControls("path-none-selected");
         }
     }
 

@@ -16,7 +16,7 @@ function updateToolPanel(panelId) {
 
 function updateShownControls(controlsId) {
     $(".controls-listing").addClass("hidden");
-    $("#" + controlsId).removeClass("hidden");
+    $("#controls_" + controlsId).removeClass("hidden");
 }
 
 function updateSelectedBrush(terrainId){
@@ -43,4 +43,21 @@ function showMaps() {
 
 function hideMaps() {
     $("#maps").addClass("hidden");
+}
+
+
+
+// COLOR WRAPPERS
+
+function updateColorWrappers() {
+
+    $(".circle-color-input-wrapper").each((index, element ) => {
+        let wrapperId = element.id;
+
+        let colorId = wrapperId.slice(2);
+
+        $("#"+wrapperId).css("background-color", $("#" + colorId).val() );
+
+    });
+
 }

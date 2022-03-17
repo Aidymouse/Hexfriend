@@ -24,7 +24,7 @@
         <script src="js/Hexfield.js"></script>
 
         <script src="js/selectors/HexMatrixSelector.js"></script>
-        <script src="js/selectors/BrushSelector.js"></script>
+        <script src="js/selectors/TerrainSelector.js"></script>
         <script src="js/selectors/IconSelector.js"></script>
         <script src="js/selectors/TextStyleSelector.js"></script>
 
@@ -49,31 +49,53 @@
 
     <body>
 
-        <div id="leftBar">
-
-            <div id="tools">
-                <!-- Note, it's important that the id of the button is the same as the changeTool id, but with the suffix 'btn_' -->
-                <button class="toolButton selectedTool" id="btn_terrain" onclick="changeTool('terrain'); updateToolButton('btn_terrain'); updateToolPanel('pnl_terrainButtons'); updateShownControls('controls_terrain')"><img src="./assets/img/tools/Terrain.png"></button>
-                <button class="toolButton" id="btn_icon" onclick="changeTool('icon'); updateToolButton('btn_icon'); updateToolPanel('pnl_icons'); updateShownControls('controls_icon')"><img src="./assets/img/tools/Icon.png"></button>
-                <button class="toolButton" id="btn_path" onclick="changeTool('path'); updateToolButton('btn_path'); updateToolPanel('pnl_path'); updateShownControls('controls_path-none-selected')"><img src="./assets/img/tools/Path.png"></button>
-                <button class="toolButton" id="btn_text" onclick="changeTool('text'); updateToolButton('btn_text'); updateToolPanel('pnl_text'); updateShownControls('controls_text-none-selected')"><img src="./assets/img/tools/Text.png"></button>
-                <button class="toolButton" id="btn_eraser" onclick="changeTool('eraser'); updateToolButton('btn_eraser'); updateToolPanel(null); updateShownControls('controls_eraser')"><img src="./assets/img/tools/Eraser.png"></button>
-                
-            </div>
+        <div id="tools">
+            <!-- Note, it's important that the id of the button is the same as the changeTool id, but with the suffix 'btn_' -->
+            <button class="toolButton selectedTool" id="btn_terrain" onclick="changeTool('terrain'); updateToolButton('btn_terrain'); updateToolPanel('pnl_terrain'); updateShownControls('controls_terrain')"><img src="./assets/img/tools/Terrain.png"></button>
+            <button class="toolButton" id="btn_icon" onclick="changeTool('icon'); updateToolButton('btn_icon'); updateToolPanel('pnl_icons'); updateShownControls('controls_icon')"><img src="./assets/img/tools/Icon.png"></button>
+            <button class="toolButton" id="btn_path" onclick="changeTool('path'); updateToolButton('btn_path'); updateToolPanel('pnl_path'); updateShownControls('controls_path-none-selected')"><img src="./assets/img/tools/Path.png"></button>
+            <button class="toolButton" id="btn_text" onclick="changeTool('text'); updateToolButton('btn_text'); updateToolPanel('pnl_text'); updateShownControls('controls_text-none-selected')"><img src="./assets/img/tools/Text.png"></button>
+            <button class="toolButton" id="btn_eraser" onclick="changeTool('eraser'); updateToolButton('btn_eraser'); updateToolPanel(null); updateShownControls('controls_eraser')"><img src="./assets/img/tools/Eraser.png"></button>
             
-            <div id="settings">
-                <div id="save-options">
-                    <button class="toolButton hidden-save-option" id="btn_export" style="height: 25px">Export</button>
-                    <button class="toolButton" id="btn_save"><img src="./assets/img/tools/Save.png"></button>
-                </div>
-                <button class="toolButton" onclick="loadSavedMaps(); showMaps()"><img src="./assets/img/tools/Maps.png"></button>
-                <button class="toolButton" onclick="showMapSettings()"><img src="./assets/img/tools/Settings.png"></button>    
+        </div>
+        
+        <div id="settings">
+            <div id="save-options">
+                <button class="toolButton hidden-save-option" id="btn_export" style="height: 25px">Export</button>
+                <button class="toolButton" id="btn_save"><img src="./assets/img/tools/Save.png"></button>
             </div>
+            <button class="toolButton" onclick="loadSavedMaps(); showMaps()"><img src="./assets/img/tools/Maps.png"></button>
+            <button class="toolButton" onclick="showMapSettings()"><img src="./assets/img/tools/Settings.png"></button>    
         </div>
 
         <div id="panels">
             <!-- The terrain and Icon panels are replaced in code with selectors -->
-            <div id="pnl_terrainButtons" class="tool-panel shown-panel">
+            <div id="pnl_terrain" class="tool-panel shown-panel">
+                <div id="current-terrain">
+
+                    <img id="current-terrain-preview">
+
+                    <div class="row"> 
+                        <div class="circle-color-input-wrapper" id="w-terrain-preview-bgColor"> 
+                            <input type="color" id="terrain-preview-bgColor" onchange="primaryToolData.terrainPreview_changeBgColor()"> 
+                        </div> 
+                        Background
+                    </div>
+                    
+                    
+
+                    <div id="terrain-preview-symbol-container" class="row hidden">
+                        <div class="circle-color-input-wrapper" id="w-terrain-preview-symbolColor">
+                            <input type="color" id="terrain-preview-symbolColor" onchange="primaryToolData.terrainPreview_changeSymbolColor()">
+                        </div>
+                        Symbol
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <div id="pnl_terrainButtons"></div>
             </div>
             
             <div id="pnl_icons" class="tool-panel">
@@ -149,22 +171,39 @@
 
             <!-- TEXT CONTROLS -->
             <div class="controls-listing hidden" id="controls_text-none-selected">
-                Left Mouse: Place Text<br>
+                Left Mouse: New Text<br>
             </div>
 
-            <div class="controls-listing hidden" id="controls_text-hovered">
+            <div class="controls-listing hidden" id="controls_text-selected-same-hovered">
+                Click and Drag: Move Text<br>
+                Keyboard: Edit Text<br>
+                Delete: Delete Selected Text
+            </div>
+
+            <div class="controls-listing hidden" id="controls_text-selected-and-hovered">
                 Left Mouse: Select Text<br>
+                Click and Drag: Select and Move Text<br>
+                Keyboard: Edit Text<br>
+                Delete: Delete Selected Text
             </div>
 
-
-            <div class="controls-listing hidden" id="controls_text-selected">
+            <div class="controls-listing hidden" id="controls_text-only-selected">
                 Left Mouse: Deselect Text<br>
-                Keyboard: Edit Text
+                Keyboard: Edit Text<br>
+                Delete: Delete Selected Text
             </div>
+
+            <div class="controls-listing hidden" id="controls_text-only-hovered">
+                Left Mouse: Select Text<br>
+                Click and Drag: Move Text
+            </div>
+
+
+            
             
             <!-- ERASER CONTROLS -->
             <div class="controls-listing hidden" id="controls_eraser">
-                Left Mouse: Erase<br>
+                Left Mouse: Erase Icons and Terrain<br>
             </div>
 
             Right Mouse: Pan Canvas<br>
@@ -175,17 +214,25 @@
         <div id="app-canvas">
         </div>
 
+
+        <!-- Windows that aren't shown all the time -->
         <div id="maps" class="hidden">
             
+            <div class="close-clicker" onclick="hideMaps()"></div>
+
             <div id="mapsMenu">
+                <div id="loadedMaps">Loading...</div>
+                
                 <button id="closeButton" onclick="hideMaps()">X</button>
                 <button id="newButton" onclick="newMap()">New Map</button>
-                <div id="loadedMaps">Loading...</div>
+
             </div>
 
         </div>
         
         <div id="map-settings-container" class="hidden">
+
+            <div class="close-clicker" onclick="hideMapSettings()"></div>
 
             <div id="map-settings">
                 <button id="closeButton" onclick="hideMapSettings()">X</button>
@@ -216,6 +263,7 @@
             </div>
         </div>
 
+        <!-- A whole other bloody web app -->
         <div id="tileset-creator" class="hidden">
 
             <div id="side-panel">

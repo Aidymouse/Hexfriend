@@ -218,14 +218,23 @@ class TextLayer {
             // CASE: Text object selected -> clicking on another text object
             //   OR: No text selected -> Clicking on text
             if (this.hoveredText) {
+
+                primaryToolData.text.oldX = primaryToolData.worldX;
+                primaryToolData.text.oldY = primaryToolData.worldY;
+                primaryToolData.text.dragging = true;
+
+                if (this.hoveredText == this.selectedText) {
+                    // Clickin on ourself!
+                    // A return here saves some redundant changes, but also prevents a bug that breaks the text tool if we click on an empty text.
+                    // This is also why we declare the drag data before we switch the text.
+                    return;
+                }
+
                 this.setSelectedText(this.hoveredText);
                 //this.setHoveredText(null);
                 this.calibrateSelectorGraphics();
                 this.detectSelectedTextStyle(this.selectedText.style);
 
-                primaryToolData.text.oldX = primaryToolData.worldX;
-                primaryToolData.text.oldY = primaryToolData.worldY;
-                primaryToolData.text.dragging = true;
             }
 
             // CASE: Text Object Selected -> Clicking on no text
@@ -407,6 +416,45 @@ class TextLayer {
         $("#text-selected-only-controls").addClass("hidden");
     }
 
+    css_updateShownControls() {
+
+        let controlsId = "text-none-selected";
+
+        if (primaryToolData.text.dragging) {
+            controlsId = "text-selected-same-hovered";
+
+        } else if (this.selectedText && this.hoveredText) {
+            if (this.selectedText == this.hoveredText) {
+
+                controlsId = "text-selected-same-hovered";
+            } else {
+
+                controlsId = "text-selected-and-hovered";
+            }
+
+        } else if (this.selectedText) {
+            controlsId = "text-only-selected";
+        
+        } else if (this.hoveredText) {
+            controlsId="text-only-hovered";
+        }
+
+        updateShownControls(controlsId);
+    }
+
+    /*
+    css_updateShownControls() {
+
+        if (this.hoveredText) {
+            updateShownControls("text-only-hovered");
+        } else if (this.selectedText) {
+            updateShownControls("text-selected-not-hovered");
+        } else {
+            updateShownControls("text-none-selected");
+        }
+
+    }*/
+
     // Change the style of selected text. This is called by a function in main, which is called by the html elements when they are edited.
     // It in turn calls a function in the text object which updates the style using whatever pedantic method pixi uses.
     changeSelectedTextStyle(styleName, newStyle) {
@@ -426,6 +474,7 @@ class TextLayer {
     calibrateSelectorGraphics() {
         this.grph_selectorGraphics.clear();
 
+
         if (this.selectedText) {
             this.grph_selectorGraphics.clear();
             this.grph_selectorGraphics.lineStyle(3, 0x444444);
@@ -433,6 +482,7 @@ class TextLayer {
                 this.selectedText.x, this.selectedText.y,
                 this.selectedText.width, this.selectedText.height
             )
+
         }
 
         if (this.hoveredText) {
@@ -442,6 +492,9 @@ class TextLayer {
                 this.hoveredText.width, this.hoveredText.height
             )
         }
+
+
+        this.css_updateShownControls();
 
     }
 

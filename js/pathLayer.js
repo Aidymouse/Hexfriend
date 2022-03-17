@@ -285,7 +285,7 @@ class PathLayer {
                 
                 this.grph_selectors.drawCircle(x, y, SELECTEDRADIUS);
             }
-            updateShownControls("controls_path-selected");
+            updateShownControls("path-selected");
             
         } else if (this.hoveredPath) {
             this.grph_selectors.lineStyle(HOVEREDSTROKETHICKNESS, HOVEREDSTROKE);
@@ -297,9 +297,9 @@ class PathLayer {
 
                 this.grph_selectors.drawCircle(x, y, HOVEREDRADIUS);
             }
-            updateShownControls("controls_path-only-hovered")
+            updateShownControls("path-only-hovered")
         } else {
-            updateShownControls("controls_path-none-selected");
+            updateShownControls("path-none-selected");
         }
         
         

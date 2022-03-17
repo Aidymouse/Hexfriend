@@ -1,5 +1,10 @@
 
 // Planned Feature List //
+
+
+// HEX: 
+// Hexagon eyedropper tool
+
 // TEXT:
 // Selecting Multiple Text
 // Rotate Text
@@ -394,7 +399,7 @@ function initialize() {
 
         // Create the selectors
         console.log("Initializing... Creating Brush Selector");
-        terrainSelectorApp = new BrushSelector(loadedTilesets["default"]);
+        terrainSelectorApp = new TerrainSelector(loadedTilesets["default"]);
         $("#pnl_terrainButtons").empty();
         terrainSelectorApp.attachToHTMLById("#pnl_terrainButtons");
 
@@ -729,6 +734,7 @@ function loadSave(saveData, newMap = false) {
     // All the little bits on top
 
     //console.log(saveData.hexfield);
+    $("#setting_map-title").val(saveData.title);
     $("#setting_hex-orientation").val( primaryHexfield.orientation )
     $("#setting_hex-width").val( primaryHexfield.hexWidth );
     $("#setting_hex-height").val( primaryHexfield.hexHeight );

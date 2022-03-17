@@ -7,26 +7,43 @@
 
     background-color: rgba(20, 20, 20, 0.5);
     backdrop-filter: blur(10px);
-
+    
+    
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
+/* SCROLLBAR */
+
+#maps ::-webkit-scrollbar {
+    width: 10px;
+}
+
+#maps ::-webkit-scrollbar-track {
+    margin: 2px;
+    border-radius: 5px;
+}
+
+#maps ::-webkit-scrollbar-thumb {
+    background-color: black;
+    border-radius: 5px;
+}
+
+
 #mapsMenu {
     width: 50%;
     height: 50%;
-
+    
     background-color: #333333;
     border: solid 1px grey;
-    border-radius: 10px;
-    padding: 10px;
-
+    border-radius: 5px;
+    
     position:relative;
-
-    overflow-y: scroll;
+    
+    overflow-y: hidden;
     overflow-x: hidden;
-
+    
 }
 
 #closeButton {
@@ -69,25 +86,22 @@
 }
 
 #loadedMaps {
-    width: 100%;
-    height: auto;
-    grid-template-rows: 100px;
-    grid-template-columns: 100px;
-    grid-auto-flow: column;
-    grid-auto-rows: 100px;
-    grid-auto-columns: 100px;
-    justify-items: start;
-
-    display: flex;
+    width: auto;
+    height: 100%;
+    display: grid;
+    grid-template-rows: 125px;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-auto-rows: 125px;
     
-    flex-direction: row;
-    flex-wrap: wrap;
+    padding: 10px;
+    box-sizing: border-box;
+    
+    overflow-y: scroll;
 
     gap: 10px;
 }
 
 .map-entry {
-    width: 20%;
     height: 120px;
     border: solid 1px grey;
 }
@@ -205,3 +219,7 @@
 .map-warning-container .warning-message {
     visibility: hidden;
 }
+
+
+
+

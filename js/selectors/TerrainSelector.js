@@ -2,7 +2,7 @@
 
 // Terrain Selector
 
-class BrushSelector extends HexMatrixSelector {
+class TerrainSelector extends HexMatrixSelector {
     constructor (tileset) {
         super();
 

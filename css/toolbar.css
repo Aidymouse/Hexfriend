@@ -1,19 +1,8 @@
-/* CONTAINER */
-#leftBar {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-
-    position: fixed;
-
-    height: 100%;
-    width: 50px;
-
-}
 
 /* TOOLS */
 #tools {
     height: auto;
+    position: fixed;
 }
 
 .toolButton {
@@ -47,6 +36,8 @@
 /* SETTINGS */
 #settings {
     margin-top: auto;
+    position: fixed;
+    bottom: 0px;
 }
 
 #save-options .hidden-save-option {

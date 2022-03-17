@@ -27,6 +27,8 @@ class IconLayer {
             let texture = primaryLoader.resources[icon.iconId].texture;
 
             // A bit hacky, we just make a new icon (with null texture (?)) and change a bunch of stuff to match the save data
+            // But it means we can re-use the adding icon code - only one place to edit!
+            // In theory...
             this.addIcon();
 
             let latestIcon = this.icons[this.icons.length-1];

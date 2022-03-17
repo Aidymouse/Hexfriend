@@ -65,7 +65,13 @@ class Hexfield {
             },
             hexes: Object.keys(this.hexes).map(hexId => {
                 let hex = this.hexes[hexId];
-                return {q: hex.q, r: hex.r, terrainId: hex.paintedTerrainId};
+
+                if (hex.overridden) {
+                    return { q: hex.q, r: hex.r, type: "overridden", overrideBgColor: hex.bgColor, overrideSymbolColor: hex.spr_symbol.tint, terrainId: hex.paintedTerrainId };
+
+                } else {
+                    return {q: hex.q, r: hex.r, type: "normal", terrainId: hex.paintedTerrainId};
+                }
             })
         }
     }
@@ -92,8 +98,9 @@ class Hexfield {
         // Load all the hexagons!
         hexfieldData.hexes.forEach(hex => {
             let hexId = this.coordsToHexId( {q: hex.q, r: hex.r, s: -hex.q-hex.r} );
+            
+            let newHex = { q: hex.q, r: hex.r, s: -hex.q - hex.r, bgColor: this.blankHexColor, spr_symbol: new PIXI.Sprite(), paintedTerrainId: hex.terrainId, overridden: hex.type=="overridden" };
 
-            let newHex = { q: hex.q, r: hex.r, s: -hex.q - hex.r, bgColor: this.blankHexColor, spr_symbol: new PIXI.Sprite(), paintedTerrainId: hex.terrainId };
             newHex.spr_symbol.anchor.set(0.5);
             newHex.spr_symbol.visible = false; // Stays false until we draw it for the first time
             this.cont_symbolSprites.addChild(newHex.spr_symbol);
@@ -102,21 +109,22 @@ class Hexfield {
             // Update hex with correct tile
             let tileId = hex.terrainId;
 
+
             if (tileId) {
 
                 let tilesetName = tileId.split("_")[0];
                 //let tileName = tileId.split("_")[1];
     
                 let hexTile = loadedTilesets[tilesetName].find(tile => tile.id == tileId);
-    
-                newHex.bgColor = hexTile.bgColor;
+
+                newHex.bgColor = hex.type == "overridden" ? hex.overrideBgColor : hexTile.bgColor;
 
                 if (hexTile.symbol) {
                     let s = newHex.spr_symbol;
                     let tex = primaryLoader.resources[hexTile.id].texture;
 
                     s.texture = tex;
-                    s.tint = hexTile.symbol.color;
+                    s.tint = hex.type=="overridden" ? hex.overrideSymbolColor : hexTile.symbol.color;
                     //s.visible = true;
 
                 }
@@ -164,9 +172,13 @@ class Hexfield {
 
     
             // No need to do a tool check, tooldata ensures that if this event fires, we're using the correct tool
-            if (this.hexes[hexId].paintedTerrainId != primaryToolData.terrain.tileId) {
+            if (this.hexes[hexId].paintedTerrainId != primaryToolData.terrain.tileId || primaryToolData.terrain.usingEditedTile) {
+
+                
     
                 let hex = this.hexes[hexId];
+
+                hex.overridden = primaryToolData.terrain.usingEditedTile;
 
                 //console.log(hexId);
     
