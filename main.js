@@ -30,16 +30,16 @@
 // Export to really niche, really useless image formats. Might be funny
 
 // TODO // ranked //
+// Exporting to PNG
 // Tileset Creator
 // Iconset Creator
-// Map is outdated message
+// Map save is outdated -> message
 // Font Selection - more fonts
 // Path Styles
 // Add individual erasers for terrain and icons
 // Custom icon width and height - custom scale modifier
 // Save As
 // Save button in the settings
-// Exporting to PNG
 // Add confirmation to map deletion
 // Trash can icon on map delete button
 // Undoing
@@ -119,6 +119,7 @@ function initialize() {
     primaryPixiApp = new PIXI.Application({
         width: $("#app-canvas").width(), height: $("#app-canvas").height(),
         //antialias: false,
+        backgroundAlpha: 0,
         forceCanvas: false
     });
 
@@ -492,20 +493,6 @@ $(() => {
         }
 
     });
-
-    // Export a file
-    $("#btn_export").on("click", () => {
-        generatedMapData = generateSave();
-
-        if (generatedMapData == null) {
-            // THis can happen if the map doesnt yet have a name and we try to export it
-            console.log("Export cancelled");
-            return
-        }
-
-        download(JSON.stringify(generatedMapData), generatedMapData['title'] + ".hf", "application/json");
-        
-    });
     
 
     // Load a file! //////////////////////////////////////
@@ -550,23 +537,7 @@ $(() => {
 });
 
 // Find credit for this code perhaps
-function download(data, filename, type) {
-    var file = new Blob([data], { type: type });
-    if (window.navigator.msSaveOrOpenBlob) // IE10+
-        window.navigator.msSaveOrOpenBlob(file, filename);
-    else { // Others
-        var a = document.createElement("a"),
-            url = URL.createObjectURL(file);
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(function () {
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-        }, 0);
-    }
-}
+
 
 function generateSave() {
     // Generate Preview

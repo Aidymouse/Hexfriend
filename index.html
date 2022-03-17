@@ -14,6 +14,7 @@
         <script src="js/helpers/hexHelpers.js"></script>
 
         <script src="js/defaultSaveData.js"></script>
+        <script src="js/export.js"></script>
         
         <script src="js/mapSettings.js"></script>
         <script src="js/tooldata.js"></script>
@@ -61,7 +62,11 @@
         
         <div id="settings">
             <div id="save-options">
-                <button class="toolButton hidden-save-option" id="btn_export" style="height: 25px">Export</button>
+
+               
+                <button class="toolButton hidden-save-option" id="btn_export" style="height: 25px" onclick="exportToPng()">Export</button>
+                
+                
                 <button class="toolButton" id="btn_save"><img src="./assets/img/tools/Save.png"></button>
             </div>
             <button class="toolButton" onclick="loadSavedMaps(); showMaps()"><img src="./assets/img/tools/Maps.png"></button>
