@@ -191,7 +191,9 @@ class PathLayer {
             this.calibrateSelectorGraphics();
 
         // CASE: Clicking on hovered path -> select it
-        } else if (this.hoveredPath) {
+        } else if (this.hoveredPath && !primaryToolData.shiftHeld ) {
+
+
             this.setSelectedPath(this.hoveredPath);
             this.calibrateSelectorGraphics();
 
@@ -215,6 +217,10 @@ class PathLayer {
     }
 
     mouseMove(e) {
+        this.calibrateSelectorGraphics();
+    }
+    
+    shiftChange() { // Fires when shift is pressed
         this.calibrateSelectorGraphics();
     }
 
@@ -287,7 +293,7 @@ class PathLayer {
             }
             updateShownControls("path-selected");
             
-        } else if (this.hoveredPath) {
+        } else if (this.hoveredPath && !primaryToolData.shiftHeld ) {
             this.grph_selectors.lineStyle(HOVEREDSTROKETHICKNESS, HOVEREDSTROKE);
             this.grph_selectors.beginFill(HOVEREDFILL);
 

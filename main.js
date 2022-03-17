@@ -528,6 +528,19 @@ $(() => {
             e.preventDefault();
             primaryTextLayer.handleKeyDown(e);
         }
+
+        if (e.key == "Shift") {
+            primaryToolData.shiftHeld = true;
+            primaryPathLayer.shiftChange();
+        }
+    });
+    
+    $(document).bind("keyup", e => {
+        
+        if (e.key == "Shift") {
+            primaryToolData.shiftHeld = false;
+            primaryPathLayer.shiftChange();
+        }
     });
 
     // Just update the tool data.

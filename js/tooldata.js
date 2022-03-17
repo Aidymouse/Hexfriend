@@ -8,6 +8,8 @@ class ToolData {
 
         this.rightMouseDown = false;
 
+        this.shiftHeld = false;
+
         this.pan = {
             oldX: -1, // in screen space
             oldY: -1,  // in screen space
@@ -91,7 +93,6 @@ class ToolData {
         this.icon.tex_icon = primaryLoader.resources[iconData.id].texture;
         this.icon.color = iconData.color;
     }
-
 
     // TERRAIN PREVIEW EDITS
     terrainPreview_changeBgColor() {
