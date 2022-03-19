@@ -1,7 +1,7 @@
 const DEFAULTHEXCOLOR = 0xf2f2f2; // aka the background color of each hex. We'll need to save this.
 const DEFAULTOUTLINECOLOR = 0x333333; // we'll need to save this too at some stage
 
-const CURRENTSAVEDATAFORMATVERSION = 2; // Used to solve conflicts when loading earlier map versions, if it happens to change
+const CURRENTSAVEDATAFORMATVERSION = 3; // Used to solve conflicts when loading earlier map versions, if it happens to change
 
 const DEFAULTSAVEDATA = {
     title: null,

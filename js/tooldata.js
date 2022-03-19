@@ -9,6 +9,7 @@ class ToolData {
         this.rightMouseDown = false;
 
         this.shiftHeld = false;
+        this.controlHeld = false;
 
         this.pan = {
             oldX: -1, // in screen space

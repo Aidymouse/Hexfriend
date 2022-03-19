@@ -6,6 +6,9 @@ class Hexfield {
         
         this.hexes = {}; // indexed list
         
+        this.undoPacket = []; // this is data that gets given to the undo manager
+        this.redoPacket = []; // 
+
         this.grph_outlines = new PIXI.Graphics();
         this.grph_hexes = new PIXI.Graphics();
         
@@ -36,7 +39,7 @@ class Hexfield {
 
         this.cont_main.on('pointerdown', e => { this.pointerdown(e) });
         this.cont_main.on('pointermove', () => { this.pointermove() });
-        
+        this.cont_main.on('pointerup', () => {this.pointerup()});
         
         this.cont_main.addChild(this.grph_hexes);
         this.cont_main.addChild(this.grph_outlines);
@@ -66,12 +69,8 @@ class Hexfield {
             hexes: Object.keys(this.hexes).map(hexId => {
                 let hex = this.hexes[hexId];
 
-                if (hex.overridden) {
-                    return { q: hex.q, r: hex.r, type: "overridden", overrideBgColor: hex.bgColor, overrideSymbolColor: hex.spr_symbol.tint, terrainId: hex.paintedTerrainId };
+                return { q: hex.q, r: hex.r, terrainId: hex.paintedTerrainId, bgColor: hex.bgColor, symbolColor: hex.spr_symbol ? hex.spr_symbol.tint : null };
 
-                } else {
-                    return {q: hex.q, r: hex.r, type: "normal", terrainId: hex.paintedTerrainId};
-                }
             })
         }
     }
@@ -99,7 +98,7 @@ class Hexfield {
         hexfieldData.hexes.forEach(hex => {
             let hexId = this.coordsToHexId( {q: hex.q, r: hex.r, s: -hex.q-hex.r} );
             
-            let newHex = { q: hex.q, r: hex.r, s: -hex.q - hex.r, bgColor: this.blankHexColor, spr_symbol: new PIXI.Sprite(), paintedTerrainId: hex.terrainId, overridden: hex.type=="overridden" };
+            let newHex = { q: hex.q, r: hex.r, s: -hex.q - hex.r, bgColor: this.blankHexColor, spr_symbol: new PIXI.Sprite(), paintedTerrainId: hex.terrainId};
 
             newHex.spr_symbol.anchor.set(0.5);
             newHex.spr_symbol.visible = false; // Stays false until we draw it for the first time
@@ -117,14 +116,14 @@ class Hexfield {
     
                 let hexTile = loadedTilesets[tilesetName].find(tile => tile.id == tileId);
 
-                newHex.bgColor = hex.type == "overridden" ? hex.overrideBgColor : hexTile.bgColor;
+                newHex.bgColor = hex.bgColor;
 
                 if (hexTile.symbol) {
                     let s = newHex.spr_symbol;
                     let tex = primaryLoader.resources[hexTile.id].texture;
 
                     s.texture = tex;
-                    s.tint = hex.type=="overridden" ? hex.overrideSymbolColor : hexTile.symbol.color;
+                    s.tint = hex.symbolColor;
                     //s.visible = true;
 
                 }
@@ -137,6 +136,46 @@ class Hexfield {
         this.drawOutlines();
         this.renderAllHexesSlow();
     }
+
+
+    // UNDO / REDO
+    handleUndo(hexData) {
+        hexData.forEach(hex => {
+            
+            let hexId = this.coordsToHexId({q: hex.q, r: hex.r, s: hex.s});
+            //console.log(hexId);
+
+            console.log(hexId);
+
+
+            this.hexes[hexId].bgColor = hex.bgColor;
+            this.hexes[hexId].spr_symbol.tint = hex.symbolColor;
+            this.hexes[hexId].paintedTerrainId = hex.paintedTerrainId;
+
+            // check terrain id against loaded tilesets
+            if (hex.paintedTerrainId) {
+                let tilesetName = hex.paintedTerrainId.split("_")[0];
+                let hexTile = loadedTilesets[tilesetName].find(t => t.id == hex.paintedTerrainId);
+
+                if (hexTile.symbol) {
+                    this.hexes[hexId].spr_symbol.texture = primaryLoader.resources[hexTile.id].texture;
+                    // change texture
+                } else {
+                    this.hexes[hexId].spr_symbol.visible = false;
+                    this.hexes[hexId].spr_symbol.texture = null;
+                }
+            } else {
+                this.hexes[hexId].spr_symbol.visible = false;
+                this.hexes[hexId].spr_symbol.texture = null;
+            }
+
+            // Fix the symbols!
+
+            this.redrawHex(hexId);
+
+        });
+    }
+
 
     // INTERACTION CONTROL
     disableInteraction() {
@@ -159,6 +198,9 @@ class Hexfield {
 
             let clickedCoords = worldToAxial(primaryToolData.worldX, primaryToolData.worldY, this.orientation, this.hexWidth, this.hexHeight);
             let hexId = this.coordsToHexId(clickedCoords);
+            
+            // Validate that there really is a hex with this idea
+            if (Object.keys(this.hexes).find(i => hexId == i) == null) return; // There is surely a better way to do this
 
             /*
             if (primaryToolData.selectedTool == "eraser") {
@@ -171,33 +213,41 @@ class Hexfield {
             }*/
 
     
+
             // No need to do a tool check, tooldata ensures that if this event fires, we're using the correct tool
-            if (this.hexes[hexId].paintedTerrainId != primaryToolData.terrain.tileId || primaryToolData.terrain.usingEditedTile) {
+            if (this.hexes[hexId].paintedTerrainId != primaryToolData.terrain.tileId || 
+                this.hexes[hexId].bgColor != primaryToolData.terrain.backgroundColor ||
+                this.hexes[hexId].spr_symbol.tint != primaryToolData.terrain.symbolColor
+                ) {
 
+                    
+                    let hex = this.hexes[hexId];
+
+                // Add hex to the undo packet before edits
+                this.undoPacket.push( {q: hex.q, r: hex.r, s: hex.s, bgColor: hex.bgColor, symbolColor: hex.spr_symbol.tint, paintedTerrainId: hex.paintedTerrainId } );
                 
-    
-                let hex = this.hexes[hexId];
-
-                hex.overridden = primaryToolData.terrain.usingEditedTile;
-
                 //console.log(hexId);
     
                 this.hexes[hexId].bgColor = primaryToolData.terrain.backgroundColor;
                 this.hexes[hexId].paintedTerrainId = primaryToolData.terrain.tileId;
+                
+                this.hexes[hexId].spr_symbol.tint = primaryToolData.terrain.symbolColor;
 
                 if (primaryToolData.terrain.tex_symbol) {
-
+                    
                     this.hexes[hexId].spr_symbol.texture = primaryToolData.terrain.tex_symbol;
-                    this.hexes[hexId].spr_symbol.tint = primaryToolData.terrain.symbolColor;
-
                     this.hexes[hexId].spr_symbol.visible = true;
-
+                    
                 } else {
                     this.hexes[hexId].spr_symbol.texture = null;
                     this.hexes[hexId].spr_symbol.visible = false;
-
+                    
                 }
-    
+                
+                
+                
+                this.redoPacket.push( {q: hex.q, r: hex.r, s: hex.s, bgColor: hex.bgColor, symbolColor: hex.spr_symbol.tint, paintedTerrainId: hex.paintedTerrainId } );
+                
                 this.redrawHex(hexId);
             }
 
@@ -207,6 +257,13 @@ class Hexfield {
 
     pointermove() {
         if (primaryToolData.mouseDown) { this.pointerdown( {data: {button: 0}} ); }
+    }
+
+    pointerup() {
+        // Add the undo stack!
+        primaryUndoManager.pushUndoEvent("hexes_painted", this.undoPacket, this.redoPacket);
+        this.undoPacket = [];
+        this.redoPacket = [];
     }
 
     coordsToHexId(axialCoords) {
@@ -229,7 +286,6 @@ class Hexfield {
 
     // CONFIG
     // Called from HTML
-
     setHexSize(newWidth, newHeight) {
         this.hexWidth = newWidth;
         this.hexHeight = newHeight;

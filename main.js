@@ -66,6 +66,7 @@ let iconSelectorApp;
 let textStyleSelectorApp;
 
 let primaryLoader;
+let primaryUndoManager;
 
 let loadedMap = {};
 let loadedMapId = -1;
@@ -216,7 +217,7 @@ function initialize() {
     // Calculate initial offset
     cont_offset.calculateBounds()
     //let offsetBounds = primaryHexArray.cont_hexagons.getBounds();
-    let offsetBounds = { x: 0, y: 0, width: 0, height: 0 }
+    let offsetBounds = { x: 0, y: 0, width: 0, height: 0 };
     //console.log(cont_offset);
 
     let initialXOffset = primaryPixiApp.view.width / 2 - offsetBounds.width / 2
@@ -433,6 +434,8 @@ function initialize() {
         let buttonId = $(".selectedTool").attr("id");
         changeTool(buttonId.replace("btn_", ""));
 
+        primaryUndoManager = new UndoManager();
+
         console.log("Done initializing!");
 
         //console.log(saveData.hexarray);
@@ -533,6 +536,23 @@ $(() => {
             primaryToolData.shiftHeld = true;
             primaryPathLayer.shiftChange();
         }
+
+        if (e.key == "Control") {
+            primaryToolData.controlHeld = true;
+        } 
+
+        // Keyboard shortcuts
+        if (primaryToolData.controlHeld && primaryToolData.shiftHeld) {
+            if (e.key == "Z") {
+                primaryUndoManager.processRedo();
+            }
+
+        } else if (primaryToolData.controlHeld) {
+            if (e.key == "z") {
+                primaryUndoManager.processUndo();
+            }
+
+        }
     });
     
     $(document).bind("keyup", e => {
@@ -540,6 +560,10 @@ $(() => {
         if (e.key == "Shift") {
             primaryToolData.shiftHeld = false;
             primaryPathLayer.shiftChange();
+        }
+
+        if (e.key == "Control") {
+            primaryToolData.controlHeld = false;
         }
     });
 
