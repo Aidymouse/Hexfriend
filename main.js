@@ -690,12 +690,16 @@ function loadSavedMaps() {
 
 function loadMap(mapId) {
 
+    
     console.log(mapId)
-
+    
+    primaryUndoManager.reset();
+    
     db.maps.get(mapId).then(map => {
         loadedMapId = mapId;
         loadSave(JSON.parse(map.mapData));
     });
+    
 }
 
 function deleteMap(mapId) {
