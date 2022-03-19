@@ -15,15 +15,18 @@ class IconLayer {
     }
 
     getSaveData() {
-        return this.icons.map(icon => { return {iconId: icon.spriteId, x: icon.sprite.position.x, y: icon.sprite.position.y} });
+        return this.icons.map(icon => { return {iconId: icon.spriteId, x: icon.sprite.position.x, y: icon.sprite.position.y, color: icon.color} });
     }
 
     loadSaveData(iconData) {
         iconData.forEach(icon => {
 
-            let iconSetId = icon.iconId.split("_")[0];
             console.log( loadedIconsets );
-            let iconColor = loadedIconsets[iconSetId].find(i => i.id == icon.iconId).color;
+
+            //let iconSetId = icon.iconId.split("_")[0];
+            //let iconColor = loadedIconsets[iconSetId].find(i => i.id == icon.iconId).color;
+
+            let iconColor = icon.color;
             let texture = primaryLoader.resources[icon.iconId].texture;
 
             // A bit hacky, we just make a new icon (with null texture (?)) and change a bunch of stuff to match the save data
@@ -69,7 +72,7 @@ class IconLayer {
         }
 
 
-        let newIcon = { spriteId: primaryToolData.icon.iconId, sprite: new PIXI.Sprite( primaryToolData.icon.tex_icon ) }
+        let newIcon = { spriteId: primaryToolData.icon.iconId, sprite: new PIXI.Sprite( primaryToolData.icon.tex_icon ), color: primaryToolData.icon.color }
         newIcon.sprite.position.set(iconX, iconY);
         newIcon.sprite.tint = primaryToolData.icon.color;
         newIcon.sprite.anchor.set(0.5);
@@ -119,12 +122,15 @@ class IconLayer {
 
     deleteIcon(iconObj) {
 
+        
         let iconIndex = this.icons.indexOf(iconObj);
         
         this.cont_iconSprites.removeChild(iconObj.sprite);
         iconObj.sprite.destroy();
         
-        this.icons.splice(iconIndex, iconIndex);
+        this.icons.splice(iconIndex, 1);
+
+        console.log(this.icons);
 
     } 
 

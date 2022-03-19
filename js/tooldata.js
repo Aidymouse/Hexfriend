@@ -36,7 +36,8 @@ class ToolData {
             //textureName: "", // Needed??
 
             eraserEnabled: false,
-            snapToHex: $("#cb_iconSnap").is(":checked")
+            snapToHex: $("#cb_iconSnap").is(":checked"),
+            usingEditedIcon: false,
         }
 
         this.text = {
@@ -92,6 +93,9 @@ class ToolData {
 
         this.icon.tex_icon = primaryLoader.resources[iconData.id].texture;
         this.icon.color = iconData.color;
+        this.icon.usingEditedIcon = false;
+
+        this.css_giveIconDataToPreview();
     }
 
     // TERRAIN PREVIEW EDITS
@@ -125,4 +129,17 @@ class ToolData {
 
     }
 
+
+    // ICON PREVIEW EDITS
+    iconPreview_changeColor() {
+        this.icon.color = PIXI.utils.string2hex( $("#icon-preview-color").val() );
+        this.icon.usingEditedIcon = true;
+
+        updateColorWrappers();
+    }
+    
+    css_giveIconDataToPreview() {
+        $("#icon-preview-color").val( PIXI.utils.hex2string(this.icon.color) );
+        updateColorWrappers();
+    }
 }
