@@ -18,7 +18,7 @@ class UndoManager {
         this.eventPointer = 0;
     }
 
-    pushUndoEvent(event, undo, redo) {
+    pushEvent(event, undo, redo) {
         if (this.eventPointer != this.eventStack.length) {
             
             this.eventStack.splice(this.eventPointer);
@@ -36,14 +36,19 @@ class UndoManager {
             return;
         }
 
-        this.eventPointer = this.eventPointer - 1;
+        this.eventPointer -= 1;
         let event = this.eventStack[this.eventPointer];
         
         switch(event.name) {
             case "hexes_painted":
                 this.undoHexesPainted(event.undoData);
                 break;
+
+            case "icon_placed":
+                this.undoIconPlaced(event.undoData);
+                break;
         }
+
 
     }
 
@@ -53,12 +58,18 @@ class UndoManager {
         }
 
         let event = this.eventStack[this.eventPointer];
+        this.eventPointer += 1;
+
         switch(event.name) {
             case "hexes_painted":
                 this.undoHexesPainted(event.redoData);
                 break;
+
+            case "icon_placed":
+                this.redoIconPlaced(event.redoData);
+                break;
         }
-        this.eventPointer = this.eventPointer + 1;
+        
     }
 
     // HEX METHODS
@@ -66,6 +77,14 @@ class UndoManager {
         primaryHexfield.handleUndo(hexData);
     }
 
+    // ICON METHODS
+    undoIconPlaced(id) {
+        primaryIconLayer.deleteIconViaUndo(id);
+    }
+
+    redoIconPlaced(iconData) {
+        primaryIconLayer.placeViaRedo(iconData);
+    }
 
 
 }

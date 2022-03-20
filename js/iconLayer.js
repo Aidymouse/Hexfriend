@@ -5,6 +5,8 @@ class IconLayer {
 
         this.cont_iconSprites = new PIXI.Container();
 
+        this.permaId = 0; // used for undoing, local to the current session only.
+
     }
 
 
@@ -21,25 +23,42 @@ class IconLayer {
     loadSaveData(iconData) {
         iconData.forEach(icon => {
 
-            console.log( loadedIconsets );
-
             //let iconSetId = icon.iconId.split("_")[0];
             //let iconColor = loadedIconsets[iconSetId].find(i => i.id == icon.iconId).color;
 
-            let iconColor = icon.color;
-            let texture = primaryLoader.resources[icon.iconId].texture;
-
-            // A bit hacky, we just make a new icon (with null texture (?)) and change a bunch of stuff to match the save data
-            // But it means we can re-use the adding icon code - only one place to edit!
-            // In theory...
-            this.addIcon();
-
-            let latestIcon = this.icons[this.icons.length-1];
-            latestIcon.sprite.tint = iconColor;
-            latestIcon.sprite.texture = texture;
-            latestIcon.sprite.position.set(icon.x, icon.y);
+            this.loadIcon(icon);
             
         });
+    }
+
+    loadIcon(iconData) {
+        let iconColor = iconData.color;
+        let texture = primaryLoader.resources[iconData.iconId].texture;
+
+        let newIcon = {spriteId: iconData.iconId, sprite: new PIXI.Sprite(texture), color: iconColor, permaId: iconData.permaId}
+        newIcon.sprite.tint = iconColor;
+        newIcon.sprite.position.set(iconData.x, iconData.y);
+        newIcon.sprite.anchor.set(0.5);
+
+        newIcon.sprite.interactive = true;
+
+        let iconScale;
+
+        if (primaryHexfield.hexWidth < primaryHexfield.hexHeight) {
+            iconScale = (primaryHexfield.hexWidth * 0.8) / primaryToolData.icon.tex_icon.width;
+        } else {
+            iconScale = (primaryHexfield.hexHeight * 0.8) / primaryToolData.icon.tex_icon.height;
+        }
+
+        newIcon.sprite.scale.set(iconScale);
+
+        newIcon.sprite.on("pointerdown", (e) => { this.pointerdownOnIcon(e, newIcon) });
+
+        newIcon.sprite.on("pointerover", (e) => { this.pointermoveOnIcon(e, newIcon) });
+
+        this.cont_iconSprites.addChild(newIcon.sprite);
+
+        this.icons.push(newIcon);
     }
 
     eraseAll() {
@@ -72,7 +91,8 @@ class IconLayer {
         }
 
 
-        let newIcon = { spriteId: primaryToolData.icon.iconId, sprite: new PIXI.Sprite( primaryToolData.icon.tex_icon ), color: primaryToolData.icon.color }
+        let newIcon = { spriteId: primaryToolData.icon.iconId, sprite: new PIXI.Sprite( primaryToolData.icon.tex_icon ), color: primaryToolData.icon.color, permaId: this.permaId }
+        this.permaId += 1;
         newIcon.sprite.position.set(iconX, iconY);
         newIcon.sprite.tint = primaryToolData.icon.color;
         newIcon.sprite.anchor.set(0.5);
@@ -99,6 +119,8 @@ class IconLayer {
         this.cont_iconSprites.addChild(newIcon.sprite);
 
         this.icons.push( newIcon );
+
+        primaryUndoManager.pushEvent("icon_placed", newIcon.permaId, { iconId: newIcon.spriteId, x: newIcon.sprite.position.x, y: newIcon.sprite.position.y, color: newIcon.color, permaId: newIcon.permaId });
     }
 
     pointermoveOnIcon(e, icon) {
@@ -133,5 +155,14 @@ class IconLayer {
         console.log(this.icons);
 
     } 
+
+    deleteIconViaUndo(permaId) {
+        let i = this.icons.find(icon => icon.permaId == permaId);
+        this.deleteIcon(i);
+    }
+
+    placeViaRedo(iconData) {
+        this.loadIcon(iconData);
+    }
 
 }

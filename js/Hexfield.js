@@ -261,7 +261,7 @@ class Hexfield {
 
     pointerup() {
         // Add the undo stack!
-        primaryUndoManager.pushUndoEvent("hexes_painted", this.undoPacket, this.redoPacket);
+        primaryUndoManager.pushEvent("hexes_painted", this.undoPacket, this.redoPacket);
         this.undoPacket = [];
         this.redoPacket = [];
     }
