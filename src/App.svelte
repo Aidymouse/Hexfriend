@@ -497,6 +497,24 @@
   }
 
   
+
+  :global(html) {
+    height: 100%;
+    width: 100%;
+
+  }
+
+  :global(body) {
+      margin: 0;
+      height: 100%;
+      width: 100%;
+  }
+
+  :global(#app) {
+      height: 100%;
+      width: 100%;
+    }
+
   main {
     text-align: center;
     padding: 1em;
