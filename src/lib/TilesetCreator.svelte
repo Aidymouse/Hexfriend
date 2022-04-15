@@ -9,7 +9,7 @@
 
   import {download} from './download2'
 
-  import ColorInputPixi from './ColorInputPixi.svelte'
+  import ColorInputPixi from './components/ColorInputPixi.svelte'
 import { tick } from 'svelte';
 
 

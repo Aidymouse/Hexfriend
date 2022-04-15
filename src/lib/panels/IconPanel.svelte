@@ -1,7 +1,7 @@
 <script lang="ts">
 
     import * as PIXI from 'pixi.js'
-    import ColorInputPixi from '../ColorInputPixi.svelte'
+    import ColorInputPixi from '../components/ColorInputPixi.svelte'
 
 
     export let loadedIconsets

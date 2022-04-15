@@ -2,8 +2,7 @@
 
     import type {Tile} from 'src/types/tilesets'
 
-    import ColorInput from '../ColorInput.svelte'
-    import ColorInputPixi from '../ColorInputPixi.svelte'
+    import ColorInputPixi from '../components/ColorInputPixi.svelte'
     import * as PIXI from 'pixi.js'
     import { getHexPath } from '../hexHelpers';
 
