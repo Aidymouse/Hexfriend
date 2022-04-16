@@ -1,7 +1,7 @@
 <script lang="ts">
 
     import { Sprite } from 'svelte-pixi'
-    import { worldToCube, cubeToWorld } from './hexHelpers';
+    import { worldToCube, cubeToWorld } from '../helpers/hexHelpers';
 
     export let icons = [];
 

@@ -1,5 +1,6 @@
 <script lang="ts">
     import ColorInput from "../ColorInput.svelte";
+import SelectGrid from "../../components/SelectGrid.svelte";
 
 
     export let data_text;
@@ -34,11 +35,7 @@
         <option value={"Times New Roman"}>Times New Roman</option>
     </select>
 
-    <select bind:value={data_text.style.align}>
-        <option value={"left"}>Left</option>
-        <option value={"center"}>Center</option>
-        <option value={"right"}>Right</option>
-    </select>
+    <SelectGrid values={["left", "center", "right"]} bind:value={data_text.style.align} filenamePrefix={"textalign"} />
 
     </div>
 

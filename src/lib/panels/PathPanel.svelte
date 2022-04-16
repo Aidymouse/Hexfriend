@@ -3,15 +3,11 @@
 
     import * as PIXI from 'pixi.js'
 
-    import ColorInput from '../ColorInput.svelte'
+    import ColorInputPixi from '../../components/ColorInputPixi.svelte'
+    import SelectGrid from '../../components/SelectGrid.svelte'
 
     export let comp_pathLayer
     export let data_path
-
-
-    $: {
-        data_path.style.color = PIXI.utils.string2hex(data_path.colorString)
-    }
 
     $: {
         if (data_path.selectedPath) {
@@ -30,23 +26,15 @@
         
         <div id="controls">
         
-            <ColorInput bind:value={data_path.colorString} label={"Color"} />
+            <ColorInputPixi bind:value={data_path.style.color} />
             Thickness <input type="number" bind:value={data_path.style.width}>
             Snap <input type="checkbox" bind:checked={data_path.snap} >
 
             Line Ends
-            <select bind:value={data_path.style.cap}>
-                <option value={"butt"}>Butt</option>
-                <option value={"round"}>Round</option>
-                <option value={"square"}>Square</option>
-            </select>
-
+            <SelectGrid values={["round", "butt", "square"]} bind:value={data_path.style.cap} filenamePrefix={"lineend"}/>
+            
             Corners
-            <select bind:value={data_path.style.join}>
-                <option value={"round"}>Round</option>
-                <option value={"miter"}>Spiky</option>
-                <option value={"bevel"}>Flat</option>
-            </select>
+            <SelectGrid values={["round", "miter", "bevel"]} bind:value={data_path.style.join} filenamePrefix={"linecorner"} />
 
         </div>
 

@@ -2,9 +2,9 @@
 
     import type {Tile} from 'src/types/tilesets'
 
-    import ColorInputPixi from '../components/ColorInputPixi.svelte'
+    import ColorInputPixi from '../../components/ColorInputPixi.svelte'
     import * as PIXI from 'pixi.js'
-    import { getHexPath } from '../hexHelpers';
+    import { getHexPath } from '../../helpers/hexHelpers';
 
     export let loadedTilesets
     export let data_terrain
@@ -14,7 +14,6 @@
     export let L
     
     $: {
-
         tilePreview = generateTilePreview(data_terrain)
     }
     

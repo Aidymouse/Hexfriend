@@ -1,7 +1,7 @@
 import type { TerrainHexField } from '../types/terrain'
 import type { Tile } from '../types/tilesets'
 
-import {genHexId} from './hexHelpers'
+import {genHexId} from '../helpers/hexHelpers'
 
 import { DEFAULTTILESET } from './defaultTileset'
 

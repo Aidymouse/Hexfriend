@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Graphics, Container } from "svelte-pixi"
     import * as PIXI from 'pixi.js'
-    import {cubeToWorld, getHexPath, genHexId, worldToCube} from './hexHelpers'
+    import {cubeToWorld, getHexPath, genHexId, worldToCube} from '../helpers/hexHelpers'
 
     import type {TerrainHex} from '../types/terrain'
     import type { Tile } from "src/types/tilesets"

@@ -3,7 +3,7 @@
     import type { path } from 'src/types/path'
 
     import { Graphics, Container } from 'svelte-pixi'
-    import { worldToCube, cube_round, cubeToWorld } from './hexHelpers';
+    import { worldToCube, cube_round, cubeToWorld } from '../helpers/hexHelpers';
 
     import * as PIXI from 'pixi.js'
 
@@ -14,9 +14,7 @@
 
     export let data_path
 
-    export let paths: path[] = [
-    ]
-    
+    export let paths: path[] = []
     
 
     let hoveredPath: path | null = null;
@@ -47,7 +45,6 @@
     
             } else if (hoveredPath) {
                 data_path.selectedPath = paths[paths.indexOf(hoveredPath)]
-                data_path.colorString = PIXI.utils.hex2string(data_path.selectedPath.style.color) // gotta do it manually, cos 
                 data_path.style = {...data_path.selectedPath.style}
                 hoveredPath = null
     
@@ -191,19 +188,16 @@
 
                 if (data_path.selectedPath == path) {
                     g.lineStyle(SELECTEDSELECTORSTYLE)
-                    //g.beginFill(0xffffff)
                     for (let pI=0; pI < path.points.length; pI += 2) {
                         g.drawCircle(path.points[pI], path.points[pI+1], 4)
                     }
-                    //g.endFill()
                     
                 } else if (hoveredPath == path) {
                     g.lineStyle(HOVEREDSELECTORSTYLE)
-                    //g.beginFill(0xffffff)
                     for (let pI=0; pI < path.points.length; pI += 2) {
                         g.drawCircle(path.points[pI], path.points[pI+1], 3)
                     }
-                    //g.endFill()
+
                 }
 
 

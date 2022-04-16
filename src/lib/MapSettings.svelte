@@ -1,6 +1,8 @@
 <script lang="ts" >
     import type { saveData } from "./defaultSaveData";
 
+    import SelectGrid from "../components/SelectGrid.svelte";
+
     export let loadedSave: saveData;
     export let tfield;
     export let showSettings;
@@ -21,13 +23,11 @@
 
         Show Grid <input type="checkbox" bind:checked={tfield.grid.shown}>
         {#if tfield.grid.shown}<input type="number" bind:value={tfield.grid.thickness} on:change={renderAllHexes}>{/if}
-        <select bind:value={tfield.orientation} on:change={renderAllHexes}>
-            <option value={"flatTop"}>Flat Topped</option>
-            <option value={"pointyTop"}>Pointy Topped</option>
-        </select>
 
-        <input type="number" bind:value={tfield.hexWidth} on:change={renderAllHexes}>
-        <input type="number" bind:value={tfield.hexHeight} on:change={renderAllHexes}>
+        <SelectGrid values={["flatTop", "pointyTop"]} bind:value={tfield.orientation} />
+
+        <input type="number" bind:value={tfield.hexWidth} on:change={() => { renderAllHexes() } }>
+        <input type="number" bind:value={tfield.hexHeight} on:change={() => { renderAllHexes() }}>
 
         <slot></slot>
 

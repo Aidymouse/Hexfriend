@@ -1,0 +1,57 @@
+<script lang="ts">
+
+    import { capitialize } from '../helpers/string'
+
+    export let values: any[] = [];
+    export let value: any;
+
+    export let filenamePrefix: string = "";
+
+</script>
+
+<div id="border-container">
+    <div id="grid">
+        {#each values as v}
+            <div class="option" class:selected={value == v} on:click={ () => { value = v } } title={ capitialize(v) }>
+                <img src={`public/assets/img/selectgrids/${filenamePrefix}${v}.png`} alt={`${v}`}>
+            </div>
+        {/each}
+    </div>
+</div>
+
+
+<style>
+    #border-container {
+        border: solid 1px #555555;
+        background-color: #555555;
+        border-radius: 3px;
+        display: inline-block;
+    }
+
+    #grid {
+        display: flex;
+        gap: 1px;
+    }
+    
+    .option {
+        width: 30px;
+        height: 30px;
+        background-color: #222222;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .option img {
+        width: 90%;
+    }
+
+    .option:hover {
+        background-color: #b4dd7f;
+    }
+
+    .selected {
+        background-color: #8cc63f !important;
+    }
+</style>

@@ -9,7 +9,7 @@
   import { tick } from 'svelte'
   import { db } from './lib/db'
 
-  import { getHexPath, cubeToWorld } from './lib/hexHelpers'
+  import { getHexPath, cubeToWorld } from './helpers/hexHelpers'
 
   // Components
   import TerrainField from './lib/TerrainField.svelte'

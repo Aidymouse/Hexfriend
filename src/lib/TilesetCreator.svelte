@@ -1,16 +1,16 @@
 <script lang="ts">
 
-  import type { hexOrientation } from './hexHelpers';
+  import type { hexOrientation } from '../helpers/hexHelpers';
 
   import * as PIXI from 'pixi.js';
   import { Pixi, Graphics, Sprite } from 'svelte-pixi'
 
-  import { getHexPathRadius } from './hexHelpers'
+  import { getHexPathRadius } from '../helpers/hexHelpers'
 
   import {download} from './download2'
 
-  import ColorInputPixi from './components/ColorInputPixi.svelte'
-import { tick } from 'svelte';
+  import ColorInputPixi from '../components/ColorInputPixi.svelte'
+  import { tick } from 'svelte';
 
 
   let app = new PIXI.Application({
