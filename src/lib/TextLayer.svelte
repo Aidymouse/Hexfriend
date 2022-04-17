@@ -88,6 +88,12 @@
         return tm.height
     }
 
+    let alignMap = {
+        "left": {x: 0, y: 0},
+        "center": {x: 0.5, y: 0},
+        "right": {x: 1, y: 0},
+    }
+
 </script>
 
 {#each texts as t (t.id)}
@@ -101,6 +107,7 @@
         interactive={true}
         on:pointerover={e => hoveredText = t}
         on:pointerout={e => hoveredText = null}
+        anchor={ alignMap[t.style.align] }
     />
 
 {/each}
@@ -109,13 +116,19 @@
     draw={g => {
         g.clear()
         if (data_text.selectedText) {
+            let tW = getTextWidth(data_text.selectedText)
+            let tH = getTextHeight(data_text.selectedText)
+
             g.lineStyle(4, 0x333333)
-            g.drawRect(data_text.selectedText.x-5, data_text.selectedText.y-5, getTextWidth(data_text.selectedText)+10, getTextHeight(data_text.selectedText)+10)
+            g.drawRect(data_text.selectedText.x - (tW * alignMap[data_text.selectedText.style.align].x) - 5, data_text.selectedText.y-5, tW+10, tH+10)
         }
 
         if (hoveredText && hoveredText != data_text.selectedText) {
+            let tW = getTextWidth(hoveredText)
+            let tH = getTextHeight(hoveredText)
+
             g.lineStyle(2, 0x555555)
-            g.drawRect(hoveredText.x-4, hoveredText.y-4, getTextWidth(hoveredText)+8, getTextHeight(hoveredText)+8)
+            g.drawRect(hoveredText.x-(tW * alignMap[hoveredText.style.align].x)-4, hoveredText.y-4, tW+8, tH+8)
         }
     }}
 />

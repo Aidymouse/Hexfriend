@@ -2,13 +2,15 @@
 
     import * as PIXI from 'pixi.js'
     import ColorInputPixi from '../../components/ColorInputPixi.svelte'
-
+    
+    import type { icon_data } from 'src/types/data';
+    import type { icon_set_data } from '../../types/icon'
 
     export let loadedIconsets
     export let L
     export let app
 
-    export let data_icon
+    export let data_icon: icon_data
     
     let selectedData = loadedIconsets['default'][0];
 
@@ -17,7 +19,7 @@
         iconPreview = getIconPreview(data_icon)
     }
 
-    function selectIcon(iconData) {
+    function selectIcon(iconData: icon_set_data) {
         selectedData = iconData
 
         data_icon.texId = iconData.texId
@@ -36,13 +38,19 @@
         return b64
     }
 
+    function selectedIconMatchesData(icon: icon_set_data): boolean {
+        if (data_icon.color != icon.color) return false
+        if (data_icon.texId != icon.texId) return false
+        return true
+    }
+
 </script>
 
 <div class="panel">
     <div id="icon-preview">
     
         <img src={iconPreview} alt={"Icon Preview"}>
-        <ColorInputPixi bind:value={data_icon.color} label={"Color"} />
+        <ColorInputPixi bind:value={data_icon.color} />
         <div>  <input type="checkbox" bind:checked={data_icon.snapToHex}> Snap to Hex </div>
     
     </div>
@@ -50,7 +58,7 @@
     <div id="buttons">
         {#each Object.keys(loadedIconsets) as setName}
             {#each loadedIconsets[setName] as iconData}
-                <button class={iconData == selectedData ? "red": ""} on:click={() => {selectIcon(iconData)}} >{iconData.display}</button>
+                <button class:selected={iconData == selectedData} on:click={() => {selectIcon(iconData)}} >{iconData.display}</button>
             {/each}
         {/each}
     </div>
@@ -64,8 +72,12 @@
     div {
         color: white;
     }
-    .red {
-        border: solid 1px red;
+
+    .selected {
+        outline-style: solid;
+        outline-width: 1px;
+        outline-color: #8cc63f;
+        border-color: #8cc63f;
     }
 
     #icon-preview {

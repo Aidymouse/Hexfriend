@@ -41,6 +41,8 @@
   let previewContainer = new PIXI.Container()
   previewContainer.addChild(previewGraphics).addChild(previewSprite)
 
+  let buttonId = 0;
+
   function generatePreview(button) {
       previewGraphics.clear();
       previewGraphics.beginFill(button.bgColor);
@@ -123,7 +125,8 @@
         display: b.display,
         bgColor: b.bgColor,
         id: tilesetName + "_" + b.display.replace(" ", "-"),
-        symbol: b.symbol ? {...b.symbol, texId: b.display.replace(" ", "-")} : null
+        symbol: b.symbol ? {...b.symbol, texId: b.display.replace(" ", "-")} : null,
+        preview: b.preview
       }
 
     });
@@ -139,6 +142,8 @@
   async function importTileset() {
     let importFile = importFiles[0]
 
+    if (!importFile) return
+
     let r = new FileReader()
     r.readAsText(importFile)
     r.onload = async eb => {
@@ -149,9 +154,14 @@
 
       /* Load textures */
  
-
+      buttonId = 0;
       tileButtons = [...setToImport]
+      tileButtons.forEach(tb => {
+        tb.buttonId = buttonId
+        buttonId++ 
+      })
       await tick();
+      stIndex = 0; // Bug here if the first tile in a tileset has a symbol. The symbol is still there, but isnt rendered for some reason until a non-symbol hex is rendered first.
       //tileButtons = tileButtons;
       console.log(tileButtons)
       
@@ -160,7 +170,16 @@
   }
 
   function newTile() {
-    let newButton = { display: "New Hex", bgColor: DEFAULTBLANKHEXCOLOR, symbol: null, symbolFile: null, preview: null }
+    let newButton = { 
+      buttonId: buttonId, // Only used internally in the tileset editor.
+      display: "New Hex", 
+      bgColor: DEFAULTBLANKHEXCOLOR, 
+      symbol: null, 
+      symbolFile: null, 
+      preview: null
+    }
+
+    buttonId += 1
     newButton.preview = generatePreview(newButton)
     tileButtons = [...tileButtons, newButton ]
     stIndex = tileButtons.length-1
@@ -169,6 +188,12 @@
   function removeSymbol() {
     tileButtons[stIndex].symbol = null
     symbolFileInput.value = null
+    tileButtons = tileButtons
+  }
+
+  function deleteTile() {
+    tileButtons.splice(stIndex, 1)
+    stIndex = -1
     tileButtons = tileButtons
   }
 
@@ -191,7 +216,7 @@
 
     <div id="tile-buttons">
 
-      {#each tileButtons as b}
+      {#each tileButtons as b (b.buttonId)}
         <button class="tile-button {tileButtons.indexOf(b) == stIndex ? 'selected' : ''}" on:click={ () => { changeSelected(tileButtons.indexOf(b)) }}>
           <img src={b.preview} alt={`${b.display} Tile`}>
         </button>
@@ -230,6 +255,7 @@
 
       <input type="text" bind:value={ tileButtons[stIndex].display } on:change={() => {tileButtons = tileButtons}}>
       <button on:click={() => {orientation = orientation == "flatTop" ? "pointyTop" : "flatTop"; tileButtons=tileButtons}}>Change Orientation</button>
+      <button on:click={() => { deleteTile() } }>Delete Hex</button>
 
     </div>
     
@@ -242,22 +268,26 @@
         </div>
         <p>Background</p>
         <p>{PIXI.utils.hex2string(tileButtons[stIndex].bgColor)}</p>
-      </div>
+      </div>      
+      
 
-      <!-- File Upload Button -->
-      
-      
+
       <!-- Symbol Filename -->
       {#if tileButtons[stIndex].symbolFile}
-        Current Symbol: {tileButtons[stIndex].symbolFile.name}
+      Current Symbol: {tileButtons[stIndex].symbolFile.name}
       {:else}
-        <p>Current Symbol: —</p>
+      <p>Current Symbol: —</p>
       {/if}
+      
 
+
+      <!-- File Upload Button -->
       <div id="upload" style="margin-top: 10px">
         <input type="file" bind:files={symbolFiles} on:change={e => { updateFile(); e.target.value="" /*Hacky, but necessary*/ } } >
       </div>
 
+
+      
       <!-- Symbol Input Controls -->
       {#if tileButtons[stIndex].symbol}
         <div class="color" style="margin-top: 10px">

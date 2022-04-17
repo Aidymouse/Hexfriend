@@ -3,7 +3,7 @@
     import * as PIXI from 'pixi.js'
     import {cubeToWorld, getHexPath, genHexId, worldToCube} from '../helpers/hexHelpers'
 
-    import type {TerrainHex} from '../types/terrain'
+    import type { TerrainHex } from '../types/terrain'
     import type { Tile } from "src/types/tilesets"
 
     let terrainGraphics = new PIXI.Graphics()
@@ -62,9 +62,17 @@
         let hex = tfield.hexes[hexId]
         let hexC = cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
 
+        if (hex.blank) {
+            hex.bgColor = tfield.blankHexColor /* Update color here, as it may not be updated. Just have to remember to call render hex when we change the blank hex color */
+            terrainGraphics.beginFill(tfield.blankHexColor)
+            terrainGraphics.drawPolygon( getHexPath(tfield.hexWidth, tfield.hexHeight, tfield.orientation, hexC.x, hexC.y) )
+            terrainGraphics.endFill()
+            return
+        }
+
         terrainGraphics.beginFill(hex.bgColor);
         terrainGraphics.drawPolygon( getHexPath(tfield.hexWidth, tfield.hexHeight, tfield.orientation, hexC.x, hexC.y) )
-        terrainGraphics.endFill();
+        terrainGraphics.endFill()
 
         if (hex.symbol) {
         
@@ -113,7 +121,8 @@
             //if (!hexExists(clickedId)) return;
 
             tfield.hexes[clickedId].bgColor = data_terrain.bgColor;
-            tfield.hexes[clickedId].symbol = data_terrain.symbolData ? {...data_terrain.symbolData} : null;
+            tfield.hexes[clickedId].symbol = data_terrain.symbolData ? {...data_terrain.symbolData} : null
+            tfield.hexes[clickedId].blank = false
 
             renderHex(clickedId)
 
@@ -147,6 +156,7 @@
 
         tfield.hexes[clickedId].bgColor = tfield.blankHexColor
         tfield.hexes[clickedId].symbol = null
+        tfield.hexes[clickedId].blank = true
 
         renderHex(clickedId)
     }

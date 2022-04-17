@@ -2,6 +2,7 @@
     import type { saveData } from "./defaultSaveData";
 
     import SelectGrid from "../components/SelectGrid.svelte";
+    import ColorInputPixi from "../components/ColorInputPixi.svelte";
 
     export let loadedSave: saveData;
     export let tfield;
@@ -24,7 +25,15 @@
         Show Grid <input type="checkbox" bind:checked={tfield.grid.shown}>
         {#if tfield.grid.shown}<input type="number" bind:value={tfield.grid.thickness} on:change={renderAllHexes}>{/if}
 
+
+        Blank Hex Color
+        <div style="width: 30px; height: 30px;">
+            <ColorInputPixi bind:value={tfield.blankHexColor} on:change={ () => {renderAllHexes()} } />
+        </div>
+        <button on:click={ () => {tfield.blankHexColor = 0xf2f2f2} }>Reset to default color</button>
+
         <SelectGrid values={["flatTop", "pointyTop"]} bind:value={tfield.orientation} />
+
 
         <input type="number" bind:value={tfield.hexWidth} on:change={() => { renderAllHexes() } }>
         <input type="number" bind:value={tfield.hexHeight} on:change={() => { renderAllHexes() }}>

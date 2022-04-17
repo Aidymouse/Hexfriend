@@ -1,8 +1,16 @@
 <script lang="ts">
   
+  /* COLORS
+
+    hexfriend green: #8cc63f
+
+  */
+
   import type { Tile } from './types/tilesets'
   import type { TerrainHexField } from './types/terrain'
   import type { saveData } from './lib/defaultSaveData'
+  import type { icon_data } from './types/data';
+  import type { text_data } from './types/text';
 
   import * as PIXI from 'pixi.js'
   import { Pixi, Container, Sprite } from 'svelte-pixi'
@@ -158,7 +166,7 @@
   let selectedTool: string = "terrain";
 
   /* DATA */
-  /* Data is bound to both layer and panel that influences that layer. It contains all the shared state they need */
+  /* Data is bound to both layer and panel of a particluar tool. It contains all the shared state they need, and is bound to both */
   
   let data_terrain = {
     bgColor: null,
@@ -166,7 +174,7 @@
     usingEyedropper: false,
   }
 
-  let data_icon = {
+  let data_icon: icon_data = {
     color: null,
     texId: null,
     pHex: 80,
@@ -182,9 +190,10 @@
   }
 
 
-  let data_text = {
-    style: {fontFamily: "Segoe UI", fill: "#000000", fontSize: 25, miterLimit: 2, strokeThickness: 0, stroke: "#f2f2f2"},
-    selectedText: null
+  let data_text: text_data = {
+    style: {fontFamily: "Segoe UI", fill: "#000000", fontSize: 25, miterLimit: 2, strokeThickness: 0, stroke: "#f2f2f2", align: "left"},
+    selectedText: null,
+    editorRef: null
   }
 
 
@@ -545,15 +554,62 @@
     border-radius: 3px;
     background-color: #333333;
     color: white;
+    padding: 5px;
   }
 
   :global(button:hover) {
     background-color: #555555;
   }
-
+  
   :global(button:active) {
     background-color: #444444;
   }
+
+  /* GLOBAL INPUT STYLE */
+  :global(input) {
+    background-color: #777777;
+    border: 0;
+    border-bottom: solid 2px #222222;
+    color: #f2f2f2;
+  }
+
+  :global(input[type=text]) {
+    padding: 5px;
+  }
+
+  :global(input[type=number]) {
+    padding: 5px;
+  }
+
+  :global(input:focus) {
+    border-color: #8cc63f;
+    outline: none;
+  }
+
+
+  :global(textarea) {
+    outline: none;
+    color: #f2f2f2;
+    background-color: #333333;
+    border-radius: 3px;
+  }
+
+  :global(textarea:focus) {
+    outline-style: solid;
+    outline-width: 1px;
+    outline-color: #8cc63f;
+    border-color: #8cc63f
+  }
+
+  :global(select) {
+    background-color: #777777;
+    color: #f2f2f2;
+    padding: 5px;
+    border-radius: 3px;
+  }
+
+
+
 
   #tool-buttons {
     position: fixed;

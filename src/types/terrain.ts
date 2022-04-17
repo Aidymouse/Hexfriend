@@ -11,6 +11,8 @@ export interface TerrainHex {
     r: number
     s: number
     
+    blank: boolean
+
 }
 
 export interface TerrainHexField {

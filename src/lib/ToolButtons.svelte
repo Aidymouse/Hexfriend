@@ -10,8 +10,6 @@
 
     export let selectedTool: string;
 
-
-
 </script>
 
 <main>

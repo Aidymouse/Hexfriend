@@ -5,13 +5,7 @@ import {genHexId} from '../helpers/hexHelpers'
 
 import { DEFAULTTILESET } from './defaultTileset'
 
-interface icon_set_data {
-    display: string
-    texId: string
-    color: number
-    pHex: number // percent of total hex taken up
-    base64: string
-}
+import type { icon_set_data } from '../types/icon'
 
 interface saveData {
     saveVersion: number
@@ -84,7 +78,7 @@ for (let q = -hexesOut; q <= hexesOut; q++) {
 
         if (-q - r >= -hexesOut && -q - r <= hexesOut) {
 
-            DEFAULTSAVEDATA.TerrainField.hexes[ genHexId(q, r, -q - r) ] = { q: q, r: r, s: -q - r, bgColor: 0xf2f2f2, symbolId: null, symbol: null }
+            DEFAULTSAVEDATA.TerrainField.hexes[ genHexId(q, r, -q - r) ] = { q: q, r: r, s: -q - r, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true }
 
         }
 

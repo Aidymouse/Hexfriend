@@ -1,4 +1,7 @@
 <script lang="ts">
+    import { createEventDispatcher } from 'svelte'
+
+    let dispatch = createEventDispatcher()
     
     export let value: string = "#000000";
 
@@ -7,6 +10,10 @@
     
     export let label = "";
 
+    $: {
+        value = value;
+        dispatch("change", {})
+    }
 
 </script>
 
@@ -14,7 +21,7 @@
 
     <div style="--bg-color: {value}; width: {width}px; height: {height}px;">
 
-        <input type="color" bind:value>
+        <input type="color" bind:value={value}>
 
     </div>
 

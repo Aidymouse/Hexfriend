@@ -5,6 +5,7 @@
     import ColorInputPixi from '../../components/ColorInputPixi.svelte'
     import * as PIXI from 'pixi.js'
     import { getHexPath } from '../../helpers/hexHelpers';
+import { TextStyle } from 'pixi.js';
 
     export let loadedTilesets
     export let data_terrain
@@ -15,6 +16,7 @@
     
     $: {
         tilePreview = generateTilePreview(data_terrain)
+        loadedTilesets = loadedTilesets
     }
     
     // Used for previews
@@ -71,6 +73,20 @@
 
     }
 
+    function styleMatchesData(tile: Tile): boolean {
+        
+        if (data_terrain.bgColor != tile.bgColor) return false
+        if (!tile.symbol && data_terrain.symbolData) return false
+        if (tile.symbol && !data_terrain.symbolData) return false
+
+        if (tile.symbol && data_terrain.symbolData) {
+            if (tile.symbol.color != data_terrain.symbolData.color) return false
+            if (tile.symbol.texId != data_terrain.symbolData.texId) return false
+        }
+
+        return true
+    }
+
 </script>
 
 <div class="panel">
@@ -89,15 +105,15 @@
             </div>
         {/if}
 
-        <button on:click={() => {data_terrain.usingEyedropper = !data_terrain.usingEyedropper}} style={data_terrain.usingEyedropper ? "border-color: red" : ""}> Eyedropper </button>
+        <button id="eyedropper" title={"Hex Eyedropper"} on:click={() => {data_terrain.usingEyedropper = !data_terrain.usingEyedropper}} class:selected={data_terrain.usingEyedropper} > <img src="public/assets/img/tools/eyedropper.png" alt={"Eyedropper"}> </button>
 
     </div>
 
     <div id="buttons">
 
-        {#each Object.keys(loadedTilesets) as tilesetName}
+        {#each Object.keys(loadedTilesets) as tilesetName} 
             {#each loadedTilesets[tilesetName] as tile (tile.id)}
-                <button on:click={ () => changeTile(tile) }>{tile.display}</button>
+                <button title={tile.display} on:click={ () => changeTile(tile) } class:selected={ styleMatchesData(tile) } ><img src={tile.preview} alt={tile.display}  ></button>
             {/each}
         {/each}
 
@@ -107,6 +123,22 @@
 
 <style>
     
+    #eyedropper {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        right: 10px;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+    }
+
+    #eyedropper img {
+        width: 80% !important;
+    }
+
     #terrain-preview {
         display: grid;
         grid-template-columns: 60px 1fr;
@@ -119,6 +151,24 @@
     #buttons {
         background-color: #555555;
         padding: 10px;
+
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+        grid-template-rows: 50px;
+        grid-auto-rows: 50px;
+        gap: 5px;
+    }
+
+    #buttons button {
+        box-sizing: border-box;
+        padding: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #buttons button img {
+        width: 90%;
     }
 
     #preview-image-centerer {
@@ -132,6 +182,12 @@
         width: 60px;
     }
 
+    .selected {
+        outline-style: solid;
+        outline-color: #8cc63f;
+        outline-width: 1px;
+        border-color: #8cc63f;
+    }
     
 
 </style>

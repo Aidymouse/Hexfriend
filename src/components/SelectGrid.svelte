@@ -1,18 +1,25 @@
 <script lang="ts">
 
     import { capitialize } from '../helpers/string'
+    import {createEventDispatcher} from 'svelte'
+    let dispatch = createEventDispatcher()
 
     export let values: any[] = [];
     export let value: any;
 
     export let filenamePrefix: string = "";
 
+    function changeValue(newValue: any) {
+        value = newValue
+        dispatch("change", {})
+    }
+
 </script>
 
 <div id="border-container">
     <div id="grid">
         {#each values as v}
-            <div class="option" class:selected={value == v} on:click={ () => { value = v } } title={ capitialize(v) }>
+            <div class="option" class:selected={value == v} on:click={ () => { changeValue(v) } } title={ capitialize(v) }>
                 <img src={`public/assets/img/selectgrids/${filenamePrefix}${v}.png`} alt={`${v}`}>
             </div>
         {/each}
@@ -41,6 +48,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        transition-duration: 0.1s;
     }
 
     .option img {
@@ -49,9 +57,11 @@
 
     .option:hover {
         background-color: #b4dd7f;
+        transition-duration: 0.1s;
     }
 
     .selected {
         background-color: #8cc63f !important;
+        transition-duration: 0s;
     }
 </style>
