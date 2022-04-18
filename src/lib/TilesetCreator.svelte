@@ -197,6 +197,14 @@
     tileButtons = tileButtons
   }
 
+  function duplicateTile() {
+    let dupeButton = {...tileButtons[stIndex]}
+    dupeButton.buttonId = buttonId
+    buttonId += 1
+    tileButtons = [...tileButtons, dupeButton ]
+    stIndex = tileButtons.length-1
+  }
+
 </script>
 
 <main>
@@ -256,6 +264,7 @@
       <input type="text" bind:value={ tileButtons[stIndex].display } on:change={() => {tileButtons = tileButtons}}>
       <button on:click={() => {orientation = orientation == "flatTop" ? "pointyTop" : "flatTop"; tileButtons=tileButtons}}>Change Orientation</button>
       <button on:click={() => { deleteTile() } }>Delete Hex</button>
+      <button on:click={() => { duplicateTile() }}> Duplicate Hex </button>
 
     </div>
     

@@ -67,6 +67,13 @@
             terrainGraphics.beginFill(tfield.blankHexColor)
             terrainGraphics.drawPolygon( getHexPath(tfield.hexWidth, tfield.hexHeight, tfield.orientation, hexC.x, hexC.y) )
             terrainGraphics.endFill()
+
+            if (terrainSprites[hexId]) { 
+                symbolsContainer.removeChild(terrainSprites[hexId])
+                terrainSprites[hexId].destroy();
+                delete terrainSprites[hexId];
+            }
+            
             return
         }
 

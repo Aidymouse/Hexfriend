@@ -17,6 +17,7 @@
     let iconPreview = "";
     $: {
         iconPreview = getIconPreview(data_icon)
+        loadedIconsets = loadedIconsets
     }
 
     function selectIcon(iconData: icon_set_data) {
@@ -38,7 +39,7 @@
         return b64
     }
 
-    function selectedIconMatchesData(icon: icon_set_data): boolean {
+    function iconMatchesData(icon: icon_set_data): boolean {
         if (data_icon.color != icon.color) return false
         if (data_icon.texId != icon.texId) return false
         return true
@@ -50,7 +51,11 @@
     <div id="icon-preview">
     
         <img src={iconPreview} alt={"Icon Preview"}>
-        <ColorInputPixi bind:value={data_icon.color} />
+        
+        <div style="width: 25px; height: 25px">
+            <ColorInputPixi bind:value={data_icon.color} />
+        </div>
+
         <div>  <input type="checkbox" bind:checked={data_icon.snapToHex}> Snap to Hex </div>
     
     </div>
@@ -58,7 +63,7 @@
     <div id="buttons">
         {#each Object.keys(loadedIconsets) as setName}
             {#each loadedIconsets[setName] as iconData}
-                <button class:selected={iconData == selectedData} on:click={() => {selectIcon(iconData)}} >{iconData.display}</button>
+                <button class:selected={ iconMatchesData(iconData) } on:click={() => {selectIcon(iconData)}} > <img src={iconData.preview} alt={iconData.display}> </button>
             {/each}
         {/each}
     </div>
@@ -69,6 +74,7 @@
         height: 60px;
         grid-row: 1/3;
     }
+
     div {
         color: white;
     }
@@ -92,5 +98,21 @@
     #buttons {
         background-color: #555555;
         padding: 10px;
+        display: grid;
+        grid-template-columns: repeat(5, 50px);
+        grid-template-rows: 50px;
+        grid-auto-rows: 50px;
+
+    }
+
+    #buttons button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    button img {
+        width: 90%;
+        height: auto;
     }
 </style>

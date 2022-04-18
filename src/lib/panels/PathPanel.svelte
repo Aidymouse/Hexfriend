@@ -13,6 +13,8 @@
         if (data_path.selectedPath) {
             data_path.selectedPath.style = {...data_path.style}
         }
+
+        pathButtons = pathButtons
     }
 
     let pathButtons = [
@@ -20,13 +22,25 @@
         {display: "Red", style: {color: 0xff0000, width: 3, cap: "round", join: "bevel"} },
     ]
 
+    function styleMatchesData(pathStyle) {
+        console.log(pathStyle, data_path.style)
+        if (pathStyle.color != data_path.style.color) return false
+        if (pathStyle.width != data_path.style.width) return false
+        if (pathStyle.cap != data_path.style.cap) return false
+        if (pathStyle.join != data_path.style.join) return false
+
+        return true
+    }
+
 </script>
 
 <div class="panel">
         
         <div id="controls">
-        
-            <ColorInputPixi bind:value={data_path.style.color} />
+            <div style="width: 25px; height: 25px">
+                <ColorInputPixi bind:value={data_path.style.color} />
+            </div>
+
             Thickness <input type="number" bind:value={data_path.style.width}>
             Snap <input type="checkbox" bind:checked={data_path.snap} >
 
@@ -50,7 +64,7 @@
             
         <div id="path-styles">
             {#each pathButtons as pb}
-                <button on:click={ () => {data_path.colorString = PIXI.utils.hex2string(pb.style.color); data_path.style = {...pb.style}} } >{pb.display}</button>
+                <button on:click={ () => {data_path.style = {...pb.style}} } class:selected={styleMatchesData(pb.style)} >{pb.display}</button>
             {/each}
         </div>
         <!--
@@ -75,5 +89,11 @@
 
     #path-styles {
         padding: 10px;
+    }
+
+    .selected {
+        border-color: #8cc63f;
+        outline: #8cc63f solid 1px;
+        transition-duration: .2s;
     }
 </style>

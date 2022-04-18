@@ -43,6 +43,7 @@
 
   import ToolButtons from './lib/ToolButtons.svelte'
   import TilesetCreator from './lib/TilesetCreator.svelte'
+  import IconsetCreator from './lib/IconsetCreator.svelte';
   
   import SavedMaps from './lib/SavedMaps.svelte';
   import MapSettings from './lib/MapSettings.svelte';
@@ -484,6 +485,7 @@
       <MapSettings {loadedSave} {tfield} bind:showSettings {save} renderAllHexes={() => {comp_terrainField.renderAllHexes()}}>
         <button on:click={() => { gen() }}> Generate Terrain </button>
         <button on:click={() => {appState = "tilesetCreator"}}>Tileset Builder (WIP, BROKEN FOR REAL)</button>  
+        <button on:click={() => {appState = "iconsetCreator"}}>Iconset Builder</button>  
       </MapSettings>
     {/if}
 
@@ -491,7 +493,11 @@
 
 {:else if appState == "tilesetCreator"}
 
-  <TilesetCreator bind:appState />
+<TilesetCreator bind:appState />
+
+{:else if appState == "iconsetCreator"}
+
+<IconsetCreator bind:appState />
 
 {/if}
 
