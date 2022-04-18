@@ -42,6 +42,19 @@ export function genHexId(q: number, r: number, s: number): string {
     return q.toString() + ":" + r.toString() + ":" + s.toString();
 }
 
+/* NEIGHBOURS */
+export function getNeighbours(q: number, r: number, s: number): string[] {
+
+    return [
+        genHexId(q + 1, r, s - 1),
+        genHexId(q + 1, r - 1, s),
+        genHexId(q, r - 1, s + 1),
+        genHexId(q - 1, r, s + 1),
+        genHexId(q - 1, r + 1, s),
+        genHexId(q, r + 1, s - 1)
+    ];
+    
+}
 
 /* COORDS */
 

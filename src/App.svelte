@@ -6,6 +6,17 @@
 
   */
 
+  /* TODO 
+  
+    - keyboard shortcuts
+    - tooltips
+    - export
+    - more fonts
+    - icon creator
+    - terrain generator
+
+  */
+
   import type { Tile } from './types/tilesets'
   import type { TerrainHexField } from './types/terrain'
   import type { saveData } from './lib/defaultSaveData'
@@ -172,6 +183,7 @@
     bgColor: null,
     symbolData: null,
     usingEyedropper: false,
+    usingPaintbucket: false,
   }
 
   let data_icon: icon_data = {
@@ -459,9 +471,9 @@
     </div>
 
     <div id="setting-buttons">
-      <button on:click={save}> <img src="assets/img/tools/save.png" alt="Save"> </button>
-      <button on:click={() => {showSavedMaps = true}}><img src="assets/img/tools/maps.png" alt="Maps"></button>
-      <button on:click={()=>{showSettings = true}}><img src="assets/img/tools/settings.png" alt="Map Settings"></button>
+      <button on:click={save} title={"Save"} > <img src="assets/img/tools/save.png" alt="Save"> </button>
+      <button on:click={() => {showSavedMaps = true}} title={"Maps"} ><img src="assets/img/tools/maps.png" alt="Maps"></button>
+      <button on:click={()=>{showSettings = true}} title={"Map Settings"} ><img src="assets/img/tools/settings.png" alt="Map Settings"></button>
     </div>
 
     {#if showSavedMaps}
@@ -555,6 +567,7 @@
     background-color: #333333;
     color: white;
     padding: 5px;
+    transition-duration: .2s;
   }
 
   :global(button:hover) {
@@ -570,6 +583,8 @@
     background-color: #777777;
     border: 0;
     border-bottom: solid 2px #222222;
+    transition-duration: .2s;
+    transition-property: border-color;
     color: #f2f2f2;
   }
 
@@ -583,6 +598,8 @@
 
   :global(input:focus) {
     border-color: #8cc63f;
+    transition-duration: .2s;
+    transition-property: border-color;
     outline: none;
   }
 

@@ -15,7 +15,7 @@
 <main>
 
     {#each buttons as b}
-        <button class={ selectedTool == b.toolCode ? "selected" : ""} on:click={e => { selectedTool = b.toolCode } } title={`${b.display} tool`}>
+        <button class={ selectedTool == b.toolCode ? "selected" : ""} on:click={e => { selectedTool = b.toolCode } } title={`${b.display} Tool`}>
             <img src={`/assets/img/tools/${b.toolCode}.png`} alt={`${b.toolCode} Tool`}>
         </button>
     {/each}
@@ -40,9 +40,12 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        transition-duration: .2s;
     }
 
     .selected {
-        background-color: #555555;
+        border-color: #8cc63f;
+        outline: #8cc63f solid 1px;
+        transition-duration: .2s;
     }
 </style>

@@ -52,11 +52,11 @@
     }
 
     .option img {
-        width: 90%;
+        width: 70%;
     }
 
     .option:hover {
-        background-color: #b4dd7f;
+        background-color: #777777;
         transition-duration: 0.1s;
     }
 

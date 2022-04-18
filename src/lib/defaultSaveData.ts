@@ -72,7 +72,7 @@ let DEFAULTSAVEDATA: saveData = {
 
 //console.log(JSON.stringify(DEFAULTSAVEDATA.tilesets['default']))
 
-let hexesOut = 10;
+let hexesOut = 50;
 for (let q = -hexesOut; q <= hexesOut; q++) {
     for (let r = -hexesOut; r <= hexesOut; r++) {
 

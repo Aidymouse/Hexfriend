@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Graphics, Container } from "svelte-pixi"
     import * as PIXI from 'pixi.js'
-    import {cubeToWorld, getHexPath, genHexId, worldToCube} from '../helpers/hexHelpers'
+    import {cubeToWorld, getHexPath, genHexId, worldToCube, getNeighbours} from '../helpers/hexHelpers'
 
     import type { TerrainHex } from '../types/terrain'
     import type { Tile } from "src/types/tilesets"
@@ -129,6 +129,17 @@
         }
     }
 
+    function paintHex(hexId: string) {
+        //data_terrain = data_terrain
+
+        tfield.hexes[hexId].bgColor = data_terrain.bgColor;
+        tfield.hexes[hexId].symbol = data_terrain.symbolData ? {...data_terrain.symbolData} : null
+        tfield.hexes[hexId].blank = false
+
+        renderHex(hexId)
+
+    }
+
     function eyedrop() {
         if (controls.mouseDown[0]) {
             let x = pan.worldX
@@ -161,15 +172,65 @@
         renderHex(clickedId)
     }
 
+    function paintbucket() {
+        let x = pan.worldX
+        let y = pan.worldY
+        let clickedCoords = worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+
+        let clickedId = genHexId( clickedCoords.q, clickedCoords.r, clickedCoords.s ) 
+
+        let baseHex = {...tfield.hexes[clickedId]} // Any neighbours with the same style (same bgColor, symbol and symbolColor) will be changed and their neighbours will be added to the list
+
+        let seenIds = [ genHexId(baseHex.q, baseHex.r, baseHex.s) ] // [id : hex] pairs
+        let changedIds = []
+        let hexStack = [ clickedId ]
+        
+        while (hexStack.length > 0) {
+            let cHex = tfield.hexes[hexStack.pop()]
+
+            // Color current hex
+            paintHex( genHexId(cHex.q, cHex.r, cHex.s) )
+
+            // Add neighbour to hexStack
+            let neighbourIds = getNeighbours(cHex.q, cHex.r, cHex.s)
+            neighbourIds.forEach(nId => {
+                if (seenIds.find(sId => sId == nId)) return
+                if (!tfield.hexes[nId]) return
+
+                let nHex = tfield.hexes[nId]
+                if (nHex.bgColor != baseHex.bgColor) return
+                
+                if ( (nHex.symbol && !baseHex.symbol) || (!nHex.symbol && baseHex.symbol) ) return
+                if (nHex.symbol && baseHex.symbol) {
+                    if (nHex.symbol.texId != baseHex.symbol.texId) return
+                    if (nHex.symbol.color != baseHex.symbol.color) return
+                }
+
+                seenIds.push(nId)
+                hexStack.push(nId)
+
+            })
+
+            changedIds.push( genHexId(cHex.q, cHex.r, cHex.s) )
+
+        }
+        
+
+    }
+
     export function pointerdown() {
         if (data_terrain.usingEyedropper) {
 
             eyedrop()
 
+        } else if (data_terrain.usingPaintbucket) {
+            paintbucket()
+
         } else {
             placeTerrain()
-        }
 
+        }
+        
     }
 
     renderAllHexes()

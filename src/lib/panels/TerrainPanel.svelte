@@ -31,6 +31,7 @@ import { TextStyle } from 'pixi.js';
         data_terrain.bgColor = t.bgColor
         data_terrain.symbolData = t.symbol
         tilePreview = generateTilePreview(data_terrain)
+        data_terrain.usingPaintbucket = false
     }
 
     function findSymbolScale(symbolData) {
@@ -106,6 +107,7 @@ import { TextStyle } from 'pixi.js';
         {/if}
 
         <button id="eyedropper" title={"Hex Eyedropper"} on:click={() => {data_terrain.usingEyedropper = !data_terrain.usingEyedropper}} class:selected={data_terrain.usingEyedropper} > <img src="public/assets/img/tools/eyedropper.png" alt={"Eyedropper"}> </button>
+        <button id="paintbucket" title={"Hex Paintbucket"} on:click={() => {data_terrain.usingPaintbucket = !data_terrain.usingPaintbucket}} class:selected={data_terrain.usingPaintbucket} > <img src="public/assets/img/tools/paintbucket.png" alt={"Paint Bucket"}> </button>
 
     </div>
 
@@ -125,8 +127,8 @@ import { TextStyle } from 'pixi.js';
     
     #eyedropper {
         position: absolute;
-        width: 30px;
-        height: 30px;
+        width: 25px;
+        height: 25px;
         right: 10px;
         margin: 0;
         display: flex;
@@ -136,6 +138,23 @@ import { TextStyle } from 'pixi.js';
     }
 
     #eyedropper img {
+        width: 80% !important;
+    }
+
+    #paintbucket {
+        position: absolute;
+        width: 25px;
+        height: 25px;
+        right: 10px;
+        top: 45px;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+    }
+
+    #paintbucket img {
         width: 80% !important;
     }
 
