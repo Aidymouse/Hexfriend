@@ -120,12 +120,30 @@
 
   function exportTileset() {
 
+    let symbolMap = {} // base64: id pairs
+
     let generatedTileset = tileButtons.map( b => { 
+
+      // Do prevent duplicate texture loads, we check if the symbol has been loaded before, and re-use the texture id if so
+      // Note: this might lead to weirdness based on order of icons, since the texture id is saved based on the *tile* id of the first tile to use that texture
+      // Example: if you have 'tree' and 'ice-tree' which both use an underlying 'tree' texture, the tree texture might be saved as "ice-tree"
+        // This won't actually change anything, just might cause some confusion if you're rooting around in your tileset files :P 
+      let setTexId;
+      if (b.symbol) {
+        setTexId = tilesetName + "_" + b.display.replace(" ", "-")
+        if (symbolMap[b.symbol.base64]) {
+          setTexId = symbolMap[b.symbol.base64]
+        } else {
+          symbolMap[b.symbol.base64] = setTexId
+        }
+      }
+
+      
       return {
         display: b.display,
         bgColor: b.bgColor,
         id: tilesetName + "_" + b.display.replace(" ", "-"),
-        symbol: b.symbol ? {...b.symbol, texId: b.display.replace(" ", "-")} : null,
+        symbol: b.symbol ? {...b.symbol, texId: setTexId} : null,
         preview: b.preview
       }
 

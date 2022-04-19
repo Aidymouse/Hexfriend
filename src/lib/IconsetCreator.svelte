@@ -6,6 +6,7 @@
   import { getHexPathRadius } from '../helpers/hexHelpers'
 
   import {download} from './download2'
+  import { tick } from 'svelte';
 
   
   interface icon_button {
@@ -150,7 +151,7 @@
     });
   }
 
-  function newIcons() {
+  async function newIcons(e) {
     if (!newIconFiles.length) return
 
     let readers = [];
@@ -159,13 +160,13 @@
         readers.push(readFileAsData(newIconFiles[i]));
     }
 
-    Promise.all(readers).then((values) => {
+    Promise.all(readers).then(async (values) => {
         // Values will be an array that contains an item
         // with the text of every selected file
         // ["File1 Content", "File2 Content" ... "FileN Content"]
 
-        values.forEach(v => {
-          let t = PIXI.Texture.from(v)
+        values.forEach(async (v) => {
+          let t = await PIXI.Texture.from(v)
 
           let iconName: string = newIconFiles[values.indexOf(v)].name
           iconName = iconName.substring(0, iconName.search(/\./)) // Remove the file extension (doesnt work if there's a period in the filename lol)
@@ -189,7 +190,9 @@
         })
 
         iconButtons = iconButtons
+        await tick();
 
+        e.target.value = "";
     });
 
   }

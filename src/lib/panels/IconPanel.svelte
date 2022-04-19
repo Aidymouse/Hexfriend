@@ -63,7 +63,7 @@
     <div id="buttons">
         {#each Object.keys(loadedIconsets) as setName}
             {#each loadedIconsets[setName] as iconData}
-                <button class:selected={ iconMatchesData(iconData) } on:click={() => {selectIcon(iconData)}} > <img src={iconData.preview} alt={iconData.display}> </button>
+                <button class:selected={ iconMatchesData(iconData) } on:click={() => {selectIcon(iconData)}} title={iconData.display}> <img src={iconData.preview} alt={iconData.display}> </button>
             {/each}
         {/each}
     </div>
@@ -99,9 +99,10 @@
         background-color: #555555;
         padding: 10px;
         display: grid;
-        grid-template-columns: repeat(5, 50px);
-        grid-template-rows: 50px;
-        grid-auto-rows: 50px;
+        grid-template-columns: repeat(5, 51px);
+        grid-template-rows: 51px;
+        grid-auto-rows: 51px;
+        gap: 5px;
 
     }
 

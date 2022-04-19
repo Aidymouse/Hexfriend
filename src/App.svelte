@@ -12,8 +12,8 @@
     - tooltips
     - export
     - more fonts
-    - icon creator
     - terrain generator
+    - dashed lines
 
   */
 
@@ -557,7 +557,6 @@
   /* PANELS */
   :global(.panel) {
     background-color: #333333;
-    border: solid 1px grey;
     border-radius: 4px;
     width: 300px;
     box-sizing: border-box;
@@ -568,7 +567,7 @@
 
   /* GLOBAL BUTTON STYLING */
   :global(button) {
-    border: solid 1px grey;
+    border: solid 1px #777777;
     border-radius: 3px;
     background-color: #333333;
     color: white;

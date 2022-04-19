@@ -32,7 +32,7 @@
         </div>
         <button on:click={ () => {tfield.blankHexColor = 0xf2f2f2} }>Reset to default color</button>
 
-        <SelectGrid values={["flatTop", "pointyTop"]} bind:value={tfield.orientation} />
+        <SelectGrid values={["flatTop", "pointyTop"]} bind:value={tfield.orientation} on:change={ () => {renderAllHexes()} } />
 
 
         <input type="number" bind:value={tfield.hexWidth} on:change={() => { renderAllHexes() } }>

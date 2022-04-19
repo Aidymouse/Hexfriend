@@ -63,6 +63,7 @@
             {/if}
             
         <div id="path-styles">
+            Path Styles
             {#each pathButtons as pb}
                 <button on:click={ () => {data_path.style = {...pb.style}} } class:selected={styleMatchesData(pb.style)} >{pb.display}</button>
             {/each}
