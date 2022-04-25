@@ -260,7 +260,16 @@ import { onMount } from "svelte";
         
     }
 
-    
+    export function clearTerrainSprites() {
+        Object.keys(terrainSprites).forEach(hexId => {
+
+            symbolsContainer.removeChild(terrainSprites[hexId])
+            terrainSprites[hexId].destroy()
+            delete terrainSprites[hexId]            
+
+        });
+    }
+
     onMount(() => {
         renderAllHexes()
         renderGrid()

@@ -42,7 +42,7 @@
         return "default_Dead-Tree"
     }
 
-    function collapseWaveGen(hexesOut, rules) {
+    function collapseWaveGen(hexes, rules) {
         
         let genHexes = {}
         
@@ -53,17 +53,9 @@
         })
 
         // Populate data structure that will hold generated hexes
-        for (let q = -hexesOut; q <= hexesOut; q++) {
-            for (let r = -hexesOut; r <= hexesOut; r++) {
-
-                if (-q - r >= -hexesOut && -q - r <= hexesOut) {
-
-                    genHexes[genHexId(q, r, -q - r)] = { q: q, r: r, s: -q - r, terrainId: null}
-
-                }
-
-            }
-        }
+        Object.keys(hexes).forEach(hexId => {
+            genHexes[genHexId(hexes[hexId].q, hexes[hexId].r, -hexes[hexId].q - hexes[hexId].r)] = { q: hexes[hexId].q, r: hexes[hexId].r, s: -hexes[hexId].q - hexes[hexId].r, terrainId: null}
+        })
 
         let hexIds = Object.keys(genHexes)
         let firstHex = null
@@ -183,7 +175,7 @@
 
 
     function generate() {
-        let generatedTerrain = collapseWaveGen(10, genFunction)
+        let generatedTerrain = collapseWaveGen(tfield.hexes, genFunction)
 
         //console.log(generatedTerrain)
 
@@ -248,10 +240,11 @@
 
 
     export let loadedTilesets
-    //export let tfield
+    export let tfield
     export let comp_terrainField
     export let showTerrainGenerator
     
+
     let importFiles = []
 
     let selectedId = ""

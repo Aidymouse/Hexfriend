@@ -17,6 +17,12 @@
     icons.forEach(i => iconId = Math.max(iconId, i.id))
     iconId++
 
+    $: {
+        // Idally, this would only trigger on a load. It can trigger on any update for now though...
+        icons.forEach(i => iconId = Math.max(iconId, i.id))
+        iconId++
+    }
+
     function getIconScale() {
         let scale: number;
         if (tfield.hexWidth < tfield.hexHeight) {

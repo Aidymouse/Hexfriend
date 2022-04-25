@@ -18,7 +18,7 @@ export class MapDexie extends Dexie {
     constructor() {
         super("mapsdb")
         this.version(4).stores({ 
-            /* I kinda dont know what im doing. These databases have to line up! 
+            /* I kinda dont know what im doing. These database IDs have to line up! 
             In theory they always should, but I'm sure dexie has a better way of sharing IDs between tables */
             mapSaves: "++id, mapTitle, previewBase64",
             mapStrings: "++id, mapString"

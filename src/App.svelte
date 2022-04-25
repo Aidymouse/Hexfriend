@@ -66,6 +66,9 @@
 
   let appState: "normal" | "tilesetCreator" | "iconsetCreator" = "normal"
 
+  let showSettings = false
+  let showTerrainGenerator = false
+
   function changeState(e) {
     appState = e.detail.newState
   }
@@ -80,9 +83,7 @@
   let comp_pathLayer;
   let comp_textLayer;
 
-
   //offsetContainer.addChild(terrainGraphics);
-
 
   /* APPLICATION */
   let app = new PIXI.Application({
@@ -92,6 +93,7 @@
     resizeTo: window
   });
 
+  let showSavedMaps = false
 
   let loading = true
 
@@ -99,6 +101,7 @@
   let loadedIconsets
   let tfield: TerrainHexField
   
+
   /* PANNING */
   let pan = {
     panning: false,
@@ -206,7 +209,6 @@
     editorRef:null,
   }
 
-
   let data_text: text_data = {
     style: {fontFamily: "Segoe UI", fill: "#000000", fontSize: 25, miterLimit: 2, strokeThickness: 0, stroke: "#f2f2f2", align: "left"},
     selectedText: null,
@@ -266,6 +268,7 @@
 
       loading = false
       await tick()
+      comp_terrainField.clearTerrainSprites();
       comp_terrainField.renderAllHexes();
 
     });
@@ -355,10 +358,8 @@
 
   
 
-  /* HOT ZONE */
-  let showSavedMaps = false
-  let showSettings = false
-  let showTerrainGenerator = false
+  
+  
 
   function gen() {
     
@@ -431,13 +432,6 @@
 
     loadSave(data, id)
     //await loadSave(data, id)
-    
-
-    console.log(loading)
-    if (loading) {
-      // Loading can still be true if nothing new was loaded
-      //loading = false
-    }
 
     data_path.selectedPath = null
     data_text.selectedText = null
@@ -448,6 +442,8 @@
     //comp_terrainField.renderAllHexes() 
   }
   
+  /* HOT ZONE */
+
 </script>
 
 
