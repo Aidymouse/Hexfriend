@@ -8,12 +8,13 @@
 
   /* TODO 
   
+    - fix textures not loading in time to be on the map
     - keyboard shortcuts
     - tooltips
-    - export
     - more fonts
-    - terrain generator
     - dashed lines
+    - hex coordinates on map
+    - export at different sizes
 
   */
 
@@ -30,37 +31,40 @@
 
   import { getHexPath, cubeToWorld } from './helpers/hexHelpers'
 
-  // Components
+  // Layers
   import TerrainField from './lib/TerrainField.svelte'
   import IconLayer from './lib/IconLayer.svelte'
   import PathLayer from './lib/PathLayer.svelte'
   import TextLayer from './lib/TextLayer.svelte'
   
+  // Panels
   import TerrainPanel from './lib/panels/TerrainPanel.svelte'
   import IconPanel from './lib/panels/IconPanel.svelte'
   import PathPanel from './lib/panels/PathPanel.svelte'
   import TextPanel from './lib/panels/TextPanel.svelte'
 
+  // Like, whatever
   import ToolButtons from './lib/ToolButtons.svelte'
   import TilesetCreator from './lib/TilesetCreator.svelte'
   import IconsetCreator from './lib/IconsetCreator.svelte';
-  
+  import TerrainGenerator from './lib/TerrainGenerator.svelte';  
   import SavedMaps from './lib/SavedMaps.svelte';
   import MapSettings from './lib/MapSettings.svelte';
 
-  import { generateTerrain } from './lib/terrainGenerator'
+  // Methods
+  import { collapseWaveGen } from './lib/terrainGenerator'
+  import { download } from './lib/download2';
 
+  // Data
   import DEFAULTSAVEDATA from './lib/defaultSaveData'
   
 
   /* STATE */
-  
-  type HexState = "normal" | "tilesetCreator"
 
   let loadedSave: saveData = DEFAULTSAVEDATA
   let loadedId: number | null = null;
 
-  let appState: HexState = "normal"
+  let appState: "normal" | "tilesetCreator" | "iconsetCreator" = "normal"
 
   function changeState(e) {
     appState = e.detail.newState
@@ -212,17 +216,21 @@
 
   const L: PIXI.Loader = new PIXI.Loader()
 
-  async function loadSave(data: saveData, id: number | null) {
+  // Never cleared, to stop duplicate textures being added
+  let seentextures = []
+  let seenicons = []
+  // Theoretically a memory leak... but bounded by how many unique tiles can be loaded. Shouldn't be a problem?
+
+  function loadSave(data: saveData, id: number | null) {
 
     loadedTilesets = data.tilesets;
     loadedIconsets = data.iconsets;
     tfield = data.TerrainField;
 
     // Load Textures
-    let seentextures = [];
     for (let tilesetName in loadedTilesets) {
       let tileset = loadedTilesets[tilesetName]
-      tileset.forEach(tile => {
+      tileset.forEach(async tile => {
         if (tile.symbol && seentextures.find(id => tile.symbol.texId == id) == undefined && !L.resources[tile.symbol.texId] ) {
           L.add(tile.symbol.texId, tile.symbol.base64)
           seentextures.push(tile.symbol.texId);
@@ -231,7 +239,6 @@
     }
 
     // Load Icons
-    let seenicons = [];
     for (let iconsetName in loadedIconsets) {
       let iconset = loadedIconsets[iconsetName]
       iconset.forEach(icon => {
@@ -243,29 +250,42 @@
       
       })
     }
+
+    L.onComplete.add( async () => {
+
+      loadedSave = data
+      loadedId = id
+
+      let firstTile = loadedTilesets[ Object.keys(loadedTilesets)[0] ][0]
+      data_terrain.bgColor = firstTile.bgColor
+      data_terrain.symbolData = firstTile.symbol ? {...firstTile.symbol} : null
   
-    L.onLoad.add(() => {
+      let firstIcon = loadedIconsets[ Object.keys(loadedIconsets)[0] ][0]
+      data_icon.color = firstIcon.color
+      data_icon.texId = firstIcon.texId
 
       loading = false
+      await tick()
+      comp_terrainField.renderAllHexes();
 
     });
   
     L.load();
     
     /* Set up tools - would be nice to remember tool settings but this works regardless of loaded tileset */
-    let firstTile = loadedTilesets[ Object.keys(loadedTilesets)[0] ][0]
-    data_terrain.bgColor = firstTile.bgColor
-    data_terrain.symbolData = firstTile.symbol ? {...firstTile.symbol} : null
 
-    let firstIcon = loadedIconsets[ Object.keys(loadedIconsets)[0] ][0]
-    data_icon.color = firstIcon.color
-    data_icon.texId = firstIcon.texId
-
-    loadedSave = data
-    loadedId = id
+    //loadedSave = data
+    //loadedId = id
   }
  
   loadSave(DEFAULTSAVEDATA, null);
+
+
+
+
+  function exportMap() {
+    download( app.renderer.plugins.extract.base64(offsetContainer), "export.png", "image/png" )
+  }
 
   /* TOOL METHODS */
 
@@ -338,11 +358,22 @@
   /* HOT ZONE */
   let showSavedMaps = false
   let showSettings = false
+  let showTerrainGenerator = false
 
   function gen() {
-    generateTerrain(tfield, loadedTilesets['default'])
+    
+    showSettings = false
 
-    comp_terrainField.renderAllHexes();
+    let generated = collapseWaveGen(10)
+    //console.log(generated)
+    let c = 0;
+    Object.keys(generated).forEach(hexId => {
+        let tileToPaint = loadedTilesets['default'].find(tile => tile.id == generated[hexId].id)
+        setTimeout(() => { comp_terrainField.paintFromTile(hexId, tileToPaint) }, c*5)
+        c++
+    })
+
+    //comp_terrainField.renderAllHexes();
   }
 
   async function save() {
@@ -362,15 +393,24 @@
 
     if (loadedId) {
       const id = await db.mapSaves.update(loadedId, {
-        mapString: c,
+        mapTitle: loadedSave.title,
         previewBase64: p
       })
+
+      await db.mapStrings.update(loadedId, {
+        mapString: c
+      })
+
       console.log(`Updated saved map with id ${loadedId}`)
 
     } else {
       const id = await db.mapSaves.add({
-        mapString: c,
-        previewBase64: p
+        mapTitle: loadedSave.title,
+        previewBase64: p,
+      })
+
+      await db.mapStrings.add({
+        mapString: c
       })
   
       console.log(`Added map with id ${id}`)
@@ -383,23 +423,31 @@
 
   }
 
-  async function load(data: saveData, id: number) {
+  function load(data: saveData, id: number) {
     
     // Clean up
     console.log(`Loaded ${id}`)
-    loadSave(data, id)
-    
     loading = true
+
+    loadSave(data, id)
+    //await loadSave(data, id)
+    
+
+    console.log(loading)
+    if (loading) {
+      // Loading can still be true if nothing new was loaded
+      //loading = false
+    }
 
     data_path.selectedPath = null
     data_text.selectedText = null
-    
-    await tick()
-    loading = false
-    // await tick() // The terrain field needs time to hook onto 
-    // comp_terrainField.renderAllHexes() 
-  }
+  
+    //await tick()
 
+    // await tick() // The terrain field needs time to hook onto 
+    //comp_terrainField.renderAllHexes() 
+  }
+  
 </script>
 
 
@@ -414,82 +462,98 @@
 
 
 
-{#if appState == "normal"}
-  {#if !loading}
-    <main
-      on:contextmenu|preventDefault={e => {}}
-      on:mousewheel={e => {pan.zoom(e)} }
-      on:pointerdown={ e => { pointerdown(e) }}
-      on:pointermove={ e => { pointermove(e) }}
-      on:pointerup={ e => { pointerup(e) }}
-    >
-      
-      <Pixi {app} >
-        <Container
-          instance={offsetContainer}
-          x={pan.offsetX}
-          y={pan.offsetY}
-          scale={ {x: pan.zoomScale, y: pan.zoomScale} }
-        >
+{#if appState == "normal" && !loading}
 
-          <TerrainField bind:this={comp_terrainField} bind:data_terrain {pan} {controls} {L} bind:tfield={loadedSave.TerrainField} />
 
-          <PathLayer bind:this={comp_pathLayer} bind:paths={loadedSave.paths} bind:data_path {pan} {controls} {selectedTool} {tfield}  />
-
-          <IconLayer bind:this={comp_iconLayer} bind:icons={loadedSave.icons} bind:data_icon {L} {pan} {selectedTool} {tfield} {controls} />          
-
-          <TextLayer bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text {pan} />
-
-        </Container>
-
-      </Pixi>
-      
-    </main>
-
-    <!-- Terrain Buttons -->
-    {#if selectedTool == "terrain"}
-      <TerrainPanel {loadedTilesets} {tfield} {app} {L} bind:data_terrain />
+  <main
+    on:contextmenu|preventDefault={e => {}}
+    on:mousewheel={e => {pan.zoom(e)} }
+    on:pointerdown={ e => { pointerdown(e) }}
+    on:pointermove={ e => { pointermove(e) }}
+    on:pointerup={ e => { pointerup(e) }}
+  >
     
-    {:else if selectedTool == "icon"}
-      <IconPanel {L} {app} {loadedIconsets} bind:data_icon />
+    <Pixi {app} >
+      <Container
+        instance={offsetContainer}
+        x={pan.offsetX}
+        y={pan.offsetY}
+        scale={ {x: pan.zoomScale, y: pan.zoomScale} }
+      >
+
+        <TerrainField bind:this={comp_terrainField} bind:data_terrain {pan} {controls} {L} bind:tfield={loadedSave.TerrainField} />
+
+        <PathLayer bind:this={comp_pathLayer} bind:paths={loadedSave.paths} bind:data_path {pan} {controls} {selectedTool} {tfield}  />
+
+        <IconLayer bind:this={comp_iconLayer} bind:icons={loadedSave.icons} bind:data_icon {L} {pan} {selectedTool} {tfield} {controls} />          
+
+        <TextLayer bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text {pan} />
+
+      </Container>
+
+    </Pixi>
     
-    {:else if selectedTool == "path"}
-      <PathPanel bind:data_path {comp_pathLayer} />
+  </main>
 
-    {:else if selectedTool == "text"}
-      <TextPanel bind:data_text {comp_textLayer} />
+  <!-- Terrain Buttons -->
+  {#if showTerrainGenerator}
+    <TerrainGenerator {loadedTilesets} {tfield} {comp_terrainField} bind:showTerrainGenerator />
 
-    {/if}
-        
-    
-    <div id="tool-buttons">
-      <ToolButtons bind:selectedTool />
-        
-      
-      <!--
-      
-      -->
-    </div>
+  {:else if selectedTool == "terrain"}
+    <TerrainPanel {loadedTilesets} {tfield} {app} {L} bind:data_terrain />
+  
+  {:else if selectedTool == "icon"}
+    <IconPanel {L} {app} {loadedIconsets} bind:data_icon />
+  
+  {:else if selectedTool == "path"}
+    <PathPanel bind:data_path {comp_pathLayer} />
 
-    <div id="setting-buttons">
-      <button on:click={save} title={"Save"} > <img src="assets/img/tools/save.png" alt="Save"> </button>
-      <button on:click={() => {showSavedMaps = true}} title={"Maps"} ><img src="assets/img/tools/maps.png" alt="Maps"></button>
-      <button on:click={()=>{showSettings = true}} title={"Map Settings"} ><img src="assets/img/tools/settings.png" alt="Map Settings"></button>
-    </div>
-
-    {#if showSavedMaps}
-      <SavedMaps bind:showSavedMaps {load} />
-    {/if}
-
-    {#if showSettings}
-      <MapSettings {loadedSave} {tfield} bind:showSettings {save} renderAllHexes={() => {comp_terrainField.renderAllHexes()}}>
-        <button on:click={() => { gen() }}> Generate Terrain </button>
-        <button on:click={() => {appState = "tilesetCreator"}}>Tileset Builder (WIP, BROKEN FOR REAL)</button>  
-        <button on:click={() => {appState = "iconsetCreator"}}>Iconset Builder</button>  
-      </MapSettings>
-    {/if}
-
+  {:else if selectedTool == "text"}
+    <TextPanel bind:data_text {comp_textLayer} />
   {/if}
+    
+    
+    <!--
+      -->
+    
+    
+
+  <div id="tool-buttons">
+    <ToolButtons bind:selectedTool />
+      
+    
+    <!--
+    
+    -->
+  </div>
+
+  <div id="setting-buttons">
+    <div id="save-buttons">
+      <button on:click={save} title={"Save"} > <img src="assets/img/tools/save.png" alt="Save"> </button>
+    </div>
+    <button on:click={() => {showSavedMaps = true}} title={"Maps"} ><img src="assets/img/tools/maps.png" alt="Maps"></button>
+    <button on:click={()=>{showSettings = true}} title={"Map Settings"} ><img src="assets/img/tools/settings.png" alt="Map Settings"></button>
+  </div>
+    
+  {#if showSavedMaps}
+  <SavedMaps bind:showSavedMaps {load} />
+  {/if}
+
+  {#if showSettings}
+    <MapSettings 
+      {loadedSave}
+      {tfield}
+      bind:showSettings
+      bind:appState
+      bind:showTerrainGenerator
+      {save}
+      renderAllHexes={() => {comp_terrainField.renderAllHexes()}}
+      renderGrid={() => { comp_terrainField.renderGrid() }}
+      exportMap={() => {exportMap()}}
+    />
+  {/if}
+
+
 
 {:else if appState == "tilesetCreator"}
 
@@ -524,7 +588,23 @@
     overflow: hidden;
   }
 
+  .invisible {
+    display: none;
+  }
+
+  #cover {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    display: none;
+  }
   
+  #cover .visible {
+    display: block;
+  }
 
   :global(html) {
     height: 100%;
@@ -630,8 +710,34 @@
     border-radius: 3px;
   }
 
+  /* GLOBAL SCROLL BAR */
+
+  /* width */
+  :global(::-webkit-scrollbar) {
+    width: 8px;
+  }
+  
+  /* Track */
+  :global(::-webkit-scrollbar-track) {
+    display: none;
+    opacity: 0;
+  }
+  
+  /* Handle */
+  :global(::-webkit-scrollbar-thumb) {
+    background: #f2f2f2;
+    opacity: 0;
+    border-radius: 4px;
+    width: 8px;
+  }
+
+  /* Handle on hover */
+  :global(::-webkit-scrollbar-thumb:hover) {
+    opacity: 1;
+  }
 
 
+  /* Tools */
 
   #tool-buttons {
     position: fixed;
@@ -656,5 +762,6 @@
     justify-content: center;
     align-items: center;
   }
+
   
 </style>

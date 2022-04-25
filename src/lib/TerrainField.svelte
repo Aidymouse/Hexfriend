@@ -5,6 +5,7 @@
 
     import type { TerrainHex } from '../types/terrain'
     import type { Tile } from "src/types/tilesets"
+import { onMount } from "svelte";
 
     let terrainGraphics = new PIXI.Graphics()
     let symbolsContainer = new PIXI.Container()
@@ -38,8 +39,10 @@
         }
     }
 
-    function renderGrid() {
+    export function renderGrid() {
         gridGraphics.clear();
+        if (!tfield.grid.shown) return
+
         gridGraphics.lineStyle(tfield.grid.thickness, tfield.grid.stroke)
 
         Object.keys(tfield.hexes).forEach(hexId => {
@@ -50,12 +53,29 @@
         });
     }
 
+    export function renderSelectiveHexes(callback: Function) {
+        // Re-renders hexes that pass true
+         Object.keys(tfield.hexes).forEach(hexId => {
+            
+            if (callback(tfield.hexes[hexId])) renderHex(hexId)
+        });
+    }
+
     export function renderAllHexes() {
         terrainGraphics.clear();
         Object.keys(tfield.hexes).forEach(hexId => {
             renderHex(hexId)
         });
         renderGrid();
+    }
+
+
+    export function paintFromTile(hexId, tileData) {
+        tfield.hexes[hexId].bgColor = tileData.bgColor
+        tfield.hexes[hexId].symbol = tileData.symbol ? {...tileData.symbol} : null
+        tfield.hexes[hexId].blank = false
+
+        renderHex(hexId)
     }
 
     function renderHex(hexId) {
@@ -240,8 +260,11 @@
         
     }
 
-    renderAllHexes()
-    renderGrid()
+    
+    onMount(() => {
+        renderAllHexes()
+        renderGrid()
+    })
 
 </script>
 

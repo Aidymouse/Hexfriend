@@ -1,5 +1,101 @@
 // Every hex has a percentange chance that its neighbour will be a different terrain type
 
+/* Terrain generating through wave function collapse! */
+
+/* Each hex needs a list of values it can possibly be, listed as terrain Id */
+
+let testGen = {
+    /* Terraom Id: [can connect to] */
+    /* NOT default that all tiles can connect to themselves */
+    "default_Plains": ["default_Beach", "default_Tree", "default_hills", "default_Plains"],
+    "default_Beach": ["default_Plains", "default_Water", "default_Beach"],
+    "default_Water": ["default_Beach", "default_Water"],
+    "default_hills": ["default_Mountain", "default_Plains", "default_hills"],
+    "default_Mountain": ["default_hills", "default_Mountain", "default_Mountains"],
+    "default_Mountains": ["default_Mountain", "default_Mountains"],
+    "default_Tree": ["default_Plains", "default_Tree"],
+    "default_Deep-Water": ["default_Water", "default_Deep-Water"],
+}
+
+let forested = {
+    "default_Plains": ["default_Tree", "default_forest"],
+    "default_Tree": ["default_forest", "default_Tree", "default_Plains"],
+    "default_forest": ["default_forest", "default_Tree"]
+}
+
+
+export function collapseWaveGen(hexesOut, rules = testGen) {
+    // Generate Hexes
+    let genHexes = {}
+    let visitedHexIds = []
+
+    for (let q = -hexesOut; q <= hexesOut; q++) {
+        for (let r = -hexesOut; r <= hexesOut; r++) {
+
+            if (-q - r >= -hexesOut && -q - r <= hexesOut) {
+
+                genHexes[genHexId(q, r, -q - r)] = { q: q, r: r, s: -q - r, id: null, domain: Object.keys(rules) }
+
+            }
+
+        }
+    }
+
+    let hexIds = Object.keys(genHexes)
+    let firstHex = null
+
+    while (visitedHexIds.length < Object.keys(genHexes).length) {
+        // Find hex with lowest weight
+        let nextHex = genHexes[ hexIds[0] ]
+        hexIds.forEach(hexId => {
+            if (genHexes[hexId].id != null) return
+
+            if (nextHex.id != null && genHexes[hexId].id == null) {
+                nextHex = genHexes[hexId]
+                return
+            }
+
+            if (genHexes[hexId].domain.length < nextHex.domain.length) nextHex = genHexes[hexId]
+        })
+
+        /* Assign ID randomly from hexes domain (currently uniform) */
+        //console.log(nextHex.q, nextHex.r, nextHex.s)
+        //console.log(nextHex.domain)
+
+        nextHex.id = nextHex.domain[rand(0, nextHex.domain.length)];
+        if (firstHex) nextHex.id = firstHex; firstHex = null;
+
+        /* Reduce neighbouring domains */
+        let neighbourIds = getHexNeighbours(nextHex.q, nextHex.r, nextHex.s)
+        neighbourIds.forEach(nId => {
+            let nHex = genHexes[nId]
+            if (!nHex) return
+            if (nHex.id != null) return
+
+            // Iterate backwards through the neighbours domain
+            for (let dI=nHex.domain.length-1; dI >= 0; dI--) {
+                let currentDomainStep = nHex.domain[dI]
+                let currentHexAllowedNeighbours = rules[nextHex.id]
+                
+                if ( currentHexAllowedNeighbours.find( domain => domain == currentDomainStep ) ) {
+                    //console.log(currentDomainStep)
+                    continue  
+                } 
+                nHex.domain.splice(dI, 1)
+                //dI--
+            }
+
+        })
+
+        /* Add current hex to visited pile */
+        visitedHexIds.push( genHexId(nextHex.q, nextHex.r, nextHex.s) )
+    }
+
+    return genHexes
+}
+
+//console.log( collapseWaveGen(3, testGen) )
+
 /*
 let genFunction: {[key: string]: {[key:string]: number} } = {
     'default_plains': {'default_plains': 25, 'default_desert': 25, 'default_water': 25, 'default_tree': 25, 'default_deepwater': 0},

@@ -57,7 +57,6 @@ export function getNeighbours(q: number, r: number, s: number): string[] {
 }
 
 /* COORDS */
-
 function AxialToCube(q: number, r: number): cubeCoords {
     return { q: q, r: r, s: -q - r }
 }

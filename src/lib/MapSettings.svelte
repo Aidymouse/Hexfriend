@@ -7,9 +7,13 @@
     export let loadedSave: saveData;
     export let tfield;
     export let showSettings;
+    export let appState;
+    export let showTerrainGenerator;
 
     export let save: Function;
     export let renderAllHexes: Function;
+    export let renderGrid: Function;
+    export let exportMap: Function;
 
 </script>
 
@@ -22,23 +26,27 @@
         <button on:click={()=>{showSettings = false}}>Close</button>
         <button on:click={()=>{ save(); showSettings = false}}>Save and Close</button>
 
-        Show Grid <input type="checkbox" bind:checked={tfield.grid.shown}>
-        {#if tfield.grid.shown}<input type="number" bind:value={tfield.grid.thickness} on:change={renderAllHexes}>{/if}
+        Show Grid <input type="checkbox" bind:checked={tfield.grid.shown} on:change={() => { renderGrid() }} >
+        {#if tfield.grid.shown}<input type="number" bind:value={tfield.grid.thickness} on:change={() => { renderGrid() } }>{/if}
 
 
         Blank Hex Color
         <div style="width: 30px; height: 30px;">
-            <ColorInputPixi bind:value={tfield.blankHexColor} on:change={ () => {renderAllHexes()} } />
+            <ColorInputPixi bind:value={tfield.blankHexColor} on:change={ () => { renderAllHexes() } } />
         </div>
         <button on:click={ () => {tfield.blankHexColor = 0xf2f2f2} }>Reset to default color</button>
 
         <SelectGrid values={["flatTop", "pointyTop"]} bind:value={tfield.orientation} on:change={ () => {renderAllHexes()} } />
 
-
         <input type="number" bind:value={tfield.hexWidth} on:change={() => { renderAllHexes() } }>
         <input type="number" bind:value={tfield.hexHeight} on:change={() => { renderAllHexes() }}>
 
-        <slot></slot>
+        <button on:click={() => { appState = "tilesetCreator" }}>Tileset Builder</button>  
+        <button on:click={() => { appState = "iconsetCreator" }}>Iconset Builder</button>  
+
+        <button on:click={() => { showTerrainGenerator = true; showSettings = false }}> Generate Terrain </button>
+            <button on:click={exportMap} title="Export" >Export</button>
+
 
     </div>
     

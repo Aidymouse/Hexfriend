@@ -12,7 +12,10 @@
     export let showSavedMaps: boolean
     export let load: Function
 
-    function clickedMap(mapString: string, id: number) {
+    async function clickedMap(id: number) {
+
+        let mapString = (await db.mapStrings.get(id)).mapString
+
         let mapData = JSON.parse(mapString)
         load(mapData, id)
         showSavedMaps = false
@@ -20,6 +23,7 @@
 
     function deleteMap(id: number) {
         db.mapSaves.delete(id);
+        db.mapStrings.delete(id);
     }
 
 </script>
@@ -27,17 +31,18 @@
 
 <div id="maps-container">
     
+    
     <div id="maps">
-        <button on:click={()=>{showSavedMaps = false}}>Close</button>
-
+        <button id="close-button" on:click={()=>{showSavedMaps = false}}>Close</button>
+        
         {#each $saves || [] as save (save.id)}
             <div id="map-save">
-                <div on:click={ () => { clickedMap(save.mapString, save.id) } }>
+                <div on:click={ () => { clickedMap(save.id) } }>
                     <div id="image-container" >
                         <img src={save.previewBase64} alt={"Map Preview"}>
                     </div>
 
-                    <p>{JSON.parse(save.mapString).title}</p>
+                    <p>{save.mapTitle}</p>
                 </div>
                 <button class="delete-button" on:click={()=>{deleteMap(save.id)}}>Delete</button>
             </div>
@@ -66,6 +71,12 @@
         height: 100%;
     }
 
+    #close-button {
+        position: absolute;
+        right: 0px;
+        top: 0px;
+    }
+
     #maps-container {
         position: fixed;
         top: 0;
@@ -84,6 +95,8 @@
         background: #333333;
         border: solid 1px grey;
         border-radius: 3px;
+
+        position: relative;
 
         padding: 10px;
         box-sizing: border-box;
