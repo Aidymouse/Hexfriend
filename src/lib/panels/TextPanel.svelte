@@ -40,11 +40,6 @@
 
 <div class="panel">
 
-    <!--
-        Had to flood this section with onchanges to make sure the selected style updates correctly.
-        Wish it worked better. Oh well.
-    -->
-
     <div id="controls">
     <ColorInput bind:value={data_text.style.fill} label={"Color"} />
     <input type="number" bind:value={data_text.style.fontSize} >

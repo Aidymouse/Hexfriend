@@ -1,5 +1,6 @@
 <script lang="ts" >
     import type { saveData } from "./defaultSaveData";
+    import type { coordinates_data } from "src/types/data";
 
     import SelectGrid from "../components/SelectGrid.svelte";
     import ColorInputPixi from "../components/ColorInputPixi.svelte";
@@ -10,10 +11,21 @@
     export let appState;
     export let showTerrainGenerator;
 
-    export let save: Function;
-    export let renderAllHexes: Function;
-    export let renderGrid: Function;
-    export let exportMap: Function;
+    export let save: Function
+    export let renderAllHexes: Function
+    export let renderGrid: Function
+    export let exportMap: Function
+    export let redrawEntireMap: Function
+
+    function changeOrientation() {
+        let t = tfield.hexWidth
+        tfield.hexWidth = tfield.hexHeight
+        tfield.hexHeight = t
+        //tfield.hexWidth, tfield.hexHeight = tfield.hexHeight, tfield.hexWidth
+        console.log(tfield)
+        
+        redrawEntireMap()
+    }
 
 </script>
 
@@ -36,16 +48,18 @@
         </div>
         <button on:click={ () => {tfield.blankHexColor = 0xf2f2f2} }>Reset to default color</button>
 
-        <SelectGrid values={["flatTop", "pointyTop"]} bind:value={tfield.orientation} on:change={ () => {renderAllHexes()} } />
+        <SelectGrid values={["flatTop", "pointyTop"]} bind:value={tfield.orientation} on:change={ () => { changeOrientation() } } />
 
-        <input type="number" bind:value={tfield.hexWidth} on:change={() => { renderAllHexes() } }>
-        <input type="number" bind:value={tfield.hexHeight} on:change={() => { renderAllHexes() }}>
+        <input type="number" bind:value={tfield.hexWidth} on:change={() => { redrawEntireMap() } }>
+        <input type="number" bind:value={tfield.hexHeight} on:change={() => { redrawEntireMap() }}>
+        <button on:click={ () => { tfield.hexWidth *= 1.1; tfield.hexHeight *= 1.1; renderAllHexes() } }>+</button>
+        <button on:click={ () => { tfield.hexWidth /= 1.1; tfield.hexHeight /= 1.1; renderAllHexes() } }>-</button>
 
-        <button on:click={() => { appState = "tilesetCreator" }}>Tileset Builder</button>  
-        <button on:click={() => { appState = "iconsetCreator" }}>Iconset Builder</button>  
+        <button on:click={() => { appState = "tilesetCreator" }}>Tileset Builder</button>
+        <button on:click={() => { appState = "iconsetCreator" }}>Iconset Builder</button>
 
         <button on:click={() => { showTerrainGenerator = true; showSettings = false }}> Generate Terrain </button>
-            <button on:click={exportMap} title="Export" >Export</button>
+        <button on:click={() => { exportMap() } } title="Export" >Export</button>
 
 
     </div>

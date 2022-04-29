@@ -8,20 +8,31 @@
 
   /* TODO 
   
-    - fix textures not loading in time to be on the map
+    - hex coordinates on map - fix pointy top + more coordinate systems
+
+    - terrain generator function validation
     - keyboard shortcuts
     - tooltips
     - more fonts
     - dashed lines
-    - hex coordinates on map
     - export at different sizes
+    - map resizing - adding / removing hexes
+    - save data checking (if loading, making new map, quitting)
+
+  */
+
+  /* BUGS 
+  
+    - symbol size is weird in preview when hex size is big
+    - coordinates show under some stuff for some reason
+  
 
   */
 
   import type { Tile } from './types/tilesets'
   import type { TerrainHexField } from './types/terrain'
   import type { saveData } from './lib/defaultSaveData'
-  import type { icon_data } from './types/data';
+  import type { coordinates_data, icon_data } from './types/data';
   import type { text_data } from './types/text';
 
   import * as PIXI from 'pixi.js'
@@ -35,13 +46,15 @@
   import TerrainField from './lib/TerrainField.svelte'
   import IconLayer from './lib/IconLayer.svelte'
   import PathLayer from './lib/PathLayer.svelte'
-  import TextLayer from './lib/TextLayer.svelte'
+  import TextLayer from './layers/TextLayer.svelte'
+  import CoordsLayer from './layers/CoordsLayer.svelte'
   
   // Panels
   import TerrainPanel from './lib/panels/TerrainPanel.svelte'
   import IconPanel from './lib/panels/IconPanel.svelte'
   import PathPanel from './lib/panels/PathPanel.svelte'
   import TextPanel from './lib/panels/TextPanel.svelte'
+  import CoordsPanel from './lib/panels/CoordsPanel.svelte'
 
   // Like, whatever
   import ToolButtons from './lib/ToolButtons.svelte'
@@ -78,10 +91,11 @@
   let offsetContainer = new PIXI.Container();
 
   /* STUFF TO BIND TO */
-  let comp_terrainField;
-  let comp_iconLayer;
-  let comp_pathLayer;
-  let comp_textLayer;
+  let comp_terrainField
+  let comp_iconLayer
+  let comp_pathLayer
+  let comp_textLayer
+  let comp_coordsLayer
 
   //offsetContainer.addChild(terrainGraphics);
 
@@ -215,6 +229,12 @@
     editorRef: null
   }
 
+  let data_coordinates: coordinates_data = {
+    shown: true,
+    style: { fill: 0x000000, fontSize: 10 },
+    system: "evenq",
+    seperator: "."
+  }
 
   const L: PIXI.Loader = new PIXI.Loader()
 
@@ -228,6 +248,7 @@
     loadedTilesets = data.tilesets;
     loadedIconsets = data.iconsets;
     tfield = data.TerrainField;
+    data_coordinates = data.coords
 
     // Load Textures
     for (let tilesetName in loadedTilesets) {
@@ -266,14 +287,18 @@
       data_icon.color = firstIcon.color
       data_icon.texId = firstIcon.texId
 
+
       loading = false
       await tick()
       comp_terrainField.clearTerrainSprites();
       comp_terrainField.renderAllHexes();
-
+      comp_coordsLayer.generateCoords();
+      
+      console.log("WHat!?")
     });
   
     L.load();
+
     
     /* Set up tools - would be nice to remember tool settings but this works regardless of loaded tileset */
 
@@ -281,13 +306,19 @@
     //loadedId = id
   }
  
-  loadSave(DEFAULTSAVEDATA, null);
+  loadSave(JSON.parse(JSON.stringify(DEFAULTSAVEDATA)), null);
 
 
 
 
   function exportMap() {
     download( app.renderer.plugins.extract.base64(offsetContainer), "export.png", "image/png" )
+  }
+
+  function redrawEntireMap() {
+    // Refreshes all hexes and coordinates
+    comp_terrainField.renderAllHexes()
+    comp_coordsLayer.generateCoords() 
   }
 
   /* TOOL METHODS */
@@ -361,21 +392,7 @@
   
   
 
-  function gen() {
-    
-    showSettings = false
 
-    let generated = collapseWaveGen(10)
-    //console.log(generated)
-    let c = 0;
-    Object.keys(generated).forEach(hexId => {
-        let tileToPaint = loadedTilesets['default'].find(tile => tile.id == generated[hexId].id)
-        setTimeout(() => { comp_terrainField.paintFromTile(hexId, tileToPaint) }, c*5)
-        c++
-    })
-
-    //comp_terrainField.renderAllHexes();
-  }
 
   async function save() {
 
@@ -424,7 +441,7 @@
 
   }
 
-  function load(data: saveData, id: number) {
+  function load(data: saveData, id: number | null) {
     
     // Clean up
     console.log(`Loaded ${id}`)
@@ -440,6 +457,16 @@
 
     // await tick() // The terrain field needs time to hook onto 
     //comp_terrainField.renderAllHexes() 
+  }
+
+  function createNewMap() {
+
+    /* TODO: Save Data Checking */
+
+    load(JSON.parse(JSON.stringify(DEFAULTSAVEDATA)), null)
+
+    showSavedMaps = false
+  
   }
   
   /* HOT ZONE */
@@ -463,7 +490,7 @@
 
   <main
     on:contextmenu|preventDefault={e => {}}
-    on:mousewheel={e => {pan.zoom(e)} }
+    on:wheel={e => {pan.zoom(e)} }
     on:pointerdown={ e => { pointerdown(e) }}
     on:pointermove={ e => { pointermove(e) }}
     on:pointerup={ e => { pointerup(e) }}
@@ -483,7 +510,10 @@
 
         <IconLayer bind:this={comp_iconLayer} bind:icons={loadedSave.icons} bind:data_icon {L} {pan} {selectedTool} {tfield} {controls} />          
 
+        <CoordsLayer bind:this={comp_coordsLayer} bind:data_coordinates tfield={loadedSave.TerrainField} />
+        
         <TextLayer bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text {pan} />
+
 
       </Container>
 
@@ -506,6 +536,9 @@
 
   {:else if selectedTool == "text"}
     <TextPanel bind:data_text {comp_textLayer} />
+
+  {:else if selectedTool == "coords"}
+    <CoordsPanel bind:data_coordinates {comp_coordsLayer} />
   {/if}
     
     
@@ -532,19 +565,20 @@
   </div>
     
   {#if showSavedMaps}
-  <SavedMaps bind:showSavedMaps {load} />
+  <SavedMaps bind:showSavedMaps {createNewMap} {load} />
   {/if}
 
   {#if showSettings}
     <MapSettings 
       {loadedSave}
-      {tfield}
+      bind:tfield
       bind:showSettings
       bind:appState
       bind:showTerrainGenerator
       {save}
       renderAllHexes={() => {comp_terrainField.renderAllHexes()}}
       renderGrid={() => { comp_terrainField.renderGrid() }}
+      redrawEntireMap={() => { redrawEntireMap() }}
       exportMap={() => {exportMap()}}
     />
   {/if}
@@ -553,20 +587,13 @@
 
 {:else if appState == "tilesetCreator"}
 
-<TilesetCreator bind:appState />
+  <TilesetCreator bind:appState />
 
 {:else if appState == "iconsetCreator"}
 
-<IconsetCreator bind:appState />
+  <IconsetCreator bind:appState />
 
 {/if}
-
-
-
-
-
-
-
 
 
 

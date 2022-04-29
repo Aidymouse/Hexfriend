@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { coordinates_data } from "src/types/data";
 
     let buttons = [
         {display: "Terrain", toolCode: "terrain"},
@@ -6,17 +7,18 @@
         {display: "Path", toolCode: "path"},
         {display: "Text", toolCode: "text"},
         {display: "Eraser", toolCode: "eraser"},
+        {display: "Coordinates", toolCode: "coords"}
     ]
 
     export let selectedTool: string;
 
 </script>
 
-<main>
+<main> 
 
     {#each buttons as b}
         <button class={ selectedTool == b.toolCode ? "selected" : ""} on:click={e => { selectedTool = b.toolCode } } title={`${b.display} Tool`}>
-            <img src={`/assets/img/tools/${b.toolCode}.png`} alt={`${b.toolCode} Tool`}>
+            <img src={`/assets/img/tools/${b.toolCode}.png`} alt={`${b.display} Tool`}>
         </button>
     {/each}
 

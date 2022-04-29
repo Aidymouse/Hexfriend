@@ -7,10 +7,13 @@ import { DEFAULTTILESET } from './defaultTileset'
 import { DEFAULTICONSET } from './defaultIconset'
 
 import type { icon_set_data } from '../types/icon'
+import type { coordinates_data } from 'src/types/data'
 
 interface saveData {
     saveVersion: number
     title: string
+
+    coords: coordinates_data
 
     TerrainField: TerrainHexField
     tilesets: {[key: string]: Tile[]}
@@ -47,15 +50,35 @@ let DEFAULTSAVEDATA: saveData = {
         blankHexColor: 0xf2f2f2,
         
         grid: {stroke: 0x333333, thickness: 2, shown: true},
-
+        
         hexes: {}
     },
 
-    tilesets: {
-        'default': DEFAULTTILESET
+    coords: {
+        shown: false,
+        style: { fill: 0xffffff, fontSize: 10, stroke: 0x000000, strokeThickness: 3, fontFamily: "Segoe UI" },
+        system: "cubeId",
+        seperator: "."
     },
 
-    
+    tilesets: {
+        'default': DEFAULTTILESET,
+        'default2': JSON.parse(`[
+            {
+                "display": "Plains",
+                "bgColor": 11462236,
+                "id": "default2_Plains",
+                "symbol": null,
+                "preview": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAArCAYAAAA65tviAAAAAXNSR0IArs4c6QAAAPNJREFUaEPl2UEOgjAQhWF7DY/F2uO59lheQ1KTGsS2M89FO++VNRD+fIXAkC7g9njeXuAhf+2+Xe8JORDaOZ9YImRURJFAVNwioyPQmLVCZmkgKi4RiZDZEV4VU0QiJEqER6UpEi3CitEOiarRU6mKSIREj2ip/IhIhLBE1FQ+ImwR5xitEFaNo8pbRCKEPaKoJJkQmaVVaFhlyqRF6/HLqnKce329a7Etr2YI041/nkLqfo8wqNRmwtrf7JFVWhP67oAu2lOs95thjZBIS8z66WPOfiPEWBH5GtcKmani0XCLSIXMiPFqQCJSISNjEI18XTsk56oKrrPZogAAAABJRU5ErkJggg=="
+            },
+            {
+                "display": "Beach",
+                "bgColor": 16318111,
+                "id": "default2_Beach",
+                "symbol": null,
+                "preview": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAArCAYAAAA65tviAAAAAXNSR0IArs4c6QAAAPBJREFUaEPl2cEOgjAQhGHridf0yXxNT0pqUoPYdnc8tDtTzkD48xUCS7qA2+N5f4GH/LX7dr0l5EBo53xiiZBREUUCUXGLjI5AY9YKmaWBqLhEJEJmR3hVTBGJkCgRHpWmSLQIK0Y7JKpGT6UqIhESPaKl8iMiEcISUVP5iLBFnGO0Qlg1jipvEYkQ9oiikmRCZJZWoWGVKZMWrccvq8px7vX1rsW2vJohTDf+eQqp+z3CoFKbCWt/s0dWaU3ouwO6aE+x3m+GNUIiLTHrp485+40QY0Xka1wrZKaKR8MtIhUyI8arAYlIhYyMQTTyde0w06tUXQnWQQAAAABJRU5ErkJggg=="
+            }]`)
+    },
 
     iconsets: {
         'default': DEFAULTICONSET

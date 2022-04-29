@@ -12,6 +12,8 @@
     export let showSavedMaps: boolean
     export let load: Function
 
+    export let createNewMap: Function
+
     async function clickedMap(id: number) {
 
         let mapString = (await db.mapStrings.get(id)).mapString
@@ -26,6 +28,8 @@
         db.mapStrings.delete(id);
     }
 
+
+
 </script>
 
 
@@ -35,10 +39,12 @@
     <div id="maps">
         <button id="close-button" on:click={()=>{showSavedMaps = false}}>Close</button>
         
+        <div class="map-save" id="new-map-button" on:click={() => { createNewMap() }}>+</div>
+
         {#each $saves || [] as save (save.id)}
-            <div id="map-save">
+            <div class="map-save">
                 <div on:click={ () => { clickedMap(save.id) } }>
-                    <div id="image-container" >
+                    <div class="image-container" >
                         <img src={save.previewBase64} alt={"Map Preview"}>
                     </div>
 
@@ -69,6 +75,18 @@
     div {
         width: 100%;
         height: 100%;
+    }
+
+    #new-map-button {
+        border: solid 1px grey;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        font-size: 48pt;
+        margin: 0;
+        padding: 0;
     }
 
     #close-button {
@@ -111,7 +129,7 @@
         overflow-x: hidden;
     }
 
-    #map-save {
+    .map-save {
         position: relative;
         overflow: hidden;
         border-radius: 3px;
@@ -126,16 +144,16 @@
         display: none;
     }
 
-    #map-save:hover .delete-button {
+    .map-save:hover .delete-button {
         display: block;
     }
 
-    #map-save:hover {
+    .map-save:hover {
         background-color: #555555;
         border: solid 1px grey;
     }
 
-    #image-container {
+    .image-container {
         width: 100%;
         height: 100%;
         overflow: hidden;

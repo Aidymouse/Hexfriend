@@ -6,3 +6,10 @@ export interface icon_data {
     pHex: number,
     snapToHex: boolean
 }
+
+export interface coordinates_data {
+    shown: boolean,
+    style: PIXI.Text["style"],
+    system: "evenq" | "cubeId",
+    seperator: string
+}

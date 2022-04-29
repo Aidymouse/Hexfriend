@@ -20,7 +20,7 @@
         //console.log(domain)
         if (domain.length < 1) {
             console.log("No domain! WTF!?")
-            return "default_Mountains"
+            return "!!BLANK!!" // should be something else
         }
 
         let cum = 0
@@ -28,7 +28,7 @@
 
 
         let randTerrain = rand(0, totalWeight)
-        console.log(randTerrain)
+        //console.log(randTerrain)
 
         for (let dI=0; dI<domain.length; dI++) {
             if (randTerrain >= cum && randTerrain < cum + domain[dI].weight) {
@@ -39,7 +39,7 @@
         }
 
         //console.log("Something fucked up!")
-        return "default_Dead-Tree"
+        return "!!BLANK!!"
     }
 
     function collapseWaveGen(hexes, rules) {
@@ -49,6 +49,7 @@
         /* Assemble the default domain */
         let defaultDomain = []
         Object.keys(rules).forEach(terrainId => {
+            if (rules[terrainId].length < 1) return
             defaultDomain.push( {id: terrainId, weight: 1} )
         })
 
@@ -62,32 +63,8 @@
 
         while (hexIds.length > 0) {
             // Find hex with lowest weight
-            let nextHex = genHexes[hexIds.pop()]
-            /*
-            hexIds.forEach(hexId => {
-                //if (genHexes[hexId].terrainId != null) return // Id will be removed from list once used up
-
-                if (nextHex.terrainId != null && genHexes[hexId].terrainId == null) {
-                    nextHex = genHexes[hexId]
-                    return
-                }
-
-                if (genHexes[hexId].domain.length < nextHex.domain.length) nextHex = genHexes[hexId]
-            })
-
-            // Remove the hex from the list of ids that need terrain
-            hexIds.splice(hexIds.indexOf( genHexId(nextHex.q, nextHex.r, nextHex.s) ), 1)
-            if (nextHex.domain.length == 0) {
-                console.log("Domain is 0, how!?!?")
-                //console.log(nextHex)
-                nextHex.terrainId = "default_Mountains"
-                continue
-            }
-
-            */
-
-            /* May be fixed with proper propegation */
-
+            let h = hexIds.pop()
+            let nextHex = genHexes[h]
 
             let neighbourIds = getNeighbours(nextHex.q, nextHex.r, nextHex.s)
 
@@ -97,71 +74,65 @@
             // Assemble the domain of this hex based on surrounding hexes
             let allBlankNeighbours = true
             
+            // Full domain but with all 0 weights
             let constructedDomain = []
+            defaultDomain.forEach(ddp => {
+                constructedDomain.push( {id: ddp.id, weight: 0} ) 
+            })
+
 
             neighbourIds.forEach(nId => {
                 let nHex = genHexes[nId]
                 if (!nHex) return
                 if (nHex.terrainId == null) return
+                if (nHex.terrainId == "!!BLANK!!") return
 
-                let neighbourRule = rules[nHex.terrainId] // gives us a list of terrains and weights
+                let neighbourRule = rules[nHex.terrainId] // gives us a list of terrain ids and weights
                 
-                neighbourRule.forEach(rulePart => {
-                    // Check if terrain is already in the constructed domain
-                    // If it is, add the weight from this rule into the constructed domain
-                    // If not, put it into the constructed domain with its weight
-                    let terrain = constructedDomain.find(domainPart => domainPart.id == rulePart.id)
-                    if (!terrain) {
-                        constructedDomain.push( {id: rulePart.id, weight: 0} )
-                        terrain = constructedDomain.find(domainPart => domainPart.id == rulePart.id)
+
+                constructedDomain.forEach(cdp => {
+                    // Ignore if this option has already been ruled out
+                    if (cdp.weight == -1) return
+
+                    // Try to find the current tile is allowed to connect to this neighbour
+                    let pertainingRule = neighbourRule.find(nrp => nrp.id == cdp.id)
+                    //console.log(pertainingRule)
+
+                    if (!pertainingRule) {
+                        // If it isnt, mark the tile as ruled out
+                        cdp.weight = -1
+                    
+                    } else {
+
+                        // If it is, add this tiles weight to the tile in the constructed domain
+                        cdp.weight += pertainingRule.weight
                     }
-                    
-                    terrain.weight += rulePart.weight
-                    
+
                 })
+                    
 
                 allBlankNeighbours = false
 
 
             })
 
+
             if (allBlankNeighbours) {
                 // Select based on default domain
                 nextHex.terrainId = pickFromWeightDomain(defaultDomain)
             } else {
-                nextHex.terrainId = pickFromWeightDomain(constructedDomain)
+
+                // Reduce the constructed domain to only what is allowed
+                let whittledDomain = []
+                constructedDomain.forEach(cdp => {
+                    if (cdp.weight > 0) whittledDomain.push( {id: cdp.id, weight: cdp.weight} ) 
+                })
+
+                nextHex.terrainId = pickFromWeightDomain(whittledDomain)
                 
             }
 
-            // Pick a random thing
-            //nextHex.terrainId = nextHex.domain[rand(0, nextHex.domain.length)];
-            
-            
-            /* Reduce neighbouring domains
-            neighbourIds.forEach(nId => {
-                let nHex = genHexes[nId]
-                if (!nHex) return
-                if (nHex.terrainId != null) return
 
-                // Iterate backwards through the neighbours domain
-                for (let dI=nHex.domain.length-1; dI >= 0; dI--) {
-                    let currentDomainStep = nHex.domain[dI]
-                    let currentHexAllowedNeighbours = rules[nextHex.terrainId]
-
-                    if ( currentHexAllowedNeighbours.find( domain => domain == currentDomainStep ) ) {
-                        //console.log(currentDomainStep)
-                        continue  
-                    } 
-                    nHex.domain.splice(dI, 1)
-                    //dI--
-                }
-
- 
-
-            }) */
-
-            /* Add current hex to visited pile */
-            //visitedHexIds.push( genHexId(nextHex.q, nextHex.r, nextHex.s) )
         }
 
         return genHexes
@@ -181,9 +152,15 @@
 
         let c = 0;
         Object.keys(generatedTerrain).forEach(hexId => {
+
+            if (generatedTerrain[hexId].terrainId == "!!BLANK!!") {
+                comp_terrainField.eraseHex(hexId)
+                return
+            }
+
             let tileToPaint = getTileFromId(generatedTerrain[hexId].terrainId) //loadedTilesets['default'].find(tile => tile.id == generatedTerrain[hexId].terrainId)
 
-            if (!tileToPaint) console.log(generatedTerrain[hexId].terrainId);
+            if (!tileToPaint) console.log(generatedTerrain[hexId].terrainId); // shouldnt happen
 
             if (slowAnimation) { 
                 setTimeout(() => { comp_terrainField.paintFromTile(hexId, tileToPaint) }, c*5)

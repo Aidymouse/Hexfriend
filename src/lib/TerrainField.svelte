@@ -3,9 +3,7 @@
     import * as PIXI from 'pixi.js'
     import {cubeToWorld, getHexPath, genHexId, worldToCube, getNeighbours} from '../helpers/hexHelpers'
 
-    import type { TerrainHex } from '../types/terrain'
-    import type { Tile } from "src/types/tilesets"
-import { onMount } from "svelte";
+    import { onMount } from "svelte";
 
     let terrainGraphics = new PIXI.Graphics()
     let symbolsContainer = new PIXI.Container()
@@ -145,7 +143,7 @@ import { onMount } from "svelte";
 
             let clickedId = genHexId( clickedCoords.q, clickedCoords.r, clickedCoords.s )
 
-            //if (!hexExists(clickedId)) return;
+            if (!hexExists(clickedId)) return
 
             tfield.hexes[clickedId].bgColor = data_terrain.bgColor;
             tfield.hexes[clickedId].symbol = data_terrain.symbolData ? {...data_terrain.symbolData} : null
@@ -156,8 +154,14 @@ import { onMount } from "svelte";
         }
     }
 
+    function hexExists(hexId) {
+        return tfield.hexes[hexId] != undefined
+    }
+
     function paintHex(hexId: string) {
         //data_terrain = data_terrain
+
+        if (!hexExists(hexId)) return
 
         tfield.hexes[hexId].bgColor = data_terrain.bgColor;
         tfield.hexes[hexId].symbol = data_terrain.symbolData ? {...data_terrain.symbolData} : null
@@ -199,12 +203,21 @@ import { onMount } from "svelte";
         renderHex(clickedId)
     }
 
+    export function eraseHex(hexId: string) {
+        tfield.hexes[hexId].bgColor = tfield.blankHexColor
+        tfield.hexes[hexId].symbol = null
+        tfield.hexes[hexId].blank = true
+
+        renderHex(hexId)
+    }
+
     function paintbucket() {
         let x = pan.worldX
         let y = pan.worldY
         let clickedCoords = worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
 
         let clickedId = genHexId( clickedCoords.q, clickedCoords.r, clickedCoords.s ) 
+        if (!hexExists(clickedId)) return
 
         let baseHex = {...tfield.hexes[clickedId]} // Any neighbours with the same style (same bgColor, symbol and symbolColor) will be changed and their neighbours will be added to the list
 
