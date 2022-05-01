@@ -292,9 +292,10 @@
       await tick()
       comp_terrainField.clearTerrainSprites();
       comp_terrainField.renderAllHexes();
+
+      comp_coordsLayer.eraseAllCoordinates();
       comp_coordsLayer.generateCoords();
       
-      console.log("WHat!?")
     });
   
     L.load();
@@ -306,7 +307,7 @@
     //loadedId = id
   }
  
-  loadSave(JSON.parse(JSON.stringify(DEFAULTSAVEDATA)), null);
+  loadSave(JSON.parse(JSON.stringify(DEFAULTSAVEDATA)), null); // Same as creating a new map
 
 
 

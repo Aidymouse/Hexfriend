@@ -17,6 +17,9 @@
     let oldSeperator = data_coordinates.seperator
 
     let texts = {} // hex id: text object
+    let coordValues = {} // hex id: list of ordered co-ord values, used for seperators
+
+    // Would be faster during runtime to generate all coord systems in advance and switch between them easily, but eats a lot of load time for something unlikely to be used that often during actual use.
 
 
     let cont_coords = new PIXI.Container()
@@ -98,17 +101,18 @@
                     let r: string | number = coordTranslation.row-coordOffsetY
                     r = r < 10 ? "0" + r : r
         
-                    s = c + data_coordinates.seperator + r
+                    s = [c, r]
                     break
                 
                 case "cubeId":
-                    s = hexId
+                    s = hexId.split(":")
                     break
 
             }
 
             if (!texts[hexId]) {
-                texts[hexId] = new PIXI.Text(s, style)
+                texts[hexId] = new PIXI.Text("", style) // Text actually gets set in the updateSeperator function
+                coordValues[hexId] = s
 
                 let p = getTextPosition(hexId)
                 texts[hexId].position.x = p.x
@@ -119,13 +123,15 @@
                 cont_coords.addChild(texts[hexId])
                 
             } else {
-                texts[hexId].text = s
+                coordValues[hexId] = s
 
                 let p = getTextPosition(hexId)
                 texts[hexId].position.x = p.x
                 texts[hexId].position.y = p.y
 
             }
+
+            updateSeperator() 
         })
 
     }
@@ -137,14 +143,14 @@
 
     export function updateSeperator() {
 
-        if (oldSeperator == "") {
-            generateCoords()
-            return
-        }
-
-
         Object.keys(texts).forEach(textId => {
-            texts[textId].text = texts[textId].text.replace(oldSeperator, data_coordinates.seperator)
+            let s = ""
+            coordValues[textId].forEach( (cv, index) => {
+                s += cv
+                if (index != coordValues[textId].length-1) s += data_coordinates.seperator
+            })
+
+            texts[textId].text = s
             
         })
         oldSeperator = data_coordinates.seperator
@@ -169,6 +175,16 @@
         let brokenId = breakDownId(hexId)
         let coords = cubeToWorld(brokenId.q, brokenId.r, brokenId.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
         return {x: coords.x, y: coords.y + tfield.hexHeight/2 - 2}
+    }
+
+    export function eraseAllCoordinates() {
+        Object.keys(texts).forEach(textId => {
+            texts[textId].destroy()
+        })
+
+        texts = []
+        coordValues = []
+        //cont_coords = new PIXI.Container()
     }
 
     onMount(() => {

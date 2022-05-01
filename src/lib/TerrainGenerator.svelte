@@ -267,7 +267,7 @@
         {#if selectedId != ""}
             {#each Object.keys(loadedTilesets) as tilesetName}
                 {#each loadedTilesets[tilesetName] as tile (tile.id)}
-                    <button on:click={() => { addTileToFunction(selectedId, tile.id) }}> <img src={tile.preview}> </button>
+                    <button on:click={() => { addTileToFunction(selectedId, tile.id) }}> <img src={tile.preview} alt={`Add ${tile.display} to generation ruleset`}> </button>
                 {/each}
             {/each}
         {/if}
@@ -296,8 +296,6 @@
         box-sizing: border-box;
         background-color: #333333;
     }
-
-    #generate-button {    }
 
     #buttons {
         display: flex;

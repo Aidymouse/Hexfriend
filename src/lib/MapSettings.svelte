@@ -36,7 +36,7 @@
         Title: <input type="text" bind:value={loadedSave.title}>
         
         <button on:click={()=>{showSettings = false}}>Close</button>
-        <button on:click={()=>{ save(); showSettings = false}}>Save and Close</button>
+        <button on:click={async ()=>{ await save(); showSettings = false}}>Save and Close</button>
 
         Show Grid <input type="checkbox" bind:checked={tfield.grid.shown} on:change={() => { renderGrid() }} >
         {#if tfield.grid.shown}<input type="number" bind:value={tfield.grid.thickness} on:change={() => { renderGrid() } }>{/if}

@@ -23,6 +23,11 @@
 
         <input type="text" bind:value={data_coordinates.seperator} on:change={() => { comp_coordsLayer.updateSeperator() }}/>
 
+        <select bind:value={data_coordinates.system} on:change={ comp_coordsLayer.generateCoords() }>
+            <option value={"evenq"}>X and Y, even lower</option>
+            <option value={"cubeId"}>Cubic Hex Id</option>
+        </select>
+
     {/if}
 </div>
 
