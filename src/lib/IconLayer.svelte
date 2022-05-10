@@ -1,7 +1,7 @@
 <script lang="ts">
 
     import { Sprite } from 'svelte-pixi'
-    import { worldToCube, cubeToWorld } from '../helpers/hexHelpers';
+    import { coords_worldToCube, coords_cubeToWorld } from '../helpers/hexHelpers';
 
     export let icons = [];
 
@@ -43,8 +43,8 @@
         let iconY = pan.worldY
         
         if (data_icon.snapToHex) {
-            let clickedHexCoords = worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight); 
-            let iconCoords = cubeToWorld(clickedHexCoords.q, clickedHexCoords.r, clickedHexCoords.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+            let clickedHexCoords = coords_worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised); 
+            let iconCoords = coords_cubeToWorld(clickedHexCoords.q, clickedHexCoords.r, clickedHexCoords.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised)
             iconX = iconCoords.x
             iconY = iconCoords.y
         } 
@@ -59,6 +59,16 @@
         icons.splice(iconIndex, 1)
         icons = icons
     }
+
+    export function pointerdown() {
+        if (data_icon.usingEraser) {
+            return
+        }
+
+        newIcon()
+
+    }
+
 </script>
 
 
@@ -70,7 +80,7 @@
         tint={icon.color}
         anchor={{x: 0.5, y: 0.5}}
         scale={{x: icon.scale, y: icon.scale}}
-        interactive={ selectedTool == "eraser" }
+        interactive={ selectedTool == "eraser" || data_icon.usingEraser }
         on:pointerdown={ e => { deleteIcon(icon) } }
         on:pointerover={ e => { if (controls.mouseDown[0]) deleteIcon(icon) } }
     />

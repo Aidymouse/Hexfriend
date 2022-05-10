@@ -10,6 +10,7 @@
     export let filenamePrefix: string = "";
 
     function changeValue(newValue: any) {
+        if (value == newValue) return
         value = newValue
         dispatch("change", {})
     }
@@ -20,7 +21,7 @@
     <div id="grid">
         {#each values as v}
             <div class="option" class:selected={value == v} on:click={ () => { changeValue(v) } } title={ capitialize(v) }>
-                <img src={`public/assets/img/selectgrids/${filenamePrefix}${v}.png`} alt={`${v}`}>
+                <img src={`/assets/img/selectgrids/${filenamePrefix}${v}.png`} alt={`${v}`}>
             </div>
         {/each}
     </div>

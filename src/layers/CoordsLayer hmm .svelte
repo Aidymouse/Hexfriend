@@ -9,6 +9,7 @@
 
     export let data_coordinates: coordinates_data;
     export let tfield;
+    export let app;
 
     // Needs some serious optimization. Render each letter and then join them seperately. This is gonna be... weird.
 
@@ -25,11 +26,79 @@
 
     let cont_coords = new PIXI.Container()
 
+    let renderHelper = new PIXI.Container() 
+
+    let alphabet = {
+        "0": null,
+        "1": null,
+        "2": null,
+        "3": null,
+        "4": null,
+        "5": null,
+        "6": null,
+        "7": null,
+        "8": null,
+        "9": null,
+        "-": null
+    }
+
+    
 
     //let style = new PIXI.TextStyle(data_coordinates.style)
-    let style = new PIXI.TextStyle(data_coordinates.style)
-    $: {
 
+    let style = new PIXI.TextStyle(data_coordinates.style)
+    
+    function generateTextSprites() {
+        Object.keys(alphabet).forEach(character => {
+
+            let t = new PIXI.Text(character, style)
+            let b = app.renderer.plugins.extract.base64(t)
+            alphabet[character] = PIXI.Texture.from(b)
+            t.destroy()
+
+        })   
+        
+        let t = new PIXI.Text(data_coordinates.seperator, style)
+        let b = app.renderer.plugins.extract.base64(t)
+        alphabet[data_coordinates.seperator] = PIXI.Texture.from(b)
+        t.destroy()
+
+        console.log(alphabet)
+    }
+
+    function assembleTextSprites() {
+        Object.keys(coordValues).forEach(hexId => {
+
+            let cs = coordValues[hexId].split("")
+
+            let letterContainer = new PIXI.Container()
+            let cumWidth = 0
+            cs.forEach(character => {
+                let s = new PIXI.Sprite(alphabet[character])
+                s.x = cumWidth
+                cumWidth += alphabet[character].width-2
+                letterContainer.addChild(s)
+            })
+
+            let position = getTextPosition(hexId)
+            //letterContainer.position.x = position.x
+            //letterContainer.position.y = position.y
+            let letterTexture = PIXI.Texture.from( app.renderer.plugins.extract.base64(letterContainer) )
+            
+
+            let lS = new PIXI.Sprite(letterTexture)
+
+            lS.position.x = position.x
+            lS.position.y = position.y
+            lS.anchor.set(0.5, 1)
+
+            cont_coords.addChild(lS)
+
+        })
+    }
+
+    /*
+    $: {
         Object.keys(data_coordinates.style).forEach(styleTag => {
             style[styleTag] = data_coordinates.style[styleTag]
         })
@@ -39,11 +108,8 @@
             updateSeperator()
             
         }
-
-        cont_coords = cont_coords
-
-
     }
+    */
 
 
     /* COORDINATE TRANSFORMATIONS */
@@ -92,7 +158,7 @@
         Object.keys(tfield.hexes).forEach(hexId => {
 
             // Find Translation
-            let s: (string | number)[]
+            let s: string
             switch (data_coordinates.system) {
                 case "evenq":
                     let brokenId = breakDownId(hexId)
@@ -113,28 +179,17 @@
 
             }
 
-            if (!texts[hexId]) {
-                texts[hexId] = new PIXI.Text("", style) // Text actually gets set in the updateSeperator function
-                coordValues[hexId] = s
-
-                let p = getTextPosition(hexId)
-                texts[hexId].position.x = p.x
-                texts[hexId].position.y = p.y
-                
-                texts[hexId].anchor = {x: 0.5, y: 1}
-                
-                cont_coords.addChild(texts[hexId])
-                
-            } else {
-                coordValues[hexId] = s
-
-                let p = getTextPosition(hexId)
-                texts[hexId].position.x = p.x
-                texts[hexId].position.y = p.y
-
+            // Put into right format
+            let coord = ""
+            for (let c=0; c<s.length-1; c++) {
+                coord += s[c]
+                coord += data_coordinates.seperator
             }
+            coord += s[s.length-1]
 
-            updateSeperator() 
+            coordValues[hexId] = coord //Array.from(coord)
+
+            //updateSeperator() 
         })
 
     }
@@ -159,6 +214,9 @@
         oldSeperator = data_coordinates.seperator
     } 
 
+    export function updateSystem() {
+
+    }
 
     export function updateTextPositions() {
         Object.keys(tfield.hexes).forEach(hexId => {
@@ -166,6 +224,7 @@
             let p = getTextPosition(hexId)
             texts[hexId].position.x = p.x
             texts[hexId].position.y = p.y
+
             
         })
     }
@@ -188,6 +247,9 @@
 
     onMount(() => {
         //generateCoords()
+        generateTextSprites()
+        generateCoords()
+        assembleTextSprites()
     })
 
 </script>

@@ -1,13 +1,11 @@
 <script lang="ts">
-    import type { coordinates_data } from "src/types/data";
 
     let buttons = [
         {display: "Terrain", toolCode: "terrain"},
         {display: "Icon", toolCode: "icon"},
         {display: "Path", toolCode: "path"},
         {display: "Text", toolCode: "text"},
-        {display: "Eraser", toolCode: "eraser"},
-        {display: "Coordinates", toolCode: "coords"}
+        {display: "Eraser", toolCode: "eraser"}
     ]
 
     export let selectedTool: string;

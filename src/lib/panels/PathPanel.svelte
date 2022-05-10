@@ -1,13 +1,15 @@
 <script lang="ts">
-    import type { path } from 'src/types/path'
+    import type { path, path_style } from 'src/types/path'
+    import type { path_data } from 'src/types/data';
 
     import * as PIXI from 'pixi.js'
 
     import ColorInputPixi from '../../components/ColorInputPixi.svelte'
     import SelectGrid from '../../components/SelectGrid.svelte'
+    import Checkbox from '../../components/Checkbox.svelte'
 
+    export let data_path: path_data
     export let comp_pathLayer
-    export let data_path
 
     $: {
         if (data_path.selectedPath) {
@@ -18,12 +20,11 @@
     }
 
     let pathButtons = [
-        {display: "Green", style: {color: 0x00ff00, width: 13, cap: "round", join: "round"} },
-        {display: "Red", style: {color: 0xff0000, width: 3, cap: "round", join: "bevel"} },
+        {display: "Green", style: {color: 0x00ff00, width: 13, cap: PIXI.LINE_CAP.ROUND, join: PIXI.LINE_JOIN.ROUND} },
+        {display: "Red", style: {color: 0xff0000, width: 3, cap: PIXI.LINE_CAP.ROUND, join: PIXI.LINE_JOIN.BEVEL} },
     ]
 
-    function styleMatchesData(pathStyle) {
-        console.log(pathStyle, data_path.style)
+    function styleMatchesData(pathStyle: path_style) {
         if (pathStyle.color != data_path.style.color) return false
         if (pathStyle.width != data_path.style.width) return false
         if (pathStyle.cap != data_path.style.cap) return false
@@ -37,23 +38,24 @@
 <div class="panel">
         
         <div id="controls">
-            <div style="width: 25px; height: 25px">
-                <ColorInputPixi bind:value={data_path.style.color} />
-            </div>
+            <ColorInputPixi bind:value={data_path.style.color} name={"pathColor"} label={"Path Color"} />
 
             Thickness <input type="number" bind:value={data_path.style.width}>
-            Snap <input type="checkbox" bind:checked={data_path.snap} >
+            <Checkbox bind:checked={data_path.snap} name="pathSnap" label={"Snap"} />
 
-            Line Ends
-            <SelectGrid values={["round", "butt", "square"]} bind:value={data_path.style.cap} filenamePrefix={"lineend"}/>
-            
-            Corners
-            <SelectGrid values={["round", "miter", "bevel"]} bind:value={data_path.style.join} filenamePrefix={"linecorner"} />
+            <span>
+                Line Ends
+                <SelectGrid values={[PIXI.LINE_CAP.ROUND, PIXI.LINE_CAP.BUTT, PIXI.LINE_CAP.SQUARE]} bind:value={data_path.style.cap} filenamePrefix={"lineend"}/>
+            </span>
+
+            <span>
+                Corners
+                <SelectGrid values={[PIXI.LINE_JOIN.ROUND, PIXI.LINE_JOIN.MITER, PIXI.LINE_JOIN.BEVEL]} bind:value={data_path.style.join} filenamePrefix={"linecorner"} />
+            </span>
 
         </div>
 
 
-        
         {#if data_path.selectedPath}
         <div id="selected-path-controls">    
                 <button on:click={() => {data_path.selectedPath = null}} >Deselect Current Path</button>
@@ -77,6 +79,9 @@
 </div>
 
 <style>
+    span {
+        display: flex;
+    }
     div { color: white; }
     
     #controls {

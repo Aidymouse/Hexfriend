@@ -8,16 +8,22 @@
 
   /* TODO 
   
+    // CORE FUNCTIONS
+    - map resizing - removing hexes
     - hex coordinates on map - fix pointy top + more coordinate systems
-
     - terrain generator function validation
     - keyboard shortcuts
-    - tooltips
-    - more fonts
-    - dashed lines
-    - export at different sizes
-    - map resizing - adding / removing hexes
+    - individual terrain and icon erasers
+    - import tilesets
+    - import iconsets
+    
+    // POLISH
+    - floating loaders - better feedback
     - save data checking (if loading, making new map, quitting)
+    - export at different sizes
+    - tooltips
+    - dashed lines
+    - more fonts
 
   */
 
@@ -32,15 +38,14 @@
   import type { Tile } from './types/tilesets'
   import type { TerrainHexField } from './types/terrain'
   import type { saveData } from './lib/defaultSaveData'
-  import type { coordinates_data, icon_data } from './types/data';
-  import type { text_data } from './types/text';
+  import type { coordinates_data, icon_data, text_data, terrain_data, path_data } from './types/data';
 
   import * as PIXI from 'pixi.js'
   import { Pixi, Container, Sprite } from 'svelte-pixi'
   import { tick } from 'svelte'
   import { db } from './lib/db'
 
-  import { getHexPath, cubeToWorld } from './helpers/hexHelpers'
+  import { getHexPath, coords_cubeToWorld } from './helpers/hexHelpers'
 
   // Layers
   import TerrainField from './lib/TerrainField.svelte'
@@ -54,7 +59,6 @@
   import IconPanel from './lib/panels/IconPanel.svelte'
   import PathPanel from './lib/panels/PathPanel.svelte'
   import TextPanel from './lib/panels/TextPanel.svelte'
-  import CoordsPanel from './lib/panels/CoordsPanel.svelte'
 
   // Like, whatever
   import ToolButtons from './lib/ToolButtons.svelte'
@@ -63,6 +67,7 @@
   import TerrainGenerator from './lib/TerrainGenerator.svelte';  
   import SavedMaps from './lib/SavedMaps.svelte';
   import MapSettings from './lib/MapSettings.svelte';
+  import Controls from './lib/Controls.svelte';
 
   // Methods
   import { collapseWaveGen } from './lib/terrainGenerator'
@@ -201,7 +206,7 @@
   /* DATA */
   /* Data is bound to both layer and panel of a particluar tool. It contains all the shared state they need, and is bound to both */
   
-  let data_terrain = {
+  let data_terrain: terrain_data = {
     bgColor: null,
     symbolData: null,
     usingEyedropper: false,
@@ -212,22 +217,23 @@
     color: null,
     texId: null,
     pHex: 80,
-    snapToHex: true
+    snapToHex: true,
+    usingEraser: false
   }
 
-  let data_path = {
-    style: {color: 0, width: 3, cap: "round", join: "round"},
-    colorString: "#000000",
+  let data_path: path_data = {
+    style: {color: 0, width: 3, cap: PIXI.LINE_CAP.ROUND, join: PIXI.LINE_JOIN.ROUND},
     selectedPath: null,
     snap: false,
-    editorRef:null,
   }
 
   let data_text: text_data = {
-    style: {fontFamily: "Segoe UI", fill: "#000000", fontSize: 25, miterLimit: 2, strokeThickness: 0, stroke: "#f2f2f2", align: "left"},
+    style: {fontFamily: "Segoe UI", fill: "#000000", fontSize: 25, miterLimit: 2, strokeThickness: 0, stroke: "#f2f2f2", align: "left", fontStyle: "normal", fontWeight: "normal"},
     selectedText: null,
-    editorRef: null
+    editorRef: null,
+    usingTextTool: false
   }
+  $: data_text.usingTextTool = selectedTool == "text"
 
   let data_coordinates: coordinates_data = {
     shown: true,
@@ -288,12 +294,29 @@
       data_icon.texId = firstIcon.texId
 
 
+      // Center the map
+      let tf = loadedSave.TerrainField
+
+      //pan.zoomScale = 1
+      if (tf.orientation == "flatTop") {
+        
+        // Fix needed //
+
+        pan.offsetX = (window.innerWidth / 2) - (tf.columns * (tf.hexWidth * 0.75)) /2
+        pan.offsetY = (window.innerHeight / 2) - ((tf.rows * tf.hexHeight + tf.hexHeight*0.5) / 2)
+        
+      } else {
+        //pan.offsetX = (tf.columns * tf.hexWidth * 0.75) / 2
+        //pan.offsetY = (tf.rows * tf.hexHeight) / 2
+
+      }
+
       loading = false
       await tick()
       comp_terrainField.clearTerrainSprites();
       comp_terrainField.renderAllHexes();
 
-      comp_coordsLayer.eraseAllCoordinates();
+      //comp_coordsLayer.eraseAllCoordinates();
       comp_coordsLayer.generateCoords();
       
     });
@@ -337,7 +360,7 @@
         break
       
       case "icon":
-        if (controls.mouseDown[0]) comp_iconLayer.newIcon()
+        if (controls.mouseDown[0]) comp_iconLayer.pointerdown()
         break
 
       case "path":
@@ -373,7 +396,7 @@
 
     switch (selectedTool) {
       case "terrain":
-        if (controls.mouseDown[0]) comp_terrainField.placeTerrain()
+        if (controls.mouseDown[0]) comp_terrainField.pointerdown()
         break
 
       case "text":
@@ -433,7 +456,7 @@
       })
   
       console.log(`Added map with id ${id}`)
-      loadedId = id
+      loadedId = Number(id)
       
     }
 
@@ -505,12 +528,15 @@
         scale={ {x: pan.zoomScale, y: pan.zoomScale} }
       >
 
-        <TerrainField bind:this={comp_terrainField} bind:data_terrain {pan} {controls} {L} bind:tfield={loadedSave.TerrainField} />
+        <TerrainField bind:this={comp_terrainField} bind:data_terrain bind:pan {controls} {L} bind:tfield />
 
         <PathLayer bind:this={comp_pathLayer} bind:paths={loadedSave.paths} bind:data_path {pan} {controls} {selectedTool} {tfield}  />
 
         <IconLayer bind:this={comp_iconLayer} bind:icons={loadedSave.icons} bind:data_icon {L} {pan} {selectedTool} {tfield} {controls} />          
 
+        <!--
+          Needs Optimization badly
+        -->
         <CoordsLayer bind:this={comp_coordsLayer} bind:data_coordinates tfield={loadedSave.TerrainField} />
         
         <TextLayer bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text {pan} />
@@ -538,8 +564,6 @@
   {:else if selectedTool == "text"}
     <TextPanel bind:data_text {comp_textLayer} />
 
-  {:else if selectedTool == "coords"}
-    <CoordsPanel bind:data_coordinates {comp_coordsLayer} />
   {/if}
     
     
@@ -566,23 +590,25 @@
   </div>
     
   {#if showSavedMaps}
-  <SavedMaps bind:showSavedMaps {createNewMap} {load} />
+    <SavedMaps bind:showSavedMaps {createNewMap} {load} />
   {/if}
 
-  {#if showSettings}
-    <MapSettings 
+  <MapSettings 
       {loadedSave}
       bind:tfield
       bind:showSettings
       bind:appState
       bind:showTerrainGenerator
+      {comp_terrainField}
+      {comp_coordsLayer}
+      bind:data_coordinates
       {save}
       renderAllHexes={() => {comp_terrainField.renderAllHexes()}}
       renderGrid={() => { comp_terrainField.renderGrid() }}
       redrawEntireMap={() => { redrawEntireMap() }}
       exportMap={() => {exportMap()}}
     />
-  {/if}
+
 
 
 
@@ -612,22 +638,10 @@
     overflow: hidden;
   }
 
-  .invisible {
-    display: none;
-  }
-
-  #cover {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: black;
-    display: none;
-  }
-  
-  #cover .visible {
-    display: block;
+  :global(h2) {
+    font-family: 'Segoe UI';
+    font-weight: normal;
+    border-bottom: solid 2px #555555;
   }
 
   :global(html) {
@@ -759,6 +773,10 @@
   :global(::-webkit-scrollbar-thumb:hover) {
     opacity: 1;
   }
+
+
+  /* GLOBAL Checkbox */
+
 
 
   /* Tools */

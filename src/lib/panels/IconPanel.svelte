@@ -2,9 +2,11 @@
 
     import * as PIXI from 'pixi.js'
     import ColorInputPixi from '../../components/ColorInputPixi.svelte'
+    import Checkbox from '../../components/Checkbox.svelte';
     
     import type { icon_data } from 'src/types/data';
     import type { icon_set_data } from '../../types/icon'
+
 
     export let loadedIconsets
     export let L
@@ -52,13 +54,15 @@
     
         <img src={iconPreview} alt={"Icon Preview"}>
         
-        <div style="width: 25px; height: 25px">
-            <ColorInputPixi bind:value={data_icon.color} />
-        </div>
 
-        <div>  <input type="checkbox" bind:checked={data_icon.snapToHex}> Snap to Hex </div>
-    
+        <ColorInputPixi bind:value={data_icon.color} w={25} h={25} label={"Icon Color"} name={"iconPanelColor"} />
+
+        <Checkbox name={"cb_snapIcon"} label="Snap To Hex Center" bind:checked = {data_icon.snapToHex} />
+
+        <button id="eraser" title={"Icon Eraser"} on:click={() => {data_icon.usingEraser = !data_icon.usingEraser}} class:selected={data_icon.usingEraser} > <img src="/assets/img/tools/eraser.png" alt={"Eyedropper"}> </button>
+
     </div>
+    
 
     <div id="buttons">
         {#each Object.keys(loadedIconsets) as setName}
@@ -116,4 +120,21 @@
         width: 90%;
         height: auto;
     }
+
+    #eraser {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 25px;
+        height: 25px;
+        padding: 2px;
+    }
+
+    #eraser img {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+    }
+
+
 </style>

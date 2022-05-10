@@ -8,7 +8,8 @@
     export let width: number = 25;
     export let height: number = 25;
     
-    export let label = "";
+    export let label: string = null;
+    export let name: string = null;
 
     $: {
         value = value;
@@ -21,11 +22,12 @@
 
     <div style="--bg-color: {value}; width: {width}px; height: {height}px;">
 
-        <input type="color" bind:value={value}>
+        <input type="color" id={name} bind:value={value}>
 
     </div>
 
-    {label}
+    <label for={name}> {label} </label>
+    
 </main>
 
 
@@ -42,6 +44,7 @@
         border-radius: 50%;
         overflow: none;
         border: solid 2px white;
+        box-sizing: border-box;
         background-color: var(--bg-color);
 
         margin-right: 5px;

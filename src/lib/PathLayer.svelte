@@ -1,18 +1,20 @@
 <script lang="ts">
 
     import type { path } from 'src/types/path'
+    import type { TerrainHexField } from 'src/types/terrain';
+    import type { path_data } from 'src/types/data';
 
     import { Graphics, Container } from 'svelte-pixi'
-    import { worldToCube, cube_round, cubeToWorld } from '../helpers/hexHelpers';
+    import { coords_worldToCube, cube_round, coords_cubeToWorld } from '../helpers/hexHelpers';
 
     import * as PIXI from 'pixi.js'
 
     export let controls;
     export let pan;
     export let selectedTool
-    export let tfield // required for snapping
+    export let tfield: TerrainHexField // required for snapping
 
-    export let data_path
+    export let data_path: path_data
 
     export let paths: path[] = []
     
@@ -78,8 +80,8 @@
         let hW = tfield.hexWidth
         let hH = tfield.hexHeight
 
-        let clickedCoords = worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
-        let centerCoords = cubeToWorld(clickedCoords.q, clickedCoords.r, clickedCoords.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+        let clickedCoords = coords_worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised)
+        let centerCoords = coords_cubeToWorld(clickedCoords.q, clickedCoords.r, clickedCoords.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised)
 
         let closestPoint = {x: Infinity, y: Infinity}
         let shortestDist = Infinity

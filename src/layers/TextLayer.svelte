@@ -1,11 +1,13 @@
 <script lang="ts">
 
+    import type { text_data } from 'src/types/data';
+
     import { Text, Graphics } from 'svelte-pixi'
     import * as PIXI from 'pixi.js'
 
     export let pan;
     
-    export let data_text;
+    export let data_text: text_data;
     let hoveredText;
 
     let dragText;
@@ -26,6 +28,8 @@
     }
 
     export function pointerdown() {
+
+        
 
         if (data_text.selectedText && hoveredText) {
             selectText()
@@ -56,6 +60,8 @@
     }
 
     export function pointermove() {
+        if (!data_text.usingTextTool) return
+        
         if (dragText) {
             dragText.x = pan.worldX - dragX
             dragText.y = pan.worldY - dragY
@@ -115,6 +121,8 @@
 <Graphics 
     draw={g => {
         g.clear()
+        if (!data_text.usingTextTool) return
+        
         if (data_text.selectedText) {
             let tW = getTextWidth(data_text.selectedText)
             let tH = getTextHeight(data_text.selectedText)

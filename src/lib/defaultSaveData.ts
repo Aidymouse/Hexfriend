@@ -1,7 +1,8 @@
 import type { TerrainHexField } from '../types/terrain'
 import type { Tile } from '../types/tilesets'
+import { map_type } from '../types/settings'
 
-import {genHexId} from '../helpers/hexHelpers'
+import {coords_evenqToCube, genHexId} from '../helpers/hexHelpers'
 
 import { DEFAULTTILESET } from './defaultTileset'
 import { DEFAULTICONSET } from './defaultIconset'
@@ -34,6 +35,13 @@ let DEFAULTSAVEDATA: saveData = {
         hexHeight: 45,
         orientation: 'flatTop',
 
+        rows: 20,
+        columns: 20,
+        raised: "odd", // Which row / column should be higher / indented
+
+        hexesOut: 10,
+
+        mapType: map_type.SQUARE,
         blankHexColor: 0xf2f2f2,
         
         grid: {stroke: 0x333333, thickness: 2, shown: true},
@@ -43,7 +51,7 @@ let DEFAULTSAVEDATA: saveData = {
 
     coords: {
         shown: false,
-        style: { fill: 0xffffff, fontSize: 10, stroke: 0x000000, strokeThickness: 3, fontFamily: "Segoe UI" },
+        style: { fill: 0x000000, fontSize: 10, stroke: 0xffffff, strokeThickness: 2, fontFamily: "Segoe UI" },
         system: "evenq",
         seperator: "."
     },
@@ -63,18 +71,21 @@ let DEFAULTSAVEDATA: saveData = {
 
 //console.log(JSON.stringify(DEFAULTSAVEDATA.tilesets['default']))
 
-let hexesOut = 10;
-for (let q = -hexesOut; q <= hexesOut; q++) {
-    for (let r = -hexesOut; r <= hexesOut; r++) {
-        
-        if (-q - r >= -hexesOut && -q - r <= hexesOut) {
-            
-            DEFAULTSAVEDATA.TerrainField.hexes[ genHexId(q, r, -q - r) ] = { q: q, r: r, s: -q - r, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true }
 
-        }
+
+for (let col=0; col<DEFAULTSAVEDATA.TerrainField.columns; col++) {
+    for (let row=0; row<DEFAULTSAVEDATA.TerrainField.rows; row++) {
+
+        let cubeCoords = coords_evenqToCube(col, row)
+        let q = cubeCoords.q
+        let r = cubeCoords.r
+        let s = cubeCoords.s
+
+        DEFAULTSAVEDATA.TerrainField.hexes[genHexId(q, r, s)] = { q: q, r: r, s: s, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true }
 
     }
 }
+        
 
 export default DEFAULTSAVEDATA;
 export type {saveData}

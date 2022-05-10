@@ -1,22 +1,25 @@
 <script lang="ts">
 
     import type {Tile} from 'src/types/tilesets'
+    import type {terrain_data} from 'src/types/data'
+    import type { TerrainHexField } from 'src/types/terrain';
 
     import ColorInputPixi from '../../components/ColorInputPixi.svelte'
     import * as PIXI from 'pixi.js'
     import { getHexPath } from '../../helpers/hexHelpers';
-import { TextStyle } from 'pixi.js';
 
     export let loadedTilesets
-    export let data_terrain
+    export let data_terrain: terrain_data
 
-    export let tfield
-    export let app
-    export let L
+    export let tfield: TerrainHexField
+    export let app: PIXI.Application
+    export let L: PIXI.Loader
     
     $: {
         tilePreview = generateTilePreview(data_terrain)
         loadedTilesets = loadedTilesets
+
+        tfield.orientation = tfield.orientation
     }
     
     // Used for previews
@@ -51,11 +54,21 @@ import { TextStyle } from 'pixi.js';
         }
     }
 
-    function generateTilePreview(data_terrain) {
+    function generateTilePreview(data_terrain: terrain_data) {
 
         g.clear()
         g.beginFill(data_terrain.bgColor)
-        g.drawPolygon( getHexPath(50, 45, tfield.orientation, 0, 0) )
+
+        let hW = 50
+        let hH = 45
+
+        if (tfield.orientation == "pointyTop") {
+            hW = 45
+            hH = 50
+        }
+
+
+        g.drawPolygon( getHexPath(hW, hH, tfield.orientation, 0, 0) )
         g.endFill()
 
         if (data_terrain.symbolData) {
@@ -91,24 +104,23 @@ import { TextStyle } from 'pixi.js';
 </script>
 
 <div class="panel">
+
     <div id="terrain-preview">
-        <div id="preview-image-centerer">
-            <img src={tilePreview} alt={"Current Tile Preview"}>
+        <div id="preview-image-centerer" >
+            <img src={tilePreview} alt={"Current Tile Preview"} class:flatTop={tfield.orientation == "flatTop"} class:pointyTop={tfield.orientation == "pointyTop"}>
         </div>
         
-        <div style="width: 25px; height: 25px">
-            <ColorInputPixi bind:value={data_terrain.bgColor} />
-        </div>
-
+        <ColorInputPixi bind:value={data_terrain.bgColor} name={"terrainColor"} label={"Terrain Color"}/>
+        
         {#if data_terrain.symbolData}
-            <div style="width: 25px; height: 25px">
-                <ColorInputPixi bind:value={data_terrain.symbolData.color} />
-            </div>
+
+            <ColorInputPixi bind:value={data_terrain.symbolData.color} name={"symbolColor"} label={"Symbol Color"} />
+
         {/if}
 
-        <button id="eyedropper" title={"Hex Eyedropper"} on:click={() => {data_terrain.usingEyedropper = !data_terrain.usingEyedropper}} class:selected={data_terrain.usingEyedropper} > <img src="public/assets/img/tools/eyedropper.png" alt={"Eyedropper"}> </button>
-        <button id="paintbucket" title={"Hex Paintbucket"} on:click={() => {data_terrain.usingPaintbucket = !data_terrain.usingPaintbucket}} class:selected={data_terrain.usingPaintbucket} > <img src="public/assets/img/tools/paintbucket.png" alt={"Paint Bucket"}> </button>
-
+        <button id="eyedropper" title={"Hex Eyedropper"} on:click={() => {data_terrain.usingEyedropper = !data_terrain.usingEyedropper}} class:selected={data_terrain.usingEyedropper} > <img src="/assets/img/tools/eyedropper.png" alt={"Eyedropper"}> </button>
+        <button id="paintbucket" title={"Hex Paintbucket"} on:click={() => {data_terrain.usingPaintbucket = !data_terrain.usingPaintbucket}} class:selected={data_terrain.usingPaintbucket} > <img src="/assets/img/tools/paintbucket.png" alt={"Paint Bucket"}> </button>
+    
     </div>
 
     <div id="buttons">
@@ -197,8 +209,12 @@ import { TextStyle } from 'pixi.js';
         align-items: center;
     }
 
-    #terrain-preview img {
+    #terrain-preview img.flatTop {
         width: 60px;
+    }
+
+    #terrain-preview img.pointyTop {
+        height: 60px;
     }
 
     .selected {

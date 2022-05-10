@@ -1,10 +1,11 @@
 <script lang="ts">
-    import ColorInput from "../ColorInput.svelte";
+    import ColorInput from "../../components/ColorInput.svelte";
     import SelectGrid from "../../components/SelectGrid.svelte";
-    import type { text_data, text_style } from "src/types/text";
+    import CustomValueToggle from "../../components/CustomValueToggle.svelte";
+    import type { text_style } from "src/types/text";
+    import type { text_data } from "src/types/data";
 
-
-    export let data_text;
+    export let data_text: text_data;
     export let comp_textLayer;
 
     /* This is fucking barbaric... but I can't find a way to make to make it work */
@@ -14,9 +15,9 @@
 
     
     let textStyles = [
-        {display: "Big", style: {fontFamily: "Segoe UI", fill: "#000000", fontSize: 40, miterLimit: 2, strokeThickness: 5, stroke: "#f2f2f2", align: "center"} },
-        {display: "Big Sans", style: {fontFamily: "Comic Sans MS", fill: "#000000", fontSize: 40, miterLimit: 2, strokeThickness: 5, stroke: "#f2f2f2", align: "center"} },
-        {display: "Little", style: {fontFamily: "Segoe UI", fill: "#000000", fontSize: 25, miterLimit: 2, strokeThickness: 0, stroke: "#f2f2f2", align: "left"} },
+        {display: "Big", style: {fontFamily: "Segoe UI", fill: "#000000", fontSize: 40, miterLimit: 2, strokeThickness: 5, stroke: "#f2f2f2", align: "center", fontStyle: "normal", fontWeight: "normal"} },
+        {display: "Big Sans", style: {fontFamily: "Comic Sans MS", fill: "#000000", fontSize: 40, miterLimit: 2, strokeThickness: 5, stroke: "#f2f2f2", align: "center", fontStyle: "normal", fontWeight: "normal"} },
+        {display: "Little", style: {fontFamily: "Segoe UI", fill: "#000000", fontSize: 25, miterLimit: 2, strokeThickness: 0, stroke: "#f2f2f2", align: "left", fontStyle: "normal", fontWeight: "normal"} },
     ]
 
     function selectedMatches(style: text_style): boolean {
@@ -41,20 +42,35 @@
 <div class="panel">
 
     <div id="controls">
-    <ColorInput bind:value={data_text.style.fill} label={"Color"} />
-    <input type="number" bind:value={data_text.style.fontSize} >
+        <ColorInput bind:value={data_text.style.fill} name="textFill" label={"Color"} />
+        <input type="number" bind:value={data_text.style.fontSize} >
 
-    <ColorInput bind:value={data_text.style.stroke} label={"Stroke"} />
-    <input type="number" bind:value={data_text.style.strokeThickness} >
+        <ColorInput bind:value={data_text.style.stroke} name="textStroke" label={"Stroke"} />
+        <input type="number" bind:value={data_text.style.strokeThickness} >
 
-    <select bind:value={data_text.style.fontFamily} >
-        <option value={"Segoe UI"}>Segoe UI</option>
-        <option value={"Comic Sans MS"}>Comic Sans</option>
-        <option value={"Arial"}>Arial</option>
-        <option value={"Times New Roman"}>Times New Roman</option>
-    </select>
+        <select bind:value={data_text.style.fontFamily} >
+            <option value={"Segoe UI"}>Segoe UI</option>
+            <option value={"Comic Sans MS"}>Comic Sans</option>
+            <option value={"Arial"}>Arial</option>
+            <option value={"Times New Roman"}>Times New Roman</option>
+        </select>
 
-    <SelectGrid values={["left", "center", "right"]} bind:value={data_text.style.align} filenamePrefix={"textalign"} />
+        <SelectGrid values={["left", "center", "right"]} bind:value={data_text.style.align} filenamePrefix={"textalign"} />
+
+        <div id="font-style-container">
+            <div id="font-style-options">
+
+                <div class="font-style-option">
+                    <CustomValueToggle offValue={"normal"} onValue={"italic"} bind:value={data_text.style.fontStyle}><i style="font-family: Times New Roman">I</i></CustomValueToggle>
+                </div>
+
+                <div class="font-style-option">
+                    <CustomValueToggle offValue={"normal"} onValue={"bold"} bind:value={data_text.style.fontWeight}><b>B</b></CustomValueToggle>
+                </div>
+
+            </div>
+        </div>
+
 
     </div>
 
@@ -103,6 +119,25 @@
     #text-styles p {
         margin: 0;
         margin-bottom: 5px;
+    }
+
+    #font-style-options {
+        display: flex;
+        gap: 1px;
+        background-color: #555555;
+        border: solid 1px #555555;
+        border-radius: 3px;
+
+    }
+
+    .font-style-option {
+        width: 30px;
+        height: 30px;
+    }
+
+    #font-style-container {
+        display: inline-block;
+        border-radius: 3px;
     }
 
 </style>

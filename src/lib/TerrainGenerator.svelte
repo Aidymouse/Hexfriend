@@ -11,8 +11,7 @@
 
 
     function validateRuleset(rules) {
-        // Rules are invalid if any hex leads to another hex with an empty domain
-        // Maybe more, but I cant think of it
+        // Rules are valid if you can't have a space that has to be ignored because the rules forbid all hexes
     }
 
 
@@ -60,6 +59,7 @@
 
         let hexIds = Object.keys(genHexes)
         let firstHex = null
+        let paintOrder = []
 
         while (hexIds.length > 0) {
             // Find hex with lowest weight
@@ -132,10 +132,11 @@
                 
             }
 
+            paintOrder.push(h)
 
         }
 
-        return genHexes
+        return {gen: genHexes, order: paintOrder}
     }
 
     
@@ -146,12 +147,14 @@
 
 
     function generate() {
-        let generatedTerrain = collapseWaveGen(tfield.hexes, genFunction)
+        let g = collapseWaveGen(tfield.hexes, genFunction)
+        let generatedTerrain = g.gen
+        let o = g.order
 
         //console.log(generatedTerrain)
 
         let c = 0;
-        Object.keys(generatedTerrain).forEach(hexId => {
+        o.forEach(hexId => {
 
             if (generatedTerrain[hexId].terrainId == "!!BLANK!!") {
                 comp_terrainField.eraseHex(hexId)

@@ -81,15 +81,24 @@ export function cube_round(frac: cubeCoords): cubeCoords {
     return { q: q, r: r, s: s }
 }
 
-export function worldToCube(worldX: number, worldY: number, hexOrientation: hexOrientation, hexWidth: number, hexHeight: number): cubeCoords {
+export function coords_worldToCube(worldX: number, worldY: number, hexOrientation: hexOrientation, hexWidth: number, hexHeight: number, raised: "even" | "odd" | null): cubeCoords {
     if (hexOrientation == "flatTop") {
         // This is the inversion of the axialToWorld
         // Of course, substituting -q-r in as S
 
+        
         let q = worldX / (hexWidth * 0.75)
-        let r = ((2 * worldY) / hexHeight - q) / 2
+        
+        let r = ((2 * (worldY) ) / hexHeight - q) / 2
 
-        return cube_round(AxialToCube(q, r));
+        let roundedCoords = cube_round(AxialToCube(q, r))
+
+        if ( (roundedCoords.q & 1) == 0 && raised == "odd") {
+            roundedCoords.r += 1
+            roundedCoords.s -= 1
+        }
+
+        return roundedCoords;
 
     } else if (hexOrientation == "pointyTop") {
         // How the fuck am i gonna do this
@@ -97,26 +106,73 @@ export function worldToCube(worldX: number, worldY: number, hexOrientation: hexO
         let r = worldY / (hexHeight * 0.75)
         let q = ((2 * worldX) / hexWidth - r) / 2
 
-        return cube_round(AxialToCube(q, r));
+        let roundedCoords = cube_round(AxialToCube(q, r));
+
+        if (raised == "even" && (roundedCoords.r & 1) == 1) {
+            roundedCoords.q -= 1
+            roundedCoords.s += 1
+        }
+
+
+        return roundedCoords
 
     }
 }
 
-export function cubeToWorld(q: number, r: number, s: number, hexOrientation: hexOrientation, hexWidth: number, hexHeight: number): {x: number, y: number} {
+export function coords_cubeToWorld(q: number, r: number, s: number, hexOrientation: hexOrientation, hexWidth: number, hexHeight: number, raised: "even" | "odd" | null): {x: number, y: number} {
     if (hexOrientation == "flatTop") {
         let hx = q * hexWidth * 0.75
         let hy = r * hexHeight / 2 - s * hexHeight / 2
 
+        if (raised == "odd" && (q & 1) == 0) {
+            hy -= hexHeight
+        }
+
         return {
-            x: hx, //+ (hx > 0 ? -0.5 : 0.5) * this.q,
-            y: hy//+ (this.s % 2 == 0 ? this.height/2 : 0)
+            x: hx, 
+            y: hy
 
         }
+
     } else if (hexOrientation == "pointyTop") {
+
+        let hx = q * hexWidth / 2 - s * hexWidth / 2
+        let hy = r * hexHeight * 0.75 
+
+        if (raised == "even" && (r & 1) == 1 ) {
+            hx += hexWidth
+        }
+
         return {
-            x: q * hexWidth / 2 - s * hexWidth / 2,
-            y: r * hexHeight * 0.75 // Negative correct??
+            x: hx,
+            y: hy
         }
 
     }
+}
+
+
+export function coords_evenqToCube(col, row) {
+    let q = col
+    let r = row - (col + (col & 1)) / 2
+    return {q: q, r: r, s: -q-r}
+}
+
+export function coords_cubeToEvenq(q, r, s) {
+    let col = q
+    let row = r + (q + (q & 1)) / 2
+    return { col: col, row: row }
+}
+
+export function coords_cubeToEvenr(q, r, s) {
+    let col = q + (r + (r & 1)) / 2
+    let row = r
+    return {col: col, row: row}
+}
+
+export function coords_evenrToCube(col, row) {
+    var q = col - (row + (row & 1)) / 2
+    var r = row
+    return {q: q, r: r, s: -q-r}
+
 }

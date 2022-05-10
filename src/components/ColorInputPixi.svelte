@@ -7,6 +7,12 @@
 
     export let value: number = 0x000000
 
+    export let label: string = null
+    export let name: string = null
+
+    export let w = 25
+    export let h = 25
+
     let oldStringValue = PIXI.utils.hex2string(value)
     let stringValue = oldStringValue
 
@@ -28,17 +34,30 @@
 </script>
 
 
+<span>
 
-<div style="--bg-color: {stringValue}">
+<div style="--bg-color: {stringValue}; width: {w}px; height: {h}px" >
 
-    <input type="color" bind:value={stringValue}>
+    <input type="color" bind:value={stringValue} id={name}>
 
 </div>
+
+{#if label}
+    <label for={name}>{label}</label>
+{/if}
+
+</span>
 
 
 
 
 <style>
+
+    span {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
 
     div {
         border-radius: 50%;

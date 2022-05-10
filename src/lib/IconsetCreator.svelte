@@ -272,9 +272,8 @@
 
     <div id="icon-controls">
 
-      <div style="width: 60px; height: 60px">
-        <ColorInputPixi bind:value={iconButtons[stIndex].color} />
-      </div>
+
+      <ColorInputPixi bind:value={iconButtons[stIndex].color} w={60} h={60}/>
 
       <input type="range" min="5" max="100" bind:value={iconButtons[stIndex].pHex}>
 

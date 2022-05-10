@@ -5,16 +5,14 @@ export interface text_style {
     miterLimit?: number,
     strokeThickness?: number,
     stroke?: string,
-    align?: string
+    align?: string,
+    fontStyle: string;
+    fontWeight: "normal" | "bold" | number;
 }
 
-export interface text_data {
-    style: text_style,
-    selectedText?: text,
-    editorRef: any,
-}
 
-export interface text {
+/* HF stands for Hexfriend */
+export interface HF_text {
     id: number,
     text: string,
     style: text_style,

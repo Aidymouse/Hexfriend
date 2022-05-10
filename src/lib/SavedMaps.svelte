@@ -9,6 +9,8 @@
         () => db.mapSaves.toArray()
     )
 
+    
+
     export let showSavedMaps: boolean
     export let load: Function
 
@@ -40,6 +42,8 @@
         <button id="close-button" on:click={()=>{showSavedMaps = false}}>Close</button>
         
         <div class="map-save" id="new-map-button" on:click={() => { createNewMap() }}>+</div>
+
+        
 
         {#each $saves || [] as save (save.id)}
             <div class="map-save">
