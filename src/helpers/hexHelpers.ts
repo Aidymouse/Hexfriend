@@ -42,6 +42,13 @@ export function genHexId(q: number, r: number, s: number): string {
     return q.toString() + ":" + r.toString() + ":" + s.toString();
 }
 
+export function genHexId_cordsObj(coords: {q: number, r: number, s: number}) {
+    let q = coords.q
+    let r = coords.r
+    let s = coords.s
+    return q.toString() + ":" + r.toString() + ":" + s.toString();
+}
+
 /* NEIGHBOURS */
 export function getNeighbours(q: number, r: number, s: number): string[] {
 
@@ -82,6 +89,9 @@ export function cube_round(frac: cubeCoords): cubeCoords {
 }
 
 export function coords_worldToCube(worldX: number, worldY: number, hexOrientation: hexOrientation, hexWidth: number, hexHeight: number, raised: "even" | "odd" | null): cubeCoords {
+    
+    
+    
     if (hexOrientation == "flatTop") {
         // This is the inversion of the axialToWorld
         // Of course, substituting -q-r in as S
@@ -92,11 +102,6 @@ export function coords_worldToCube(worldX: number, worldY: number, hexOrientatio
         let r = ((2 * (worldY) ) / hexHeight - q) / 2
 
         let roundedCoords = cube_round(AxialToCube(q, r))
-
-        if ( (roundedCoords.q & 1) == 0 && raised == "odd") {
-            roundedCoords.r += 1
-            roundedCoords.s -= 1
-        }
 
         return roundedCoords;
 
@@ -109,8 +114,8 @@ export function coords_worldToCube(worldX: number, worldY: number, hexOrientatio
         let roundedCoords = cube_round(AxialToCube(q, r));
 
         if (raised == "even" && (roundedCoords.r & 1) == 1) {
-            roundedCoords.q -= 1
-            roundedCoords.s += 1
+            //roundedCoords.q -= 1
+            //roundedCoords.s += 1
         }
 
 
@@ -125,7 +130,7 @@ export function coords_cubeToWorld(q: number, r: number, s: number, hexOrientati
         let hy = r * hexHeight / 2 - s * hexHeight / 2
 
         if (raised == "odd" && (q & 1) == 0) {
-            hy -= hexHeight
+            //hy -= hexHeight
         }
 
         return {
@@ -140,7 +145,7 @@ export function coords_cubeToWorld(q: number, r: number, s: number, hexOrientati
         let hy = r * hexHeight * 0.75 
 
         if (raised == "even" && (r & 1) == 1 ) {
-            hx += hexWidth
+            //hx += hexWidth
         }
 
         return {

@@ -1,8 +1,9 @@
 <script lang="ts">
     import { Graphics, Container } from "svelte-pixi"
     import * as PIXI from 'pixi.js'
-    import {coords_cubeToWorld, getHexPath, genHexId, coords_worldToCube, getNeighbours, coords_cubeToEvenq, coords_evenqToCube, coords_evenrToCube} from '../helpers/hexHelpers'
+    import {coords_cubeToWorld, getHexPath, genHexId, coords_worldToCube, getNeighbours, coords_cubeToEvenq, coords_evenqToCube, coords_evenrToCube, genHexId_cordsObj} from '../helpers/hexHelpers'
 
+    import { map_type } from "/src/types/settings";
     import { onMount } from "svelte";
 
     let terrainGraphics = new PIXI.Graphics()
@@ -18,10 +19,163 @@
     
     export let data_terrain
 
+    /* SQUARE SHAPED MAPS */
+    export function changeRaisedColumn() {
+        if (tfield.raised == "even") {
+            // Change render status of the invisible top hexes
+            for (let col = 0; col < tfield.columns; col+=2) {
+                let topHexCoords = coords_evenqToCube(col, -1)
+                let topHexId = genHexId_cordsObj(topHexCoords)
+                
+                let topHex = tfield.hexes[topHexId]
+                topHex.renderable = false
+                //renderHex(topHexId)
 
-    
+
+                let bottomHexCoords = coords_evenqToCube(col, tfield.rows-1)
+                let bottomHexId = genHexId_cordsObj(bottomHexCoords)
+                
+                let bottomHex = tfield.hexes[bottomHexId]
+                bottomHex.renderable = true
+
+                // Iterate through column, starting from topmost hex (well, one down really)
+                for (let row = tfield.rows-2; row>=-1; row--) {
+                    // Move current hex contents into hex above itself
+                    let cHexCoords = coords_evenqToCube(col, row)
+                    let cHexId = genHexId_cordsObj(cHexCoords)
+                    let cHex = tfield.hexes[cHexId]
+
+                    let belowHexCoords = coords_evenqToCube(col, row+1)
+                    let belowHexId = genHexId_cordsObj(belowHexCoords)
+                    let belowHex = tfield.hexes[belowHexId]
+
+                    belowHex.bgColor = cHex.bgColor
+                    belowHex.symbol = cHex.symbol ? {...cHex.symbol} : null
+                    belowHex.blank = cHex.blank
+                }
+
+            }
+
+        } else {
+
+
+            // Change render status of the invisible top hexes
+            for (let col = 0; col < tfield.columns; col+=2) {
+                let topHexCoords = coords_evenqToCube(col, -1)
+                let topHexId = genHexId_cordsObj(topHexCoords)
+                let topHex = tfield.hexes[topHexId]
+                topHex.renderable = true
+
+                let bottomHexCoords = coords_evenqToCube(col, tfield.rows-1)
+                let bottomHexId = genHexId_cordsObj(bottomHexCoords)
+                let bottomHex = tfield.hexes[bottomHexId]
+                bottomHex.renderable = false
+
+                // Iterate through column, starting from topmost hex (well, one down really)
+                for (let row = 0; row<tfield.rows; row++) {
+                    // Move current hex contents into hex above itself
+                    let cHexCoords = coords_evenqToCube(col, row)
+                    let cHexId = genHexId_cordsObj(cHexCoords)
+                    let cHex = tfield.hexes[cHexId]
+
+                    let aboveHexCoords = coords_evenqToCube(col, row-1)
+                    let aboveHexId = genHexId_cordsObj(aboveHexCoords)
+                    let aboveHex = tfield.hexes[aboveHexId]
+
+                    aboveHex.bgColor = cHex.bgColor
+                    aboveHex.symbol = cHex.symbol ? {...cHex.symbol} : null
+                    aboveHex.blank = cHex.blank
+                }
+
+            }
+
+
+        }
+
+        renderAllHexes()
+    }
+
+    export function changeIndentedRow() {
+            if (tfield.raised == "odd") {
+
+                for (let row = 0; row < tfield.rows; row+=2) {
+                    let leftHexCoords = coords_evenrToCube(-1, row)
+                    let leftHexId = genHexId_cordsObj(leftHexCoords)
+                    
+                    let leftHex = tfield.hexes[leftHexId]
+                    leftHex.renderable = true
+                    //renderHex(topHexId)
+
+
+                    let rightHexCoords = coords_evenrToCube(tfield.columns-1, row)
+                    let rightHexId = genHexId_cordsObj(rightHexCoords)
+                    
+                    let rightHex = tfield.hexes[rightHexId]
+                    rightHex.renderable = false
+
+                    // Move each hex one left
+                    for (let col = 0; col<tfield.columns; col++) {
+                        // Move current hex contents into hex above itself
+                        let cHexCoords = coords_evenrToCube(col, row)
+                        let cHexId = genHexId_cordsObj(cHexCoords)
+                        let cHex = tfield.hexes[cHexId]
+
+                        let leftHexCoords = coords_evenrToCube(col-1, row)
+                        let leftHexId = genHexId_cordsObj(leftHexCoords)
+                        let leftHex = tfield.hexes[leftHexId]
+
+                        leftHex.bgColor = cHex.bgColor
+                        leftHex.symbol = cHex.symbol ? {...cHex.symbol} : null
+                        leftHex.blank = cHex.blank
+                    }
+                
+
+                }
+
+            } else {
+                for (let row = 0; row < tfield.rows; row+=2) {
+                    let leftmostHexCoords = coords_evenrToCube(-1, row)
+                    let leftmostHexId = genHexId_cordsObj(leftmostHexCoords)
+                    
+                    let leftmostHex = tfield.hexes[leftmostHexId]
+                    leftmostHex.renderable = false
+                    //renderHex(topHexId)
+
+
+                    let rightmostHexCoords = coords_evenrToCube(tfield.columns-1, row)
+                    let rightmostHexId = genHexId_cordsObj(rightmostHexCoords)
+                    
+                    let rightmostHex = tfield.hexes[rightmostHexId]
+                    rightmostHex.renderable = true
+
+                    // Move each hex one right
+                    for (let col = tfield.columns-2; col >= -1; col--) {
+                        // Move current hex contents into hex above itself
+                        let cHexCoords = coords_evenrToCube(col, row)
+                        let cHexId = genHexId_cordsObj(cHexCoords)
+                        let cHex = tfield.hexes[cHexId]
+
+                        let rightHexCoords = coords_evenrToCube(col+1, row)
+                        let rightHexId = genHexId_cordsObj(rightHexCoords)
+                        let rightHex = tfield.hexes[rightHexId]
+
+                        rightHex.bgColor = cHex.bgColor
+                        rightHex.symbol = cHex.symbol ? {...cHex.symbol} : null
+                        rightHex.blank = cHex.blank
+                    }
+                
+
+                }
+            }
+
+            renderAllHexes()
+    }
+
     export function square_expandMapDimension(direction: "left" | "right" | "top" | "bottom", amount: number) {
         
+        // Will come back here later...
+        return
+
         if (direction == "right" || direction=="left") {
             // Just add new blank hexes
             if (direction == "right") console.log("Add Right")
@@ -164,7 +318,7 @@
 
     }
 
-    export function changeOrientation() {
+    function square_changeOrientation() {
         // set up new array with new hexes
 
         // erase all hex sprites
@@ -174,24 +328,71 @@
         for (let row = 0; row < tfield.rows; row++) {
             for (let col = 0; col < tfield.columns; col++) {
 
-                let oldCubeCoords = tfield.orientation == "pointyTop" ? coords_evenqToCube(col, row) : coords_evenrToCube(col, row)
+                let raiseMod = 0
+
+                if (tfield.raised == "odd") {
+
+                    // Remember, this function is being called *because* the orientation just changed, so we have to use the counterpart orienttaion in these ifs
+                    // It's found using the new orientation, but it applies to the old hexes
+                    if (tfield.orientation == "pointyTop" && (col & 1) == 0) {
+                        raiseMod = 1
+                    }
+
+                    if (tfield.orientation == "flatTop" && (row & 1) == 0) {
+                        raiseMod = 1
+                    }
+                }
+
+                let sourceCubeCoords = tfield.orientation == "pointyTop" ? coords_evenqToCube(col, row-raiseMod) : coords_evenrToCube(col-raiseMod, row)
                 let cubeCoords = tfield.orientation == "pointyTop" ? coords_evenrToCube(col, row) : coords_evenqToCube(col, row)
                 let q = cubeCoords.q
                 let r = cubeCoords.r
                 let s = cubeCoords.s
 
-                let currentHex = tfield.hexes[genHexId(oldCubeCoords.q, oldCubeCoords.r, oldCubeCoords.s)]
+                console.log(sourceCubeCoords)
 
-                newHexes[genHexId(q, r, s)] = { q: q, r: r, s: s, bgColor: currentHex.bgColor, symbolId: currentHex.symbolId, symbol: currentHex.symbol ? {...currentHex.symbol} : null, blank: currentHex.blank }
+                let sourceHex = tfield.hexes[genHexId(sourceCubeCoords.q, sourceCubeCoords.r, sourceCubeCoords.s)]
+
+                newHexes[genHexId(q, r, s)] = { q: q, r: r, s: s, bgColor: sourceHex.bgColor, symbolId: sourceHex.symbolId, symbol: sourceHex.symbol ? {...sourceHex.symbol} : null, blank: sourceHex.blank, renderable: true }
+                
+                // Make sure to include the dummy hexes as well
+                if (tfield.orientation == "flatTop" && row == 0 && (col&1) == 0) {
+                    newHexes[genHexId(q, r-1, s+1)] = { q: q, r: r-1, s: s+1, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true, renderable: false }
             
+                } else if (tfield.orientation == "pointyTop" && col == 0 && (row&1) == 0) {
+                    newHexes[genHexId(q-1, r, s+1)] = { q: q-1, r: r, s: s+1, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true, renderable: false }
+
+                }
+
             }
         }
 
+        
         tfield.hexes = newHexes
-
+        
         for (var i = symbolsContainer.children.length - 1; i >= 0; i--) {symbolsContainer.removeChild(symbolsContainer.children[i]);};
+        
+        if (tfield.raised == "odd") {
+            if (tfield.orientation == "flatTop") changeRaisedColumn()
+            if (tfield.orientation == "pointyTop") changeIndentedRow()
 
-        renderAllHexes()
+        } else {
+            // renderAllhexes() is called in the change column / row functions, so it's a lil more efficient to call it in an else block here
+            renderAllHexes()
+        }
+    }
+
+
+    /* RADIAL SHAPES MAPS */
+    function radial_changeOrientation() {
+        console.log("Radial Change Orientation!")
+    }
+
+
+    export function changeOrientation() {
+        if (tfield.mapType == map_type.SQUARE) square_changeOrientation()
+        else if (tfield.mapType == map_type.RADIAL) radial_changeOrientation()
+
     }
 
     function findSymbolScale(symbolData) {
@@ -219,7 +420,11 @@
 
         Object.keys(tfield.hexes).forEach(hexId => {
             let hex = tfield.hexes[hexId]
+            if (!hex.renderable) return
+
             let hexC = coords_cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised);
+
+            //if (tfield.mapType == map_type.SQUARE) hexC = computeSquareBasedOffset(hexC, hex.q, hex.r)
 
             gridGraphics.drawPolygon( getHexPath(tfield.hexWidth, tfield.hexHeight, tfield.orientation, hexC.x, hexC.y) )
         });
@@ -236,6 +441,7 @@
     export function renderAllHexes() {
         terrainGraphics.clear();
         Object.keys(tfield.hexes).forEach(hexId => {
+
             renderHex(hexId)
         });
         renderGrid();
@@ -252,7 +458,19 @@
 
     function renderHex(hexId) {
         let hex = tfield.hexes[hexId]
+
+        if (!hex.renderable) {
+            if (terrainSprites[hexId]) { 
+                symbolsContainer.removeChild(terrainSprites[hexId])
+                terrainSprites[hexId].destroy();
+                delete terrainSprites[hexId];
+            }
+            return
+        }
+
         let hexC = coords_cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised);
+
+        //if (tfield.mapType == map_type.SQUARE) hexC = computeSquareBasedOffset(hexC, hex.q, hex.r)
 
         if (hex.blank) {
             hex.bgColor = tfield.blankHexColor /* Update color here, as it may not be updated. Just have to remember to call render hex when we change the blank hex color */
@@ -353,7 +571,7 @@
 
             let clickedId = genHexId( clickedCoords.q, clickedCoords.r, clickedCoords.s )
 
-            //if (!hexExists(clickedId)) return;
+            if (!hexExists(clickedId)) return;
 
             let cHex = tfield.hexes[clickedId]
 

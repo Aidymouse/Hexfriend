@@ -12,7 +12,8 @@ export interface TerrainHex {
     r: number
     s: number
     
-    blank: boolean
+    blank: boolean,
+    renderable: boolean
 
 }
  

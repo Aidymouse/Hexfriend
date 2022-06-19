@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "dexie": "^3.2.1",
+    "gh-pages": "^4.0.0",
     "pixi.js": "^6.2.2",
     "svelte-pixi": "0.0.5"
   }

@@ -68,8 +68,8 @@
                     lowestRow = Math.min(brokenCoords.r + (brokenCoords.q + (brokenCoords.q&1)) / 2, lowestRow)
                 })
         
-                coordOffsetX = lowestCol
-                coordOffsetY = lowestRow
+                coordOffsetX = 0 //lowestCol
+                coordOffsetY = 0 //lowestRow
                 return
 
             case "cubeId":

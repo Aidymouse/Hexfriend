@@ -2,7 +2,7 @@ import type { TerrainHexField } from '../types/terrain'
 import type { Tile } from '../types/tilesets'
 import { map_type } from '../types/settings'
 
-import {coords_evenqToCube, genHexId} from '../helpers/hexHelpers'
+import {coords_evenqToCube, coords_evenrToCube, genHexId} from '../helpers/hexHelpers'
 
 import { DEFAULTTILESET } from './defaultTileset'
 import { DEFAULTICONSET } from './defaultIconset'
@@ -37,7 +37,7 @@ let DEFAULTSAVEDATA: saveData = {
 
         rows: 20,
         columns: 20,
-        raised: "odd", // Which row / column should be higher / indented
+        raised: "even", // Which row / column should be higher / indented. This is implemented with an invisible hex. It's all quite messy.
 
         hexesOut: 10,
 
@@ -52,7 +52,7 @@ let DEFAULTSAVEDATA: saveData = {
     coords: {
         shown: false,
         style: { fill: 0x000000, fontSize: 10, stroke: 0xffffff, strokeThickness: 2, fontFamily: "Segoe UI" },
-        system: "evenq",
+        system: "cubeId",
         seperator: "."
     },
 
@@ -81,7 +81,19 @@ for (let col=0; col<DEFAULTSAVEDATA.TerrainField.columns; col++) {
         let r = cubeCoords.r
         let s = cubeCoords.s
 
-        DEFAULTSAVEDATA.TerrainField.hexes[genHexId(q, r, s)] = { q: q, r: r, s: s, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true }
+        DEFAULTSAVEDATA.TerrainField.hexes[genHexId(q, r, s)] = { q: q, r: r, s: s, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true, renderable: true }
+        
+        // These hexes are used in the even / odd raised row calculation
+        // They're kept hidden
+        if (row == 0 && (col&1) == 0) {
+            DEFAULTSAVEDATA.TerrainField.hexes[genHexId(q, r-1, s+1)] = { q: q, r: r-1, s: s+1, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true, renderable: false }
+            
+        }
+        
+        if (col == 0 && (row&1) == 0) {
+            //DEFAULTSAVEDATA.TerrainField.hexes[genHexId(q-1, r, s+1)] = { q: q-1, r: r, s: s+1, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true, renderable: false }
+
+        }
 
     }
 }

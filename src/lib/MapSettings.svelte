@@ -91,13 +91,13 @@
             {#if tfield.orientation == "flatTop"}
                 <p>Raised Column</p>
                 <div style={"height: 100%; display: flex; align-items: center;"}>
-                    <SelectGrid values={["even", "odd"]} filenamePrefix={"raisedColumn"} bind:value={tfield.raised} on:change={() => { renderAllHexes() }}/>
+                    <SelectGrid values={["even", "odd"]} filenamePrefix={"raisedColumn"} bind:value={tfield.raised} on:change={() => { comp_terrainField.changeRaisedColumn() }}/>
                 </div>
 
             {:else if tfield.orientation == "pointyTop"}
                 <p>Indented Row</p>
                 <div style={"height: 100%; display: flex; align-items: center;"}>
-                    <SelectGrid values={["even", "odd"]} filenamePrefix={"indentedRow"} bind:value={tfield.raised} on:change={() => { renderAllHexes() }} />
+                    <SelectGrid values={["even", "odd"]} filenamePrefix={"indentedRow"} bind:value={tfield.raised} on:change={() => { comp_terrainField.changeIndentedRow() }} />
                 </div>
                 
             {/if}
@@ -167,9 +167,6 @@
     #settings.shown {
         left: 0px !important;
     }
-
-
-
 
     .helperText {
         font-size: 12px;

@@ -609,6 +609,10 @@
       exportMap={() => {exportMap()}}
     />
 
+  <Controls 
+    {selectedTool}
+    {data_terrain}
+  />
 
 
 
