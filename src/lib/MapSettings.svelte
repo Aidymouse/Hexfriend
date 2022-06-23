@@ -48,6 +48,8 @@
     <input style="font-size: 20pt; font-family: Segoe UI; border-radius: 3px" type="text" placeholder="Map Title" bind:value={loadedSave.title}>
     
 
+    <p style="font-size: 10pt; color: red; background-color: rgba(1, 1, 1, 0.5); padding: 5px; margin-top: 5px;">Hexfriend is currently a work in progress, no where near finished.</p>
+
     <h2>Grid</h2>
     <div class="settings-grid">
         <label for="showGrid">Show Grid</label>
@@ -91,7 +93,7 @@
             {#if tfield.orientation == "flatTop"}
                 <p>Raised Column</p>
                 <div style={"height: 100%; display: flex; align-items: center;"}>
-                    <SelectGrid values={["even", "odd"]} filenamePrefix={"raisedColumn"} bind:value={tfield.raised} on:change={() => { comp_terrainField.changeRaisedColumn() }}/>
+                    <SelectGrid values={["even", "odd"]} filenamePrefix={"raisedColumn"} bind:value={tfield.raised} on:change={() => { comp_terrainField.updateRaisedColumn() }}/>
                 </div>
 
             {:else if tfield.orientation == "pointyTop"}
@@ -107,13 +109,16 @@
     </div>
 
 
-    <h2>Map Dimensions</h2>
-    <button on:click={() => { comp_terrainField.square_expandMapDimension('left', 1) } }>Add Left</button>
-    <button on:click={() => { comp_terrainField.square_expandMapDimension('top', 1) } }>Add Top</button>
-    <button on:click={() => { comp_terrainField.square_expandMapDimension('bottom', 1) } }>Add Bottom</button>
-    <button on:click={() => { comp_terrainField.square_expandMapDimension('right', 1) } }>Add Right</button>
-    
+    <!--
+    -->
+        <h2>Map Dimensions</h2>
+        <button on:click={() => { comp_terrainField.square_expandMapDimension('left', 1) } }>Add Left</button>
+        <button on:click={() => { comp_terrainField.square_expandMapDimension('top', 1) } }>Add Top</button>
+        <button on:click={() => { comp_terrainField.square_expandMapDimension('bottom', 1) } }>Add Bottom</button>
+        <button on:click={() => { comp_terrainField.square_expandMapDimension('right', 1) } }>Add Right</button>
 
+
+    
     <h2 style="margin-bottom: 0px;">Coordinates</h2>
     <p class="helperText">Turn coordinates on only before export. They are slow.</p>
     <div class="settings-grid">

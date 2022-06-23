@@ -8,16 +8,18 @@
 
   /* TODO 
   
+    
+
     // CORE FUNCTIONS
     - map resizing - removing hexes
     - hex coordinates on map - fix pointy top + more coordinate systems
-    - terrain generator function validation
     - keyboard shortcuts
     - individual terrain and icon erasers
     - import tilesets
     - import iconsets
     
     // POLISH
+    - terrain generator function validation
     - floating loaders - better feedback
     - save data checking (if loading, making new map, quitting)
     - export at different sizes
@@ -41,7 +43,7 @@
   import type { coordinates_data, icon_data, text_data, terrain_data, path_data } from './types/data';
 
   import * as PIXI from 'pixi.js'
-  import { Pixi, Container, Sprite } from 'svelte-pixi'
+  import { Pixi, Container } from 'svelte-pixi'
   import { tick } from 'svelte'
   import { db } from './lib/db'
 

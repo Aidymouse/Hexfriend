@@ -1,5 +1,6 @@
 export type hexOrientation = 'flatTop' | 'pointyTop';
 type cubeCoords = {q: number, r: number, s: number};
+import { hex2rgb } from "@pixi/utils";
 import type { TerrainHex } from "src/types/terrain";
 
 export function getHexPath(width: number, height: number, orientation: hexOrientation = 'flatTop', centerX: number = 0, centerY: number = 0): number[] {
@@ -157,27 +158,81 @@ export function coords_cubeToWorld(q: number, r: number, s: number, hexOrientati
 }
 
 
-export function coords_evenqToCube(col, row) {
-    let q = col
-    let r = row - (col + (col & 1)) / 2
-    return {q: q, r: r, s: -q-r}
-}
-
-export function coords_cubeToEvenq(q, r, s) {
+// EVEN Q = second column has raised tile - the DEFAULT for new maps
+// ODD Q = first column has raised tile
+function coords_cubeToEvenq(q: number, r: number, s) {
     let col = q
     let row = r + (q + (q & 1)) / 2
     return { col: col, row: row }
 }
 
-export function coords_cubeToEvenr(q, r, s) {
+function coords_cubeToOddq(q: number, r: number, s) {
+    let col = q
+    let row = r + (q - (q & 1)) / 2
+    return { col: col, row: row }
+}
+
+export function coords_cubeToq(raisedColumn: "odd" | "even", q, r, s) {
+    if (raisedColumn == "even") return coords_cubeToEvenq(q, r, s)
+    return coords_cubeToOddq(q, r, s)
+}
+
+
+function coords_evenqToCube(col, row) {
+    let q = col
+    let r = row - (col + (col & 1)) / 2
+    return {q: q, r: r, s: -q-r}
+}
+
+function coords_oddqToCube(col: number, row: number) {
+    let q = col
+    let r = row - (col - (col & 1)) / 2
+    return {q: q, r: r, s: -q-r}
+}
+
+export function coords_qToCube(oddOrEven: "odd" | "even", col, row) {
+    if (oddOrEven == "even") return coords_evenqToCube(col, row)
+    return coords_oddqToCube(col, row)
+}
+
+// EVEN R = first row is indented
+// ODD R = second row is indented
+function coords_cubeToEvenr(q, r, s) {
     let col = q + (r + (r & 1)) / 2
     let row = r
     return {col: col, row: row}
 }
 
-export function coords_evenrToCube(col, row) {
+function coords_cubeToOddr(q, r, s) {
+    let col = q + (r - (r & 1)) / 2
+    let row = r
+    return { col: col, row: row }
+
+}
+
+export function coords_cubeTor(indentedRow: "odd" | "even", q, r, s) {
+    if (indentedRow == "even") return coords_cubeToEvenr(q, r, s)
+    return coords_cubeToOddr(q, r, s) 
+}
+
+
+
+function coords_evenrToCube(col, row) {
     var q = col - (row + (row & 1)) / 2
     var r = row
     return {q: q, r: r, s: -q-r}
-
+    
 }
+
+function coords_oddrToCube(col, row) {
+    var q = col - (row - (row & 1)) / 2
+    var r = row
+    return {q: q, r: r, s: -q-r}
+}
+
+export function coords_rToCube(indentedRow: "odd" | "even", col, row) {
+    if (indentedRow == "even") return coords_evenrToCube(col, row)
+    return coords_oddrToCube(col, row)
+}
+
+// ODD R = second row is indented

@@ -1,4 +1,10 @@
+
+
 <script lang="ts">
+
+    // All sorts of fuckery. Really messy. We have to lie about what the coordinates are on a cosmetic level. Is this the best way to go about it???
+    // I think so, we just have to make our coordinate system selection here.
+    // Hopefully using evenq is just a shortcut in set up and isnt required anywhere else but set up and here.
 
     import type { coordinates_data } from 'src/types/data';
     

@@ -2,7 +2,7 @@ import type { TerrainHexField } from '../types/terrain'
 import type { Tile } from '../types/tilesets'
 import { map_type } from '../types/settings'
 
-import {coords_evenqToCube, coords_evenrToCube, genHexId} from '../helpers/hexHelpers'
+import {coords_qToCube, coords_evenrToCube, genHexId} from '../helpers/hexHelpers'
 
 import { DEFAULTTILESET } from './defaultTileset'
 import { DEFAULTICONSET } from './defaultIconset'
@@ -76,7 +76,7 @@ let DEFAULTSAVEDATA: saveData = {
 for (let col=0; col<DEFAULTSAVEDATA.TerrainField.columns; col++) {
     for (let row=0; row<DEFAULTSAVEDATA.TerrainField.rows; row++) {
 
-        let cubeCoords = coords_evenqToCube(col, row)
+        let cubeCoords = coords_qToCube("even", col, row)
         let q = cubeCoords.q
         let r = cubeCoords.r
         let s = cubeCoords.s
@@ -84,9 +84,11 @@ for (let col=0; col<DEFAULTSAVEDATA.TerrainField.columns; col++) {
         DEFAULTSAVEDATA.TerrainField.hexes[genHexId(q, r, s)] = { q: q, r: r, s: s, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true, renderable: true }
         
         // These hexes are used in the even / odd raised row calculation
-        // They're kept hidden
+        // They're kept hidden until needed
+        // Conversely, we could create the hexes spontaneously whenever they're needed, but this method is faster I believe
+        // However, it causes some confusing things and trouble in places, mainly the map expansion code in TerrainField.svelte
         if (row == 0 && (col&1) == 0) {
-            DEFAULTSAVEDATA.TerrainField.hexes[genHexId(q, r-1, s+1)] = { q: q, r: r-1, s: s+1, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true, renderable: false }
+            //DEFAULTSAVEDATA.TerrainField.hexes[genHexId(q, r-1, s+1)] = { q: q, r: r-1, s: s+1, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true, renderable: false }
             
         }
         
