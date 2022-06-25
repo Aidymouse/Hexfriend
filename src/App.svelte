@@ -41,6 +41,7 @@
   import type { TerrainHexField } from './types/terrain'
   import type { saveData } from './lib/defaultSaveData'
   import type { coordinates_data, icon_data, text_data, terrain_data, path_data } from './types/data';
+  import { coord_system } from './types/cordinates';
 
   import * as PIXI from 'pixi.js'
   import { Pixi, Container } from 'svelte-pixi'
@@ -69,7 +70,7 @@
   import TerrainGenerator from './lib/TerrainGenerator.svelte';  
   import SavedMaps from './lib/SavedMaps.svelte';
   import MapSettings from './lib/MapSettings.svelte';
-  import Controls from './lib/Controls.svelte';
+  import Controls from './lib/ControlTooltips.svelte';
 
   // Methods
   import { collapseWaveGen } from './lib/terrainGenerator'
@@ -210,9 +211,10 @@
   
   let data_terrain: terrain_data = {
     bgColor: null,
-    symbolData: null,
+    symbol: null,
     usingEyedropper: false,
     usingPaintbucket: false,
+    usingEraser: false
   }
 
   let data_icon: icon_data = {
@@ -240,7 +242,7 @@
   let data_coordinates: coordinates_data = {
     shown: true,
     style: { fill: 0x000000, fontSize: 10 },
-    system: "evenq",
+    system: coord_system.ROWCOL,
     seperator: "."
   }
 
@@ -289,7 +291,7 @@
 
       let firstTile = loadedTilesets[ Object.keys(loadedTilesets)[0] ][0]
       data_terrain.bgColor = firstTile.bgColor
-      data_terrain.symbolData = firstTile.symbol ? {...firstTile.symbol} : null
+      data_terrain.symbol = firstTile.symbol ? {...firstTile.symbol} : null
   
       let firstIcon = loadedIconsets[ Object.keys(loadedIconsets)[0] ][0]
       data_icon.color = firstIcon.color
@@ -319,7 +321,7 @@
       comp_terrainField.renderAllHexes();
 
       //comp_coordsLayer.eraseAllCoordinates();
-      comp_coordsLayer.generateCoords();
+      //comp_coordsLayer.generateCoords();
       
     });
   
@@ -407,6 +409,7 @@
       
       case "eraser":
         if (controls.mouseDown[0]) comp_terrainField.erase()
+        /* Icons are handled differently in the icon handler */
         break
     }
   }
@@ -575,7 +578,7 @@
     
 
   <div id="tool-buttons">
-    <ToolButtons bind:selectedTool />
+    <ToolButtons bind:selectedTool bind:hexOrientation={tfield.orientation}/>
       
     
     <!--
@@ -682,6 +685,7 @@
   :global(.panel) {
     background-color: #333333;
     border-radius: 4px;
+    overflow: hidden;
     width: 300px;
     box-sizing: border-box;
     position: fixed;

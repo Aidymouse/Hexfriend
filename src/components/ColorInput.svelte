@@ -26,8 +26,9 @@
 
     </div>
 
-    <label for={name}> {label} </label>
-    
+    {#if label}
+        <label for={name}> {label} </label>
+    {/if}
 </main>
 
 

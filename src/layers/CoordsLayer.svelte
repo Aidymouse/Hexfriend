@@ -1,209 +1,129 @@
-
-
 <script lang="ts">
 
-    // All sorts of fuckery. Really messy. We have to lie about what the coordinates are on a cosmetic level. Is this the best way to go about it???
-    // I think so, we just have to make our coordinate system selection here.
-    // Hopefully using evenq is just a shortcut in set up and isnt required anywhere else but set up and here.
-
-    import type { coordinates_data } from 'src/types/data';
-    
     import * as PIXI from 'pixi.js'
     import { Container, Text } from 'svelte-pixi'
+    import type { TerrainHexField } from "src/types/terrain"
+    import type { coordinates_data } from 'src/types/data'
+    import { coord_system } from '/src/types/cordinates'
+    import { coords_cubeToWorld } from '/src/helpers/hexHelpers';
+    import { coords_cubeToq, coords_cubeTor } from '/src/helpers/hexHelpers';
     import { onMount } from 'svelte';
-    import { coords_cubeToWorld } from '../helpers/hexHelpers'
-
-    export let data_coordinates: coordinates_data;
-    export let tfield;
-
-    // Needs some serious optimization. Render each letter and then join them seperately. This is gonna be... weird.
 
 
-    let coordOffsetX = 0
-    let coordOffsetY = 0
-    let oldSeperator = data_coordinates.seperator
+    interface coordText {
+        pixiText: PIXI.Text,
+        parts: number[]
+    }
 
-    let texts = {} // hex id: text object
-    let coordValues = {} // hex id: list of ordered co-ord values, used for seperators
-
-    // Would be faster during runtime to generate all coord systems in advance and switch between them easily, but eats a lot of load time for something unlikely to be used that often during actual use.
-
-
-    let cont_coords = new PIXI.Container()
-
-
-    //let style = new PIXI.TextStyle(data_coordinates.style)
-    let style = new PIXI.TextStyle(data_coordinates.style)
     $: {
-
-        Object.keys(data_coordinates.style).forEach(styleTag => {
-            style[styleTag] = data_coordinates.style[styleTag]
+        Object.entries(texts).forEach(([hexId, text]) => {
+            text.pixiText.style = data_coordinates.style
         })
+    }
+    
 
+    let texts: { [key: string]: coordText } = {} // hex id: coordText
+
+    let cont_textContainer = new PIXI.Container()
+
+    export let tfield: TerrainHexField
+    export let data_coordinates: coordinates_data
+
+    function breakDownHexID(hexId: string) {
+        let brokenId = hexId.split(":")
+        return {q: Number(brokenId[0]), r: Number(brokenId[1]), s: Number(brokenId[2])}
+    }
+
+    function createTextIfNoneExists(hexId: string) {
+        //texts[hexId] = { text: "", x: 0, y: 0, parts: [] }
         
-        if (oldSeperator != data_coordinates.seperator) {
-            updateSeperator()
-            
+        if (!textExists(hexId)) {
+            texts[hexId] = {pixiText: new PIXI.Text("", data_coordinates.style), parts: []}
+            texts[hexId].pixiText.anchor.x = 0.5
+            texts[hexId].pixiText.anchor.y = 1
+            cont_textContainer.addChild(texts[hexId].pixiText)
         }
-
-        cont_coords = cont_coords
-
-
+        
     }
 
+    async function generateCoords(system: coord_system) {
 
-    /* COORDINATE TRANSFORMATIONS */
-    function translate_cubeToEvenQ(q, r, s) {
-        let col = q
-        let row = r + (q + (q&1)) / 2
-        return {col: col, row: row}
-    }
-
-
-
-    function calculateOffset() {
-        // Based on the coord system and dimensions of the map
-
-        switch (data_coordinates.system) {
-            case "evenq":
-                let lowestCol = Infinity
-                let lowestRow = Infinity
+        switch(system) {
+            case (coord_system.HEXID):
                 Object.keys(tfield.hexes).forEach(hexId => {
-                    let brokenCoords = breakDownId(hexId)
-                    lowestCol = Math.min(brokenCoords.q, lowestCol)
-                    lowestRow = Math.min(brokenCoords.r + (brokenCoords.q + (brokenCoords.q&1)) / 2, lowestRow)
-                })
-        
-                coordOffsetX = 0 //lowestCol
-                coordOffsetY = 0 //lowestRow
-                return
+                    
+                    createTextIfNoneExists(hexId)
 
-            case "cubeId":
-                coordOffsetX = 0
-                coordOffsetY = 0
-                return
+                    let idParts = breakDownHexID(hexId)
 
-            default:
-                coordOffsetX = 0
-                coordOffsetY = 0
+                    texts[hexId].parts = [idParts.q, idParts.r, idParts.s]
+                    texts[hexId].pixiText.text = `${texts[hexId].parts[0]}${data_coordinates.seperator}${texts[hexId].parts[1]}${data_coordinates.seperator}${texts[hexId].parts[2]}`
+                    
+                    let newPos = coords_cubeToWorld(idParts.q, idParts.r, idParts.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+
+                    texts[hexId].pixiText.position.x = newPos.x
+                    texts[hexId].pixiText.position.y = newPos.y + tfield.hexHeight/2 - 4
+
+                }) 
+                break
+
+            case (coord_system.ROWCOL):
+
+                Object.keys(tfield.hexes).forEach(hexId => {
+                    
+                    createTextIfNoneExists(hexId)
+
+                    let cube = breakDownHexID(hexId)
+                    let idParts = tfield.orientation == "flatTop" ? coords_cubeToq(tfield.raised, cube.q, cube.r, cube.s) : coords_cubeTor(tfield.raised, cube.q, cube.r, cube.s)
+
+                    let newPos = coords_cubeToWorld(cube.q, cube.r, cube.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+
+                    texts[hexId].parts = [idParts.col, idParts.row]
+                    //texts[hexId].pixiText.text = `${texts[hexId].parts[0]}${data_coordinates.seperator}${texts[hexId].parts[1]}`
+                    texts[hexId].pixiText.text = `${texts[hexId].parts[0]}${data_coordinates.seperator}${texts[hexId].parts[1]}`
+                    
+                    texts[hexId].pixiText.position.x = newPos.x
+                    texts[hexId].pixiText.position.y = newPos.y + tfield.hexHeight/2 - 4
+
+                }) 
+
+                break
+            
+            case (coord_system.AXIAL):
+                Object.keys(tfield.hexes).forEach(hexId => {
+                    
+                    createTextIfNoneExists(hexId)
+
+                    let cube = breakDownHexID(hexId)
+
+                    let newPos = coords_cubeToWorld(cube.q, cube.r, cube.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+
+                    texts[hexId].parts = [cube.q, cube.r]
+                    
+                    texts[hexId].pixiText.text = `${texts[hexId].parts[0]}${data_coordinates.seperator}${texts[hexId].parts[1]}`
+                    texts[hexId].pixiText.position.x = newPos.x
+                    texts[hexId].pixiText.position.y = newPos.y + tfield.hexHeight/2 - 4
+
+                }) 
+
+                break
+
         }
 
-
     }
 
-    export function generateCoords() {
-
-        calculateOffset()
-
-        Object.keys(tfield.hexes).forEach(hexId => {
-
-            // Find Translation
-            let s: (string | number)[]
-            switch (data_coordinates.system) {
-                case "evenq":
-                    let brokenId = breakDownId(hexId)
-        
-                    let coordTranslation = translate_cubeToEvenQ(brokenId.q, brokenId.r, brokenId.s)
-        
-                    let c: string | number = coordTranslation.col-coordOffsetX
-                    c = c < 10 ? "0" + c : c
-                    let r: string | number = coordTranslation.row-coordOffsetY
-                    r = r < 10 ? "0" + r : r
-        
-                    s = [c, r]
-                    break
-                
-                case "cubeId":
-                    s = hexId.split(":")
-                    break
-
-            }
-
-            if (!texts[hexId]) {
-                texts[hexId] = new PIXI.Text("", style) // Text actually gets set in the updateSeperator function
-                coordValues[hexId] = s
-
-                let p = getTextPosition(hexId)
-                texts[hexId].position.x = p.x
-                texts[hexId].position.y = p.y
-                
-                texts[hexId].anchor = {x: 0.5, y: 1}
-                
-                cont_coords.addChild(texts[hexId])
-                
-            } else {
-                coordValues[hexId] = s
-
-                let p = getTextPosition(hexId)
-                texts[hexId].position.x = p.x
-                texts[hexId].position.y = p.y
-
-            }
-
-            updateSeperator() 
-        })
-
-    }
-
-    function breakDownId(hexId: string): {q: number, r: number, s: number} {
-        let s = hexId.split(":")
-        return {q: Number(s[0]), r: Number(s[1]), s: Number(s[2])}
-    }
-
-    export function updateSeperator() {
-
-        Object.keys(texts).forEach(textId => {
-            let s = ""
-            coordValues[textId].forEach( (cv, index) => {
-                s += cv
-                if (index != coordValues[textId].length-1) s += data_coordinates.seperator
-            })
-
-            texts[textId].text = s
-            
-        })
-        oldSeperator = data_coordinates.seperator
-    } 
-
-
-    export function updateTextPositions() {
-        Object.keys(tfield.hexes).forEach(hexId => {
-            
-            let p = getTextPosition(hexId)
-            texts[hexId].position.x = p.x
-            texts[hexId].position.y = p.y
-            
-        })
-    }
-
-    function getTextPosition(hexId) {
-        let brokenId = breakDownId(hexId)
-        let coords = coords_cubeToWorld(brokenId.q, brokenId.r, brokenId.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised)
-        return {x: coords.x, y: coords.y + tfield.hexHeight/2 - 2}
-    }
-
-    export function eraseAllCoordinates() {
-        Object.keys(texts).forEach(textId => {
-            texts[textId].destroy()
-        })
-
-        texts = []
-        coordValues = []
-        //cont_coords = new PIXI.Container()
+    function textExists(hexId: string) {
+        return texts[hexId] != null
     }
 
     onMount(() => {
-        //generateCoords()
+        generateCoords( data_coordinates.system )
     })
 
 </script>
 
+
 {#if data_coordinates.shown}
-<Container
-    instance = {cont_coords}
-/>
+    <Container instance={cont_textContainer}>
+    </Container>
 {/if}
-
-
-
-<style></style>

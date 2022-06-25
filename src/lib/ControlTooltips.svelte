@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { terrain_data } from "src/types/data";
+import TerrainField from "./TerrainField.svelte";
 
 
     export let selectedTool;
@@ -22,10 +23,15 @@
 
         if (data_terrain.usingEyedropper) {
             c_terrain.leftMouse = "Eyedrop Hex"
+        } else if (data_terrain.usingPaintbucket && data_terrain.usingEraser) {
+            c_terrain.leftMouse = "Erase all similar"
+        
         } else if (data_terrain.usingPaintbucket) {
             c_terrain.leftMouse = "Fill with Terrain"
             
-        } 
+        } else if (data_terrain.usingEraser) {
+            c_terrain.leftMouse = "Erase Hex"
+        }
     }
  
 </script>

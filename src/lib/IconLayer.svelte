@@ -1,17 +1,19 @@
 <script lang="ts">
-
+    import type { TerrainHexField } from 'src/types/terrain';
     import { Sprite } from 'svelte-pixi'
     import { coords_worldToCube, coords_cubeToWorld } from '../helpers/hexHelpers';
+
+    import type { icon_data } from '/src/types/data'
 
     export let icons = [];
 
     export let L
     export let pan
-    export let tfield
+    export let tfield: TerrainHexField
     export let selectedTool
     export let controls
 
-    export let data_icon;
+    export let data_icon: icon_data;
     
     let iconId: number = 0;
     icons.forEach(i => iconId = Math.max(iconId, i.id))

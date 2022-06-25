@@ -3,9 +3,9 @@
     import * as PIXI from 'pixi.js'
     import {coords_cubeToWorld, getHexPath, genHexId, coords_worldToCube, getNeighbours, coords_qToCube, coords_rToCube, genHexId_cordsObj} from '../helpers/hexHelpers'
 
-    import { map_type } from "/src/types/settings";
     import { onMount } from "svelte";
     
+    import { map_type } from "/src/types/settings";
     import type { TerrainHex, TerrainHexField } from "src/types/terrain";
 import { collapseWaveGen } from "./terrainGenerator";
 
@@ -245,7 +245,6 @@ import { collapseWaveGen } from "./terrainGenerator";
         }
     }
 
-
     function square_expandDown(amount: number) {
         for (let col=0; col<tfield.columns; col++) {
             for (let row=0; row < amount; row++) {
@@ -304,8 +303,9 @@ import { collapseWaveGen } from "./terrainGenerator";
         }
 
         tfield.hexes = newHexes
-        for (var i = symbolsContainer.children.length - 1; i >= 0; i--) {symbolsContainer.removeChild(symbolsContainer.children[i]);};
-        
+        //for (var i = symbolsContainer.children.length - 1; i >= 0; i--) {symbolsContainer.removeChild(symbolsContainer.children[i]);};
+        clearTerrainSprites()
+
         renderAllHexes()
 
     }
@@ -319,24 +319,23 @@ import { collapseWaveGen } from "./terrainGenerator";
 
 
 
-    /* OTHER */
-
+    /* FUNCTIONS THAT APPLY TO ALL MAP TYPES */
     export function changeOrientation() {
         if (tfield.mapType == map_type.SQUARE) square_changeOrientation()
         else if (tfield.mapType == map_type.RADIAL) radial_changeOrientation()
 
     }
 
-    function findSymbolScale(symbolData) {
+    function findSymbolScale(symbol) {
         if (tfield.hexWidth < tfield.hexHeight) {
-            let s = tfield.hexWidth * symbolData.pHex / 100 / symbolData.texWidth;
+            let s = tfield.hexWidth * symbol.pHex / 100 / symbol.texWidth;
             return {
                 x: s,
                 y: s
             }
 
         } else {
-            let s = tfield.hexHeight * symbolData.pHex / 100 / symbolData.texHeight;
+            let s = tfield.hexHeight * symbol.pHex / 100 / symbol.texHeight;
             return {
                 x: s,
                 y: s
@@ -450,6 +449,8 @@ import { collapseWaveGen } from "./terrainGenerator";
 
     }
 
+
+    /* PAINT */
     export function paintFromTile(hexId, tileData) {
         tfield.hexes[hexId].bgColor = tileData.bgColor
         tfield.hexes[hexId].symbol = tileData.symbol ? {...tileData.symbol} : null
@@ -471,19 +472,12 @@ import { collapseWaveGen } from "./terrainGenerator";
             if (!hexExists(clickedId)) return
 
             tfield.hexes[clickedId].bgColor = data_terrain.bgColor;
-            tfield.hexes[clickedId].symbol = data_terrain.symbolData ? {...data_terrain.symbolData} : null
+            tfield.hexes[clickedId].symbol = data_terrain.symbol ? {...data_terrain.symbol} : null
             tfield.hexes[clickedId].blank = false
 
             renderHex(clickedId)
 
         }
-    }
-
-    function hexExists(hexId) {
-
-        // If the hex is not rendereable, it doesnt exist.
-        return tfield.hexes[hexId] != undefined ? tfield.hexes[hexId].renderable : false
-
     }
 
     function paintHex(hexId: string) {
@@ -492,13 +486,23 @@ import { collapseWaveGen } from "./terrainGenerator";
         if (!hexExists(hexId)) return
 
         tfield.hexes[hexId].bgColor = data_terrain.bgColor;
-        tfield.hexes[hexId].symbol = data_terrain.symbolData ? {...data_terrain.symbolData} : null
+        tfield.hexes[hexId].symbol = data_terrain.symbol ? {...data_terrain.symbol} : null
         tfield.hexes[hexId].blank = false
 
         renderHex(hexId)
 
     }
 
+    /* TESTS? */
+    function hexExists(hexId) {
+
+        // If the hex is not rendereable, it doesnt exist.
+        return tfield.hexes[hexId] != undefined ? tfield.hexes[hexId].renderable : false
+
+    }
+
+    
+    /* ACTIONS */
     function eyedrop() {
         if (controls.mouseDown[0]) {
             let x = pan.worldX
@@ -512,7 +516,7 @@ import { collapseWaveGen } from "./terrainGenerator";
             let cHex = tfield.hexes[clickedId]
 
             data_terrain.bgColor = cHex.bgColor
-            data_terrain.symbolData = cHex.symbol ? {...cHex.symbol} : null
+            data_terrain.symbol = cHex.symbol ? {...cHex.symbol} : null
 
             data_terrain.usingEyedropper = false
 
@@ -541,33 +545,67 @@ import { collapseWaveGen } from "./terrainGenerator";
         let y = pan.worldY
         let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised)
 
-        let clickedId = genHexId( clickedCoords.q, clickedCoords.r, clickedCoords.s ) 
+        let clickedId = genHexId_cordsObj(clickedCoords)
         if (!hexExists(clickedId)) return
 
         
-        // Check is hex in data matches the clicked style. If it does, abort painting!
+        // Check if hex in data matches the clicked style. If it does, abort painting!
         // Should be done in paint terrain as well
         let cHex = tfield.hexes[clickedId]
         if (cHex.bgColor == data_terrain.bgColor) {
-           if (!data_terrain.symbolData && !cHex.symbol) return
+           if (!data_terrain.symbol && !cHex.symbol) return
 
-            if (data_terrain.symbolData && cHex.symbol) {
-                if (data_terrain.symbolData.color == cHex.symbol.color && data_terrain.symbolData.texId == cHex.symbol.texId) return
+            if (data_terrain.symbol && cHex.symbol) {
+                if (data_terrain.symbol.color == cHex.symbol.color && data_terrain.symbol.texId == cHex.symbol.texId) return
             }
             
         }
 
-        let baseHex = {...tfield.hexes[clickedId]} // Any neighbours with the same style (same bgColor, symbol and symbolColor) will be changed and their neighbours will be added to the list
+        getContiguousHexIdsOfSameType(clickedId).forEach(hexId => {
+            paintHex(hexId)
+        })        
+
+    }
+
+    function erasePaintbucket() {
+        // Find all like hexes, much like a paintbucket, and perform a specific operation on them, passing in hex id as a parameter
+
+        let clickedId = genHexId_cordsObj( coords_worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised) )
+        
+        if (!hexExists(clickedId)) return
+        if (tfield.hexes[clickedId].blank) return
+
+        let hexes = getContiguousHexIdsOfSameType(clickedId)
+        hexes.forEach(hexId => {
+            eraseHex(hexId)
+        })
+
+    }
+
+    /* UNCATEGORIZED */
+    function getContiguousHexIdsOfSameType(hexId: string): string[] {
+
+        /*
+        let x = pan.worldX
+        let y = pan.worldY
+
+        let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised)
+
+        let clickedId = genHexId( clickedCoords.q, clickedCoords.r, clickedCoords.s ) 
+        if (!hexExists(clickedId)) return
+        */
+
+        let baseHex = {...tfield.hexes[hexId]} // Any neighbours with the same style (same bgColor, symbol and symbolColor) will be changed and their neighbours will be added to the list
 
         let seenIds = [ genHexId(baseHex.q, baseHex.r, baseHex.s) ]
         let changedIds = []
-        let hexStack = [ clickedId ]
+        let hexStack = [ hexId ]
         
         while (hexStack.length > 0) {
             let cHex = tfield.hexes[hexStack.pop()]
 
-            // Color current hex
-            paintHex( genHexId(cHex.q, cHex.r, cHex.s) )
+            // Perform operation on current hex
+            //operation( genHexId(cHex.q, cHex.r, cHex.s) )
 
             // Add neighbour to hexStack
             let neighbourIds = getNeighbours(cHex.q, cHex.r, cHex.s)
@@ -592,18 +630,26 @@ import { collapseWaveGen } from "./terrainGenerator";
             changedIds.push( genHexId(cHex.q, cHex.r, cHex.s) )
 
         }
-        
 
+        return changedIds
     }
 
     export function pointerdown() {
+
         if (data_terrain.usingEyedropper) {
 
             eyedrop()
 
+        } else if (data_terrain.usingPaintbucket && data_terrain.usingEraser) {
+            //console.log("Paintbucket Erase!")
+            erasePaintbucket()
+
         } else if (data_terrain.usingPaintbucket) {
             paintbucket()
 
+        } else if (data_terrain.usingEraser) {
+            erase()
+        
         } else {
             placeTerrain()
 

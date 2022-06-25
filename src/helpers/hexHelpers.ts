@@ -64,6 +64,10 @@ export function getNeighbours(q: number, r: number, s: number): string[] {
     
 }
 
+
+
+
+
 /* COORDS */
 function AxialToCube(q: number, r: number): cubeCoords {
     return { q: q, r: r, s: -q - r }
@@ -172,13 +176,13 @@ function coords_cubeToOddq(q: number, r: number, s) {
     return { col: col, row: row }
 }
 
-export function coords_cubeToq(raisedColumn: "odd" | "even", q, r, s) {
+export function coords_cubeToq(raisedColumn: "odd" | "even", q: number, r: number, s: number) {
     if (raisedColumn == "even") return coords_cubeToEvenq(q, r, s)
     return coords_cubeToOddq(q, r, s)
 }
 
 
-function coords_evenqToCube(col, row) {
+function coords_evenqToCube(col: number, row: number) {
     let q = col
     let r = row - (col + (col & 1)) / 2
     return {q: q, r: r, s: -q-r}
@@ -190,7 +194,7 @@ function coords_oddqToCube(col: number, row: number) {
     return {q: q, r: r, s: -q-r}
 }
 
-export function coords_qToCube(oddOrEven: "odd" | "even", col, row) {
+export function coords_qToCube(oddOrEven: "odd" | "even", col: number, row: number) {
     if (oddOrEven == "even") return coords_evenqToCube(col, row)
     return coords_oddqToCube(col, row)
 }

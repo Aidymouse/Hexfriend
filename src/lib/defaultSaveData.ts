@@ -2,13 +2,14 @@ import type { TerrainHexField } from '../types/terrain'
 import type { Tile } from '../types/tilesets'
 import { map_type } from '../types/settings'
 
-import {coords_qToCube, coords_evenrToCube, genHexId} from '../helpers/hexHelpers'
+import {coords_qToCube, genHexId} from '../helpers/hexHelpers'
 
 import { DEFAULTTILESET } from './defaultTileset'
 import { DEFAULTICONSET } from './defaultIconset'
 
 import type { icon_set_data } from '../types/icon'
 import type { coordinates_data } from 'src/types/data'
+import { coord_system } from '/src/types/cordinates'
 
 interface saveData {
     saveVersion: number
@@ -52,7 +53,7 @@ let DEFAULTSAVEDATA: saveData = {
     coords: {
         shown: false,
         style: { fill: 0x000000, fontSize: 10, stroke: 0xffffff, strokeThickness: 2, fontFamily: "Segoe UI" },
-        system: "cubeId",
+        system: coord_system.ROWCOL,
         seperator: "."
     },
 

@@ -9,6 +9,7 @@
     ]
 
     export let selectedTool: string;
+    export let hexOrientation: "flatTop" | "pointyTop";
 
 </script>
 
@@ -16,7 +17,11 @@
 
     {#each buttons as b}
         <button class={ selectedTool == b.toolCode ? "selected" : ""} on:click={e => { selectedTool = b.toolCode } } title={`${b.display} Tool`}>
-            <img src={`/assets/img/tools/${b.toolCode}.png`} alt={`${b.display} Tool`}>
+            {#if b.toolCode == "terrain"}
+                <img src={`/assets/img/tools/${b.toolCode}_${hexOrientation == "flatTop" ? "ft" : "pt"}.png`} alt={`${b.display} Tool`}>
+            {:else}
+                <img src={`/assets/img/tools/${b.toolCode}.png`} alt={`${b.display} Tool`}>
+            {/if}
         </button>
     {/each}
 

@@ -32,21 +32,22 @@
 
     function changeTile(t: Tile) {
         data_terrain.bgColor = t.bgColor
-        data_terrain.symbolData = t.symbol
+        data_terrain.symbol = t.symbol ? {...t.symbol} : null
         tilePreview = generateTilePreview(data_terrain)
         data_terrain.usingPaintbucket = false
+        data_terrain.usingEraser = false
     }
 
-    function findSymbolScale(symbolData) {
+    function findSymbolScale(symbol) {
         if (tfield.hexWidth < tfield.hexHeight) {
-            let s = tfield.hexWidth * symbolData.pHex / 100 / symbolData.texWidth;
+            let s = tfield.hexWidth * symbol.pHex / 100 / symbol.texWidth;
             return {
                 x: s,
                 y: s
             }
 
         } else {
-            let s = tfield.hexHeight * symbolData.pHex / 100 / symbolData.texHeight;
+            let s = tfield.hexHeight * symbol.pHex / 100 / symbol.texHeight;
             return {
                 x: s,
                 y: s
@@ -71,10 +72,10 @@
         g.drawPolygon( getHexPath(hW, hH, tfield.orientation, 0, 0) )
         g.endFill()
 
-        if (data_terrain.symbolData) {
-            s.texture = L.resources[data_terrain.symbolData.texId].texture
-            s.tint = data_terrain.symbolData.color
-            s.scale = findSymbolScale(data_terrain.symbolData) 
+        if (data_terrain.symbol) {
+            s.texture = L.resources[data_terrain.symbol.texId].texture
+            s.tint = data_terrain.symbol.color
+            s.scale = findSymbolScale(data_terrain.symbol) 
             s.anchor.set(0.5)
             
         } else {
@@ -89,13 +90,15 @@
 
     function styleMatchesData(tile: Tile): boolean {
         
-        if (data_terrain.bgColor != tile.bgColor) return false
-        if (!tile.symbol && data_terrain.symbolData) return false
-        if (tile.symbol && !data_terrain.symbolData) return false
+        if (data_terrain.usingEraser) return false
 
-        if (tile.symbol && data_terrain.symbolData) {
-            if (tile.symbol.color != data_terrain.symbolData.color) return false
-            if (tile.symbol.texId != data_terrain.symbolData.texId) return false
+        if (data_terrain.bgColor != tile.bgColor) return false
+        if (!tile.symbol && data_terrain.symbol) return false
+        if (tile.symbol && !data_terrain.symbol) return false
+
+        if (tile.symbol && data_terrain.symbol) {
+            if (tile.symbol.color != data_terrain.symbol.color) return false
+            if (tile.symbol.texId != data_terrain.symbol.texId) return false
         }
 
         return true
@@ -112,14 +115,15 @@
         
         <ColorInputPixi bind:value={data_terrain.bgColor} name={"terrainColor"} label={"Terrain Color"}/>
         
-        {#if data_terrain.symbolData}
+        {#if data_terrain.symbol}
 
-            <ColorInputPixi bind:value={data_terrain.symbolData.color} name={"symbolColor"} label={"Symbol Color"} />
+            <ColorInputPixi bind:value={data_terrain.symbol.color} name={"symbolColor"} label={"Symbol Color"} />
 
         {/if}
 
-        <button id="eyedropper" title={"Hex Eyedropper"} on:click={() => {data_terrain.usingEyedropper = !data_terrain.usingEyedropper}} class:selected={data_terrain.usingEyedropper} > <img src="/assets/img/tools/eyedropper.png" alt={"Eyedropper"}> </button>
-        <button id="paintbucket" title={"Hex Paintbucket"} on:click={() => {data_terrain.usingPaintbucket = !data_terrain.usingPaintbucket}} class:selected={data_terrain.usingPaintbucket} > <img src="/assets/img/tools/paintbucket.png" alt={"Paint Bucket"}> </button>
+        <button id="eyedropper" class="small-panel-button" title={"Hex Eyedropper"} on:click={() => {data_terrain.usingEyedropper = !data_terrain.usingEyedropper}} class:selected={data_terrain.usingEyedropper} > <img src="/assets/img/tools/eyedropper.png" alt={"Eyedropper"}> </button>
+        <button id="paintbucket" class="small-panel-button" title={"Hex Paintbucket"} on:click={() => {data_terrain.usingPaintbucket = !data_terrain.usingPaintbucket}} class:selected={data_terrain.usingPaintbucket} > <img src="/assets/img/tools/paintbucket.png" alt={"Paint Bucket"}> </button>
+        <button id="eraser" class="small-panel-button" title={"Hex Eraser"} on:click={() => {data_terrain.usingEraser = !data_terrain.usingEraser}} class:selected={data_terrain.usingEraser} > <img src="/assets/img/tools/eraser.png" alt={"Eraser"}> </button>
     
     </div>
 
@@ -137,38 +141,38 @@
 
 <style>
     
-    #eyedropper {
+    .small-panel-button {
         position: absolute;
         width: 25px;
         height: 25px;
-        right: 10px;
         margin: 0;
         display: flex;
         justify-content: center;
         align-items: center;
         padding: 0;
+
     }
 
-    #eyedropper img {
+    .small-panel-button img {
         width: 80% !important;
+
     }
+
+    #eyedropper {
+        right: 10px;
+    }
+
 
     #paintbucket {
-        position: absolute;
-        width: 25px;
-        height: 25px;
         right: 10px;
         top: 45px;
-        margin: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 0;
     }
 
-    #paintbucket img {
-        width: 80% !important;
+    #eraser {
+        right: 45px;
+
     }
+
 
     #terrain-preview {
         display: grid;

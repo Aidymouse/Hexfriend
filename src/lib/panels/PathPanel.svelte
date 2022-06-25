@@ -38,18 +38,22 @@
 <div class="panel">
         
         <div id="controls">
-            <ColorInputPixi bind:value={data_path.style.color} name={"pathColor"} label={"Path Color"} />
+                <label for="pathColor">Color</label>
+                <ColorInputPixi bind:value={data_path.style.color} name={"pathColor"}/>
 
-            Thickness <input type="number" bind:value={data_path.style.width}>
-            <Checkbox bind:checked={data_path.snap} name="pathSnap" label={"Snap"} />
+                <label for="pathThickness">Thickness</label>
+                <input id="pathThickness" type="number" bind:value={data_path.style.width}>
 
+
+            <button id="snap" class="small-panel-button" title={"Snap"} on:click={() => {data_path.snap = !data_path.snap}} class:selected={data_path.snap} > <img src="/assets/img/tools/snap.png" alt={"Snap"}> </button>
+
+            <label>Line Cap</label>
             <span>
-                Line Ends
                 <SelectGrid values={[PIXI.LINE_CAP.ROUND, PIXI.LINE_CAP.BUTT, PIXI.LINE_CAP.SQUARE]} bind:value={data_path.style.cap} filenamePrefix={"lineend"}/>
             </span>
-
+            
+            <label>Line End</label>
             <span>
-                Corners
                 <SelectGrid values={[PIXI.LINE_JOIN.ROUND, PIXI.LINE_JOIN.MITER, PIXI.LINE_JOIN.BEVEL]} bind:value={data_path.style.join} filenamePrefix={"linecorner"} />
             </span>
 
@@ -57,18 +61,20 @@
 
 
         {#if data_path.selectedPath}
-        <div id="selected-path-controls">    
+            <div id="selected-path-controls">
                 <button on:click={() => {data_path.selectedPath = null}} >Deselect Current Path</button>
                 <button on:click={() => {comp_pathLayer.removeLastPoint(data_path.selectedPath)}}>Remove Last Point</button>
-                <button on:click={() => {comp_pathLayer.deletePath(data_path.selectedPath)}}>Delete Path</button>
+                <button style="color: red;" on:click={() => {comp_pathLayer.deletePath(data_path.selectedPath)}}>Delete Path</button>
             </div>
-            {/if}
+        {/if}
             
-        <div id="path-styles">
-            Path Styles
-            {#each pathButtons as pb}
-                <button on:click={ () => {data_path.style = {...pb.style}} } class:selected={styleMatchesData(pb.style)} >{pb.display}</button>
-            {/each}
+        <div id="path-styles" style={data_path.selectedPath ? "padding-top: 0px;" : ""}>
+            <p>Path Styles</p>
+            <div style="display: flex; gap: 5px;">
+                {#each pathButtons as pb}
+                    <button on:click={ () => {data_path.style = {...pb.style}} } class:selected={styleMatchesData(pb.style)} >{pb.display}</button>
+                {/each}
+            </div>
         </div>
         <!--
 
@@ -79,22 +85,57 @@
 </div>
 
 <style>
+
     span {
         display: flex;
     }
     div { color: white; }
     
+    .small-panel-button {
+        position: absolute;
+        width: 25px;
+        height: 25px;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+    }
+
+    .small-panel-button img {
+        width: 90%;
+        height: auto;
+    }
+
+    #snap {
+        top: 10px;
+        right: 10px;
+    }
+
     #controls {
         padding: 10px;
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        row-gap: 5px;
     }
 
     #selected-path-controls {
         background-color: #555555;
         padding: 10px;
+        display: grid;
+        grid-template-rows: auto;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 5px;
     }
 
     #path-styles {
         padding: 10px;
+        background-color: #555555;
+    }
+
+    #path-styles p {
+        margin: 0;
+        margin-bottom: 5px;
     }
 
     .selected {

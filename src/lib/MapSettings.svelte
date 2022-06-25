@@ -7,6 +7,7 @@
     import SelectGrid from "../components/SelectGrid.svelte";
     import ColorInputPixi from "../components/ColorInputPixi.svelte";
     import Checkbox from "../components/Checkbox.svelte";
+import { coord_system } from "/src/types/cordinates";
 
     export let loadedSave: saveData
     export let showSettings
@@ -36,7 +37,7 @@
         //redrawEntireMap()
     }
 
-
+    let addOrRemoveHex: "add" | "remove" = "add"
     
 
 </script>
@@ -45,9 +46,12 @@
   
 <div id="settings" class:shown={showSettings}>
     
-    <input style="font-size: 20pt; font-family: Segoe UI; border-radius: 3px" type="text" placeholder="Map Title" bind:value={loadedSave.title}>
+    <input style="font-size: 20pt; font-family: Segoe UI; border-radius: 3px; width: 100%; box-sizing: border-box;" type="text" placeholder="Map Title" bind:value={loadedSave.title}>
     
-
+    <span style="display: grid; grid-template-columns: 1fr 1fr; margin-top: 5px; column-gap: 5px;">
+        <button on:click={() => { exportMap() } } title="Export" >Export</button>
+        <button on:click={() => {  } } title="Export" >Import</button>
+    </span>
     <p style="font-size: 10pt; color: red; background-color: rgba(1, 1, 1, 0.5); padding: 5px; margin-top: 5px;">Hexfriend is currently a work in progress, no where near finished.</p>
 
     <h2>Grid</h2>
@@ -111,21 +115,39 @@
 
     <!--
     -->
-        <h2>Map Dimensions</h2>
-        <button on:click={() => { comp_terrainField.square_expandMapDimension('left', 1) } }>Add Left</button>
-        <button on:click={() => { comp_terrainField.square_expandMapDimension('top', 1) } }>Add Top</button>
-        <button on:click={() => { comp_terrainField.square_expandMapDimension('bottom', 1) } }>Add Bottom</button>
-        <button on:click={() => { comp_terrainField.square_expandMapDimension('right', 1) } }>Add Right</button>
-
+    <h2>Map Dimensions</h2>
+    <div id="map-dimensions">
+        {#if addOrRemoveHex == "add"}
+            <button style="grid-area: left;" on:click={() => { comp_terrainField.square_expandMapDimension('left', 1) } }>Add<br>Left</button>
+            <button style="grid-area: top;" on:click={() => { comp_terrainField.square_expandMapDimension('top', 1) } }>Add<br>Top</button>
+            <button style="grid-area: bottom;" on:click={() => { comp_terrainField.square_expandMapDimension('bottom', 1) } }>Add<br>Bottom</button>
+            <button style="grid-area: right;" on:click={() => { comp_terrainField.square_expandMapDimension('right', 1) } }>Add<br>Right</button>
+            <button style="grid-area: center;" on:click={() => { addOrRemoveHex = "remove" }}> 
+                <img src={`/assets/img/tools/addHex_${tfield.orientation == "flatTop" ? "ft" : "pt"}.png`} alt={"Add Hex"} title={"Add Hex"}> 
+            </button>
+            
+        {:else}
+            <button style="grid-area: center;" on:click={() => { addOrRemoveHex = "add" }}> 
+                <img src={`/assets/img/tools/removeHex_${tfield.orientation == "flatTop" ? "ft" : "pt"}.png`} alt={"Remove Hex"} title={"Remove Hex"}> 
+            </button>
+        {/if}
+    </div>
 
     
     <h2 style="margin-bottom: 0px;">Coordinates</h2>
-    <p class="helperText">Turn coordinates on only before export. They are slow.</p>
+    <p class="helperText">Coordinates can be slow on larger maps.</p>
     <div class="settings-grid">
         <label for="showCoords">Show Coordinates</label>
         <Checkbox bind:checked={data_coordinates.shown} name={"showCoords"} />
 
         {#if data_coordinates.shown}
+            <label for="coordsSystem">Coordinate System</label>
+            <select id="coordsSystem" bind:value={data_coordinates.system}>
+                <option value={coord_system.ROWCOL}>Column, Row</option>
+                <option value={coord_system.AXIAL}>Axial</option>
+                <option value={coord_system.HEXID}>Hex ID</option>
+            </select>
+
             <label for="coordFontSize">Font Size</label>
             <input id="coordFontSize" type="number" bind:value={data_coordinates.style.fontSize}>
             
@@ -145,20 +167,65 @@
     </div>
 
 
-    <h2>Idk</h2>
+    <h2>Experimental</h2>
+    <p class="helperText">This stuff is not polished and may be broken.</p>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
     
     <button on:click={() => { appState = "tilesetCreator" }}>Tileset Builder</button>
     <button on:click={() => { appState = "iconsetCreator" }}>Iconset Builder</button>
 
     <button on:click={() => { showTerrainGenerator = true; showSettings = false }}> Generate Terrain </button>
-    <button on:click={() => { exportMap() } } title="Export" >Export</button>
+    </div>
 
+    <h2>About</h2>
+    <p class="helperText">
+        Hexfriend version 0.1 – "Hex Cometh"
+        <br>
+        By Aidymouse
+    </p>
 
+    <p class="helperText">
+        Hexfriend is built with Svelte, Pixi JS and Typescript. Check out the <a href="https://www.github.com/Aidymouse/Hexfriend">Github</a>
+    </p>
+
+    <p class="helperText" style="text-align: center; font-size: 20pt;">
+        ☺
+    </p>
+        
+    
 
 </div>
     
 
 <style>
+
+    .rotated90 {
+        rotate: 90deg
+    }
+
+    #map-dimensions {
+        display: grid;
+        
+        grid-template-columns: 60px 60px 60px;
+        grid-template-rows: 60px 60px 60px;
+        gap: 5px;
+
+        grid-template-areas: "top-left top top-right"
+        "left center right"
+        "bottom-left bottom bottom-right";
+    }
+
+    #map-dimensions button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #map-dimensions button img {
+        width: 90%;
+        height: auto;
+    }
 
     h2 {
         margin-bottom: 10px;
@@ -185,7 +252,7 @@
 
     .settings-grid {
         display: grid;
-        grid-template-columns: 3fr 1fr;
+        grid-template-columns: 3fr 2fr;
         grid-template-rows: auto;
         row-gap: 5px;
     }

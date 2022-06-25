@@ -5,6 +5,8 @@
     import type { text_style } from "src/types/text";
     import type { text_data } from "src/types/data";
 
+    import type * as PIXI from 'pixi.js'
+
     export let data_text: text_data;
     export let comp_textLayer;
 
@@ -31,7 +33,7 @@
         textStyles = textStyles
     }
 
-    function changeTextStyle(style: text_style) {
+    function changeTextStyle(style: PIXI.Text['style']) {
         data_text.style = {...style};
         //data_text = data_text
         textStyles = textStyles /* Updates the selected button */
@@ -42,35 +44,49 @@
 <div class="panel">
 
     <div id="controls">
-        <ColorInput bind:value={data_text.style.fill} name="textFill" label={"Color"} />
-        <input type="number" bind:value={data_text.style.fontSize} >
+        <label for="textFill">Color</label>
+        <ColorInput bind:value={data_text.style.fill} name="textFill" />
 
-        <ColorInput bind:value={data_text.style.stroke} name="textStroke" label={"Stroke"} />
-        <input type="number" bind:value={data_text.style.strokeThickness} >
+        <label for="fontSize">Font Size</label>
+        <input id="fontSize" type="number" bind:value={data_text.style.fontSize} >
 
-        <select bind:value={data_text.style.fontFamily} >
+        <label for="textStroke">Outline</label>
+        <ColorInput bind:value={data_text.style.stroke} name="textStroke"/>
+
+        <label for="textStrokeThickness">Thickness</label>
+        <input for="textStrokeThickness" type="number" bind:value={data_text.style.strokeThickness} >
+        
+        <label for="textFont">Font</label>
+        <select id="textFont" bind:value={data_text.style.fontFamily} >
             <option value={"Segoe UI"}>Segoe UI</option>
             <option value={"Comic Sans MS"}>Comic Sans</option>
             <option value={"Arial"}>Arial</option>
             <option value={"Times New Roman"}>Times New Roman</option>
         </select>
 
-        <SelectGrid values={["left", "center", "right"]} bind:value={data_text.style.align} filenamePrefix={"textalign"} />
+        <div id="font-style-controls">
+            <span>
+                    <div id="font-style-container">
+                    <div id="font-style-options">
 
-        <div id="font-style-container">
-            <div id="font-style-options">
-
-                <div class="font-style-option">
-                    <CustomValueToggle offValue={"normal"} onValue={"italic"} bind:value={data_text.style.fontStyle}><i style="font-family: Times New Roman">I</i></CustomValueToggle>
+                        <div class="font-style-option">
+                            <CustomValueToggle offValue={"normal"} onValue={"italic"} bind:value={data_text.style.fontStyle}><i style="font-family: Times New Roman">I</i></CustomValueToggle>
+                        </div>
+                        
+                        <div class="font-style-option">
+                            <CustomValueToggle offValue={"normal"} onValue={"bold"} bind:value={data_text.style.fontWeight}><b>B</b></CustomValueToggle>
+                        </div>
+                        
+                    </div>
                 </div>
+            </span>
 
-                <div class="font-style-option">
-                    <CustomValueToggle offValue={"normal"} onValue={"bold"} bind:value={data_text.style.fontWeight}><b>B</b></CustomValueToggle>
-                </div>
-
-            </div>
+            <span>
+                <SelectGrid values={["left", "center", "right"]} bind:value={data_text.style.align} filenamePrefix={"textalign"} />
+            </span>
         </div>
-
+        
+        
 
     </div>
 
@@ -84,9 +100,11 @@
 
     <div id="text-styles" style={data_text.selectedText ? "padding-top: 10px" : ""}>
         <p>Text Styles</p>
-        {#each textStyles as ts}
-            <button on:click={() => {  changeTextStyle( ts.style ) }} class:selected={ selectedMatches(ts.style) } >{ts.display}</button>
-        {/each}
+        <div style="display: flex; gap: 5px;">
+            {#each textStyles as ts}
+                <button on:click={() => {  changeTextStyle( ts.style ) }} class:selected={ selectedMatches(ts.style) } >{ts.display}</button>
+            {/each}
+        </div>
     </div>
 
 
@@ -99,6 +117,9 @@
 
     #controls {
         padding: 10px;
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        row-gap: 5px;
     }
 
     .selected {
@@ -138,6 +159,13 @@
     #font-style-container {
         display: inline-block;
         border-radius: 3px;
+    }
+
+    #font-style-controls {
+        grid-column: 1/3;
+        display: flex;
+        justify-content: center;
+        gap: 5px;
     }
 
 </style>

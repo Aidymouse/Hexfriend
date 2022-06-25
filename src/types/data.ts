@@ -1,13 +1,15 @@
 import type * as PIXI from 'pixi.js'
+import type { coord_system } from './cordinates'
 import type { path, path_style } from './path'
 import type { text_style, HF_text } from './text'
 import type { TileSymbol } from './tilesets'
 
 export interface terrain_data {
     bgColor: number,
-    symbolData?: TileSymbol,
+    symbol?: TileSymbol,
     usingEyedropper: boolean,
     usingPaintbucket: boolean,
+    usingEraser: boolean
 }
 
 export interface icon_data {
@@ -20,8 +22,8 @@ export interface icon_data {
 
 export interface coordinates_data {
     shown: boolean,
-    style: PIXI.Text["style"],
-    system: "evenq" | "cubeId",
+    style: PIXI.Text["style"]
+    system: coord_system
     seperator: string
 }
 
