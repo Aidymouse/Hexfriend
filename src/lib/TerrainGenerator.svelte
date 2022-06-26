@@ -270,7 +270,7 @@
         {#if selectedId != ""}
             {#each Object.keys(loadedTilesets) as tilesetName}
                 {#each loadedTilesets[tilesetName] as tile (tile.id)}
-                    <button on:click={() => { addTileToFunction(selectedId, tile.id) }}> <img src={tile.preview} alt={`Add ${tile.display} to generation ruleset`}> </button>
+                    <button on:click={() => { addTileToFunction(selectedId, tile.id) }}> <img src={tile.preview} alt={tile.id} title={`Add ${tile.display} to generation ruleset`}> </button>
                 {/each}
             {/each}
         {/if}

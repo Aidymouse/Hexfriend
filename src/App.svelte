@@ -3,6 +3,7 @@
   /* COLORS
 
     hexfriend green: #8cc63f
+    hexfiend red: #FF6666
 
   */
 
@@ -11,20 +12,23 @@
     
 
     // CORE FUNCTIONS
-    - map resizing - removing hexes
     - hex coordinates on map - fix pointy top + more coordinate systems
+    - tooltips
+    - move icons when resizing map
+    
     - keyboard shortcuts
-    - individual terrain and icon erasers
     - import tilesets
     - import iconsets
     
-    // POLISH
+    // POLISH / ROADMAP
+    // not ranked
     - terrain generator function validation
+    - terrain generator
     - floating loaders - better feedback
     - save data checking (if loading, making new map, quitting)
     - export at different sizes
     - tooltips
-    - dashed lines
+    - dashed line
     - more fonts
 
   */
@@ -42,6 +46,8 @@
   import type { saveData } from './lib/defaultSaveData'
   import type { coordinates_data, icon_data, text_data, terrain_data, path_data } from './types/data';
   import { coord_system } from './types/cordinates';
+
+  import {tools} from './types/toolData'
 
   import * as PIXI from 'pixi.js'
   import { Pixi, Container } from 'svelte-pixi'
@@ -204,7 +210,7 @@
     mouseDown: [false, false, false, false, false]
   }
 
-  let selectedTool: string = "terrain";
+  let selectedTool: tools = tools.TERRAIN;
 
   /* DATA */
   /* Data is bound to both layer and panel of a particluar tool. It contains all the shared state they need, and is bound to both */
@@ -237,7 +243,7 @@
     editorRef: null,
     usingTextTool: false
   }
-  $: data_text.usingTextTool = selectedTool == "text"
+  $: data_text.usingTextTool = selectedTool == tools.TEXT
 
   let data_coordinates: coordinates_data = {
     shown: true,
@@ -346,11 +352,13 @@
   function redrawEntireMap() {
     // Refreshes all hexes and coordinates
     comp_terrainField.renderAllHexes()
-    comp_coordsLayer.generateCoords() 
+    //comp_coordsLayer.generateCoords(loadedSave.coords.system) 
+    //comp_coordsLayer.updateCoordPositions()
   }
 
-  /* TOOL METHODS */
 
+
+  /* TOOL METHODS */
 
   /* ALL PURPOSE POINTER METHODS */
   function pointerdown(e: PointerEvent) {
@@ -359,7 +367,7 @@
     if (controls.mouseDown[2]) pan.startPan(e)
 
     switch (selectedTool) {
-      case "terrain":
+      case tools.TERRAIN:
         if (controls.mouseDown[0]) comp_terrainField.pointerdown()
         break
       
@@ -399,15 +407,15 @@
     pan.handle(e);
 
     switch (selectedTool) {
-      case "terrain":
+      case tools.TERRAIN:
         if (controls.mouseDown[0]) comp_terrainField.pointerdown()
         break
 
-      case "text":
+      case tools.TEXT:
         comp_textLayer.pointermove()
         break
       
-      case "eraser":
+      case tools.ERASER:
         if (controls.mouseDown[0]) comp_terrainField.erase()
         /* Icons are handled differently in the icon handler */
         break
@@ -533,7 +541,7 @@
         scale={ {x: pan.zoomScale, y: pan.zoomScale} }
       >
 
-        <TerrainField bind:this={comp_terrainField} bind:data_terrain bind:pan {controls} {L} bind:tfield />
+        <TerrainField bind:this={comp_terrainField} bind:data_terrain bind:pan {controls} {L} bind:tfield {comp_coordsLayer} />
 
         <PathLayer bind:this={comp_pathLayer} bind:paths={loadedSave.paths} bind:data_path {pan} {controls} {selectedTool} {tfield}  />
 
@@ -607,7 +615,6 @@
       {comp_terrainField}
       {comp_coordsLayer}
       bind:data_coordinates
-      {save}
       renderAllHexes={() => {comp_terrainField.renderAllHexes()}}
       renderGrid={() => { comp_terrainField.renderGrid() }}
       redrawEntireMap={() => { redrawEntireMap() }}
@@ -617,6 +624,9 @@
   <Controls 
     {selectedTool}
     {data_terrain}
+    {data_icon}
+    {data_path}
+    {data_text}
   />
 
 
@@ -757,6 +767,18 @@
     padding: 5px;
     border-radius: 3px;
   }
+
+  :global(button:disabled) {
+    border: solid 1px #222222;
+    background-color: #222222;
+    color: #777777;
+  }
+
+  :global(button:disabled:hover) {
+    border: solid 1px #222222;
+    background-color: #222222;
+  }
+
 
   /* GLOBAL SCROLL BAR */
 

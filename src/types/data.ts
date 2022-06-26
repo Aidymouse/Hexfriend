@@ -25,6 +25,7 @@ export interface coordinates_data {
     style: PIXI.Text["style"]
     system: coord_system
     seperator: string
+    gap: number
 }
 
 export interface text_data {

@@ -46,78 +46,106 @@
         
     }
 
-    async function generateCoords(system: coord_system) {
+    export function generateAllCoords(system: coord_system) {
 
-        switch(system) {
-            case (coord_system.HEXID):
-                Object.keys(tfield.hexes).forEach(hexId => {
-                    
-                    createTextIfNoneExists(hexId)
+        Object.keys(tfield.hexes).forEach(hexId => {
+            createTextIfNoneExists(hexId)
+            generateCoord(hexId, system)
+        })
+        updateAllCoordPositions()
 
-                    let idParts = breakDownHexID(hexId)
+    }
 
-                    texts[hexId].parts = [idParts.q, idParts.r, idParts.s]
-                    texts[hexId].pixiText.text = `${texts[hexId].parts[0]}${data_coordinates.seperator}${texts[hexId].parts[1]}${data_coordinates.seperator}${texts[hexId].parts[2]}`
-                    
-                    let newPos = coords_cubeToWorld(idParts.q, idParts.r, idParts.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+    export function generateCoord(hexId: string, system: coord_system = data_coordinates.system) {
+        createTextIfNoneExists(hexId)
+        
+        generateCoordText(hexId)
 
-                    texts[hexId].pixiText.position.x = newPos.x
-                    texts[hexId].pixiText.position.y = newPos.y + tfield.hexHeight/2 - 4
+        updateCoordPosition(hexId)
+    }
 
-                }) 
-                break
+    export function updateAllCoordPositions() {
+        Object.entries(texts).forEach( ([hexId, text]) => {
 
-            case (coord_system.ROWCOL):
+           updateCoordPosition(hexId)
 
-                Object.keys(tfield.hexes).forEach(hexId => {
-                    
-                    createTextIfNoneExists(hexId)
+        } )
+    }
 
-                    let cube = breakDownHexID(hexId)
-                    let idParts = tfield.orientation == "flatTop" ? coords_cubeToq(tfield.raised, cube.q, cube.r, cube.s) : coords_cubeTor(tfield.raised, cube.q, cube.r, cube.s)
+    function updateCoordPosition(hexId: string) {
+        let text = texts[hexId]
 
-                    let newPos = coords_cubeToWorld(cube.q, cube.r, cube.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+        let idParts = breakDownHexID(hexId)
+        let newPos = coords_cubeToWorld(idParts.q, idParts.r, idParts.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
 
-                    texts[hexId].parts = [idParts.col, idParts.row]
-                    //texts[hexId].pixiText.text = `${texts[hexId].parts[0]}${data_coordinates.seperator}${texts[hexId].parts[1]}`
-                    texts[hexId].pixiText.text = `${texts[hexId].parts[0]}${data_coordinates.seperator}${texts[hexId].parts[1]}`
-                    
-                    texts[hexId].pixiText.position.x = newPos.x
-                    texts[hexId].pixiText.position.y = newPos.y + tfield.hexHeight/2 - 4
+        text.pixiText.position.x = newPos.x
+        text.pixiText.position.y = newPos.y + tfield.hexHeight/2 - data_coordinates.gap
+    }
 
-                }) 
+    
+    export function eliminateCoord(hexId) {
+        cont_textContainer.removeChild( texts[hexId].pixiText )
+        texts[hexId].pixiText.destroy()
+        delete texts[hexId]
+    }
 
+    function generateCoordText(hexId, system: coord_system = data_coordinates.system) {
+        switch (system) {
+            case coord_system.CUBE: {
+
+                let idParts = breakDownHexID(hexId)
+                
+                texts[hexId].parts = [idParts.q, idParts.r, idParts.s]
+                texts[hexId].pixiText.text = `${texts[hexId].parts[0]}${data_coordinates.seperator}${texts[hexId].parts[1]}${data_coordinates.seperator}${texts[hexId].parts[2]}`
                 break
             
-            case (coord_system.AXIAL):
-                Object.keys(tfield.hexes).forEach(hexId => {
-                    
-                    createTextIfNoneExists(hexId)
+            }
 
-                    let cube = breakDownHexID(hexId)
+            case coord_system.ROWCOL: {
+                let cube = breakDownHexID(hexId)
+                let idParts = tfield.orientation == "flatTop" ? coords_cubeToq(tfield.raised, cube.q, cube.r, cube.s) : coords_cubeTor(tfield.raised, cube.q, cube.r, cube.s)
 
-                    let newPos = coords_cubeToWorld(cube.q, cube.r, cube.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
-
-                    texts[hexId].parts = [cube.q, cube.r]
-                    
-                    texts[hexId].pixiText.text = `${texts[hexId].parts[0]}${data_coordinates.seperator}${texts[hexId].parts[1]}`
-                    texts[hexId].pixiText.position.x = newPos.x
-                    texts[hexId].pixiText.position.y = newPos.y + tfield.hexHeight/2 - 4
-
-                }) 
-
+                texts[hexId].parts = [idParts.col, idParts.row]
+                texts[hexId].pixiText.text = `${texts[hexId].parts[0]}${data_coordinates.seperator}${texts[hexId].parts[1]}`
+                
                 break
+            }
 
+            case coord_system.AXIAL: {
+                let cube = breakDownHexID(hexId)
+
+                //let newPos = coords_cubeToWorld(cube.q, cube.r, cube.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+
+                texts[hexId].parts = [cube.q, cube.r]                
+                texts[hexId].pixiText.text = `${texts[hexId].parts[0]}${data_coordinates.seperator}${texts[hexId].parts[1]}`
+                break
+            }
         }
+    }
 
+    export function updateAllCoordsText() {
+        Object.entries(texts).forEach( ([hexId, text]) => {
+            generateCoordText(hexId)
+        })
+    }
+
+    export function updateCoordText(hexId) {
+        generateCoordText(hexId)
     }
 
     function textExists(hexId: string) {
         return texts[hexId] != null
     }
 
+    export function cullUnusedCoordinates() {
+        Object.keys(texts).forEach(hexId => {
+            if (tfield.hexes[hexId] == null) { eliminateCoord(hexId) }
+        })
+    }
+
     onMount(() => {
-        generateCoords( data_coordinates.system )
+        cullUnusedCoordinates()
+        generateAllCoords( data_coordinates.system )
     })
 
 </script>

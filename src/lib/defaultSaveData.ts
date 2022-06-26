@@ -54,7 +54,8 @@ let DEFAULTSAVEDATA: saveData = {
         shown: false,
         style: { fill: 0x000000, fontSize: 10, stroke: 0xffffff, strokeThickness: 2, fontFamily: "Segoe UI" },
         system: coord_system.ROWCOL,
-        seperator: "."
+        seperator: ".",
+        gap: 4
     },
 
     tilesets: {

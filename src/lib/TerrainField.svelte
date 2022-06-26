@@ -2,12 +2,13 @@
     import { Graphics, Container } from "svelte-pixi"
     import * as PIXI from 'pixi.js'
     import {coords_cubeToWorld, getHexPath, genHexId, coords_worldToCube, getNeighbours, coords_qToCube, coords_rToCube, genHexId_cordsObj} from '../helpers/hexHelpers'
-
     import { onMount } from "svelte";
+
     
     import { map_type } from "/src/types/settings";
     import type { TerrainHex, TerrainHexField } from "src/types/terrain";
-import { collapseWaveGen } from "./terrainGenerator";
+
+    import { collapseWaveGen } from "./terrainGenerator";
 
     let terrainGraphics = new PIXI.Graphics()
     let symbolsContainer = new PIXI.Container()
@@ -20,6 +21,8 @@ import { collapseWaveGen } from "./terrainGenerator";
     export let L
     export let tfield: TerrainHexField
     
+    export let comp_coordsLayer
+
     export let data_terrain
 
     export function copyHex(from: TerrainHex, to: TerrainHex) {
@@ -31,7 +34,7 @@ import { collapseWaveGen } from "./terrainGenerator";
     }
 
     /* SQUARE SHAPED MAPS */
-    export function updateRaisedColumn() {
+    export function square_updateRaisedColumn() {
 
         // the labels look backwards, but thats cos the value is bound to the thing that triggers this function
 
@@ -43,7 +46,8 @@ import { collapseWaveGen } from "./terrainGenerator";
                 let newHexCoords = coords_qToCube("odd", col, tfield.rows-1)
                 let newId = genHexId_cordsObj(newHexCoords)
                 tfield.hexes[newId] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true, renderable: true }
-                
+                comp_coordsLayer.generateCoord(newId)
+
                 // Move all hexes one down
                 for (let row=tfield.rows-1; row >= 0; row--) {
                     let destinationCoords = coords_qToCube("odd", col, row)
@@ -53,11 +57,13 @@ import { collapseWaveGen } from "./terrainGenerator";
                     let sourceHex = tfield.hexes[genHexId_cordsObj(sourceId)]
 
                     copyHex(sourceHex, destinationHex)
+                    comp_coordsLayer.updateCoordText(genHexId_cordsObj(destinationCoords))
                 }
 
                 let oldHexCoords = coords_qToCube("even", col, 0)
                 eraseHex(genHexId_cordsObj(oldHexCoords))
                 delete(tfield.hexes[genHexId_cordsObj(oldHexCoords)])
+                comp_coordsLayer.eliminateCoord(genHexId_cordsObj(oldHexCoords))
             }
 
         }
@@ -69,6 +75,7 @@ import { collapseWaveGen } from "./terrainGenerator";
                 let newHexCoords = coords_qToCube("even", col, 0)
                 let newId = genHexId_cordsObj(newHexCoords)
                 tfield.hexes[newId] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true, renderable: true }
+                comp_coordsLayer.generateCoord(newId)
                 
                 // Move all hexes one up
                 for (let row=0; row < tfield.rows; row++) {
@@ -79,11 +86,13 @@ import { collapseWaveGen } from "./terrainGenerator";
                     let sourceHex = tfield.hexes[genHexId_cordsObj(sourceId)]
 
                     copyHex(sourceHex, destinationHex)
+                    comp_coordsLayer.updateCoordText(genHexId_cordsObj(destinationCoords))
                 }
 
                 let oldHexCoords = coords_qToCube("odd", col, tfield.rows-1)
                 eraseHex(genHexId_cordsObj(oldHexCoords))
                 delete(tfield.hexes[genHexId_cordsObj(oldHexCoords)])
+                comp_coordsLayer.eliminateCoord(genHexId_cordsObj(oldHexCoords))
             }
             
         }
@@ -92,7 +101,7 @@ import { collapseWaveGen } from "./terrainGenerator";
     }
 
 
-    export function changeIndentedRow() {
+    export function square_changeIndentedRow() {
         if (tfield.raised == "odd") {
 
             for (let row = 1; row < tfield.rows; row+=2) {
@@ -101,7 +110,8 @@ import { collapseWaveGen } from "./terrainGenerator";
                 let newHexCoords = coords_rToCube("odd", tfield.columns-1, row)
                 let newId = genHexId_cordsObj(newHexCoords)
                 tfield.hexes[newId] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true, renderable: true }
-                
+                comp_coordsLayer.generateCoord(newId)
+
                 // Move all hexes one right
                 for (let col=tfield.columns-1; col >= 0; col--) {
                     let destinationCoords = coords_rToCube("odd", col, row)
@@ -111,11 +121,13 @@ import { collapseWaveGen } from "./terrainGenerator";
                     let sourceHex = tfield.hexes[genHexId_cordsObj(sourceId)]
 
                     copyHex(sourceHex, destinationHex)
+                    comp_coordsLayer.updateCoordText(genHexId_cordsObj(destinationCoords))
                 }
 
                 let oldHexCoords = coords_rToCube("even", 0, row)
                 eraseHex(genHexId_cordsObj(oldHexCoords))
                 delete(tfield.hexes[genHexId_cordsObj(oldHexCoords)])
+                comp_coordsLayer.eliminateCoord(genHexId_cordsObj(oldHexCoords))
             }
 
         }
@@ -127,7 +139,8 @@ import { collapseWaveGen } from "./terrainGenerator";
                 let newHexCoords = coords_rToCube("even", 0, row)
                 let newId = genHexId_cordsObj(newHexCoords)
                 tfield.hexes[newId] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true, renderable: true }
-                
+                comp_coordsLayer.generateCoord(newId)
+
                 // Move all hexes one up
                 for (let col=0; col < tfield.columns; col++) {
                     let destinationCoords = coords_rToCube("even", col, row)
@@ -137,11 +150,13 @@ import { collapseWaveGen } from "./terrainGenerator";
                     let sourceHex = tfield.hexes[genHexId_cordsObj(sourceId)]
 
                     copyHex(sourceHex, destinationHex)
+                    comp_coordsLayer.updateCoordText(genHexId_cordsObj(destinationCoords))
                 }
 
                 let oldHexCoords = coords_rToCube("odd", tfield.columns-1, row)
                 eraseHex(genHexId_cordsObj(oldHexCoords))
                 delete(tfield.hexes[genHexId_cordsObj(oldHexCoords)])
+                comp_coordsLayer.eliminateCoord(genHexId_cordsObj(oldHexCoords))
             }
             
         }
@@ -149,14 +164,42 @@ import { collapseWaveGen } from "./terrainGenerator";
         renderAllHexes()
     }
 
+    function square_changeOrientation() {
+     
+        let newHexes = {}
+        
+        for (let col=0; col < tfield.columns; col++) {
+            for (let row=0; row < tfield.rows; row++) {
+
+                
+                let newHexCoords = tfield.orientation == "flatTop" ? coords_qToCube(tfield.raised, col, row) : coords_rToCube(tfield.raised, col, row)
+
+                let sourceHexCoords = tfield.orientation == "flatTop" ? coords_rToCube(tfield.raised, col, row) : coords_qToCube(tfield.raised, col, row)
+                let sourceHex: TerrainHex = tfield.hexes[genHexId_cordsObj(sourceHexCoords)]
+
+                let newHex = {...sourceHex, q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s}
+
+                newHexes[genHexId_cordsObj(newHexCoords)] = newHex
+
+            }
+        }
+
+        tfield.hexes = newHexes
+        //for (var i = symbolsContainer.children.length - 1; i >= 0; i--) {symbolsContainer.removeChild(symbolsContainer.children[i]);};
+        clearTerrainSprites()
+        renderAllHexes()
+
+        comp_coordsLayer.generateAllCoords()
+
+    }
     
+
     export function square_expandMapDimension(direction: "left" | "right" | "top" | "bottom", amount: number) {
         
         // Will come back here later...
         switch (direction) {
             case "right": 
                 square_expandRight(amount)
-                renderAllHexes()
                 break
             
             case "left":
@@ -164,46 +207,48 @@ import { collapseWaveGen } from "./terrainGenerator";
                 square_moveAllHexesRight(amount)
 
                 if (tfield.orientation == "flatTop") {
-                    tfield.raised = tfield.raised == "odd" ? "even" : "odd"
-                    updateRaisedColumn()
+                    
+                    pan.offsetX -= tfield.hexWidth * 0.75 * pan.zoomScale * amount
+                    if (amount % 2 == 1) {
+                        tfield.raised = tfield.raised == "odd" ? "even" : "odd"
+                        square_updateRaisedColumn()
+                        pan.offsetY += tfield.hexHeight * 0.5 * (tfield.raised == "odd" ? -1 : 1) * pan.zoomScale
+                    }
 
-                    pan.offsetX -= tfield.hexWidth * 0.75 * pan.zoomScale
-                    pan.offsetY += tfield.hexHeight * 0.5 * (tfield.raised == "odd" ? -1 : 1) * pan.zoomScale
                 } else {
-
-                    pan.offsetX -= tfield.hexWidth * pan.zoomScale
+                    pan.offsetX -= tfield.hexWidth * pan.zoomScale * amount
 
                 }
                 
-                renderAllHexes()
-
                 break
 
             case "bottom":
                 square_expandDown(amount)
-                renderAllHexes()
                 break
             
             case "top":
                 square_expandDown(amount)
-                
                 square_moveAllHexesDown(amount)
 
                 if (tfield.orientation == "flatTop") {
-                    pan.offsetY -= tfield.hexHeight * pan.zoomScale
+                    pan.offsetY -= tfield.hexHeight * pan.zoomScale * amount
                 
                 } else {
-                    tfield.raised = tfield.raised == "odd" ? "even" : "odd"
-                    changeIndentedRow()
-
-                    pan.offsetY -= tfield.hexHeight * 0.75 * pan.zoomScale
-                    pan.offsetX += tfield.hexWidth * 0.5 * (tfield.raised == "odd" ? -1 : 1) * pan.zoomScale    
+                    pan.offsetY -= tfield.hexHeight * 0.75 * pan.zoomScale * amount
+                    
+                    if (amount % 2 == 1) {
+                        tfield.raised = tfield.raised == "odd" ? "even" : "odd"
+                        square_changeIndentedRow()
+                        pan.offsetX += tfield.hexWidth * 0.5 * (tfield.raised == "odd" ? -1 : 1) * pan.zoomScale
+                    }
                     
                 }
 
-                renderAllHexes()
                 break
         }
+
+        
+        renderAllHexes()
 
     }
 
@@ -211,13 +256,14 @@ import { collapseWaveGen } from "./terrainGenerator";
         for (let col=0; col<amount; col++) {
             for (let row=0; row < tfield.rows; row++) {
 
-                let newHexCoords = tfield.orientation == "flatTop" ? coords_qToCube(tfield.raised, tfield.columns + col, row) : coords_rToCube(tfield.raised, tfield.columns + col, row)
+                let newHexCoords = tfield.orientation == "flatTop" ? coords_qToCube(tfield.raised, tfield.columns, row) : coords_rToCube(tfield.raised, tfield.columns, row)
                 
                 tfield.hexes[ genHexId_cordsObj(newHexCoords) ] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true, renderable: true }
-            
+                comp_coordsLayer.generateCoord( genHexId_cordsObj(newHexCoords) )
             }
 
             tfield.columns += 1
+            
         }
 
         
@@ -231,7 +277,6 @@ import { collapseWaveGen } from "./terrainGenerator";
                 let destinationHex = tfield.hexes[genHexId_cordsObj(destinationCoords)]
 
                 let sourceColumn = col-amount
-                
 
                 let sourceCoords = tfield.orientation == "flatTop" ? coords_qToCube(tfield.raised, sourceColumn, row) : coords_rToCube(tfield.raised, sourceColumn, row)
                 let sourceHex = tfield.hexes[genHexId_cordsObj(sourceCoords)]
@@ -253,7 +298,7 @@ import { collapseWaveGen } from "./terrainGenerator";
                 let newHexCoords = tfield.orientation == "flatTop" ? coords_qToCube(tfield.raised, col, tfield.rows + row) : coords_rToCube(tfield.raised, col, tfield.rows + row)
                 
                 tfield.hexes[ genHexId_cordsObj(newHexCoords) ] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true, renderable: true }
-            
+                comp_coordsLayer.generateCoord(genHexId_cordsObj(newHexCoords))
             }
             
         }
@@ -282,47 +327,155 @@ import { collapseWaveGen } from "./terrainGenerator";
         }
     }
 
-    function square_changeOrientation() {
-     
-        let newHexes = {}
-        
-        for (let col=0; col < tfield.columns; col++) {
-            for (let row=0; row < tfield.rows; row++) {
-
+    
+    export function square_reduceMapDimension(direction: "left" | "right" | "top" | "bottom", amount: number) {
+        switch (direction) {
+            case "right":
+                if (amount >= tfield.columns) amount = tfield.columns-1
+                if (amount == 0) return
+                square_removeRight(amount)
                 
-                let newHexCoords = tfield.orientation == "flatTop" ? coords_qToCube(tfield.raised, col, row) : coords_rToCube(tfield.raised, col, row)
+                break
+                
+            case "left":
+                if (amount >= tfield.columns) amount = tfield.columns-1
+                if (amount == 0) return
 
-                let sourceHexCoords = tfield.orientation == "flatTop" ? coords_rToCube(tfield.raised, col, row) : coords_qToCube(tfield.raised, col, row)
-                let sourceHex: TerrainHex = tfield.hexes[genHexId_cordsObj(sourceHexCoords)]
+                // Move everything 1 left
+                square_moveAllHexesLeft(amount)
+                square_removeRight(amount)
 
-                let newHex = {...sourceHex, q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s}
+                if (tfield.orientation == "flatTop") {
+                    if (amount % 2 == 1) {
+                        tfield.raised = tfield.raised == "odd" ? "even" : "odd"
+                        square_updateRaisedColumn()
+                    } 
 
-                newHexes[genHexId_cordsObj(newHexCoords)] = newHex
+                    pan.offsetX += tfield.hexWidth * 0.75 * pan.zoomScale * amount
+                    pan.offsetY += tfield.hexHeight * 0.5 * (tfield.raised == "odd" ? -1 : 1) * pan.zoomScale * (amount % 2 == 0 ? 0 : 1)
+                } else {
 
-            }
+                    pan.offsetX += tfield.hexWidth * pan.zoomScale * amount
+
+                }
+
+                break
+
+            case "bottom":
+                if (amount >= tfield.rows) amount = tfield.rows-1
+                if (amount == 0) return
+
+                square_removeBottom(amount)
+                break
+            
+            case "top":
+                if (amount >= tfield.rows) amount = tfield.rows-1
+                if (amount == 0) return
+
+                square_moveAllHexesUp(amount)
+                square_removeBottom(amount)
+
+                if (tfield.orientation == "flatTop") {
+                    pan.offsetY += tfield.hexHeight * pan.zoomScale * amount
+                
+                } else {
+                    pan.offsetY += tfield.hexHeight * 0.75 * pan.zoomScale * amount
+                    
+                    if (amount % 2 == 1) {
+                        tfield.raised = tfield.raised == "odd" ? "even" : "odd"
+                        square_changeIndentedRow()
+                        pan.offsetX += tfield.hexWidth * 0.5 * (tfield.raised == "odd" ? -1 : 1) * pan.zoomScale
+                    }
+                    
+                }
+
+                break
+
+
+
         }
 
-        tfield.hexes = newHexes
-        //for (var i = symbolsContainer.children.length - 1; i >= 0; i--) {symbolsContainer.removeChild(symbolsContainer.children[i]);};
-        clearTerrainSprites()
-
         renderAllHexes()
-
     }
 
+    function square_removeRight(amount: number) {
+        for (let col=0; col<amount; col++){
 
-    /* RADIAL SHAPES MAPS */
-    function radial_changeOrientation() {
-        console.log("Radial Change Orientation!")
+            for (let row=0; row<tfield.rows; row++) {
+
+                let fatedHexCoords = tfield.orientation == "flatTop" ? coords_qToCube(tfield.raised, tfield.columns-1, row) : coords_rToCube(tfield.raised, tfield.columns-1, row)
+                eliminateHex( genHexId_cordsObj(fatedHexCoords) )
+
+            }
+
+            tfield.columns -= 1
+        }
     }
 
+    function square_moveAllHexesLeft(amount: number) {
+        for (let col = 0; col <= tfield.columns-1-amount; col++) {
+            for (let row=0; row<tfield.rows; row++) {
 
+                let destinationCoords = tfield.orientation == "flatTop" ? coords_qToCube(tfield.raised, col, row) : coords_rToCube(tfield.raised, col, row)
+                let destinationHex = tfield.hexes[genHexId_cordsObj(destinationCoords)]
+
+                let sourceColumn = col+amount
+                
+
+                let sourceCoords = tfield.orientation == "flatTop" ? coords_qToCube(tfield.raised, sourceColumn, row) : coords_rToCube(tfield.raised, sourceColumn, row)
+                let sourceHex = tfield.hexes[genHexId_cordsObj(sourceCoords)]
+
+                copyHex(sourceHex, destinationHex)
+                
+                if (sourceColumn > tfield.columns-1-amount) {
+                    sourceHex.blank = true
+                }
+            }
+        }
+    }
+    
+    function square_removeBottom(amount: number) {
+        for (let col=0; col<tfield.columns; col++) {
+            for (let row=0; row < amount; row++) {
+                
+                let newHexCoords = tfield.orientation == "flatTop" ? coords_qToCube(tfield.raised, col, tfield.rows-1 - row) : coords_rToCube(tfield.raised, col, tfield.rows-1 - row)
+                
+                eliminateHex( genHexId_cordsObj(newHexCoords) )
+
+            }
+            
+        }
+        tfield.rows -= amount
+    }
+    
+    function square_moveAllHexesUp(amount: number) {
+        for (let col = 0; col < tfield.columns; col++) {
+            for (let row=0; row<=tfield.rows-1-amount; row++) {
+
+                let destinationCoords = tfield.orientation == "flatTop" ? coords_qToCube(tfield.raised, col, row) : coords_rToCube(tfield.raised, col, row)
+                let destinationHex = tfield.hexes[genHexId_cordsObj(destinationCoords)]
+
+                let sourceRow = row+amount
+                
+                let sourceCoords = tfield.orientation == "flatTop" ? coords_qToCube(tfield.raised, col, sourceRow) : coords_rToCube(tfield.raised, col, sourceRow)
+                let sourceHex = tfield.hexes[genHexId_cordsObj(sourceCoords)]
+
+                copyHex(sourceHex, destinationHex)
+                
+                if (sourceRow > tfield.rows-1-amount) {
+                    sourceHex.blank = true
+                }
+            }
+        }
+    }
 
 
     /* FUNCTIONS THAT APPLY TO ALL MAP TYPES */
     export function changeOrientation() {
         if (tfield.mapType == map_type.SQUARE) square_changeOrientation()
-        else if (tfield.mapType == map_type.RADIAL) radial_changeOrientation()
+        //else if (tfield.mapType == map_type.RADIAL) radial_changeOrientation()
+
+        comp_coordsLayer.cullUnusedCoordinates()
 
     }
 
@@ -371,7 +524,7 @@ import { collapseWaveGen } from "./terrainGenerator";
         });
     }
 
-    export function renderAllHexes() {
+    export async function renderAllHexes() {
         terrainGraphics.clear();
         Object.keys(tfield.hexes).forEach(hexId => {
 
@@ -380,7 +533,7 @@ import { collapseWaveGen } from "./terrainGenerator";
         renderGrid();
     }
 
-    function renderHex(hexId) {
+    async function renderHex(hexId) {
         let hex = tfield.hexes[hexId]
 
         if (!hex.renderable) {
@@ -579,6 +732,20 @@ import { collapseWaveGen } from "./terrainGenerator";
         hexes.forEach(hexId => {
             eraseHex(hexId)
         })
+
+    }
+
+    function eliminateHex(hexId: string) {
+
+        if (tfield.hexes[hexId].symbol) {
+            symbolsContainer.removeChild(terrainSprites[hexId])
+            terrainSprites[hexId].destroy()
+            delete terrainSprites[hexId]
+        }
+
+        delete tfield.hexes[hexId]
+
+        comp_coordsLayer.eliminateCoord(hexId)
 
     }
 

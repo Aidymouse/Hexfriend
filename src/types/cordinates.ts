@@ -1,5 +1,5 @@
 export enum coord_system {
-    HEXID,
+    CUBE,
     ROWCOL,
     AXIAL
 }

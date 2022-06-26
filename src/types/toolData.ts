@@ -6,9 +6,16 @@ interface path {
     points: number[]
 }
 
+export enum tools {
+    TERRAIN = "terrain",
+    ICON = "icon",
+    PATH = "path",
+    TEXT = "text",
+    ERASER = "eraser"
+}
 
 interface ToolData {
-    selectedTool: "terrain" | "icon" | "path" | "text" | "eraser",
+    selectedTool: tools,
 
     terrain: {
         tile: Tile

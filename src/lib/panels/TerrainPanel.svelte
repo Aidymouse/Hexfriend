@@ -38,16 +38,16 @@
         data_terrain.usingEraser = false
     }
 
-    function findSymbolScale(symbol) {
-        if (tfield.hexWidth < tfield.hexHeight) {
-            let s = tfield.hexWidth * symbol.pHex / 100 / symbol.texWidth;
+    function findSymbolScale(symbol, hW, hH) {
+        if (hW < hH) {
+            let s = hW * symbol.pHex / 100 / symbol.texWidth;
             return {
                 x: s,
                 y: s
             }
 
         } else {
-            let s = tfield.hexHeight * symbol.pHex / 100 / symbol.texHeight;
+            let s = hH * symbol.pHex / 100 / symbol.texHeight;
             return {
                 x: s,
                 y: s
@@ -75,7 +75,7 @@
         if (data_terrain.symbol) {
             s.texture = L.resources[data_terrain.symbol.texId].texture
             s.tint = data_terrain.symbol.color
-            s.scale = findSymbolScale(data_terrain.symbol) 
+            s.scale = findSymbolScale(data_terrain.symbol, hW, hH) 
             s.anchor.set(0.5)
             
         } else {

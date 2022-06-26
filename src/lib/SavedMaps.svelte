@@ -39,25 +39,25 @@
     
     
     <div id="maps">
-        <button id="close-button" on:click={()=>{showSavedMaps = false}}>Close</button>
         
         <div class="map-save" id="new-map-button" on:click={() => { createNewMap() }}>+</div>
-
         
-
+        
+        
         {#each $saves || [] as save (save.id)}
-            <div class="map-save">
-                <div on:click={ () => { clickedMap(save.id) } }>
-                    <div class="image-container" >
+        <div class="map-save">
+            <div on:click={ () => { clickedMap(save.id) } }>
+                <div class="image-container" >
                         <img src={save.previewBase64} alt={"Map Preview"}>
                     </div>
-
+                    
                     <p>{save.mapTitle}</p>
                 </div>
-                <button class="delete-button" on:click={()=>{deleteMap(save.id)}}>Delete</button>
+                <button class="delete-button" on:click={()=>{deleteMap(save.id)}}> <img src="/assets/img/tools/trash.png"> </button>
             </div>
         {/each}
-        
+            
+        <button id="close-button" on:click={()=>{showSavedMaps = false}}> <img src="/assets/img/tools/close.png"> </button>
         
     </div>
     
@@ -95,8 +95,23 @@
 
     #close-button {
         position: absolute;
-        right: 0px;
-        top: 0px;
+        right: 5px;
+        top: 5px;
+
+        width: 30px;
+        height: 30px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 0px;
+    }
+
+    
+    #close-button img {
+        width: 70%;
+        height: auto;
     }
 
     #maps-container {
@@ -113,7 +128,7 @@
 
     #maps {
         width: 50%;
-        height: 50%;
+        height: 75%;
         background: #333333;
         border: solid 1px grey;
         border-radius: 3px;
@@ -139,6 +154,7 @@
         border-radius: 3px;
         border: solid 1px transparent;
         cursor: pointer;
+        transition-duration: 0.2s;
     }
 
     .delete-button {
@@ -146,15 +162,31 @@
         top: 10px;
         right: 10px;
         display: none;
+
+        width: 30px;
+        height: 30px;
+        padding: 0px;
+
+        justify-content: center;
+        align-items: center;
+
+        transition-duration: 0.2s;
+    }
+
+    .delete-button img {
+        width: 70%;
     }
 
     .map-save:hover .delete-button {
-        display: block;
+        display: flex;
+
     }
 
     .map-save:hover {
         background-color: #555555;
-        border: solid 1px grey;
+        border: solid 1px #8cc63f;
+        outline: #8cc63f solid 1px;
+        transition-duration: 0.2s;
     }
 
     .image-container {
@@ -167,9 +199,10 @@
         background-color: #000000;
     }
 
-    img {
+    .image-container img {
         width: 150%;
     }
+
 
 
 
