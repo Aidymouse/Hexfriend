@@ -65,7 +65,7 @@
     }
 
     function setTooltips_path() {
-        c_path.leftMouse = "Place Start Point"
+        c_path.leftMouse = "Start New Path"
 
         if (data_path.selectedPath) {
             c_path.leftMouse = "Place Point"
@@ -86,7 +86,7 @@
     }
 
     function setTooltips_text() {
-        c_text.leftMouse = "Place Start Path"
+        c_text.leftMouse = "Place New Text"
 
         if (data_text.selectedText) {
 

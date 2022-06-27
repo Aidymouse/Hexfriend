@@ -129,10 +129,15 @@
 
     <div id="buttons">
 
-        {#each Object.keys(loadedTilesets) as tilesetName} 
-            {#each loadedTilesets[tilesetName] as tile (tile.id)}
-                <button title={tile.display} on:click={ () => changeTile(tile) } class:selected={ styleMatchesData(tile) } ><img src={tile.preview} alt={tile.display}  ></button>
-            {/each}
+        {#each loadedTilesets as tileset (tileset.id)} 
+            {#if tileset.id != "default"}
+                <h2>{tileset.name}</h2>
+            {/if}
+            <div class="button-grid">
+                {#each tileset.tiles as tile (tile.id)}
+                    <button title={tile.display} on:click={ () => changeTile(tile) } class:selected={ styleMatchesData(tile) } ><img src={tile.preview} alt={tile.display}  ></button>
+                {/each}
+            </div>
         {/each}
 
     </div>
@@ -183,15 +188,25 @@
         background-color: #333333;
     }
     
-    #buttons {
-        background-color: #555555;
-        padding: 10px;
-
+    .button-grid {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
         grid-template-rows: 50px;
         grid-auto-rows: 50px;
         gap: 5px;
+
+    }
+
+    #buttons h2 {
+        border-color: #333333;
+        margin-bottom: 5px;
+        margin-top: 10px;
+    }
+
+    #buttons {
+        background-color: #555555;
+        padding: 10px;
+
     }
 
     #buttons button {

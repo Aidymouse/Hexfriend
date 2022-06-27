@@ -17,4 +17,14 @@ interface TileSymbol {
     base64: string,
 }
 
-export type { Tile, TileSymbol }
+interface Tileset {
+    name: string
+    id: string
+    author: string
+    version: number
+    tiles: Tile[]
+}
+
+
+
+export type { Tile, TileSymbol, Tileset }

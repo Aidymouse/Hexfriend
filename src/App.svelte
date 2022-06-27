@@ -17,7 +17,6 @@
     - move icons when resizing map
     
     - keyboard shortcuts
-    - import tilesets
     - import iconsets
     
     // POLISH / ROADMAP
@@ -38,10 +37,10 @@
     - symbol size is weird in preview when hex size is big
     - coordinates show under some stuff for some reason
   
-
   */
 
-  import type { Tile } from './types/tilesets'
+  import type { Tileset } from './types/tilesets'
+  import type { Iconset } from './types/icon';
   import type { TerrainHexField } from './types/terrain'
   import type { saveData } from './lib/defaultSaveData'
   import type { coordinates_data, icon_data, text_data, terrain_data, path_data } from './types/data';
@@ -91,16 +90,10 @@
   let loadedSave: saveData = DEFAULTSAVEDATA
   let loadedId: number | null = null;
 
-  let appState: "normal" | "tilesetCreator" | "iconsetCreator" = "normal"
+  let appState: "normal" | "tilesetCreator" | "iconsetCreator" = "tilesetCreator"
 
   let showSettings = false
-  let showTerrainGenerator = false
-
-  function changeState(e) {
-    appState = e.detail.newState
-  }
-
-  
+  let showTerrainGenerator = false  
 
   let offsetContainer = new PIXI.Container();
 
@@ -125,7 +118,7 @@
 
   let loading = true
 
-  let loadedTilesets: {[key: string]: Tile[]}
+  let loadedTilesets: Tileset[]
   let loadedIconsets
   let tfield: TerrainHexField
   
@@ -249,7 +242,8 @@
     shown: true,
     style: { fill: 0x000000, fontSize: 10 },
     system: coord_system.ROWCOL,
-    seperator: "."
+    seperator: ".",
+    gap: 4
   }
 
   const L: PIXI.Loader = new PIXI.Loader()
@@ -262,44 +256,50 @@
   function loadSave(data: saveData, id: number | null) {
 
     loadedTilesets = data.tilesets;
+
+    console.log(loadedTilesets)
+
     loadedIconsets = data.iconsets;
     tfield = data.TerrainField;
     data_coordinates = data.coords
 
     // Load Textures
-    for (let tilesetName in loadedTilesets) {
-      let tileset = loadedTilesets[tilesetName]
-      tileset.forEach(async tile => {
+    loadedTilesets.forEach(tileset => {
+
+      tileset.tiles.forEach(async tile => {
         if (tile.symbol && seentextures.find(id => tile.symbol.texId == id) == undefined && !L.resources[tile.symbol.texId] ) {
           L.add(tile.symbol.texId, tile.symbol.base64)
           seentextures.push(tile.symbol.texId);
         }
       });
-    }
+    
+    })
+    
 
     // Load Icons
-    for (let iconsetName in loadedIconsets) {
-      let iconset = loadedIconsets[iconsetName]
-      iconset.forEach(icon => {
+    loadedIconsets.forEach(iconset => {
 
+      iconset.icons.forEach(icon => {
         if (seenicons.find(id => icon.texId == id) == undefined && !L.resources[icon.texId]) {
           L.add(icon.texId, icon.base64)
           seenicons.push(icon.texId)
         }
-      
       })
-    }
 
-    L.onComplete.add( async () => {
+    })
+
+    //L.onComplete.add( );
+  
+    L.load(async () => {
 
       loadedSave = data
       loadedId = id
 
-      let firstTile = loadedTilesets[ Object.keys(loadedTilesets)[0] ][0]
+      let firstTile = loadedTilesets[0].tiles[0]
       data_terrain.bgColor = firstTile.bgColor
       data_terrain.symbol = firstTile.symbol ? {...firstTile.symbol} : null
   
-      let firstIcon = loadedIconsets[ Object.keys(loadedIconsets)[0] ][0]
+      let firstIcon = loadedIconsets[0].icons[0]
       data_icon.color = firstIcon.color
       data_icon.texId = firstIcon.texId
 
@@ -330,8 +330,6 @@
       //comp_coordsLayer.generateCoords();
       
     });
-  
-    L.load();
 
     
     /* Set up tools - would be nice to remember tool settings but this works regardless of loaded tileset */
@@ -342,7 +340,39 @@
  
   loadSave(JSON.parse(JSON.stringify(DEFAULTSAVEDATA)), null); // Same as creating a new map
 
+  function loadTilesetTextures(tileset: Tileset) {
 
+    tileset.tiles.forEach(async tile => {
+      if (tile.symbol && seentextures.find(id => tile.symbol.texId == id) == undefined && !L.resources[tile.symbol.texId] ) {
+        L.add(tile.symbol.texId, tile.symbol.base64)
+        seentextures.push(tile.symbol.texId);
+      }
+    });
+
+
+
+    L.load( () => {
+      console.log("Gaming.")
+    });
+
+  }
+
+  function loadIconsetTextures(iconset: Iconset) {
+
+    iconset.icons.forEach(icon => {
+        if (seenicons.find(id => icon.texId == id) == undefined && !L.resources[icon.texId]) {
+          L.add(icon.texId, icon.base64)
+          seenicons.push(icon.texId)
+        }
+      })
+
+
+
+    L.load( () => {
+      console.log("Gaming.")
+    });
+
+  }
 
 
   function exportMap() {
@@ -442,6 +472,8 @@
         return
       }
     }
+
+    console.log(loadedSave)
 
     let c = JSON.stringify(loadedSave)
     let p = app.renderer.plugins.extract.base64(offsetContainer);
@@ -619,6 +651,12 @@
       renderGrid={() => { comp_terrainField.renderGrid() }}
       redrawEntireMap={() => { redrawEntireMap() }}
       exportMap={() => {exportMap()}}
+      
+      bind:loadedTilesets
+      bind:loadedIconsets
+
+      loadTilesetTextures={ (tileset) => { loadTilesetTextures(tileset) } }
+      loadIconsetTextures={ (iconset) => { loadIconsetTextures(iconset) } }
     />
 
   <Controls 
@@ -777,6 +815,13 @@
   :global(button:disabled:hover) {
     border: solid 1px #222222;
     background-color: #222222;
+  }
+
+  :global(.selected) {
+    outline-style: solid;
+    outline-width: 1px;
+    outline-color: #8cc63f;
+    border-color: #8cc63f
   }
 
 

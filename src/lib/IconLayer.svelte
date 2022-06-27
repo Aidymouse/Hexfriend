@@ -82,8 +82,8 @@
         tint={icon.color}
         anchor={{x: 0.5, y: 0.5}}
         scale={{x: icon.scale, y: icon.scale}}
-        interactive={ selectedTool == "eraser" || data_icon.usingEraser }
-        on:pointerdown={ e => { deleteIcon(icon) } }
+        interactive={ selectedTool == "eraser" || (selectedTool == "icon" && data_icon.usingEraser) }
+        on:pointerdown={ e => { if (e.detail.data.button == 0) deleteIcon(icon) } }
         on:pointerover={ e => { if (controls.mouseDown[0]) deleteIcon(icon) } }
     />
 {/each}

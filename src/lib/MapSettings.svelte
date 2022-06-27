@@ -9,6 +9,9 @@
     import Checkbox from "../components/Checkbox.svelte";
     import { coord_system } from "/src/types/cordinates";
 
+    import type { Tileset } from "/src/types/tilesets"
+    import type { Iconset } from "/src/types/icon";
+
     export let loadedSave: saveData
     export let showSettings
     export let appState
@@ -25,6 +28,11 @@
     export let comp_coordsLayer
     export let data_coordinates: coordinates_data
 
+    export let loadedTilesets
+    export let loadTilesetTextures: Function
+    export let loadedIconsets
+    export let loadIconsetTextures: Function
+
     function changeOrientation() {
         let t = tfield.hexWidth
         tfield.hexWidth = tfield.hexHeight
@@ -39,6 +47,73 @@
     let addOrRemoveHex: "add" | "remove" = "add"
     
 
+
+
+
+    let tilesetFiles
+
+    function importTileset() {
+        let importFile = tilesetFiles[0]
+
+        if (!importFile) return
+
+        let r = new FileReader()
+        r.readAsText(importFile)
+        r.onload = eb => {
+        /* Read the file */
+            let setToImport = JSON.parse(eb.target.result);
+            
+            /* Check that set hasn't already been imported */
+            if ( loadedTilesets.find( (ts: Tileset) => ts.id == setToImport.id ) != null ) {
+                alert("You've already imported this tileset :)")
+                return
+            }
+        
+            loadedTilesets.push(setToImport)
+            loadedTilesets = loadedTilesets
+        
+            /* We also have to load all of these textures */
+            loadTilesetTextures( setToImport )
+
+        }
+
+    }
+
+    function removeTileset() {
+
+    }
+
+
+    let iconsetFiles
+
+    function importIconset() {
+        let importFile = iconsetFiles[0]
+
+        if (!importFile) return
+
+        let r = new FileReader()
+        r.readAsText(importFile)
+        r.onload = eb => {
+        /* Read the file */
+            let setToImport = JSON.parse(eb.target.result);
+            
+            /* Check that set hasn't already been imported */
+            if ( loadedTilesets.find( (is: Iconset) => is.id == setToImport.id ) != null ) {
+                alert("You've already imported this icon set :)")
+                return
+            }
+        
+            loadedIconsets.push(setToImport)
+            loadedIconsets = loadedIconsets
+        
+            /* We also have to load all of these textures */
+            loadIconsetTextures( setToImport )
+
+        }
+    }
+
+
+
 </script>
 
 <button id="close-tab" class:shown={showSettings} on:click={()=>{showSettings = false}} title={"Close Settings"}> <img src="/assets/img/tools/back.png" alt={"Back"}> </button>
@@ -47,12 +122,15 @@
     
     <input style="font-size: 20pt; font-family: Segoe UI; border-radius: 3px; width: 100%; box-sizing: border-box;" type="text" placeholder="Map Title" bind:value={loadedSave.title}>
     
+    <!-- EXPORT / IMPORT --> 
     <span style="display: grid; grid-template-columns: 1fr 1fr; margin-top: 5px; column-gap: 5px;">
         <button on:click={() => { exportMap() } } title="Export" >Export as PNG</button>
         <button disabled={true} on:click={() => {  } } title="Import (Coming Soon)" >Import</button>
     </span> 
     <p style="font-size: 10pt; color: #FF6666; background-color: rgba(1, 1, 1, 0.5); padding: 5px; margin-top: 5px;">Hexfriend is still a work in progress, so unexpected things may occur.</p>
 
+
+    
     <h2>Grid</h2>
     <div class="settings-grid">
         <label for="showGrid">Show Grid</label>
@@ -65,6 +143,7 @@
         {/if}
     </div>
     
+
 
     <h2>Hexes</h2>
     <div class="settings-grid">
@@ -114,8 +193,7 @@
     </div>
 
 
-    <!--
-    -->
+
     <h2>Map Dimensions</h2>
     <section id="map-dimensions-container">
         <div id="map-dimensions">
@@ -141,6 +219,7 @@
     </section>
 
     
+
     <h2 style="margin-bottom: 0px;">Coordinates</h2>
     <p class="helperText">Coordinates can slow down map changes such as adding or removing rows.</p>
     <div class="settings-grid">
@@ -177,12 +256,42 @@
     </div>
 
 
-    <h2>Tilesets</h2>
 
-    <button>Import Tileset</button>
+    <h2>Tilesets</h2>
+    <div id="tilesets">
+        {#each loadedTilesets as tileset (tileset.id)}
+            <div class="loaded-tileset">
+                {tileset.name}
+
+                {#if tileset.id != "default"}
+                        <button> <img src="/assets/img/tools/trash.png" alt={"Trash"} title={"Remove Tileset"}> </button>
+                {/if}
+
+            </div>
+        {/each}
+
+        <span> <button class="file-input-button">Import Tileset <input type="file" bind:files={tilesetFiles} on:change={ () => {importTileset()} } /></button> </span>
+    </div>
+
     
+
     <h2>Iconsets</h2>
-    <button>Import Iconset</button>
+    <div id="iconsets">
+        {#each loadedIconsets as iconset (iconset.id)}
+            <div class="loaded-tileset">
+                {iconset.name}
+
+                {#if iconset.id != "default"}
+                    <button> <img src="/assets/img/tools/trash.png" alt={"Trash"} title={"Remove Iconset"}> </button>
+                {/if}
+
+            </div>
+        {/each}
+
+        <span> <button class="file-input-button">Import Iconset <input type="file" accept=".hfis" bind:files={iconsetFiles} on:change={ () => {importIconset()} } /></button> </span>
+    </div>
+
+
 
     <h2>Experimental</h2>
     <p class="helperText">This stuff is not polished and may be broken.</p>
@@ -195,6 +304,8 @@
     <button disabled={true} on:click={() => { /*showTerrainGenerator = true; showSettings = false */ }} title={"Coming soon!"}> Generate Terrain </button>
     </div>
     
+
+
     <h2>About</h2>
     <p class="helperText">
         Hexfriend version 0.1 – "Hex Cometh"
@@ -216,6 +327,71 @@
     
 
 <style>
+
+   
+
+    #iconsets {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 30px;
+        grid-auto-rows: 30px;
+        row-gap: 5px;
+    }
+
+
+    #tilesets {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 30px;
+        grid-auto-rows: 30px;
+        row-gap: 5px;
+    }
+
+    .loaded-tileset {
+        background-color: #555555;
+        padding: 5px;
+        border-radius: 4px;
+        position: relative;
+    }
+
+    .loaded-tileset:hover button {
+        opacity: 1;
+    }
+
+    .loaded-tileset button {
+        opacity: 0;
+        position: absolute;
+        height: 100%;
+        top: 0px;
+        right: 0px;
+        width: 30px;
+        padding: 0;
+        border: none;
+        border-top-left-radius: 0px;
+        border-bottom-left-radius: 0px;
+        border: solid 1px #555555;
+    }
+
+    .loaded-tileset button img {
+        width: 80%;
+        height: auto;
+    }
+
+
+
+    .file-input-button {
+        position: relative;
+    }
+
+    .file-input-button input {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        opacity: 0;
+    }
+
 
     #map-dimensions-container {
         display: flex;
@@ -245,6 +421,8 @@
         width: 90%;
         height: auto;
     }
+
+
 
     h2 {
         margin-bottom: 10px;
@@ -301,6 +479,8 @@
         overflow-x: hidden;
         transition-duration: 0.2s;
     }
+
+    
 
     #close-tab {
         position: absolute;

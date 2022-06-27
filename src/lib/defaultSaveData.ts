@@ -1,5 +1,5 @@
 import type { TerrainHexField } from '../types/terrain'
-import type { Tile } from '../types/tilesets'
+import type { Tile, Tileset } from '../types/tilesets'
 import { map_type } from '../types/settings'
 
 import {coords_qToCube, genHexId} from '../helpers/hexHelpers'
@@ -7,7 +7,7 @@ import {coords_qToCube, genHexId} from '../helpers/hexHelpers'
 import { DEFAULTTILESET } from './defaultTileset'
 import { DEFAULTICONSET } from './defaultIconset'
 
-import type { icon_set_data } from '../types/icon'
+import type { Iconset } from '../types/icon'
 import type { coordinates_data } from 'src/types/data'
 import { coord_system } from '/src/types/cordinates'
 
@@ -18,8 +18,8 @@ interface saveData {
     coords: coordinates_data
 
     TerrainField: TerrainHexField
-    tilesets: {[key: string]: Tile[]}
-    iconsets: {[key: string]: icon_set_data[]}
+    tilesets: Tileset[]
+    iconsets: Iconset[]
     paths: []
     texts: []
     icons: []
@@ -58,13 +58,13 @@ let DEFAULTSAVEDATA: saveData = {
         gap: 4
     },
 
-    tilesets: {
-        'default': DEFAULTTILESET,
-    },
+    tilesets: [
+        DEFAULTTILESET
+    ],
 
-    iconsets: {
-        'default': DEFAULTICONSET
-    },
+    iconsets: [
+        DEFAULTICONSET
+    ],
 
     paths: [],
     icons: [],

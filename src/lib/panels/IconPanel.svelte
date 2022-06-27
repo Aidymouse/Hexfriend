@@ -4,17 +4,18 @@
     import ColorInputPixi from '../../components/ColorInputPixi.svelte'
     import Checkbox from '../../components/Checkbox.svelte';
     
-    import type { icon_data } from 'src/types/data';
-    import type { icon_set_data } from '../../types/icon'
+    import type { icon_data} from 'src/types/data';
+    import type { Icon, Iconset } from '../../types/icon'
+import IconsetCreator from '../IconsetCreator.svelte';
 
 
-    export let loadedIconsets
+    export let loadedIconsets: Iconset[]
     export let L
     export let app
 
     export let data_icon: icon_data
     
-    let selectedData = loadedIconsets['default'][0];
+    let selectedData = loadedIconsets[0].icons[0];
 
     let iconPreview = "";
     $: {
@@ -22,17 +23,19 @@
         loadedIconsets = loadedIconsets
     }
 
-    function selectIcon(iconData: icon_set_data) {
+    function selectIcon(iconData: Icon) {
         selectedData = iconData
 
         data_icon.texId = iconData.texId
         data_icon.color = iconData.color
         data_icon.pHex = iconData.pHex
+
+        data_icon.usingEraser = false
     }
 
     let s = new PIXI.Sprite()
 
-    function getIconPreview(iconData) {
+    function getIconPreview(iconData: icon_data): string {
         s.texture = L.resources[iconData.texId].texture
         s.tint = iconData.color
         
@@ -41,7 +44,7 @@
         return b64
     }
 
-    function iconMatchesData(icon: icon_set_data): boolean {
+    function iconMatchesData(icon: Icon): boolean {
         if (data_icon.color != icon.color) return false
         if (data_icon.texId != icon.texId) return false
         return true
@@ -53,7 +56,6 @@
     <div id="icon-preview">
     
         <img src={iconPreview} alt={"Icon Preview"}>
-        
 
         <ColorInputPixi bind:value={data_icon.color} w={25} h={25} label={"Icon Color"} name={"iconPanelColor"} />
 
@@ -65,12 +67,20 @@
     
 
     <div id="buttons">
-        {#each Object.keys(loadedIconsets) as setName}
-            {#each loadedIconsets[setName] as iconData}
-                <button class:selected={ iconMatchesData(iconData) } on:click={() => {selectIcon(iconData)}} title={iconData.display}> <img src={iconData.preview} alt={iconData.display}> </button>
-            {/each}
+        {#each loadedIconsets as iconset (iconset.id)}
+
+            {#if iconset.id != "default"}
+                <h2>{iconset.name}</h2>
+            {/if}
+
+            <div class="button-grid">
+                {#each iconset.icons as iconData}
+                    <button class:selected={ iconMatchesData(iconData) } on:click={() => {selectIcon(iconData)}} title={iconData.display}> <img src={iconData.preview} alt={iconData.display}> </button>
+                {/each}
+            </div>
         {/each}
     </div>
+
 </div>
 
 <style>
@@ -102,12 +112,22 @@
     #buttons {
         background-color: #555555;
         padding: 10px;
+        
+
+    }
+
+    .button-grid {
         display: grid;
         grid-template-columns: repeat(5, 51px);
         grid-template-rows: 51px;
         grid-auto-rows: 51px;
         gap: 5px;
+    }
 
+    #buttons h2 {
+        border-color: #333333;
+        margin-bottom: 5px;
+        margin-top: 10px;
     }
 
     #buttons button {
