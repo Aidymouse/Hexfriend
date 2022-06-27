@@ -1,19 +1,16 @@
 import type { map_type } from './settings'
-import type {TileSymbol} from './tilesets'
+import type { Tile } from './tilesets'
 
 // Hexes are the data that get drawn as terrain
 export interface TerrainHex {
-    bgColor: number
-    symbol: TileSymbol | null
-    symbolId: string | null
 
-    
+    // If no tile, the hex is blank
+    tile: Tile | null 
+
     q: number
     r: number
     s: number
 
-    blank: boolean,
-    renderable: boolean
 
 }
  

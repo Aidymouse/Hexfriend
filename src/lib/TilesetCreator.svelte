@@ -23,8 +23,6 @@
   
   export let appState;
 
-  let tilesetName = "default"
-
   let orientation: hexOrientation = "flatTop"
 
   let workingTileset: Tileset = {
@@ -47,16 +45,17 @@
   previewContainer.addChild(previewGraphics).addChild(previewSprite)
 
 
-  function findID(baseId: string = "new-hex"): string {
+  function findID(baseId: string): string {
 
-    let id = baseId
     let counter = 0
+    let proposedId = `${ IDify(workingTileset.name) }_${baseId}${counter == 0 ? "" : counter}`
 
-    while (workingTileset.tiles.find( (tile: Tile) => tile.id == `${id}${counter == 0 ? "" : counter}` ) != null) {
+    while (workingTileset.tiles.find( (tile: Tile) => tile.id == proposedId ) != null) {
       counter++
+      proposedId = `${ IDify(workingTileset.name) }_${baseId}${counter == 0 ? "" : counter}`
     }
 
-    return `${id}${counter == 0 ? "" : counter}`
+    return proposedId
   }
 
 
@@ -64,7 +63,7 @@
 
     let newTile: Tile = {
       display: "New Hex",
-      id: findID("new-hex"),
+      id: findID( IDify("new-hex") ),
       symbol: null,
       bgColor: DEFAULTBLANKHEXCOLOR,
       preview: ""
@@ -76,6 +75,24 @@
     workingTileset.tiles = [...workingTileset.tiles, newTile]
 
     selectedTile = workingTileset.tiles[workingTileset.tiles.length - 1]
+    
+    
+  }
+
+  function duplicateTile(tile: Tile) {
+    let newTile = {...tile}
+    
+
+    newTile.display = "Copy of " + tile.display
+    newTile.id = findID( IDify(newTile.display) )
+    
+    workingTileset.tiles = [...workingTileset.tiles, newTile]
+    selectedTile = workingTileset.tiles[workingTileset.tiles.length - 1]
+  }
+
+  function removeTile(tile: Tile) {
+
+    workingTileset.tiles = workingTileset.tiles.filter( (t: Tile) => t.id != tile.id )
 
   }
 
@@ -96,7 +113,7 @@
       return app.renderer.plugins.extract.base64(previewContainer)
   } 
 
-  function IDify(name: string) {
+  function IDify(name: string): string {
     return name.toLowerCase().replace(" ", "-")
   }
 
@@ -105,18 +122,14 @@
   
     if (selectedTile) {
       selectedTile.preview = generatePreview(selectedTile)
-      selectedTile.id = workingTileset.id + "_" + findID( IDify(selectedTile.display) )
+      selectedTile.id = findID( IDify(selectedTile.display) )
     }
   }
 
 
-  let symbolFileInput
   let symbolFiles = [];
 
   function updateSymbolFile() {
-    
-
-    console.log(symbolFiles[0].name)
 
     let r = new FileReader()
     r.readAsDataURL(symbolFiles[0])
@@ -172,7 +185,7 @@
 
     download( 
       JSON.stringify(workingTileset),
-      tilesetName + ".hfts"
+      workingTileset.name + ".hfts"
     )
 
   }
@@ -199,6 +212,7 @@
       await tick();
       //workingTileset.tiles = workingTileset.tiles;
       
+      selectedTile = null
 
     }
   }
@@ -209,16 +223,26 @@
   
   <nav>
     <div id="set-controls">
-      <button on:click={ () => {appState = "normal"} }>Exit Tileset Builder</button>
-      <input type="text" bind:value={workingTileset.name} placeholder="Tileset Name" >
-      <input type="text" bind:value={workingTileset.author} placeholder="Tileset Author">
-      <input type="number" bind:value={workingTileset.version}>
-      <button on:click={ () => exportTileset() }>Export</button>
+      <div id="grid">
+        <button on:click={ () => {appState = "normal"} } style="grid-column: 1/3;">Exit Tileset Builder</button>
 
-      <button on:click={ () => importTileset() } class="file-input-button">
-        Import Tileset
-        <input type="file" bind:files={importFiles} accept={".hfts"} on:change={e => {importTileset(); e.target.value = ""}}>
-      </button>
+        <label for="setName">Tileset Name</label>
+        <input id="setName" type="text" bind:value={workingTileset.name} placeholder="Tileset Name" >
+        
+        <label for="setAuthor">Author</label>
+        <input id="setAuthor" type="text" bind:value={workingTileset.author} placeholder="You!">
+        
+        <label for="setVersion">Version</label>
+        <input id="setVersion" type="number" bind:value={workingTileset.version}>
+        
+        <button on:click={ () => importTileset() } class="file-input-button">
+          Import
+          <input type="file" bind:files={importFiles} accept={".hfts"} on:change={e => {importTileset(); e.target.value = ""}}>
+        </button>
+
+        <button on:click={ () => exportTileset() }>Export</button>
+
+      </div>
     </div>
 
 
@@ -238,10 +262,15 @@
   {#if selectedTile}
 
     <div id="tile-preview">
-
-
       
       <Pixi {app}>
+
+        <Graphics draw={(g) => {
+          g.clear();
+          g.beginFill(selectedTile.bgColor);
+          g.drawPolygon( getHexPathRadius(150, orientation, 150, 150) );
+          g.endFill();
+        }} />
 
         {#if selectedTile.symbol}
           <Sprite 
@@ -254,17 +283,18 @@
           />
         {/if}
 
-        <Graphics draw={(g) => {
-          g.clear();
-          g.beginFill(selectedTile.bgColor);
-          g.drawPolygon( getHexPathRadius(150, orientation, 150, 150) );
-          g.endFill();
-        }} />
+        
       
       </Pixi>
       
       
       <input type="text" bind:value={ selectedTile.display } on:change={() => { workingTileset.tiles = workingTileset.tiles }}>
+
+      <div id="tile-controls">
+        <button on:click={ () => { orientation = orientation == "flatTop" ? "pointyTop" : "flatTop" } } title="Change Hex Orientation" > <img src="/assets/img/tools/changeOrientation.png" alt="Change Orientation"> </button>
+        <button on:click={ () => {duplicateTile(selectedTile)} } title="Duplicate this Hex"> <img src="/assets/img/tools/duplicate.png" alt="Hex Duplicate"> </button>
+        <button on:click={ () => {removeTile(selectedTile); selectedTile = null} } title="Delete this Hex" > <img src="/assets/img/tools/trash.png" alt="Trash"> </button>
+      </div>
       <!--
       <button on:click={() => {orientation = orientation == "flatTop" ? "pointyTop" : "flatTop"; workingTileset.tiles=workingTileset.tiles}}>Change Orientation</button>
       <button on:click={() => { deleteTile() } }>Delete Hex</button>
@@ -272,17 +302,18 @@
       -->
     </div>
     
-    <div id="tile-controls">
+    <div id="tile-style">
       
       <!-- Background Color -->
       <div class="color" style="margin-bottom: 10px">
         
+        <ColorInputPixi bind:value={selectedTile.bgColor} w={50} h={50} />
+        
         <div>
-          <ColorInputPixi bind:value={selectedTile.bgColor} w={50} h={50} />
+          <p>Background</p>
+          <p class="color-string">{PIXI.utils.hex2string(selectedTile.bgColor)}</p>
         </div>
 
-        <p>Background</p>
-        <p>{PIXI.utils.hex2string(selectedTile.bgColor)}</p>
       </div>      
       
 
@@ -309,11 +340,13 @@
       -->
       {#if selectedTile.symbol}
         <div class="color" style="margin-top: 10px">
+          <ColorInputPixi bind:value={selectedTile.symbol.color} w={50} h={50} />
+          
           <div>
-            <ColorInputPixi bind:value={selectedTile.symbol.color} w={50} h={50} />
+            <p>Symbol</p>
+            <p class="color-string">{PIXI.utils.hex2string(selectedTile.symbol.color)}</p>
           </div>
-          <p>Symbol</p>
-          <p>{PIXI.utils.hex2string(selectedTile.symbol.color)}</p>
+        
         </div>
 
         <div id="symbol-scale">
@@ -329,7 +362,7 @@
   {:else}
 
     <div id="editor-placeholder">
-      <p>Select a tile or make a new one!</p>
+      <p style="color: #aaaaaa">Select a tile or make a new one!</p>
     </div>
 
   {/if}
@@ -348,6 +381,46 @@
 
 <style>
 
+  #tile-controls {
+    margin-top: 5px;
+    display: flex;
+    gap: 5px;
+  }
+
+  #tile-controls button {
+    width: 40px;
+    height: 40px;
+    padding: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #tile-controls button img {
+    height: 80%;
+
+  }
+
+  #set-controls {
+    padding: 10px;
+    background-color: #555555;
+    box-sizing: border-box;
+  }  
+  
+  
+  #set-controls #grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    gap: 5px;
+  }
+
+  #grid input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
   .file-input-button {
       position: relative;
   }
@@ -359,25 +432,6 @@
       top: 0px;
       left: 0px;
       opacity: 0;
-  }
-
-  #import-button {
-    position: relative;
-  } 
-   
-  #import-button input {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-  }
-
-  input[type="number"] {
-    background-color: #777777;
-    border: 0;
-    border-bottom: solid 2px #222222;
   }
 
   main {
@@ -403,7 +457,7 @@
     flex-direction: column;
   }
 
-  #tile-controls {
+  #tile-style {
     display: flex;
     justify-content: center;
     flex-direction: column;
@@ -413,11 +467,6 @@
   nav {
     height: 100%;
     background-color: #222222;
-  }
-
-  #set-controls {
-    background-color: #555555;
-    padding: 10px;
   }
 
   #tile-buttons {
@@ -444,16 +493,24 @@
   .color {
     display: grid;
     grid-template-columns: 60px 1fr;
-    grid-template-rows: 30px 30px;
+    grid-template-rows: 60px;
     column-gap: 10px;
   }
 
+
   .color div {
-    grid-row: 1/3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .color p {
     margin: 0;
+  }
+
+  .color .color-string {
+    font-size: 10pt;
+    color: #bbbbbb
   }
 
 </style>

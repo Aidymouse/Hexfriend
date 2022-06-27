@@ -15,6 +15,8 @@
     export let app: PIXI.Application
     export let L: PIXI.Loader
     
+    export let symbolTextureLookupTable
+
     $: {
         tilePreview = generateTilePreview(data_terrain)
         loadedTilesets = loadedTilesets
@@ -31,11 +33,21 @@
     let tilePreview: string = generateTilePreview( data_terrain );
 
     function changeTile(t: Tile) {
-        data_terrain.bgColor = t.bgColor
-        data_terrain.symbol = t.symbol ? {...t.symbol} : null
+        data_terrain.tile = {...t, symbol: t.symbol ? {...t.symbol} : null}
         tilePreview = generateTilePreview(data_terrain)
         data_terrain.usingPaintbucket = false
         data_terrain.usingEraser = false
+    }
+
+    function getSymbolTextureId(tileId: string) {
+        
+        // If tileId appears in the lookup table, use the lookup table version instead
+        if (Object.keys(symbolTextureLookupTable).find(k => k == tileId)) {
+            return symbolTextureLookupTable[tileId]
+        }
+
+        return tileId
+
     }
 
     function findSymbolScale(symbol, hW, hH) {
@@ -58,7 +70,7 @@
     function generateTilePreview(data_terrain: terrain_data) {
 
         g.clear()
-        g.beginFill(data_terrain.bgColor)
+        g.beginFill(data_terrain.tile ? data_terrain.tile.bgColor : tfield.blankHexColor)
 
         let hW = 50
         let hH = 45
@@ -68,14 +80,13 @@
             hH = 50
         }
 
-
         g.drawPolygon( getHexPath(hW, hH, tfield.orientation, 0, 0) )
         g.endFill()
 
-        if (data_terrain.symbol) {
-            s.texture = L.resources[data_terrain.symbol.texId].texture
-            s.tint = data_terrain.symbol.color
-            s.scale = findSymbolScale(data_terrain.symbol, hW, hH) 
+        if (data_terrain.tile && data_terrain.tile.symbol) {
+            s.texture = L.resources[ getSymbolTextureId(data_terrain.tile.id) ].texture
+            s.tint = data_terrain.tile.symbol.color
+            s.scale = findSymbolScale(data_terrain.tile.symbol, hW, hH) 
             s.anchor.set(0.5)
             
         } else {
@@ -90,15 +101,26 @@
 
     function styleMatchesData(tile: Tile): boolean {
         
-        if (data_terrain.usingEraser) return false
+        return tilesMatch(tile, data_terrain.tile)
+        
+    }
 
-        if (data_terrain.bgColor != tile.bgColor) return false
-        if (!tile.symbol && data_terrain.symbol) return false
-        if (tile.symbol && !data_terrain.symbol) return false
+    function tilesMatch(tile1: Tile, tile2: Tile): boolean {
+        if (tile1 == null && tile2 != null) return false
+        if (tile1 != null && tile2 == null) return false
+        if (tile1 == null && tile2 == null) return true // Both are blank
 
-        if (tile.symbol && data_terrain.symbol) {
-            if (tile.symbol.color != data_terrain.symbol.color) return false
-            if (tile.symbol.texId != data_terrain.symbol.texId) return false
+        // Return false if one has a symbol and one does not
+        if (tile1.symbol != null && tile2.symbol == null) return false
+        if (tile1.symbol == null && tile2.symbol != null) return false
+
+        if (tile1.bgColor != tile2.bgColor) return false
+
+        if (tile1.symbol && tile2.symbol) {
+
+            if (tile1.symbol.color != tile2.symbol.color) return false
+            if ( getSymbolTextureId(tile1.id) != getSymbolTextureId(tile2.id) ) return false
+
         }
 
         return true
@@ -113,11 +135,11 @@
             <img src={tilePreview} alt={"Current Tile Preview"} class:flatTop={tfield.orientation == "flatTop"} class:pointyTop={tfield.orientation == "pointyTop"}>
         </div>
         
-        <ColorInputPixi bind:value={data_terrain.bgColor} name={"terrainColor"} label={"Terrain Color"}/>
+        <ColorInputPixi bind:value={data_terrain.tile.bgColor} name={"terrainColor"} label={"Terrain Color"}/>
         
-        {#if data_terrain.symbol}
+        {#if data_terrain.tile.symbol}
 
-            <ColorInputPixi bind:value={data_terrain.symbol.color} name={"symbolColor"} label={"Symbol Color"} />
+            <ColorInputPixi bind:value={data_terrain.tile.symbol.color} name={"symbolColor"} label={"Symbol Color"} />
 
         {/if}
 

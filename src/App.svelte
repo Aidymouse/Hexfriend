@@ -7,6 +7,7 @@
 
   */
 
+
   /* TODO 
   
     
@@ -90,7 +91,7 @@
   let loadedSave: saveData = DEFAULTSAVEDATA
   let loadedId: number | null = null;
 
-  let appState: "normal" | "tilesetCreator" | "iconsetCreator" = "tilesetCreator"
+  let appState: "normal" | "tilesetCreator" | "iconsetCreator" = "normal"
 
   let showSettings = false
   let showTerrainGenerator = false  
@@ -209,8 +210,11 @@
   /* Data is bound to both layer and panel of a particluar tool. It contains all the shared state they need, and is bound to both */
   
   let data_terrain: terrain_data = {
-    bgColor: null,
-    symbol: null,
+    //bgColor: null,
+    //symbol: null,
+
+    tile: null,
+    
     usingEyedropper: false,
     usingPaintbucket: false,
     usingEraser: false
@@ -249,15 +253,19 @@
   const L: PIXI.Loader = new PIXI.Loader()
 
   // Never cleared, to stop duplicate textures being added
-  let seentextures = []
   let seenicons = []
   // Theoretically a memory leak... but bounded by how many unique tiles can be loaded. Shouldn't be a problem?
+  
+  let seentextures = []
+  let symbolTextureLookupTable = {
+    // tile id: id of tile who's texture we use
+
+    // most of the time these will match up, but sometimes they wont.
+  }
 
   function loadSave(data: saveData, id: number | null) {
 
     loadedTilesets = data.tilesets;
-
-    console.log(loadedTilesets)
 
     loadedIconsets = data.iconsets;
     tfield = data.TerrainField;
@@ -266,15 +274,11 @@
     // Load Textures
     loadedTilesets.forEach(tileset => {
 
-      tileset.tiles.forEach(async tile => {
-        if (tile.symbol && seentextures.find(id => tile.symbol.texId == id) == undefined && !L.resources[tile.symbol.texId] ) {
-          L.add(tile.symbol.texId, tile.symbol.base64)
-          seentextures.push(tile.symbol.texId);
-        }
-      });
+      loadTilesetTextures(tileset, false)
     
     })
     
+    console.log(symbolTextureLookupTable)
 
     // Load Icons
     loadedIconsets.forEach(iconset => {
@@ -289,15 +293,16 @@
     })
 
     //L.onComplete.add( );
-  
+
     L.load(async () => {
 
       loadedSave = data
       loadedId = id
 
       let firstTile = loadedTilesets[0].tiles[0]
-      data_terrain.bgColor = firstTile.bgColor
-      data_terrain.symbol = firstTile.symbol ? {...firstTile.symbol} : null
+      data_terrain.tile = {...firstTile, symbol: firstTile.symbol ? {...firstTile.symbol} : null }
+      //bgColor = firstTile.bgColor
+      //data_terrain.symbol = firstTile.symbol ? {...firstTile.symbol} : null
   
       let firstIcon = loadedIconsets[0].icons[0]
       data_icon.color = firstIcon.color
@@ -340,20 +345,32 @@
  
   loadSave(JSON.parse(JSON.stringify(DEFAULTSAVEDATA)), null); // Same as creating a new map
 
-  function loadTilesetTextures(tileset: Tileset) {
+  function loadTilesetTextures(tileset: Tileset, loadImmediately: boolean = true) {
 
     tileset.tiles.forEach(async tile => {
-      if (tile.symbol && seentextures.find(id => tile.symbol.texId == id) == undefined && !L.resources[tile.symbol.texId] ) {
-        L.add(tile.symbol.texId, tile.symbol.base64)
-        seentextures.push(tile.symbol.texId);
+
+      //console.log(tile.symbol.texId)
+
+      if (tile.symbol) {
+
+        let entry = Object.entries(L.resources).find( ([id, r]) => r.url == tile.symbol.base64)
+
+        if (entry) {
+          // Texture already exists! Add this tile's ID to the lookup table
+          symbolTextureLookupTable[tile.id] = entry[0]
+
+        } else {
+          L.add(tile.id, tile.symbol.base64)
+        }
+
       }
+
+
     });
 
+    if (!loadImmediately) return
 
-
-    L.load( () => {
-      console.log("Gaming.")
-    });
+    L.load();
 
   }
 
@@ -573,7 +590,7 @@
         scale={ {x: pan.zoomScale, y: pan.zoomScale} }
       >
 
-        <TerrainField bind:this={comp_terrainField} bind:data_terrain bind:pan {controls} {L} bind:tfield {comp_coordsLayer} />
+        <TerrainField bind:this={comp_terrainField} bind:data_terrain bind:pan {controls} {L} bind:tfield {comp_coordsLayer} {symbolTextureLookupTable} />
 
         <PathLayer bind:this={comp_pathLayer} bind:paths={loadedSave.paths} bind:data_path {pan} {controls} {selectedTool} {tfield}  />
 
@@ -598,7 +615,7 @@
     <TerrainGenerator {loadedTilesets} {tfield} {comp_terrainField} bind:showTerrainGenerator />
 
   {:else if selectedTool == "terrain"}
-    <TerrainPanel {loadedTilesets} {tfield} {app} {L} bind:data_terrain />
+    <TerrainPanel {loadedTilesets} {tfield} {app} {L} bind:data_terrain {symbolTextureLookupTable} />
   
   {:else if selectedTool == "icon"}
     <IconPanel {L} {app} {loadedIconsets} bind:data_icon />

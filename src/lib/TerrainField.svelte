@@ -1,4 +1,8 @@
+
 <script lang="ts">
+    
+    // There's probably some clean up to do in that different colored hexes can have the same ID...
+
     import { Graphics, Container } from "svelte-pixi"
     import * as PIXI from 'pixi.js'
     import {coords_cubeToWorld, getHexPath, genHexId, coords_worldToCube, getNeighbours, coords_qToCube, coords_rToCube, genHexId_cordsObj} from '../helpers/hexHelpers'
@@ -7,6 +11,7 @@
     
     import { map_type } from "/src/types/settings";
     import type { TerrainHex, TerrainHexField } from "src/types/terrain";
+    import type { Tile } from "src/types/tilesets";
 
     import { collapseWaveGen } from "./terrainGenerator";
 
@@ -25,11 +30,11 @@
 
     export let data_terrain
 
+    export let symbolTextureLookupTable
+
     export function copyHex(from: TerrainHex, to: TerrainHex) {
 
-        to.bgColor = from.bgColor
-        to.blank = from.blank
-        to.symbol = from.symbol ? {...from.symbol} : null
+        to.tile = from.tile ? {...from.tile, symbol: from.tile.symbol ? {...from.tile.symbol} : null} : null
 
     }
 
@@ -45,7 +50,7 @@
                 // Create hex at bottom of column
                 let newHexCoords = coords_qToCube("odd", col, tfield.rows-1)
                 let newId = genHexId_cordsObj(newHexCoords)
-                tfield.hexes[newId] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true, renderable: true }
+                tfield.hexes[newId] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, tile: null }
                 comp_coordsLayer.generateCoord(newId)
 
                 // Move all hexes one down
@@ -74,7 +79,7 @@
                 // Create hex at top of column
                 let newHexCoords = coords_qToCube("even", col, 0)
                 let newId = genHexId_cordsObj(newHexCoords)
-                tfield.hexes[newId] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true, renderable: true }
+                tfield.hexes[newId] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, tile: null }
                 comp_coordsLayer.generateCoord(newId)
                 
                 // Move all hexes one up
@@ -109,7 +114,7 @@
                 // Create hex at right of row
                 let newHexCoords = coords_rToCube("odd", tfield.columns-1, row)
                 let newId = genHexId_cordsObj(newHexCoords)
-                tfield.hexes[newId] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true, renderable: true }
+                tfield.hexes[newId] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, tile: null }
                 comp_coordsLayer.generateCoord(newId)
 
                 // Move all hexes one right
@@ -138,7 +143,7 @@
                 // Create hex at top of column
                 let newHexCoords = coords_rToCube("even", 0, row)
                 let newId = genHexId_cordsObj(newHexCoords)
-                tfield.hexes[newId] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true, renderable: true }
+                tfield.hexes[newId] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, tile: null }
                 comp_coordsLayer.generateCoord(newId)
 
                 // Move all hexes one up
@@ -258,7 +263,7 @@
 
                 let newHexCoords = tfield.orientation == "flatTop" ? coords_qToCube(tfield.raised, tfield.columns, row) : coords_rToCube(tfield.raised, tfield.columns, row)
                 
-                tfield.hexes[ genHexId_cordsObj(newHexCoords) ] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true, renderable: true }
+                tfield.hexes[ genHexId_cordsObj(newHexCoords) ] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, tile: null }
                 comp_coordsLayer.generateCoord( genHexId_cordsObj(newHexCoords) )
             }
 
@@ -284,7 +289,7 @@
                 copyHex(sourceHex, destinationHex)
                 
                 if (sourceColumn < amount) {
-                    sourceHex.blank = true
+                    sourceHex.tile = null
                 }
             }
         }
@@ -297,7 +302,7 @@
 
                 let newHexCoords = tfield.orientation == "flatTop" ? coords_qToCube(tfield.raised, col, tfield.rows + row) : coords_rToCube(tfield.raised, col, tfield.rows + row)
                 
-                tfield.hexes[ genHexId_cordsObj(newHexCoords) ] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, bgColor: 0xf2f2f2, symbolId: null, symbol: null, blank: true, renderable: true }
+                tfield.hexes[ genHexId_cordsObj(newHexCoords) ] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, tile: null }
                 comp_coordsLayer.generateCoord(genHexId_cordsObj(newHexCoords))
             }
             
@@ -321,7 +326,7 @@
                 copyHex(sourceHex, destinationHex)
                 
                 if (sourceRow < amount) {
-                    sourceHex.blank = true
+                    sourceHex.tile = null
                 }
             }
         }
@@ -428,7 +433,7 @@
                 copyHex(sourceHex, destinationHex)
                 
                 if (sourceColumn > tfield.columns-1-amount) {
-                    sourceHex.blank = true
+                    sourceHex.tile = null
                 }
             }
         }
@@ -463,7 +468,7 @@
                 copyHex(sourceHex, destinationHex)
                 
                 if (sourceRow > tfield.rows-1-amount) {
-                    sourceHex.blank = true
+                    sourceHex.tile = null
                 }
             }
         }
@@ -506,11 +511,8 @@
 
         Object.keys(tfield.hexes).forEach(hexId => {
             let hex = tfield.hexes[hexId]
-            if (!hex.renderable) return
 
             let hexC = coords_cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised);
-
-            //if (tfield.mapType == map_type.SQUARE) hexC = computeSquareBasedOffset(hexC, hex.q, hex.r)
 
             gridGraphics.drawPolygon( getHexPath(tfield.hexWidth, tfield.hexHeight, tfield.orientation, hexC.x, hexC.y) )
         });
@@ -536,21 +538,11 @@
     async function renderHex(hexId) {
         let hex = tfield.hexes[hexId]
 
-        if (!hex.renderable) {
-            if (terrainSprites[hexId]) { 
-                symbolsContainer.removeChild(terrainSprites[hexId])
-                terrainSprites[hexId].destroy();
-                delete terrainSprites[hexId];
-            }
-            return
-        }
-
         let hexC = coords_cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised);
 
         //if (tfield.mapType == map_type.SQUARE) hexC = computeSquareBasedOffset(hexC, hex.q, hex.r)
 
-        if (hex.blank) {
-            hex.bgColor = tfield.blankHexColor /* Update color here, as it may not be updated. Just have to remember to call render hex when we change the blank hex color */
+        if (!hex.tile) {
             terrainGraphics.beginFill(tfield.blankHexColor)
             terrainGraphics.drawPolygon( getHexPath(tfield.hexWidth, tfield.hexHeight, tfield.orientation, hexC.x, hexC.y) )
             terrainGraphics.endFill()
@@ -564,11 +556,11 @@
             return
         }
 
-        terrainGraphics.beginFill(hex.bgColor);
+        terrainGraphics.beginFill(hex.tile.bgColor);
         terrainGraphics.drawPolygon( getHexPath(tfield.hexWidth, tfield.hexHeight, tfield.orientation, hexC.x, hexC.y) )
         terrainGraphics.endFill()
 
-        if (hex.symbol) {
+        if (hex.tile.symbol != null) {
         
         // Optimize here - only update icon if it needs updating
 
@@ -579,12 +571,12 @@
             }
 
             let ns = new PIXI.Sprite()
-            ns.texture = L.resources[hex.symbol.texId].texture
+            ns.texture = L.resources[ getSymbolTextureId(hex.tile.id)].texture
             let hc = hexC //coords_cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
             ns.position.set(hc.x, hc.y)
             ns.anchor.set(0.5)
-            ns.tint = hex.symbol.color
-            ns.scale = findSymbolScale(hex.symbol) 
+            ns.tint = hex.tile.symbol.color
+            ns.scale = findSymbolScale(hex.tile.symbol) 
 
             symbolsContainer.addChild(ns);
 
@@ -603,17 +595,27 @@
     }
 
 
-    /* PAINT */
-    export function paintFromTile(hexId, tileData) {
-        tfield.hexes[hexId].bgColor = tileData.bgColor
-        tfield.hexes[hexId].symbol = tileData.symbol ? {...tileData.symbol} : null
-        tfield.hexes[hexId].blank = false
+    function getSymbolTextureId(tileId: string) {
+        
+        // If tileId appears in the lookup table, use the lookup table version instead
+        if (Object.keys(symbolTextureLookupTable).find(k => k == tileId)) {
+            return symbolTextureLookupTable[tileId]
+        }
 
+        return tileId
+
+    }
+
+    /* PAINT */
+    export function paintFromTile(hexId, tile: Tile) {
+        if (!hexExists(hexId)) return
+        tfield.hexes[hexId].tile = tile ? {...tile, symbol: tile.symbol ? {...tile.symbol} : null} : null
         renderHex(hexId)
     }    
 
     export function placeTerrain() {
-        data_terrain = data_terrain
+
+        //data_terrain = data_terrain
         // Needs checking if terrain matches what we're trying to place already
         if (controls.mouseDown[0]) {
             let x = pan.worldX
@@ -622,27 +624,14 @@
 
             let clickedId = genHexId( clickedCoords.q, clickedCoords.r, clickedCoords.s )
 
-            if (!hexExists(clickedId)) return
-
-            tfield.hexes[clickedId].bgColor = data_terrain.bgColor;
-            tfield.hexes[clickedId].symbol = data_terrain.symbol ? {...data_terrain.symbol} : null
-            tfield.hexes[clickedId].blank = false
-
-            renderHex(clickedId)
-
+            paintFromTile(clickedId, data_terrain.tile)
         }
     }
 
     function paintHex(hexId: string) {
         //data_terrain = data_terrain
 
-        if (!hexExists(hexId)) return
-
-        tfield.hexes[hexId].bgColor = data_terrain.bgColor;
-        tfield.hexes[hexId].symbol = data_terrain.symbol ? {...data_terrain.symbol} : null
-        tfield.hexes[hexId].blank = false
-
-        renderHex(hexId)
+        paintFromTile(hexId, data_terrain.tile)
 
     }
 
@@ -650,12 +639,14 @@
     function hexExists(hexId) {
 
         // If the hex is not rendereable, it doesnt exist.
-        return tfield.hexes[hexId] != undefined ? tfield.hexes[hexId].renderable : false
+        return tfield.hexes[hexId] != undefined
 
     }
 
     
     /* ACTIONS */
+    
+
     function eyedrop() {
         if (controls.mouseDown[0]) {
             let x = pan.worldX
@@ -668,8 +659,8 @@
 
             let cHex = tfield.hexes[clickedId]
 
-            data_terrain.bgColor = cHex.bgColor
-            data_terrain.symbol = cHex.symbol ? {...cHex.symbol} : null
+            // HACKY!!!! Needs changing
+            data_terrain.tile = cHex.tile ? {...cHex.tile, symbol: cHex.tile.symbol ? {...cHex.tile.symbol} : null} : generateBlankTile()
 
             data_terrain.usingEyedropper = false
 
@@ -686,12 +677,11 @@
 
     export function eraseHex(hexId: string) {
 
-        tfield.hexes[hexId].bgColor = tfield.blankHexColor
-        tfield.hexes[hexId].symbol = null
-        tfield.hexes[hexId].blank = true
-
+        tfield.hexes[hexId].tile = null
         renderHex(hexId)
     }
+
+    
 
     function paintbucket() {
         let x = pan.worldX
@@ -700,19 +690,10 @@
 
         let clickedId = genHexId_cordsObj(clickedCoords)
         if (!hexExists(clickedId)) return
-
+        if (hexMatchesData(clickedId)) return
         
         // Check if hex in data matches the clicked style. If it does, abort painting!
         // Should be done in paint terrain as well
-        let cHex = tfield.hexes[clickedId]
-        if (cHex.bgColor == data_terrain.bgColor) {
-           if (!data_terrain.symbol && !cHex.symbol) return
-
-            if (data_terrain.symbol && cHex.symbol) {
-                if (data_terrain.symbol.color == cHex.symbol.color && data_terrain.symbol.texId == cHex.symbol.texId) return
-            }
-            
-        }
 
         getContiguousHexIdsOfSameType(clickedId).forEach(hexId => {
             paintHex(hexId)
@@ -726,7 +707,7 @@
         let clickedId = genHexId_cordsObj( coords_worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised) )
         
         if (!hexExists(clickedId)) return
-        if (tfield.hexes[clickedId].blank) return
+        if (tfield.hexes[clickedId].tile == null) return
 
         let hexes = getContiguousHexIdsOfSameType(clickedId)
         hexes.forEach(hexId => {
@@ -750,6 +731,57 @@
     }
 
     /* UNCATEGORIZED */
+    function hexesMatch(hexId1, hexId2): boolean {
+        if (!hexExists(hexId1)) return false
+        if (!hexExists(hexId2)) return false
+
+        let hex1 = tfield.hexes[hexId1]
+        let hex2 = tfield.hexes[hexId2]
+
+        return tilesMatch(hex1.tile, hex2.tile)
+
+    }
+
+    function tilesMatch(tile1: Tile, tile2: Tile): boolean {
+        if (tile1 == null && tile2 != null) return false
+        if (tile1 != null && tile2 == null) return false
+        if (tile1 == null && tile2 == null) return true // Both are blank
+
+        // Return false if one has a symbol and one does not
+        if (tile1.symbol != null && tile2.symbol == null) return false
+        if (tile1.symbol == null && tile2.symbol != null) return false
+
+        if (tile1.bgColor != tile2.bgColor) return false
+
+        if (tile1.symbol && tile2.symbol) {
+
+            if (tile1.symbol.color != tile2.symbol.color) return false
+            if ( getSymbolTextureId(tile1.id) != getSymbolTextureId(tile2.id) ) return false
+
+        }
+
+        return true
+    }
+    
+    function hexMatchesData(hexId): boolean {
+        if (!hexExists(hexId)) return false
+
+        let hex = tfield.hexes[hexId]
+
+        return tilesMatch(hex.tile, data_terrain.tile)
+
+    }
+
+    function generateBlankTile(): Tile {
+        return {
+            bgColor: tfield.blankHexColor,
+            display: "Blank",
+            id: "blank",
+            symbol: null
+        }
+    }
+
+
     function getContiguousHexIdsOfSameType(hexId: string): string[] {
 
         /*
@@ -778,19 +810,13 @@
             let neighbourIds = getNeighbours(cHex.q, cHex.r, cHex.s)
             neighbourIds.forEach(nId => {
                 if (seenIds.find(sId => sId == nId)) return
-                if (!tfield.hexes[nId]) return
+                if (!hexExists(nId)) return
 
-                let nHex = tfield.hexes[nId]
-                if (nHex.bgColor != baseHex.bgColor) return
-                
-                if ( (nHex.symbol && !baseHex.symbol) || (!nHex.symbol && baseHex.symbol) ) return
-                if (nHex.symbol && baseHex.symbol) {
-                    if (nHex.symbol.texId != baseHex.symbol.texId) return
-                    if (nHex.symbol.color != baseHex.symbol.color) return
+                if (hexesMatch(nId, hexId)) {
+                    seenIds.push(nId)
+                    hexStack.push(nId)
                 }
 
-                seenIds.push(nId)
-                hexStack.push(nId)
 
             })
 
@@ -802,6 +828,7 @@
     }
 
     export function pointerdown() {
+
 
         if (data_terrain.usingEyedropper) {
 
@@ -818,6 +845,7 @@
             erase()
         
         } else {
+
             placeTerrain()
 
         }

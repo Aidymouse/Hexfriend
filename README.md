@@ -1,7 +1,7 @@
 # Hexfriend
 A friendly online hexmapper - you can find it at https://www.hexfriend.net
 
-Hexfriend is a tool for building hexmaps for D&D type games. It seeks to be as friendly and usable as possible.
+Hexfriend is a tool for building hexmaps for D&D type games. It aims to be as friendly and usable as possible.
 
 ### Meat and Bones
 Hexfriend is built with Svelte and PIXI and some quite messy typescript.

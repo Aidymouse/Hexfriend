@@ -2,11 +2,10 @@ import type * as PIXI from 'pixi.js'
 import type { coord_system } from './cordinates'
 import type { path, path_style } from './path'
 import type { text_style, HF_text } from './text'
-import type { TileSymbol } from './tilesets'
+import type { TileSymbol, Tile } from './tilesets'
 
 export interface terrain_data {
-    bgColor: number,
-    symbol?: TileSymbol,
+    tile?: Tile
     usingEyedropper: boolean,
     usingPaintbucket: boolean,
     usingEraser: boolean

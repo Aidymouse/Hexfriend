@@ -1,56 +1,164 @@
 <script lang="ts">
-  import * as PIXI from 'pixi.js'
-  import ColorInputPixi from '../components/ColorInputPixi.svelte'
 
-  import { Pixi, Sprite, Graphics } from 'svelte-pixi'
+  import type { hexOrientation } from '../helpers/hexHelpers';
+  import type {Icon, Iconset} from '/src/types/icon'
+
+  import * as PIXI from 'pixi.js';
+  import { Pixi, Graphics, Sprite } from 'svelte-pixi'
+
   import { getHexPathRadius } from '../helpers/hexHelpers'
 
   import {download} from './download2'
+
+  import ColorInputPixi from '../components/ColorInputPixi.svelte'
   import { tick } from 'svelte';
 
-  
-  interface icon_button {
-    display: string,
-    buttonId: number,
-    color: number,
-    pHex: number,
-    texHeight: number,
-    texWidth: number,
-    base64: string,
-    file: any,
-    preview: string
-  }
 
   let app = new PIXI.Application({
     width: 300,
     height: 300,
     backgroundAlpha: 0
   });
+  
+  
+  export let appState;
 
-  export let appState
+  let orientation: hexOrientation = "flatTop"
 
-  let iconButtons: icon_button[] = []
-  let stIndex: number = -1
-  let buttonId: number = 0 // Used internally in this component only to keep track of buttons
+  let workingIconset: Iconset = {
+    name: "New Iconset",
+    id: "new-iconset",
+    author: "",
+    version: 1,
+    icons: []
+  }
 
-  let setName: string = "default"
 
-  let newIconFiles = []
+  let selectedIcon: Icon | null = null
 
-  let hexOrientation: "flatTop" | "pointyTop" = "flatTop"
+  let loader = new PIXI.Loader()
+  
 
-  let importFiles = [];
+  let previewSprite = new PIXI.Sprite()
+  let previewGraphics = new PIXI.Graphics()
+  let previewContainer = new PIXI.Container()
+  previewContainer.addChild(previewGraphics).addChild(previewSprite)
+
+
+  function findID(baseId: string): string {
+
+    let counter = 0
+    let proposedId = `${ IDify(workingIconset.name) }_${baseId}${counter == 0 ? "" : counter}`
+
+    while (workingIconset.icons.find( (icon: Icon) => icon.id == proposedId ) != null) {
+      counter++
+      proposedId = `${ IDify(workingIconset.name) }_${baseId}${counter == 0 ? "" : counter}`
+    }
+
+    return proposedId
+  }
+
+  function IDify(name: string): string {
+    return name.toLowerCase().replace(" ", "-")
+  }
+
+  let newIconFiles: FileList
+  function newIcon() {
+
+    //console.log(newIconFiles)
+
+    Array.from(newIconFiles).forEach(file => {
+      let r = new FileReader()
+
+      r.readAsDataURL(file)
+      r.onload = async eb => {
+        
+        loader.reset()
+        loader.add("s", eb.target.result)
+        loader.load(() => {
+
+
+          let iconName = file.name.split(".")[0]
+          console.log( findID(IDify(iconName)) )
+
+          let newIcon: Icon = {
+            display: iconName,
+            texId: findID( IDify(iconName) ),
+            id: findID( IDify(iconName) ),
+            color: 0,
+            pHex: 80,
+            base64: eb.target.result,
+            preview: "",
+            texWidth: loader.resources.s.texture.width,
+            texHeight: loader.resources.s.texture.height
+          }
+          
+          console.log(newIcon.id)
+
+          workingIconset.icons[workingIconset.icons.length] = newIcon
+
+        })
+
+      }
+
+      
+
+    })
+
+    //workingIconset.icons = workingIconset.icons
+
+    //console.log(workingIconset.icons)
+    
+    
+  }
+
+  function duplicateIcon(icon: Icon) {
+    let newIcon = {...icon}
+    
+
+    newIcon.display = "Copy of " + icon.display
+    newIcon.id = findID( IDify(newIcon.display) )
+    
+    workingIconset.icons = [...workingIconset.icons, newIcon]
+    selectedIcon = workingIconset.icons[workingIconset.icons.length - 1]
+  }
+
+  function removeIcon(icon: Icon) {
+
+    workingIconset.icons = workingIconset.icons.filter( (t: Icon) => t.id != icon.id )
+
+  }
+
+  function generatePreview(icon: Icon) {
+      previewGraphics.clear();
+      previewGraphics.beginFill(DEFAULTBLANKHEXCOLOR);
+      previewGraphics.drawPolygon( getHexPathRadius(25, orientation, 0, 0) );
+      previewGraphics.endFill();
+      
+      previewSprite.texture = PIXI.Texture.from(icon.base64)
+      previewSprite.scale.set( getIconScale(icon, 25).x )
+      previewSprite.anchor.set(0.5)
+      previewSprite.tint = icon.color
+
+      return app.renderer.plugins.extract.base64(previewContainer)
+  } 
+
+  
 
   $: {
-    if (stIndex >= 0) {
-      iconButtons[stIndex].preview = generatePreview(iconButtons[stIndex]) 
+    //if (selectedIcon) selectedIcon.preview = generatePreview(workingIconset.icons[stIndex])
+  
+    if (selectedIcon) {
+      selectedIcon.preview = generatePreview(selectedIcon)
+      selectedIcon.id = findID( IDify(selectedIcon.display) )
     }
   }
 
-  function getIconScale(iconButton: icon_button, radius: number = 150) {
+
+  function getIconScale(symbol, radius = 150) {
 
     let h, w
-    if (hexOrientation == "pointyTop") {
+    if (orientation == "pointyTop") {
         h = radius * 2;
         w = Math.cos(Math.PI / 6) * radius * 2;
 
@@ -62,226 +170,171 @@
 
     let scale
     if (w < h) {
-      scale = w * iconButton.pHex / 100 / iconButton.texWidth
+      scale = w * symbol.pHex / 100 / symbol.texWidth
     } else {
-      scale = h * iconButton.pHex / 100 / iconButton.texHeight;
+      scale = h * symbol.pHex / 100 / symbol.texHeight;
     }
 
     return {x: scale, y: scale}
   }
 
-  function importIconSet() {
+  const DEFAULTBLANKHEXCOLOR = 0xf2f2f2
+
+  function exportIconset() {
+
+    workingIconset.id = IDify(workingIconset.name)
+
+    download( 
+      JSON.stringify(workingIconset),
+      workingIconset.name + ".hfts"
+    )
+
+  }
+
+  let importFiles = [];
+
+  async function importIconset() {
     let importFile = importFiles[0]
+
     if (!importFile) return
 
+
     let r = new FileReader()
-    
     r.readAsText(importFile)
-    r.onload = eb => {
-      let importSet = JSON.parse(eb.target.result)
+    r.onload = async eb => {
+      /* Read the file */
+      let setToImport = JSON.parse(eb.target.result);
       
-      buttonId = 0;
+      //console.log(setToImport)
 
+      /* Load textures */
+ 
+      workingIconset = {...setToImport}
+      await tick();
+      //workingIconset.icons = workingIconset.icons;
       
-      importSet.forEach(iconData => {
-        // Get width and height
-        app.loader.reset()
-        app.loader.add("s", iconData.base64)
-        app.loader.load(() => {
-
-          let newButton: icon_button = {
-            display: iconData.display,
-            buttonId: buttonId,
-            color: iconData.color,
-            pHex: iconData.pHex,
-            texWidth: app.loader.resources["s"].texture.width,
-            texHeight: app.loader.resources["s"].texture.height,
-            base64: iconData.base64,
-            preview: iconData.preview,
-            file: null,
-          }
-
-          iconButtons = [...iconButtons, newButton]
-          iconButtons = iconButtons
-
-          buttonId++
-          
-        })
-
-      })
-
-      iconButtons = iconButtons
+      selectedIcon = null
 
     }
-  }
-
-  function exportIconSet() {
-    let iconSetForExport = []
-
-    iconButtons.forEach(ib => {
-      let i = {
-        display: ib.display,
-        texId: setName + "_" + ib.display.replace(" ", "-"),
-        color: ib.color,
-        pHex: ib.pHex,
-        base64: ib.base64,
-        preview: ib.preview
-      }
-
-      iconSetForExport.push(i)
-    })
-
-    console.log(iconSetForExport)
-    download(JSON.stringify(iconSetForExport), setName + ".hfis")
-  }
-
-  function readFileAsData(file) {
-    return new Promise(function(resolve,reject){
-        let fr = new FileReader();
-
-        fr.onload = function(e){
-            resolve(e.target.result);
-        };
-
-        fr.onerror = function(){
-            reject(fr);
-        };
-
-        fr.readAsDataURL(file);
-    });
-  }
-
-  async function newIcons(e) {
-    if (!newIconFiles.length) return
-
-    let readers = [];
-
-    for(let i = 0;i < newIconFiles.length;i++){
-        readers.push(readFileAsData(newIconFiles[i]));
-    }
-
-    Promise.all(readers).then(async (values) => {
-        // Values will be an array that contains an item
-        // with the text of every selected file
-        // ["File1 Content", "File2 Content" ... "FileN Content"]
-
-        values.forEach(async (v) => {
-          let t = await PIXI.Texture.from(v)
-
-          let iconName: string = newIconFiles[values.indexOf(v)].name
-          iconName = iconName.substring(0, iconName.search(/\./)) // Remove the file extension (doesnt work if there's a period in the filename lol)
-
-          let newButton: icon_button = {
-            display: iconName,
-            buttonId: buttonId,
-            color: 0xffffff,
-            pHex: 80,
-            texHeight: t.height, 
-            texWidth: t.width,
-            base64: v,
-            file: null, // Gets set in a mome
-            preview: ""
-          }
-          newButton.preview = generatePreview(newButton)
-
-          buttonId++
-
-          iconButtons.push(newButton)
-        })
-
-        iconButtons = iconButtons
-        await tick();
-
-        e.target.value = "";
-    });
-
-  }
-
-  function deleteIcon() {
-    iconButtons.splice(stIndex, 1)
-    stIndex = -1
-    iconButtons = iconButtons
-  }
-
-  function generatePreview(icon: icon_button) {
-    let s = new PIXI.Sprite( PIXI.Texture.from(icon.base64) )
-    s.tint = icon.color
-    return app.renderer.plugins.extract.base64(s)
   }
 
 </script>
 
 <main>
-
+  
   <nav>
-
     <div id="set-controls">
-    
-      <button on:click={() => { appState = "normal" }}> Exit Iconset Creator </button>
-    
-      <input type="text" bind:value={setName}>
-      <button on:click={ () => { exportIconSet() } }>Export</button>
-      <button id="import-button">Import <input type="file" bind:files={importFiles} on:change={e => { importIconSet(); e.target.value = ""}}> </button>
+      <div id="grid">
+        <button on:click={ () => {appState = "normal"} } style="grid-column: 1/3;">Exit Iconset Builder</button>
 
+        <label for="setName">Iconset Name</label>
+        <input id="setName" type="text" bind:value={workingIconset.name} placeholder="Iconset Name" >
+        
+        <label for="setAuthor">Author</label>
+        <input id="setAuthor" type="text" bind:value={workingIconset.author} placeholder="You!">
+        
+        <label for="setVersion">Version</label>
+        <input id="setVersion" type="number" bind:value={workingIconset.version}>
+        
+        <button on:click={ () => importIconset() } class="file-input-button">
+          Import
+          <input type="file" bind:files={importFiles} accept={".hfis"} on:change={e => {importIconset(); e.target.value = ""}}>
+        </button>
+
+        <button on:click={ () => exportIconset() }>Export</button>
+
+      </div>
     </div>
+
 
     <div id="icon-buttons">
 
-      {#each iconButtons as b (b.buttonId) }
-        <button on:click={ () => {stIndex = iconButtons.indexOf(b)} } class:selected={stIndex == iconButtons.indexOf(b)} title={b.display} > <img src={b.preview} alt={b.display}> </button>
+      {#each workingIconset.icons as icon (icon.id)}
+        <button class="icon-button" class:selected={ selectedIcon == icon } on:click={ () => { selectedIcon = icon }} title={icon.display}>
+          <img src={icon.preview} alt="Button for {icon.display}">
+        </button>
       {/each}
 
-      <button id="new-icon-button"> 
+      <button class="icon-button file-input-button">
         +
-        <input type="file" multiple bind:files={newIconFiles} on:change={async (e) => { newIcons(e) } } >
+        <input type="file" multiple accept="image/*" bind:files={newIconFiles} on:change={() => {
+          newIcon()
+        }} />
       </button>
     
     </div>
-  
   </nav>
 
-  {#if stIndex >= 0}
-    <div id="icon-preview">
+  {#if selectedIcon}
 
+    <div id="icon-preview">
+      
       <Pixi {app}>
-        
-        <Graphics
-          draw={g => {
-            g.clear();
-            g.beginFill(0xf2f2f2);
-            g.drawPolygon( getHexPathRadius(150, hexOrientation, 150, 150) );
-            g.endFill();
-          }}
-        />
+
+        <Graphics draw={(g) => {
+          g.clear();
+          g.beginFill(DEFAULTBLANKHEXCOLOR);
+          g.drawPolygon( getHexPathRadius(150, orientation, 150, 150) );
+          g.endFill();
+        }} />
 
         <Sprite 
-          texture={ PIXI.Texture.from( iconButtons[stIndex].base64 ) }
-          tint={iconButtons[stIndex].color}
+          texture={PIXI.Texture.from(selectedIcon.base64)}
           x={150}
           y={150}
           anchor={ {x: 0.5, y: 0.5} }
-          scale={ getIconScale(iconButtons[stIndex]) } 
+          tint={selectedIcon.color}
+          scale={ getIconScale( selectedIcon ) }
         />
 
+        
+        
+      
       </Pixi>
+      
+      
+      <input type="text" bind:value={ selectedIcon.display } on:change={() => { workingIconset.icons = workingIconset.icons }}>
 
-      <input type="text" bind:value={ iconButtons[stIndex].display }>
-      <button on:click={() => {deleteIcon()} }>Delete</button>
+      <div id="icon-controls">
+        <button on:click={ () => { orientation = orientation == "flatTop" ? "pointyTop" : "flatTop" } } title="Change Hex Orientation" > <img src="/assets/img/tools/changeOrientation.png" alt="Change Orientation"> </button>
+        <button on:click={ () => {duplicateIcon(selectedIcon)} } title="Duplicate this Hex"> <img src="/assets/img/tools/duplicate.png" alt="Hex Duplicate"> </button>
+        <button on:click={ () => {removeIcon(selectedIcon); selectedIcon = null} } title="Delete this Hex" > <img src="/assets/img/tools/trash.png" alt="Trash"> </button>
+      </div>
+      <!--
+      <button on:click={() => {orientation = orientation == "flatTop" ? "pointyTop" : "flatTop"; workingIconset.icons=workingIconset.icons}}>Change Orientation</button>
+      <button on:click={() => { deleteIcon() } }>Delete Hex</button>
+      <button on:click={() => { duplicateIcon() }}> Duplicate Hex </button>
+      -->
+    </div>
+    
+    <div id="icon-style">
+      
+      <!-- Background Color -->
+      <div class="color" style="margin-bottom: 10px">
+        
+        <ColorInputPixi bind:value={selectedIcon.color} w={50} h={50} />
+        
+        <div>
+          <p>Tint</p>
+          <p class="color-string">{PIXI.utils.hex2string(selectedIcon.color)}</p>
+        </div>
+
+      </div>      
+      
+      <div id="symbol-scale">
+        Icon Scale
+        <input type="range" min="5" max="100" bind:value={selectedIcon.pHex}>
+        <input type="number" bind:value={selectedIcon.pHex}>%
+      </div>
 
     </div>
-
-    <div id="icon-controls">
-
-
-      <ColorInputPixi bind:value={iconButtons[stIndex].color} w={60} h={60}/>
-
-      <input type="range" min="5" max="100" bind:value={iconButtons[stIndex].pHex}>
-
-    </div>
-
-  {:else}
-    <div id={"editor-placeholder"}> <p>Create or select an icon to start!</p> <p class={"subtitle"}>Tip: You can select multiple files at once when you add an icon.</p> </div>
   
+  {:else}
+
+    <div id="editor-placeholder">
+      <p style="color: #aaaaaa">Select a icon or make a new one!</p>
+    </div>
+
   {/if}
 
 </main>
@@ -289,127 +342,145 @@
 
 
 
+
+
+
+
+
+
+
 <style>
 
-main {
-  display: grid;
-  grid-template-columns: 310px 1fr 1fr;
-  height: 100%;
-}
+  #icon-controls {
+    margin-top: 5px;
+    display: flex;
+    gap: 5px;
+  }
 
+  #icon-controls button {
+    width: 40px;
+    height: 40px;
+    padding: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-/* BUTTONS */
-nav {
-  background-color: #222222;
-}
+  #icon-controls button img {
+    height: 80%;
 
-#set-controls {
-  padding: 10px;
-  box-sizing: border-box;
-  background-color: #555555;
-}
+  }
 
-#icon-buttons {
-  padding: 10px;
-  box-sizing: border-box;
+  #set-controls {
+    padding: 10px;
+    background-color: #555555;
+    box-sizing: border-box;
+  }  
   
-  display: grid;
-  gap: 10px;
-  grid-template-columns: repeat(5, 50px);
-  grid-template-rows: 50px;
-  grid-auto-rows: 50px;
-}
+  
+  #set-controls #grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    gap: 5px;
+  }
 
-#icon-buttons button {
-  width: 100%;
-  height: 100%;
+  #grid input {
+    width: 100%;
+    box-sizing: border-box;
+  }
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+  .file-input-button {
+      position: relative;
+  }
 
-#icon-buttons button img {
-  width: 90%;
-}
+  .file-input-button input {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      opacity: 0;
+  }
 
-#new-icon-button {
-  position: relative;
-}
+  main {
+    display: grid;
+    grid-template-columns: 310px 1fr 1fr;
+    grid-template-rows: 1fr;
+    margin: 0;
+    height: 100%;
+    color: #f2f2f2;
+  }
 
-#new-icon-button input {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-}
+  #editor-placeholder {
+    grid-column: 2/4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-.selected {
-  border-color: #8cc63f;
-  outline: #8cc63f solid 1px;
-}
+  #icon-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
 
-#import-button {
-  position: relative;
-}
+  #icon-style {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    width: 50%;
+  }
 
-#import-button input {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  left: 0px;
-  top: 0px;
-  opacity: 0;
-}
+  nav {
+    height: 100%;
+    background-color: #222222;
+  }
+
+  #icon-buttons {
+    padding: 10px;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(5, 50px);
+    grid-template-rows: 50px;
+    grid-auto-rows: 50px;
+  }
+
+  .icon-button {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .icon-button img {
+    width: 100%;
+  }
+
+  .color {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    grid-template-rows: 60px;
+    column-gap: 10px;
+  }
 
 
-/* PREVIEW */
-#icon-preview {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
+  .color div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 
+  .color p {
+    margin: 0;
+  }
 
-
-/* CONTROLS */
-#icon-controls {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-#icon-controls input[type="range"] {
-  width: 60%;
-}
-
-
-
-
-
-/* PLACEHOLDER */
-
-#editor-placeholder {
-  grid-column: 2/4;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #f2f2f2;
-}
-
-#editor-placeholder p {
-  margin: 0;
-}
-
-#editor-placeholder p.subtitle {
-  margin: 0;
-  margin-top: 5px;
-  font-size: 10pt;
-  color: #999999;
-}
+  .color .color-string {
+    font-size: 10pt;
+    color: #bbbbbb
+  }
 
 </style>
