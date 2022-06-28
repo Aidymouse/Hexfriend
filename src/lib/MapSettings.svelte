@@ -44,13 +44,10 @@
         //redrawEntireMap()
     }
 
-    let addOrRemoveHex: "add" | "remove" = "add"
-    
+    let addOrRemoveMapDimensions: "add" | "remove" = "add"
 
 
-
-
-    let tilesetFiles
+    let tilesetFiles: FileList
 
     function importTileset() {
         let importFile = tilesetFiles[0]
@@ -197,12 +194,12 @@
     <h2>Map Dimensions</h2>
     <section id="map-dimensions-container">
         <div id="map-dimensions">
-            {#if addOrRemoveHex == "add"}
+            {#if addOrRemoveMapDimensions == "add"}
                 <button style="grid-area: left;" on:click={() => { comp_terrainField.square_expandMapDimension('left', 1) } }>Add<br>Left</button>
                 <button style="grid-area: top;" on:click={() => { comp_terrainField.square_expandMapDimension('top', 1) } }>Add<br>Top</button>
                 <button style="grid-area: bottom;" on:click={() => { comp_terrainField.square_expandMapDimension('bottom', 1) } }>Add<br>Bottom</button>
                 <button style="grid-area: right;" on:click={() => { comp_terrainField.square_expandMapDimension('right', 1) } }>Add<br>Right</button>
-                <button style="grid-area: center;" on:click={() => { addOrRemoveHex = "remove" }}> 
+                <button style="grid-area: center;" on:click={() => { addOrRemoveMapDimensions = "remove" }}> 
                     <img src={`/assets/img/tools/addHex_${tfield.orientation == "flatTop" ? "ft" : "pt"}.png`} alt={"Add Hex"} title={"Add Hex"}> 
                 </button>
                 
@@ -211,7 +208,7 @@
                 <button style="grid-area: top;" on:click={() => { comp_terrainField.square_reduceMapDimension('top', 1) } }>Remove<br>Top</button>
                 <button style="grid-area: bottom;" on:click={() => { comp_terrainField.square_reduceMapDimension('bottom', 1) } }>Remove<br>Bottom</button>
                 <button style="grid-area: right;" on:click={() => { comp_terrainField.square_reduceMapDimension('right', 1) } }>Remove<br>Right</button>
-                <button style="grid-area: center;" on:click={() => { addOrRemoveHex = "add" }}> 
+                <button style="grid-area: center;" on:click={() => { addOrRemoveMapDimensions = "add" }}> 
                     <img src={`/assets/img/tools/removeHex_${tfield.orientation == "flatTop" ? "ft" : "pt"}.png`} alt={"Remove Hex"} title={"Remove Hex"}> 
                 </button>
             {/if}
@@ -270,12 +267,15 @@
             </div>
         {/each}
 
-        <span> <button class="file-input-button">Import Tileset <input type="file" bind:files={tilesetFiles} on:change={ () => {importTileset()} } /></button> </span>
+        <span> 
+            <button class="file-input-button">Import Tileset <input type="file" bind:files={tilesetFiles} on:change={ () => {importTileset()} } /></button> 
+            <button on:click={() => { appState = "tilesetCreator" }}>Tileset Builder</button>
+        </span>
     </div>
 
     
 
-    <h2>Iconsets</h2>
+    <h2>Icon Sets</h2>
     <div id="iconsets">
         {#each loadedIconsets as iconset (iconset.id)}
             <div class="loaded-tileset">
@@ -288,20 +288,21 @@
             </div>
         {/each}
 
-        <span> <button class="file-input-button">Import Iconset <input type="file" accept=".hfis" bind:files={iconsetFiles} on:change={ () => {importIconset()} } /></button> </span>
+        <span>
+            <button class="file-input-button">Import Iconset <input type="file" accept=".hfis" bind:files={iconsetFiles} on:change={ () => {importIconset()} } /></button> 
+            <button on:click={() => { appState = "iconsetCreator" }}>Iconset Builder</button>
+        </span>
     </div>
 
 
 
     <h2>Experimental</h2>
-    <p class="helperText">This stuff is not polished and may be broken.</p>
+    <p class="helperText">Not polished and maybe broken.</p>
 
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
     
-    <button on:click={() => { appState = "tilesetCreator" }}>Tileset Builder</button>
-    <button on:click={() => { appState = "iconsetCreator" }}>Iconset Builder</button>
 
-    <button disabled={true} on:click={() => { /*showTerrainGenerator = true; showSettings = false */ }} title={"Coming soon!"}> Generate Terrain </button>
+        <button on:click={() => { showTerrainGenerator = true; showSettings = false }} title={"Coming soon!"}> Generate Terrain </button>
     </div>
     
 
@@ -347,6 +348,12 @@
         row-gap: 5px;
     }
 
+    #tilesets span, #iconsets span {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 5px;
+    }
+   
     .loaded-tileset {
         background-color: #555555;
         padding: 5px;

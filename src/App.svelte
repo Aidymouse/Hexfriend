@@ -58,16 +58,16 @@
 
   // Layers
   import TerrainField from './lib/TerrainField.svelte'
-  import IconLayer from './lib/IconLayer.svelte'
-  import PathLayer from './lib/PathLayer.svelte'
+  import IconLayer from './layers/IconLayer.svelte'
+  import PathLayer from './layers/PathLayer.svelte'
   import TextLayer from './layers/TextLayer.svelte'
   import CoordsLayer from './layers/CoordsLayer.svelte'
   
   // Panels
-  import TerrainPanel from './lib/panels/TerrainPanel.svelte'
-  import IconPanel from './lib/panels/IconPanel.svelte'
-  import PathPanel from './lib/panels/PathPanel.svelte'
-  import TextPanel from './lib/panels/TextPanel.svelte'
+  import TerrainPanel from './panels/TerrainPanel.svelte'
+  import IconPanel from './panels/IconPanel.svelte'
+  import PathPanel from './panels/PathPanel.svelte'
+  import TextPanel from './panels/TextPanel.svelte'
 
   // Like, whatever
   import ToolButtons from './lib/ToolButtons.svelte'
@@ -253,14 +253,9 @@
   const L: PIXI.Loader = new PIXI.Loader()
 
   // Never cleared, to stop duplicate textures being added
-  let seenicons = []
   // Theoretically a memory leak... but bounded by how many unique tiles can be loaded. Shouldn't be a problem?
-  
-  let seentextures = []
   let symbolTextureLookupTable = {
     // tile id: id of tile who's texture we use
-
-    // most of the time these will match up, but sometimes they wont.
   }
 
   let iconTextureLookupTable = {
@@ -331,7 +326,7 @@
       comp_terrainField.renderAllHexes();
 
       //comp_coordsLayer.eraseAllCoordinates();
-      //comp_coordsLayer.generateCoords();
+      comp_coordsLayer.generateAllCoords();
       
     });
 

@@ -718,7 +718,7 @@
 
     function eliminateHex(hexId: string) {
 
-        if (tfield.hexes[hexId].symbol) {
+        if (tfield.hexes[hexId].tile && tfield.hexes[hexId].tile.symbol) {
             symbolsContainer.removeChild(terrainSprites[hexId])
             terrainSprites[hexId].destroy()
             delete terrainSprites[hexId]

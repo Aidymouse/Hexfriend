@@ -48,6 +48,8 @@
 
     export function generateAllCoords(system: coord_system) {
 
+        cullUnusedCoordinates()
+        
         Object.keys(tfield.hexes).forEach(hexId => {
             createTextIfNoneExists(hexId)
             generateCoord(hexId, system)

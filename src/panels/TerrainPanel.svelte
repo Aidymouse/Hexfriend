@@ -4,9 +4,9 @@
     import type {terrain_data} from 'src/types/data'
     import type { TerrainHexField } from 'src/types/terrain';
 
-    import ColorInputPixi from '../../components/ColorInputPixi.svelte'
+    import ColorInputPixi from '../components/ColorInputPixi.svelte'
     import * as PIXI from 'pixi.js'
-    import { getHexPath } from '../../helpers/hexHelpers';
+    import { getHexPath } from '../helpers/hexHelpers';
 
     export let loadedTilesets
     export let data_terrain: terrain_data

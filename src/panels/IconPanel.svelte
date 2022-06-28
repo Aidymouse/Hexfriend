@@ -1,11 +1,11 @@
 <script lang="ts">
 
     import * as PIXI from 'pixi.js'
-    import ColorInputPixi from '../../components/ColorInputPixi.svelte'
-    import Checkbox from '../../components/Checkbox.svelte';
+    import ColorInputPixi from '../components/ColorInputPixi.svelte'
+    import Checkbox from '../components/Checkbox.svelte';
     
     import type { icon_data} from 'src/types/data';
-    import type { Icon, Iconset } from '../../types/icon'
+    import type { Icon, Iconset } from '../types/icon'
 
 
     export let loadedIconsets: Iconset[]

@@ -4,9 +4,9 @@
 
     import * as PIXI from 'pixi.js'
 
-    import ColorInputPixi from '../../components/ColorInputPixi.svelte'
-    import SelectGrid from '../../components/SelectGrid.svelte'
-    import Checkbox from '../../components/Checkbox.svelte'
+    import ColorInputPixi from '../components/ColorInputPixi.svelte'
+    import SelectGrid from '../components/SelectGrid.svelte'
+    import Checkbox from '../components/Checkbox.svelte'
 
     export let data_path: path_data
     export let comp_pathLayer

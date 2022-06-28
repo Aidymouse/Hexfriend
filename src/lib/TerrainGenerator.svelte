@@ -1,7 +1,10 @@
 <script lang="ts">
+    import type { TerrainHex, TerrainHexField } from 'src/types/terrain';
+    import type { Tile, Tileset } from "/src/types/tilesets"
 
     import {genHexId, getNeighbours } from '../helpers/hexHelpers'
     import { download } from './download2';
+
 
     function rand(min: number, max: number): number {
         min = Math.ceil(min);
@@ -141,8 +144,12 @@
 
     
     function getTileFromId(tileId: string) {
-        let setName = tileId.split("_")[0]
-        return loadedTilesets[setName].find(tile => tile.id == tileId)
+        
+        let setId = tileId.split("_")[0]
+        
+        let tileset = loadedTilesets.find((tileset: Tileset) => tileset.id == setId)
+        
+        return tileset.tiles.find((tile: Tile) => tile.id == tileId)
     }
 
 
@@ -219,10 +226,10 @@
     }
 
 
-    export let loadedTilesets
-    export let tfield
+    export let loadedTilesets: Tileset[]
+    export let tfield: TerrainHexField
     export let comp_terrainField
-    export let showTerrainGenerator
+    export let showTerrainGenerator: boolean
     
 
     let importFiles = []
@@ -235,9 +242,8 @@
 
     }
     // Populate the gen function
-    Object.keys(loadedTilesets).forEach(tilesetName => {
-        let tileset = loadedTilesets[tilesetName]
-        tileset.forEach(tile => {
+    loadedTilesets.forEach( (tileset: Tileset) => {
+        tileset.tiles.forEach( (tile: Tile) => {
             genFunction[tile.id] = [ {id: tile.id, weight: 1} ]
         })
     })
@@ -268,34 +274,39 @@
 
     <div id="add-tiles">
         {#if selectedId != ""}
-            {#each Object.keys(loadedTilesets) as tilesetName}
-                {#each loadedTilesets[tilesetName] as tile (tile.id)}
+            {#each loadedTilesets as tileset}
+                {#each tileset.tiles as tile (tile.id)}
                     <button on:click={() => { addTileToFunction(selectedId, tile.id) }}> <img src={tile.preview} alt={tile.id} title={`Add ${tile.display} to generation ruleset`}> </button>
                 {/each}
             {/each}
         {/if}
     </div>
 
-    <button id="generate-button" on:click={() => { generate() }}>Generate!</button>
-    <button on:click={() => { exportGenFunction() }}>Export</button>
-    <button id="import-button"><input type="file" bind:files={importFiles} on:change={() => { importGenFunction() }}>Import</button>
-    <button on:click={() => {showTerrainGenerator = false}} >Close Generator</button>
-    <div><input type="checkbox" bind:checked={slowAnimation}> Animate Generator</div>
+    <div id="generator-controls">
+
+        <button id="generate-button" on:click={() => { generate() }}>Generate!</button>
+        <button on:click={() => { exportGenFunction() }}>Export</button>
+        <button id="import-button"><input type="file" bind:files={importFiles} on:change={() => { importGenFunction() }}>Import</button>
+        <button on:click={() => {showTerrainGenerator = false}} >Close Generator</button>
+        <div><input type="checkbox" bind:checked={slowAnimation}> Animate Generator</div>
+
+    </div>
 </main>
 
 <style>
 
     main {
         width: 600px;
-        height: calc(100% - 20px);
+        height: 80%;
         position: absolute;
         top: 10px;
         right: 10px;
         padding: 10px;
 
         display: grid;
+        gap: 5px;
         grid-template-columns: 1fr 115px;
-        grid-template-rows: 1fr 30px;
+        grid-template-rows: 1fr auto;
         box-sizing: border-box;
         background-color: #333333;
     }
@@ -317,6 +328,7 @@
         gap: 5px;
         padding: 5px;
         background-color: #555555;
+        overflow: scroll;
     }
 
     #add-tiles button {
@@ -365,6 +377,12 @@
         align-items: center;
     }
 
+    .added-tile:hover {
+        outline: #8cc63f solid 2px;
+        border-radius: 4px;
+        transition-duration: 0.2s;
+        transition-property: outline-color;
+    }
 
     .terrain-category {
         display: flex;

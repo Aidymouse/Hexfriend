@@ -1,7 +1,7 @@
 <script lang="ts">
-    import ColorInput from "../../components/ColorInput.svelte";
-    import SelectGrid from "../../components/SelectGrid.svelte";
-    import CustomValueToggle from "../../components/CustomValueToggle.svelte";
+    import ColorInput from "../components/ColorInput.svelte";
+    import SelectGrid from "../components/SelectGrid.svelte";
+    import CustomValueToggle from "../components/CustomValueToggle.svelte";
     import type { text_style } from "src/types/text";
     import type { text_data } from "src/types/data";
 
