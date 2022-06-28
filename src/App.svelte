@@ -266,6 +266,8 @@
 
   function loadSave(data: saveData, id: number | null) {
 
+    console.log(data)
+
     loadedTilesets = data.tilesets;
     loadedIconsets = data.iconsets;
 
@@ -398,8 +400,17 @@
   }
 
 
-  function exportMap() {
-    download( app.renderer.plugins.extract.base64(offsetContainer), "export.png", "image/png" )
+  function exportMap(exportType) {
+    console.log(exportType)
+    switch (exportType) {
+      case "image/png":
+        download( app.renderer.plugins.extract.base64(offsetContainer), `${loadedSave.title ? loadedSave.title : "Untitled Hexfriend"}`, exportType )
+        break
+      
+      case "application/json":
+        download(JSON.stringify(loadedSave), `${loadedSave.title ? loadedSave.title : "Untitled Hexfriend"}.hexfriend`, exportType)
+        break 
+    }
   }
 
   function redrawEntireMap() {
@@ -669,11 +680,15 @@
       bind:showTerrainGenerator
       {comp_terrainField}
       {comp_coordsLayer}
+      {comp_iconLayer}
+      {comp_pathLayer}
+      {comp_textLayer}
       bind:data_coordinates
       renderAllHexes={() => {comp_terrainField.renderAllHexes()}}
       renderGrid={() => { comp_terrainField.renderGrid() }}
       redrawEntireMap={() => { redrawEntireMap() }}
-      exportMap={() => {exportMap()}}
+      exportMap={exportMap}
+      {load}
       
       bind:loadedTilesets
       bind:loadedIconsets

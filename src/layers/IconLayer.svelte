@@ -1,16 +1,19 @@
 <script lang="ts">
-    import type { TerrainHexField } from 'src/types/terrain';
+    import type { TerrainHexField } from 'src/types/terrain'
+    import type * as PIXI from 'pixi.js'
+    import type { tools } from 'src/types/toolData'
+
     import { Sprite } from 'svelte-pixi'
-    import { coords_worldToCube, coords_cubeToWorld } from '../helpers/hexHelpers';
+    import { coords_worldToCube, coords_cubeToWorld } from '../helpers/hexHelpers'
 
     import type { icon_data } from '/src/types/data'
 
     export let icons = [];
 
-    export let L
+    export let L: PIXI.Loader
     export let pan
     export let tfield: TerrainHexField
-    export let selectedTool
+    export let selectedTool: tools
     export let controls
 
     export let data_icon: icon_data
@@ -78,6 +81,18 @@
 
         newIcon()
 
+    }
+
+    export function moveAllIcons(xMod: number, yMod: number) {
+    
+        icons.forEach(icon => {
+            icon.x += xMod
+            icon.y += yMod
+        })
+
+        icons = icons
+        
+        
     }
 
 </script>

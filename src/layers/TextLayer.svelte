@@ -100,6 +100,15 @@
         "right": {x: 1, y: 0},
     }
 
+    export function moveAllTexts(xMod, yMod) {
+        texts.forEach(t => {
+            t.x += xMod
+            t.y += yMod
+        })
+
+        texts = texts
+    }
+
 </script>
 
 {#each texts as t (t.id)}

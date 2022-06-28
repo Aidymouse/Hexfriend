@@ -28,10 +28,19 @@
     export let comp_coordsLayer
     export let data_coordinates: coordinates_data
 
+    //export let data_terrain: terrain_data
     export let loadedTilesets
     export let loadTilesetTextures: Function
     export let loadedIconsets
     export let loadIconsetTextures: Function
+
+    export let comp_iconLayer
+    export let comp_pathLayer
+    export let comp_textLayer
+
+    export let load: Function
+
+    let exportType: "Export As..." | "image/png" | "application/json" = "Export As..." 
 
     function changeOrientation() {
         let t = tfield.hexWidth
@@ -76,8 +85,13 @@
 
     }
 
-    function removeTileset() {
+    function removeTileset(setId: string) {
+        //comp_terrainField.removeAllTilesOfSet(setId)
 
+        // This line will need to change if the default tileset ever gets removeable
+        //data_terrain.tile = {...loadedTilesets[0].tiles[0]}
+        
+        loadedTilesets = loadedTilesets.filter( (ts: Tileset) => ts.id != setId)
     }
 
 
@@ -111,6 +125,139 @@
 
 
 
+    function expandMapDimension(direction, amount) {
+
+        
+
+        comp_terrainField.square_expandMapDimension(direction, amount)
+
+        let xMod = 0;
+        let yMod = 0;
+
+        switch (direction) {
+            case "left": {
+                if (tfield.orientation == "flatTop") {
+                                    
+                    //pan.offsetX -= tfield.hexWidth * 0.75 * pan.zoomScale * amountOfHexes
+
+                    xMod = tfield.hexWidth * 0.75 * amount
+
+                    if (amount % 2 == 1) {
+                        yMod = -tfield.hexHeight * 0.5 * (tfield.raised == "odd" ? -1 : 1)
+                    }
+                    
+
+                } else {
+                    xMod = tfield.hexWidth * amount
+
+                }
+                break
+            }
+
+            case "top": {
+
+                if (tfield.orientation == "flatTop") {
+                    yMod = tfield.hexHeight * amount
+                
+                } else {
+                    yMod = tfield.hexHeight * 0.75 * amount
+                    
+                    if (amount % 2 == 1) {
+                        xMod = -tfield.hexWidth * 0.5 * (tfield.raised == "odd" ? -1 : 1)
+                    }
+                    
+                }
+                break
+
+            }
+
+        }
+
+        comp_iconLayer.moveAllIcons(xMod, yMod)
+        comp_pathLayer.moveAllPaths(xMod, yMod)
+        comp_textLayer.moveAllTexts(xMod, yMod)
+    }
+
+    function reduceMapDimension(direction, amount) {
+        
+        if (direction == "left" || direction == "right") {
+            if (tfield.columns <= amount) amount = tfield.columns - 1
+            if (amount == 0) return
+        }
+
+        if (direction == "top" || direction == "bottom") {
+            if (tfield.rows <= amount) amount = tfield.rows - 1
+            if (amount == 0) return
+            
+        }
+
+        comp_terrainField.square_reduceMapDimension(direction, amount)
+
+        let xMod = 0;
+        let yMod = 0;
+
+        switch (direction) {
+            case "left": {
+                if (tfield.orientation == "flatTop") {
+                                    
+                    //pan.offsetX -= tfield.hexWidth * 0.75 * pan.zoomScale * amountOfHexes
+
+                    xMod = -tfield.hexWidth * 0.75 * amount
+
+                    if (amount % 2 == 1) {
+                        yMod = -tfield.hexHeight * 0.5 * (tfield.raised == "odd" ? -1 : 1)
+                    }
+                    
+
+                } else {
+                    xMod = -tfield.hexWidth * amount
+
+                }
+                break
+            }
+
+            case "top": {
+
+                if (tfield.orientation == "flatTop") {
+                    yMod = -tfield.hexHeight * amount
+                
+                } else {
+                    yMod = -tfield.hexHeight * 0.75 * amount
+                    
+                    if (amount % 2 == 1) {
+                        xMod = -tfield.hexWidth * 0.5 * (tfield.raised == "odd" ? -1 : 1)
+                    }
+                    
+                }
+                break
+
+            }
+
+        }
+
+        comp_iconLayer.moveAllIcons(xMod, yMod)
+        comp_pathLayer.moveAllPaths(xMod, yMod)
+        comp_textLayer.moveAllTexts(xMod, yMod)
+    }
+
+
+    let mapImportFiles: FileList
+    function importMap() {
+
+        if (!mapImportFiles[0]) return
+
+        let r = new FileReader()
+        r.readAsText(mapImportFiles[0])
+        r.onload = eb => {
+
+            let saveData = JSON.parse(eb.target.result)
+            //console.log(saveData)
+            load(saveData, null)
+
+        }
+
+    }
+
 </script>
 
 <button id="close-tab" class:shown={showSettings} on:click={()=>{showSettings = false}} title={"Close Settings"}> <img src="/assets/img/tools/back.png" alt={"Back"}> </button>
@@ -121,8 +268,19 @@
     
     <!-- EXPORT / IMPORT --> 
     <span style="display: grid; grid-template-columns: 1fr 1fr; margin-top: 5px; column-gap: 5px;">
-        <button on:click={() => { exportMap() } } title="Export" >Export as PNG</button>
-        <button disabled={true} on:click={() => {  } } title="Import (Coming Soon)" >Import</button>
+        
+
+        
+        <select id="export-map-select" bind:value={exportType} title="Export" on:change={() => { exportMap( exportType ); exportType = "Export As..."} }>
+            <option value={"Export As..."} style="display: none">Export As...</option>
+            <option value={"image/png"}>PNG</option>
+            <option value={"application/json"}>Hexfriend</option>
+        </select>
+
+        <button class="file-input-button" on:click={() => {  } } title="Import" >
+            Import
+            <input type="file" accept=".hexfriend" bind:files={mapImportFiles} on:change={ () => { importMap() } }>
+        </button>
     </span> 
     <p style="font-size: 10pt; color: #FF6666; background-color: rgba(1, 1, 1, 0.5); padding: 5px; margin-top: 5px;">Hexfriend is still a work in progress, so unexpected things may occur.</p>
 
@@ -195,19 +353,19 @@
     <section id="map-dimensions-container">
         <div id="map-dimensions">
             {#if addOrRemoveMapDimensions == "add"}
-                <button style="grid-area: left;" on:click={() => { comp_terrainField.square_expandMapDimension('left', 1) } }>Add<br>Left</button>
-                <button style="grid-area: top;" on:click={() => { comp_terrainField.square_expandMapDimension('top', 1) } }>Add<br>Top</button>
-                <button style="grid-area: bottom;" on:click={() => { comp_terrainField.square_expandMapDimension('bottom', 1) } }>Add<br>Bottom</button>
-                <button style="grid-area: right;" on:click={() => { comp_terrainField.square_expandMapDimension('right', 1) } }>Add<br>Right</button>
+                <button style="grid-area: left;" on:click={() => { expandMapDimension('left', 1) } }>Add<br>Left</button>
+                <button style="grid-area: top;" on:click={() => { expandMapDimension('top', 1) } }>Add<br>Top</button>
+                <button style="grid-area: bottom;" on:click={() => { expandMapDimension('bottom', 1) } }>Add<br>Bottom</button>
+                <button style="grid-area: right;" on:click={() => { expandMapDimension('right', 1) } }>Add<br>Right</button>
                 <button style="grid-area: center;" on:click={() => { addOrRemoveMapDimensions = "remove" }}> 
                     <img src={`/assets/img/tools/addHex_${tfield.orientation == "flatTop" ? "ft" : "pt"}.png`} alt={"Add Hex"} title={"Add Hex"}> 
                 </button>
                 
             {:else}
-                <button style="grid-area: left;" on:click={() => { comp_terrainField.square_reduceMapDimension('left', 1) } }>Remove<br>Left</button>
-                <button style="grid-area: top;" on:click={() => { comp_terrainField.square_reduceMapDimension('top', 1) } }>Remove<br>Top</button>
-                <button style="grid-area: bottom;" on:click={() => { comp_terrainField.square_reduceMapDimension('bottom', 1) } }>Remove<br>Bottom</button>
-                <button style="grid-area: right;" on:click={() => { comp_terrainField.square_reduceMapDimension('right', 1) } }>Remove<br>Right</button>
+                <button style="grid-area: left;" on:click={() => { reduceMapDimension('left', 1) } }>Remove<br>Left</button>
+                <button style="grid-area: top;" on:click={() => { reduceMapDimension('top', 1) } }>Remove<br>Top</button>
+                <button style="grid-area: bottom;" on:click={() => { reduceMapDimension('bottom', 1) } }>Remove<br>Bottom</button>
+                <button style="grid-area: right;" on:click={() => { reduceMapDimension('right', 1) } }>Remove<br>Right</button>
                 <button style="grid-area: center;" on:click={() => { addOrRemoveMapDimensions = "add" }}> 
                     <img src={`/assets/img/tools/removeHex_${tfield.orientation == "flatTop" ? "ft" : "pt"}.png`} alt={"Remove Hex"} title={"Remove Hex"}> 
                 </button>
@@ -218,7 +376,7 @@
     
 
     <h2 style="margin-bottom: 0px;">Coordinates</h2>
-    <p class="helperText">Coordinates can slow down map changes such as adding or removing rows.</p>
+    <p class="helperText">Coordinates can slow down map changes such as adding hexes or changing orientation.</p>
     <div class="settings-grid">
         <label for="showCoords">Show Coordinates</label>
         <Checkbox bind:checked={data_coordinates.shown} name={"showCoords"} />
@@ -261,7 +419,7 @@
                 {tileset.name}
 
                 {#if tileset.id != "default"}
-                        <button> <img src="/assets/img/tools/trash.png" alt={"Trash"} title={"Remove Tileset"}> </button>
+                        <button on:click={() => {removeTileset(tileset.id)}}> <img src="/assets/img/tools/trash.png" alt={"Trash"} title={"Remove Tileset"}> </button>
                 {/if}
 
             </div>
@@ -329,7 +487,20 @@
 
 <style>
 
-   
+   #export-map-select {
+    border: solid 1px #777777;
+    border-radius: 3px;
+    background-color: #333333;
+    color: white;
+    padding: 5px;
+    transition-duration: .2s;
+
+    text-align: center
+   }
+
+   #export-map-select:hover {
+    background-color: #555555;
+   }
 
     #iconsets {
         display: grid;

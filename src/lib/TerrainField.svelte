@@ -214,11 +214,13 @@
                 if (tfield.orientation == "flatTop") {
                     
                     pan.offsetX -= tfield.hexWidth * 0.75 * pan.zoomScale * amount
+
                     if (amount % 2 == 1) {
                         tfield.raised = tfield.raised == "odd" ? "even" : "odd"
                         square_updateRaisedColumn()
                         pan.offsetY += tfield.hexHeight * 0.5 * (tfield.raised == "odd" ? -1 : 1) * pan.zoomScale
                     }
+                    
 
                 } else {
                     pan.offsetX -= tfield.hexWidth * pan.zoomScale * amount
@@ -645,7 +647,18 @@
 
     
     /* ACTIONS */
-    
+    export function removeAllTilesOfSet(setId) {
+        Object.entries(tfield.hexes).forEach( ( [hexId, hex] ) => {
+
+            if (!hex.tile) return
+
+            let hexSetId = hex.tile.id.split("_")[0]
+            if (setId == hexSetId) {
+                eraseHex(hexId)
+            }
+
+        })
+    }
 
     function eyedrop() {
         if (controls.mouseDown[0]) {
@@ -718,7 +731,7 @@
 
     function eliminateHex(hexId: string) {
 
-        if (tfield.hexes[hexId].tile && tfield.hexes[hexId].tile.symbol) {
+        if (terrainSprites[hexId]) {
             symbolsContainer.removeChild(terrainSprites[hexId])
             terrainSprites[hexId].destroy()
             delete terrainSprites[hexId]
@@ -861,6 +874,8 @@
 
         });
     }
+
+    
 
     onMount(() => {
         renderAllHexes()

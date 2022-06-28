@@ -165,6 +165,17 @@
 
     }
 
+    export function moveAllPaths(xMod: number, yMod: number) {
+        paths.forEach(path => {
+            for (let pI=0; pI < path.points.length; pI += 2) {
+                path.points[pI] += xMod
+                path.points[pI+1] += yMod
+            }
+        })
+
+        paths = paths
+    }
+
     const HOVEREDSELECTORSTYLE = { width: 1, color: 0x555555 }
     const SELECTEDSELECTORSTYLE = { width: 2, color: 0x333333 }
 
