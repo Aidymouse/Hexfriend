@@ -282,8 +282,7 @@
             <input type="file" accept=".hexfriend" bind:files={mapImportFiles} on:change={ () => { importMap() } }>
         </button>
     </span> 
-    <p style="font-size: 10pt; color: #FF6666; background-color: rgba(1, 1, 1, 0.5); padding: 5px; margin-top: 5px;">Hexfriend is still a work in progress, so unexpected things may occur.</p>
-
+    
 
     
     <h2>Grid</h2>
@@ -467,7 +466,7 @@
 
     <h2>About</h2>
     <p class="helperText">
-        Hexfriend version 0.1 – "Hex Cometh"
+        Hexfriend version 1.0 – "Hex Cometh"
         <br>
         By Aidymouse
     </p>
