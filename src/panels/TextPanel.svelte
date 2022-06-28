@@ -16,11 +16,7 @@
     }
 
     
-    let textStyles = [
-        {display: "Big", style: {fontFamily: "Segoe UI", fill: "#000000", fontSize: 40, miterLimit: 2, strokeThickness: 5, stroke: "#f2f2f2", align: "center", fontStyle: "normal", fontWeight: "normal"} },
-        {display: "Big Sans", style: {fontFamily: "Comic Sans MS", fill: "#000000", fontSize: 40, miterLimit: 2, strokeThickness: 5, stroke: "#f2f2f2", align: "center", fontStyle: "normal", fontWeight: "normal"} },
-        {display: "Little", style: {fontFamily: "Segoe UI", fill: "#000000", fontSize: 25, miterLimit: 2, strokeThickness: 0, stroke: "#f2f2f2", align: "left", fontStyle: "normal", fontWeight: "normal"} },
-    ]
+    export let textStyles
 
     function selectedMatches(style: text_style): boolean {
 
@@ -38,6 +34,21 @@
         //data_text = data_text
         textStyles = textStyles /* Updates the selected button */
     }
+
+    function newTextStyle() {
+        let name = prompt("What would you like to name this text style?")
+        if (name == null) return
+
+        textStyles = [...textStyles, {display: name, style: {...data_text.style}}]
+    }
+
+    let fonts = [
+        "Arial",
+        "Comic Sans MS",
+        "Segoe UI",
+        "Times New Roman",
+        "Trebuchet MS"
+    ]
 
 </script>
 
@@ -58,10 +69,9 @@
         
         <label for="textFont">Font</label>
         <select id="textFont" bind:value={data_text.style.fontFamily} >
-            <option value={"Segoe UI"}>Segoe UI</option>
-            <option value={"Comic Sans MS"}>Comic Sans</option>
-            <option value={"Arial"}>Arial</option>
-            <option value={"Times New Roman"}>Times New Roman</option>
+            {#each fonts as font}
+                <option value={font}>{font}</option>
+            {/each}
         </select>
 
         <div id="font-style-controls">
@@ -92,18 +102,20 @@
 
     {#if data_text.selectedText}
         <div id="selected-text-controls">
-            <button on:click={() => {comp_textLayer.deleteText(data_text.selectedText)} } > Delete Text </button>
-        
-            <textarea bind:value={data_text.selectedText.text} use:focus bind:this={data_text.editorRef}/> <!-- The editor ref is literally jsut used to let us focus the text area by clicking on the text. -->
+            <div id="text-area-wrapper">
+                <textarea bind:value={data_text.selectedText.text} use:focus bind:this={data_text.editorRef}/> <!-- The editor ref is literally jsut used to let us focus the text area by clicking on the text. -->
+                <button on:click={() => {comp_textLayer.deleteText(data_text.selectedText)} } > <img src="/assets/img/tools/trash.png" alt="Trash" title="Delete Selected Text"> </button>
+            </div>
         </div>
     {/if}
 
     <div id="text-styles" style={data_text.selectedText ? "padding-top: 10px" : ""}>
         <p>Text Styles</p>
-        <div style="display: flex; gap: 5px;">
+        <div style="display: flex; gap: 5px; flex-wrap: wrap">
             {#each textStyles as ts}
                 <button on:click={() => {  changeTextStyle( ts.style ) }} class:selected={ selectedMatches(ts.style) } >{ts.display}</button>
             {/each}
+            <button class="green-button" style="width: 28px;" on:click={()=>{ newTextStyle() }} title="Save current text style" > + </button>
         </div>
     </div>
 
@@ -130,6 +142,37 @@
     #selected-text-controls {
         padding: 10px;
         background-color: #555555;
+    }
+
+    #selected-text-controls #text-area-wrapper {
+        position: relative;
+        width: 100%;
+        box-sizing: border-box;
+        min-height: 60px;
+    }
+    
+    #selected-text-controls textarea {
+        box-sizing: border-box;
+        min-height: 60px;
+        max-width: 100%;
+        min-width: 100%;
+        height: 100%;
+    }
+
+    #selected-text-controls button {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 30px;
+        height: 30px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #selected-text-controls button img {
+        height: 80%; 
     }
 
     #text-styles {

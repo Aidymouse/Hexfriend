@@ -11,18 +11,16 @@
     export let data_path: path_data
     export let comp_pathLayer
 
+
     $: {
         if (data_path.selectedPath) {
             data_path.selectedPath.style = {...data_path.style}
         }
 
-        pathButtons = pathButtons
+        pathStyles = pathStyles
     }
 
-    let pathButtons = [
-        {display: "Green", style: {color: 0x00ff00, width: 13, cap: PIXI.LINE_CAP.ROUND, join: PIXI.LINE_JOIN.ROUND} },
-        {display: "Red", style: {color: 0xff0000, width: 3, cap: PIXI.LINE_CAP.ROUND, join: PIXI.LINE_JOIN.BEVEL} },
-    ]
+    export let pathStyles
 
     function styleMatchesData(pathStyle: path_style) {
         if (pathStyle.color != data_path.style.color) return false
@@ -31,6 +29,15 @@
         if (pathStyle.join != data_path.style.join) return false
 
         return true
+    }
+
+    function newPathStyle() {
+        let name = prompt("What would you like to name your path style?")
+        if (name == null) return
+
+        pathStyles = [...pathStyles,
+            { display: name, style: {...data_path.style} }
+        ]
     }
 
 </script>
@@ -70,10 +77,11 @@
             
         <div id="path-styles" style={data_path.selectedPath ? "padding-top: 0px;" : ""}>
             <p>Path Styles</p>
-            <div style="display: flex; gap: 5px;">
-                {#each pathButtons as pb}
+            <div style="display: flex; gap: 5px; flex-wrap: wrap">
+                {#each pathStyles as pb}
                     <button on:click={ () => {data_path.style = {...pb.style}} } class:selected={styleMatchesData(pb.style)} >{pb.display}</button>
                 {/each}
+                <button class="green-button" style="width: 28px;" on:click={ () => { newPathStyle() } } title="Save current path style" > + </button>
             </div>
         </div>
         <!--

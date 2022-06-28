@@ -638,10 +638,10 @@
     <IconPanel {L} {app} {loadedIconsets} bind:data_icon {iconTextureLookupTable} />
   
   {:else if selectedTool == "path"}
-    <PathPanel bind:data_path {comp_pathLayer} />
+    <PathPanel bind:data_path {comp_pathLayer} bind:pathStyles={loadedSave.pathStyles} />
 
   {:else if selectedTool == "text"}
-    <TextPanel bind:data_text {comp_textLayer} />
+    <TextPanel bind:data_text {comp_textLayer} bind:textStyles={loadedSave.textStyles} />
 
   {/if}
     
@@ -731,6 +731,17 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
+  }
+
+  :global(.green-button) {
+    border-color: #648d2e;
+    background-color: #8cc63f;
+    color: white;
+  }
+
+  :global(.green-button:hover) {
+    border: none;
+    background-color: #648d2e;
   }
 
   :global(h2) {

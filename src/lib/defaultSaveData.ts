@@ -11,6 +11,8 @@ import type { Iconset } from '../types/icon'
 import type { coordinates_data } from 'src/types/data'
 import { coord_system } from '/src/types/cordinates'
 
+import * as PIXI from 'pixi.js'
+
 interface saveData {
     saveVersion: number
     title: string
@@ -23,6 +25,9 @@ interface saveData {
     paths: []
     texts: []
     icons: []
+
+    pathStyles: any[]
+    textStyles: any[]
 }
 
 const CURRENTSAVEVERSION = 1
@@ -69,6 +74,24 @@ let DEFAULTSAVEDATA: saveData = {
     paths: [],
     icons: [],
     texts: [],
+
+    pathStyles: [
+        { display: "River", style: { color: 10813439, width: 6, cap: "round", join: "round" } }, 
+        { display: "Path", style: { color: 16774327, width: 4, cap: "round", join: "bevel" } }, 
+        { display: "Trail", style: { color: 16367733, width: 3, cap: "round", join: "round" } }, 
+        { display: "Pass", style: { color: 12632256, width: 5, cap: "round", join: "miter" } },
+        { display: "Political Division", style: { "color": 16711680, "width": 5, cap: "round", join: "round" } }
+    ],
+
+    textStyles: [
+        { display: "Region", style: { fontFamily: "Times New Roman", fill: "#ffffff", fontSize: 50, miterLimit: 2, strokeThickness: 10, stroke: "#000000", align: "left", fontStyle: "normal", fontWeight: "normal" } }, 
+        { display: "Barony", style: { fontFamily: "Times New Roman", fill: "#ffffff", fontSize: 40, miterLimit: 2, strokeThickness: 8, stroke: "#713800", align: "left", fontStyle: "normal", fontWeight: "normal" } }, 
+        { display: "City", style: { fontFamily: "Segoe UI", fill: "#ffffff", fontSize: 30, miterLimit: 2, strokeThickness: 5, stroke: "#800000", align: "left", fontStyle: "normal", fontWeight: "normal" } }, 
+        { display: "Town", style: { fontFamily: "Segoe UI", fill: "#ffffff", fontSize: 25, miterLimit: 2, strokeThickness: 5, stroke: "#000066", align: "left", fontStyle: "normal", fontWeight: "normal" } }, 
+        { display: "Village", style: { fontFamily: "Segoe UI", fill: "#000000", fontSize: 20, miterLimit: 2, strokeThickness: 0, stroke: "#ffffff", align: "left", fontStyle: "normal", fontWeight: "normal" } }, 
+        { display: "River", style: { fontFamily: "Segoe UI", fill: "#000000", fontSize: 17, miterLimit: 2, strokeThickness: 3, stroke: "#ffffff", align: "left", fontStyle: "italic", fontWeight: "normal" } }, 
+        { display: "Dungeon", style: { fontFamily: "Segoe UI", fill: "#ffffff", fontSize: 20, miterLimit: 2, strokeThickness: 6, stroke: "#aa0000", align: "left", fontStyle: "normal", fontWeight: "bold" } }
+    ]
 }
 
 //console.log(JSON.stringify(DEFAULTSAVEDATA.tilesets['default']))

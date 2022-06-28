@@ -487,6 +487,14 @@
 
 <style>
 
+    a {
+        color: #8cc63f;
+    }
+
+    a:visited {
+        color: #8cc63f
+    }
+
    #export-map-select {
     border: solid 1px #777777;
     border-radius: 3px;

@@ -370,7 +370,9 @@
   {:else}
 
     <div id="editor-placeholder">
-      <p style="color: #aaaaaa">Select a tile or make a new one!</p>
+      <p style="color: #f2f2f2; margin-bottom: 10px;">Select a tile or make a new one!</p>
+
+      <p style="font-size: 10pt"> For best results, use white 100px by 100px images for symbols.</p>
     </div>
 
   {/if}
@@ -433,6 +435,19 @@
   #grid input {
     width: 100%;
     box-sizing: border-box;
+  }
+
+  #editor-placeholder {
+    grid-column: 2/4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  #editor-placeholder p {
+    color: #aaaaaa;
+    margin: 0;
   }
 
   .file-input-button {

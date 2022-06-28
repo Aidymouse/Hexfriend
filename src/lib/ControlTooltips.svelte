@@ -79,17 +79,19 @@
     /* Text */
     interface text_controls {
         leftMouse: string
+        clickAndDrag: string
     }
 
     let c_text: text_controls = {
-        leftMouse: "Place New Text"
+        leftMouse: "Place New Text",
+        clickAndDrag: "Move Text"
     }
 
     function setTooltips_text() {
         c_text.leftMouse = "Place New Text"
 
         if (data_text.selectedText) {
-
+            c_text.leftMouse = "Deselect Text"
         }
 
         
@@ -152,6 +154,7 @@
     
     {:else if selectedTool == tools.TEXT}
         <div class="control"> <p>Left Mouse</p> <p>{c_text.leftMouse}</p></div>
+        <div class="control"> <p>Click and Drag</p> <p>{c_text.clickAndDrag}</p></div>
 
     {:else if selectedTool == tools.ERASER}
         <div class="control"> <p>Left Mouse</p> <p>Erase Terrain + Icons</p></div>

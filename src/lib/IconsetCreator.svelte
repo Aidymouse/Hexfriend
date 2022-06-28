@@ -336,7 +336,10 @@
   {:else}
 
     <div id="editor-placeholder">
-      <p style="color: #aaaaaa">Select a icon or make a new one!</p>
+      <p style="color: #f2f2f2; margin-bottom: 10px;">Select a icon or make a new one!</p>
+      
+      <p style="font-size: 10pt"> For best results, use white 100px by 100px images.</p>
+      <p style="font-size: 10pt"> Hint: You can upload multiple images at once!</p>
     </div>
 
   {/if}
@@ -422,6 +425,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
+  }
+
+  #editor-placeholder p {
+    color: #aaaaaa;
+    margin: 0;
   }
 
   #icon-preview {
