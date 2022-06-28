@@ -80,7 +80,7 @@ let DEFAULTSAVEDATA: saveData = {
         { display: "Path", style: { color: 16774327, width: 4, cap: "round", join: "bevel" } }, 
         { display: "Trail", style: { color: 16367733, width: 3, cap: "round", join: "round" } }, 
         { display: "Pass", style: { color: 12632256, width: 5, cap: "round", join: "miter" } },
-        { display: "Political Division", style: { "color": 16711680, "width": 5, cap: "round", join: "round" } }
+        { display: "Border", style: { "color": 16711680, "width": 5, cap: "round", join: "round" } }
     ],
 
     textStyles: [

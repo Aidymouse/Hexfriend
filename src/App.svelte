@@ -264,140 +264,7 @@
 
 
 
-  function loadSave(data: saveData, id: number | null) {
 
-    console.log(data)
-
-    loadedTilesets = data.tilesets;
-    loadedIconsets = data.iconsets;
-
-    tfield = data.TerrainField;
-    data_coordinates = data.coords
-
-    // Load Textures
-    loadedTilesets.forEach(tileset => {
-
-      loadTilesetTextures(tileset, false)
-    
-    })
-    
-    // Load Icons
-    loadedIconsets.forEach( (iconset: Iconset) => {
-
-      loadIconsetTextures(iconset, false)
-
-    })
-
-    //L.onComplete.add( );
-
-    L.load(async () => {
-
-      loadedSave = data
-      loadedId = id
-
-      let firstTile = loadedTilesets[0].tiles[0]
-      data_terrain.tile = {...firstTile, symbol: firstTile.symbol ? {...firstTile.symbol} : null }
-      //bgColor = firstTile.bgColor
-      //data_terrain.symbol = firstTile.symbol ? {...firstTile.symbol} : null
-  
-      let firstIcon = loadedIconsets[0].icons[0]
-      data_icon.color = firstIcon.color
-      data_icon.texId = firstIcon.texId
-
-
-      // Center the map
-      let tf = loadedSave.TerrainField
-
-      //pan.zoomScale = 1
-      if (tf.orientation == "flatTop") {
-        
-        // Fix needed //
-
-        pan.offsetX = (window.innerWidth / 2) - (tf.columns * (tf.hexWidth * 0.75)) /2
-        pan.offsetY = (window.innerHeight / 2) - ((tf.rows * tf.hexHeight + tf.hexHeight*0.5) / 2)
-        
-      } else {
-        //pan.offsetX = (tf.columns * tf.hexWidth * 0.75) / 2
-        //pan.offsetY = (tf.rows * tf.hexHeight) / 2
-
-      }
-
-      loading = false
-      await tick()
-      comp_terrainField.clearTerrainSprites();
-      comp_terrainField.renderAllHexes();
-
-      //comp_coordsLayer.eraseAllCoordinates();
-      comp_coordsLayer.generateAllCoords();
-      
-    });
-
-    
-    /* Set up tools - would be nice to remember tool settings but this works regardless of loaded tileset */
-
-    //loadedSave = data
-    //loadedId = id
-  }
- 
-  loadSave(JSON.parse(JSON.stringify(DEFAULTSAVEDATA)), null); // Same as creating a new map
-
-  function loadTilesetTextures(tileset: Tileset, loadImmediately: boolean = true) {
-
-    tileset.tiles.forEach(async tile => {
-
-      //console.log(tile.symbol.texId)
-
-      if (tile.symbol) {
-
-        let entry = Object.entries(L.resources).find( ([id, r]) => r.url == tile.symbol.base64)
-
-        if (entry) {
-          // Texture already exists! Add this tile's ID to the lookup table
-          symbolTextureLookupTable[tile.id] = entry[0]
-
-        } else {
-          L.add(tile.id, tile.symbol.base64)
-        }
-
-      }
-
-
-    })
-
-    if (!loadImmediately) return
-
-    L.load();
-
-  }
-
-  function loadIconsetTextures(iconset: Iconset, loadImmediately: boolean = true) {
-
-    iconset.icons.forEach(async icon => {
-
-      //console.log(tile.symbol.texId)
-
-      let entry = Object.entries(L.resources).find( ([id, r]) => r.url == icon.base64)
-
-      if (entry) {
-        // Texture already exists! Add this tile's ID to the lookup table
-        iconTextureLookupTable[icon.texId] = entry[0]
-
-      } else {
-        L.add(icon.texId, icon.base64)
-      }
-
-
-
-    })
-
-
-    if (!loadImmediately) return
-
-    L.load( () => {
-      console.log("Gaming.")
-    });
-
-  }
 
 
   function exportMap(exportType) {
@@ -572,6 +439,145 @@
   
   }
   
+  function loadSave(data: saveData, id: number | null) {
+
+    loadedTilesets = data.tilesets;
+    loadedIconsets = data.iconsets;
+
+    tfield = data.TerrainField;
+    data_coordinates = data.coords
+
+    // Load Textures
+    loadedTilesets.forEach(tileset => {
+
+      loadTilesetTextures(tileset, false)
+    
+    })
+    
+    // Load Icons
+    loadedIconsets.forEach( (iconset: Iconset) => {
+
+      loadIconsetTextures(iconset, false)
+
+    })
+
+    //L.onComplete.add( );
+
+    L.load(async () => {
+
+      loadedSave = data
+      loadedId = id
+
+      let firstTile = loadedTilesets[0].tiles[0]
+      data_terrain.tile = {...firstTile, symbol: firstTile.symbol ? {...firstTile.symbol} : null }
+      //bgColor = firstTile.bgColor
+      //data_terrain.symbol = firstTile.symbol ? {...firstTile.symbol} : null
+  
+      let firstIcon = loadedIconsets[0].icons[0]
+      data_icon.color = firstIcon.color
+      data_icon.texId = firstIcon.texId
+
+
+      // Center the map
+      let tf = loadedSave.TerrainField
+
+      //pan.zoomScale = 1
+      if (tf.orientation == "flatTop") {
+        
+        let mapWidth = tf.columns * tf.hexWidth * 0.75 + tf.hexWidth*0.25
+        let mapHeight = (tf.rows-1) * tf.hexHeight - tf.hexHeight*0.5
+
+        pan.offsetX = window.innerWidth/2 - mapWidth/2 * pan.zoomScale
+        pan.offsetY = window.innerHeight/2 - mapHeight/2 * pan.zoomScale
+        
+      } else {
+        let mapHeight = tf.rows * tf.hexHeight * 0.75 + tf.hexHeight*0.25
+        let mapWidth = (tf.columns-1) * tf.hexWidth - tf.hexWidth*0.5
+
+        pan.offsetX = window.innerWidth/2 - mapWidth/2 * pan.zoomScale
+        pan.offsetY = window.innerHeight/2 - mapHeight/2 * pan.zoomScale
+
+      }
+
+      loading = false
+      await tick()
+      comp_terrainField.clearTerrainSprites();
+      comp_terrainField.renderAllHexes();
+
+      //comp_coordsLayer.eraseAllCoordinates();
+      comp_coordsLayer.generateAllCoords();
+      
+    });
+
+    
+    /* Set up tools - would be nice to remember tool settings but this works regardless of loaded tileset */
+
+    //loadedSave = data
+    //loadedId = id
+  }
+  
+  function loadTilesetTextures(tileset: Tileset, loadImmediately: boolean = true) {
+
+    tileset.tiles.forEach(async tile => {
+
+      //console.log(tile.symbol.texId)
+
+      if (tile.symbol) {
+
+        let entry = Object.entries(L.resources).find( ([id, r]) => r.url == tile.symbol.base64)
+
+        if (entry) {
+          // Texture already exists! Add this tile's ID to the lookup table
+          symbolTextureLookupTable[tile.id] = entry[0]
+
+        } else {
+          L.add(tile.id, tile.symbol.base64)
+        }
+
+      }
+
+
+    })
+
+    if (!loadImmediately) return
+
+    L.load();
+
+  }
+
+  function loadIconsetTextures(iconset: Iconset, loadImmediately: boolean = true) {
+
+    iconset.icons.forEach(async icon => {
+
+      //console.log(tile.symbol.texId)
+
+      let entry = Object.entries(L.resources).find( ([id, r]) => r.url == icon.base64)
+
+      if (entry) {
+        // Texture already exists! Add this tile's ID to the lookup table
+        iconTextureLookupTable[icon.texId] = entry[0]
+
+      } else {
+        L.add(icon.texId, icon.base64)
+      }
+
+
+
+    })
+
+
+    if (!loadImmediately) return
+
+    L.load( () => {
+      console.log("Gaming.")
+    });
+
+  }
+
+
+  
+  loadSave(JSON.parse(JSON.stringify(DEFAULTSAVEDATA)), null); // Same as creating a new map
+
   /* HOT ZONE */
 
 </script>

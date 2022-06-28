@@ -109,8 +109,7 @@
         </div>
     {/if}
 
-    <div id="text-styles" style={data_text.selectedText ? "padding-top: 10px" : ""}>
-        <p>Text Styles</p>
+    <div id="text-styles" style={data_text.selectedText ? "padding-top: 0px" : ""}>
         <div style="display: flex; gap: 5px; flex-wrap: wrap">
             {#each textStyles as ts}
                 <button on:click={() => {  changeTextStyle( ts.style ) }} class:selected={ selectedMatches(ts.style) } >{ts.display}</button>

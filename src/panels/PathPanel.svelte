@@ -76,7 +76,6 @@
         {/if}
             
         <div id="path-styles" style={data_path.selectedPath ? "padding-top: 0px;" : ""}>
-            <p>Path Styles</p>
             <div style="display: flex; gap: 5px; flex-wrap: wrap">
                 {#each pathStyles as pb}
                     <button on:click={ () => {data_path.style = {...pb.style}} } class:selected={styleMatchesData(pb.style)} >{pb.display}</button>
