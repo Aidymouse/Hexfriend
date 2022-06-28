@@ -9,3 +9,8 @@ Thanks to mattjennings, without who's svelte-pixi project this would not have be
 
 ### License
 The software is free to use, copy, share, steal, whatever! Check the license file for real details :)
+
+### Coming Soon...
+Hexfriend is never finished! Here's a list of stuff to do:
+ - Keyboard Shortcuts
+ - More to come!
