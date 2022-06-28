@@ -263,11 +263,17 @@
     // most of the time these will match up, but sometimes they wont.
   }
 
+  let iconTextureLookupTable = {
+    // icon texId: id of tile who's texture we use
+  }
+
+
+
   function loadSave(data: saveData, id: number | null) {
 
     loadedTilesets = data.tilesets;
-
     loadedIconsets = data.iconsets;
+
     tfield = data.TerrainField;
     data_coordinates = data.coords
 
@@ -278,17 +284,10 @@
     
     })
     
-    console.log(symbolTextureLookupTable)
-
     // Load Icons
-    loadedIconsets.forEach(iconset => {
+    loadedIconsets.forEach( (iconset: Iconset) => {
 
-      iconset.icons.forEach(icon => {
-        if (seenicons.find(id => icon.texId == id) == undefined && !L.resources[icon.texId]) {
-          L.add(icon.texId, icon.base64)
-          seenicons.push(icon.texId)
-        }
-      })
+      loadIconsetTextures(iconset, false)
 
     })
 
@@ -366,7 +365,7 @@
       }
 
 
-    });
+    })
 
     if (!loadImmediately) return
 
@@ -374,16 +373,28 @@
 
   }
 
-  function loadIconsetTextures(iconset: Iconset) {
+  function loadIconsetTextures(iconset: Iconset, loadImmediately: boolean = true) {
 
-    iconset.icons.forEach(icon => {
-        if (seenicons.find(id => icon.texId == id) == undefined && !L.resources[icon.texId]) {
-          L.add(icon.texId, icon.base64)
-          seenicons.push(icon.texId)
-        }
-      })
+    iconset.icons.forEach(async icon => {
+
+      //console.log(tile.symbol.texId)
+
+      let entry = Object.entries(L.resources).find( ([id, r]) => r.url == icon.base64)
+
+      if (entry) {
+        // Texture already exists! Add this tile's ID to the lookup table
+        iconTextureLookupTable[icon.texId] = entry[0]
+
+      } else {
+        L.add(icon.texId, icon.base64)
+      }
 
 
+
+    })
+
+
+    if (!loadImmediately) return
 
     L.load( () => {
       console.log("Gaming.")
@@ -594,7 +605,7 @@
 
         <PathLayer bind:this={comp_pathLayer} bind:paths={loadedSave.paths} bind:data_path {pan} {controls} {selectedTool} {tfield}  />
 
-        <IconLayer bind:this={comp_iconLayer} bind:icons={loadedSave.icons} bind:data_icon {L} {pan} {selectedTool} {tfield} {controls} />          
+        <IconLayer bind:this={comp_iconLayer} bind:icons={loadedSave.icons} bind:data_icon {L} {pan} {selectedTool} {tfield} {controls} {iconTextureLookupTable} />          
 
         <!--
           Needs Optimization badly
@@ -618,7 +629,7 @@
     <TerrainPanel {loadedTilesets} {tfield} {app} {L} bind:data_terrain {symbolTextureLookupTable} />
   
   {:else if selectedTool == "icon"}
-    <IconPanel {L} {app} {loadedIconsets} bind:data_icon />
+    <IconPanel {L} {app} {loadedIconsets} bind:data_icon {iconTextureLookupTable} />
   
   {:else if selectedTool == "path"}
     <PathPanel bind:data_path {comp_pathLayer} />

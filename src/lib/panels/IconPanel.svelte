@@ -6,7 +6,6 @@
     
     import type { icon_data} from 'src/types/data';
     import type { Icon, Iconset } from '../../types/icon'
-import IconsetCreator from '../IconsetCreator.svelte';
 
 
     export let loadedIconsets: Iconset[]
@@ -14,6 +13,8 @@ import IconsetCreator from '../IconsetCreator.svelte';
     export let app
 
     export let data_icon: icon_data
+
+    export let iconTextureLookupTable
     
     let selectedData = loadedIconsets[0].icons[0];
 
@@ -36,7 +37,7 @@ import IconsetCreator from '../IconsetCreator.svelte';
     let s = new PIXI.Sprite()
 
     function getIconPreview(iconData: icon_data): string {
-        s.texture = L.resources[iconData.texId].texture
+        s.texture = L.resources[ getIconTextureId(iconData.texId) ].texture
         s.tint = iconData.color
         
         let b64 = app.renderer.plugins.extract.base64(s) //PIXI.autoDetectRenderer().plugins.extract.base64(c)
@@ -46,8 +47,16 @@ import IconsetCreator from '../IconsetCreator.svelte';
 
     function iconMatchesData(icon: Icon): boolean {
         if (data_icon.color != icon.color) return false
-        if (data_icon.texId != icon.texId) return false
+        if (getIconTextureId(data_icon.texId) != getIconTextureId(icon.texId) ) return false
         return true
+    }
+
+    function getIconTextureId(id: string): string {
+        if (Object.keys(iconTextureLookupTable).find(k => k == id)) {
+            return iconTextureLookupTable[id]
+        }
+
+        return id
     }
 
 </script>

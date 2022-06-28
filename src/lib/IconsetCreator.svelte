@@ -36,13 +36,14 @@
 
   let selectedIcon: Icon | null = null
 
-  let loader = new PIXI.Loader()
+  const l: PIXI.Loader = new PIXI.Loader()
+  let texId = 0;
   
 
   let previewSprite = new PIXI.Sprite()
-  let previewGraphics = new PIXI.Graphics()
+  //let previewGraphics = new PIXI.Graphics()
   let previewContainer = new PIXI.Container()
-  previewContainer.addChild(previewGraphics).addChild(previewSprite)
+  previewContainer.addChild(previewSprite)
 
 
   function findID(baseId: string): string {
@@ -67,37 +68,41 @@
 
     //console.log(newIconFiles)
 
+    
     Array.from(newIconFiles).forEach(file => {
       let r = new FileReader()
-
+      
       r.readAsDataURL(file)
       r.onload = async eb => {
         
-        loader.reset()
-        loader.add("s", eb.target.result)
-        loader.load(() => {
+        l.reset()
 
+        l.add( "s" , eb.target.result)
+        
+        l.load(() => {
 
           let iconName = file.name.split(".")[0]
-          console.log( findID(IDify(iconName)) )
-
+  
           let newIcon: Icon = {
             display: iconName,
             texId: findID( IDify(iconName) ),
             id: findID( IDify(iconName) ),
-            color: 0,
+            color: 0xffffff,
             pHex: 80,
             base64: eb.target.result,
-            preview: "",
-            texWidth: loader.resources.s.texture.width,
-            texHeight: loader.resources.s.texture.height
+            preview: eb.target.result,
+            texWidth: l.resources['s'].texture.width,
+            texHeight: l.resources['s'].texture.height
           }
-          
-          console.log(newIcon.id)
-
+            
           workingIconset.icons[workingIconset.icons.length] = newIcon
+  
+          texId++
+
+          selectedIcon = workingIconset.icons[workingIconset.icons.length-1]
 
         })
+
 
       }
 
@@ -105,10 +110,6 @@
 
     })
 
-    //workingIconset.icons = workingIconset.icons
-
-    //console.log(workingIconset.icons)
-    
     
   }
 
@@ -130,24 +131,27 @@
   }
 
   function generatePreview(icon: Icon) {
-      previewGraphics.clear();
-      previewGraphics.beginFill(DEFAULTBLANKHEXCOLOR);
-      previewGraphics.drawPolygon( getHexPathRadius(25, orientation, 0, 0) );
-      previewGraphics.endFill();
+      //previewGraphics.clear();
+      //previewGraphics.beginFill(DEFAULTBLANKHEXCOLOR);
+      //previewGraphics.drawPolygon( getHexPathRadius(25, orientation, 0, 0) );
+      //previewGraphics.endFill();
       
       previewSprite.texture = PIXI.Texture.from(icon.base64)
       previewSprite.scale.set( getIconScale(icon, 25).x )
       previewSprite.anchor.set(0.5)
       previewSprite.tint = icon.color
 
-      return app.renderer.plugins.extract.base64(previewContainer)
-  } 
+      let p = app.renderer.plugins.extract.base64(previewSprite)
 
+      return p
+  }
   
 
   $: {
     //if (selectedIcon) selectedIcon.preview = generatePreview(workingIconset.icons[stIndex])
   
+    orientation = orientation
+
     if (selectedIcon) {
       selectedIcon.preview = generatePreview(selectedIcon)
       selectedIcon.id = findID( IDify(selectedIcon.display) )
@@ -186,7 +190,7 @@
 
     download( 
       JSON.stringify(workingIconset),
-      workingIconset.name + ".hfts"
+      workingIconset.name + ".hfis"
     )
 
   }
@@ -279,7 +283,7 @@
         }} />
 
         <Sprite 
-          texture={PIXI.Texture.from(selectedIcon.base64)}
+          texture={ PIXI.Texture.from( selectedIcon.base64 ) }
           x={150}
           y={150}
           anchor={ {x: 0.5, y: 0.5} }

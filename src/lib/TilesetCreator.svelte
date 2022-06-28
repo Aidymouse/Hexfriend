@@ -24,6 +24,7 @@
   export let appState;
 
   let orientation: hexOrientation = "flatTop"
+  let oldOrientation: hexOrientation = "pointyTop"
 
   let workingTileset: Tileset = {
     name: "New Tileset",
@@ -120,6 +121,13 @@
   $: {
     //if (selectedTile) selectedTile.preview = generatePreview(workingTileset.tiles[stIndex])
   
+    orientation = orientation // This line ensures the preview gets updated
+
+    if (oldOrientation == orientation) {
+      oldOrientation = orientation == "flatTop" ? "pointyTop" : "flatTop"
+      workingTileset.tiles.forEach(tile => tile.preview = generatePreview(tile))
+    }
+
     if (selectedTile) {
       selectedTile.preview = generatePreview(selectedTile)
       selectedTile.id = findID( IDify(selectedTile.display) )
@@ -291,7 +299,7 @@
       <input type="text" bind:value={ selectedTile.display } on:change={() => { workingTileset.tiles = workingTileset.tiles }}>
 
       <div id="tile-controls">
-        <button on:click={ () => { orientation = orientation == "flatTop" ? "pointyTop" : "flatTop" } } title="Change Hex Orientation" > <img src="/assets/img/tools/changeOrientation.png" alt="Change Orientation"> </button>
+        <button on:click={ () => { orientation = orientation == "flatTop" ? "pointyTop" : "flatTop"; generatePreview(selectedTile) } } title="Change Hex Orientation" > <img src="/assets/img/tools/changeOrientation.png" alt="Change Orientation"> </button>
         <button on:click={ () => {duplicateTile(selectedTile)} } title="Duplicate this Hex"> <img src="/assets/img/tools/duplicate.png" alt="Hex Duplicate"> </button>
         <button on:click={ () => {removeTile(selectedTile); selectedTile = null} } title="Delete this Hex" > <img src="/assets/img/tools/trash.png" alt="Trash"> </button>
       </div>
@@ -352,7 +360,7 @@
         <div id="symbol-scale">
           Symbol Scale
           <input type="range" min="5" max="100" bind:value={selectedTile.symbol.pHex}>
-          <input type="number" bind:value={selectedTile.symbol.pHex}>%
+          <input type="number" bind:value={selectedTile.symbol.pHex}>
         </div>
         {/if}
 
@@ -380,6 +388,12 @@
 
 
 <style>
+
+  #symbol-scale {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+  }
 
   #tile-controls {
     margin-top: 5px;
@@ -487,7 +501,8 @@
   }
   
   .tile-button img {
-    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
   }
 
   .color {

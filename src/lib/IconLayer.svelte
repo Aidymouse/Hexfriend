@@ -13,7 +13,8 @@
     export let selectedTool
     export let controls
 
-    export let data_icon: icon_data;
+    export let data_icon: icon_data
+    export let iconTextureLookupTable
     
     let iconId: number = 0;
     icons.forEach(i => iconId = Math.max(iconId, i.id))
@@ -28,15 +29,23 @@
     function getIconScale() {
         let scale: number;
         if (tfield.hexWidth < tfield.hexHeight) {
-            scale = tfield.hexWidth * (data_icon.pHex/100) / L.resources[data_icon.texId].texture.width;
+            scale = tfield.hexWidth * (data_icon.pHex/100) / L.resources[ getIconTextureId(data_icon.texId) ].texture.width;
 
         } else {
-            scale = tfield.hexHeight * (data_icon.pHex/100) / L.resources[data_icon.texId].texture.height;
+            scale = tfield.hexHeight * (data_icon.pHex/100) / L.resources[ getIconTextureId(data_icon.texId) ].texture.height;
         
         }
 
         return scale
 
+    }
+
+    function getIconTextureId(id: string): string {
+        if (Object.keys(iconTextureLookupTable).find(k => k == id)) {
+            return iconTextureLookupTable[id]
+        }
+
+        return id
     }
 
     export function newIcon() {
@@ -76,7 +85,7 @@
 
 {#each icons as icon (icon.id)}
     <Sprite 
-        texture={L.resources[icon.texId].texture}
+        texture={L.resources[ getIconTextureId(icon.texId) ].texture}
         x={icon.x}
         y={icon.y}
         tint={icon.color}
