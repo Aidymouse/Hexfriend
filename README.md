@@ -14,6 +14,8 @@ The software is free to use, copy, share, steal, whatever! Check the license fil
 
 ### Coming Soon...
 Hexfriend is never finished! Here's a list of stuff to do:
+ - Undo
+ - Hex Flower shaped maps
  - Keyboard Shortcuts
  - More to come!
 
