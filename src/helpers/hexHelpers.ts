@@ -1,7 +1,8 @@
-export type hexOrientation = 'flatTop' | 'pointyTop';
-type cubeCoords = { q: number; r: number; s: number };
 import { hex2rgb } from '@pixi/utils';
 import type { TerrainHex } from 'src/types/terrain';
+
+export type hexOrientation = 'flatTop' | 'pointyTop';
+type cubeCoords = { q: number; r: number; s: number };
 
 export function getHexPath(
 	width: number,

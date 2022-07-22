@@ -1,8 +1,8 @@
-import type * as PIXI from 'pixi.js';
 import type { coord_system } from './cordinates';
 import type { path, path_style } from './path';
-import type { text_style, HF_text } from './text';
-import type { TileSymbol, Tile } from './tilesets';
+import type { HF_text, text_style } from './text';
+import type { Tile, TileSymbol } from './tilesets';
+import type * as PIXI from 'pixi.js';
 
 export interface terrain_data {
 	tile?: Tile;

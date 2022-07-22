@@ -1,159 +1,152 @@
 <script lang="ts">
+	import { coords_cubeToWorld } from '/src/helpers/hexHelpers';
+	import { coords_cubeToq, coords_cubeTor } from '/src/helpers/hexHelpers';
+	import { coord_system } from '/src/types/cordinates';
+	import * as PIXI from 'pixi.js';
+	import type { coordinates_data } from 'src/types/data';
+	import type { TerrainHexField } from 'src/types/terrain';
+	import { onMount } from 'svelte';
+	import { Container, Text } from 'svelte-pixi';
 
-    import * as PIXI from 'pixi.js'
-    import { Container, Text } from 'svelte-pixi'
-    import type { TerrainHexField } from "src/types/terrain"
-    import type { coordinates_data } from 'src/types/data'
-    import { coord_system } from '/src/types/cordinates'
-    import { coords_cubeToWorld } from '/src/helpers/hexHelpers';
-    import { coords_cubeToq, coords_cubeTor } from '/src/helpers/hexHelpers';
-    import { onMount } from 'svelte';
+	interface coordText {
+		pixiText: PIXI.Text;
+		parts: number[];
+	}
 
+	$: {
+		Object.entries(texts).forEach(([hexId, text]) => {
+			text.pixiText.style = data_coordinates.style;
+		});
+	}
 
-    interface coordText {
-        pixiText: PIXI.Text,
-        parts: number[]
-    }
+	let texts: { [key: string]: coordText } = {}; // hex id: coordText
 
-    $: {
-        Object.entries(texts).forEach(([hexId, text]) => {
-            text.pixiText.style = data_coordinates.style
-        })
-    }
-    
+	let cont_textContainer = new PIXI.Container();
 
-    let texts: { [key: string]: coordText } = {} // hex id: coordText
+	export let tfield: TerrainHexField;
+	export let data_coordinates: coordinates_data;
 
-    let cont_textContainer = new PIXI.Container()
+	function breakDownHexID(hexId: string) {
+		let brokenId = hexId.split(':');
+		return { q: Number(brokenId[0]), r: Number(brokenId[1]), s: Number(brokenId[2]) };
+	}
 
-    export let tfield: TerrainHexField
-    export let data_coordinates: coordinates_data
+	function createTextIfNoneExists(hexId: string) {
+		//texts[hexId] = { text: "", x: 0, y: 0, parts: [] }
 
-    function breakDownHexID(hexId: string) {
-        let brokenId = hexId.split(":")
-        return {q: Number(brokenId[0]), r: Number(brokenId[1]), s: Number(brokenId[2])}
-    }
+		if (!textExists(hexId)) {
+			texts[hexId] = { pixiText: new PIXI.Text('', data_coordinates.style), parts: [] };
+			texts[hexId].pixiText.anchor.x = 0.5;
+			texts[hexId].pixiText.anchor.y = 1;
+			cont_textContainer.addChild(texts[hexId].pixiText);
+		}
+	}
 
-    function createTextIfNoneExists(hexId: string) {
-        //texts[hexId] = { text: "", x: 0, y: 0, parts: [] }
-        
-        if (!textExists(hexId)) {
-            texts[hexId] = {pixiText: new PIXI.Text("", data_coordinates.style), parts: []}
-            texts[hexId].pixiText.anchor.x = 0.5
-            texts[hexId].pixiText.anchor.y = 1
-            cont_textContainer.addChild(texts[hexId].pixiText)
-        }
-        
-    }
+	export function generateAllCoords(system: coord_system) {
+		cullUnusedCoordinates();
 
-    export function generateAllCoords(system: coord_system) {
+		Object.keys(tfield.hexes).forEach((hexId) => {
+			createTextIfNoneExists(hexId);
+			generateCoord(hexId, system);
+		});
+		updateAllCoordPositions();
+	}
 
-        cullUnusedCoordinates()
-        
-        Object.keys(tfield.hexes).forEach(hexId => {
-            createTextIfNoneExists(hexId)
-            generateCoord(hexId, system)
-        })
-        updateAllCoordPositions()
+	export function generateCoord(hexId: string, system: coord_system = data_coordinates.system) {
+		createTextIfNoneExists(hexId);
 
-    }
+		generateCoordText(hexId);
 
-    export function generateCoord(hexId: string, system: coord_system = data_coordinates.system) {
-        createTextIfNoneExists(hexId)
-        
-        generateCoordText(hexId)
+		updateCoordPosition(hexId);
+	}
 
-        updateCoordPosition(hexId)
-    }
+	export function updateAllCoordPositions() {
+		Object.entries(texts).forEach(([hexId, text]) => {
+			updateCoordPosition(hexId);
+		});
+	}
 
-    export function updateAllCoordPositions() {
-        Object.entries(texts).forEach( ([hexId, text]) => {
+	function updateCoordPosition(hexId: string) {
+		let text = texts[hexId];
 
-           updateCoordPosition(hexId)
+		let idParts = breakDownHexID(hexId);
+		let newPos = coords_cubeToWorld(idParts.q, idParts.r, idParts.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
 
-        } )
-    }
+		text.pixiText.position.x = newPos.x;
+		text.pixiText.position.y = newPos.y + tfield.hexHeight / 2 - data_coordinates.gap;
+	}
 
-    function updateCoordPosition(hexId: string) {
-        let text = texts[hexId]
+	export function eliminateCoord(hexId) {
+		cont_textContainer.removeChild(texts[hexId].pixiText);
+		texts[hexId].pixiText.destroy();
+		delete texts[hexId];
+	}
 
-        let idParts = breakDownHexID(hexId)
-        let newPos = coords_cubeToWorld(idParts.q, idParts.r, idParts.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+	function generateCoordText(hexId, system: coord_system = data_coordinates.system) {
+		switch (system) {
+			case coord_system.CUBE: {
+				let idParts = breakDownHexID(hexId);
 
-        text.pixiText.position.x = newPos.x
-        text.pixiText.position.y = newPos.y + tfield.hexHeight/2 - data_coordinates.gap
-    }
+				texts[hexId].parts = [idParts.q, idParts.r, idParts.s];
+				texts[
+					hexId
+				].pixiText.text = `${texts[hexId].parts[0]}${data_coordinates.seperator}${texts[hexId].parts[1]}${data_coordinates.seperator}${texts[hexId].parts[2]}`;
+				break;
+			}
 
-    
-    export function eliminateCoord(hexId) {
-        cont_textContainer.removeChild( texts[hexId].pixiText )
-        texts[hexId].pixiText.destroy()
-        delete texts[hexId]
-    }
+			case coord_system.ROWCOL: {
+				let cube = breakDownHexID(hexId);
+				let idParts =
+					tfield.orientation == 'flatTop'
+						? coords_cubeToq(tfield.raised, cube.q, cube.r, cube.s)
+						: coords_cubeTor(tfield.raised, cube.q, cube.r, cube.s);
 
-    function generateCoordText(hexId, system: coord_system = data_coordinates.system) {
-        switch (system) {
-            case coord_system.CUBE: {
+				texts[hexId].parts = [idParts.col, idParts.row];
+				texts[hexId].pixiText.text = `${texts[hexId].parts[0]}${data_coordinates.seperator}${texts[hexId].parts[1]}`;
 
-                let idParts = breakDownHexID(hexId)
-                
-                texts[hexId].parts = [idParts.q, idParts.r, idParts.s]
-                texts[hexId].pixiText.text = `${texts[hexId].parts[0]}${data_coordinates.seperator}${texts[hexId].parts[1]}${data_coordinates.seperator}${texts[hexId].parts[2]}`
-                break
-            
-            }
+				break;
+			}
 
-            case coord_system.ROWCOL: {
-                let cube = breakDownHexID(hexId)
-                let idParts = tfield.orientation == "flatTop" ? coords_cubeToq(tfield.raised, cube.q, cube.r, cube.s) : coords_cubeTor(tfield.raised, cube.q, cube.r, cube.s)
+			case coord_system.AXIAL: {
+				let cube = breakDownHexID(hexId);
 
-                texts[hexId].parts = [idParts.col, idParts.row]
-                texts[hexId].pixiText.text = `${texts[hexId].parts[0]}${data_coordinates.seperator}${texts[hexId].parts[1]}`
-                
-                break
-            }
+				//let newPos = coords_cubeToWorld(cube.q, cube.r, cube.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
 
-            case coord_system.AXIAL: {
-                let cube = breakDownHexID(hexId)
+				texts[hexId].parts = [cube.q, cube.r];
+				texts[hexId].pixiText.text = `${texts[hexId].parts[0]}${data_coordinates.seperator}${texts[hexId].parts[1]}`;
+				break;
+			}
+		}
+	}
 
-                //let newPos = coords_cubeToWorld(cube.q, cube.r, cube.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+	export function updateAllCoordsText() {
+		Object.entries(texts).forEach(([hexId, text]) => {
+			generateCoordText(hexId);
+		});
+	}
 
-                texts[hexId].parts = [cube.q, cube.r]                
-                texts[hexId].pixiText.text = `${texts[hexId].parts[0]}${data_coordinates.seperator}${texts[hexId].parts[1]}`
-                break
-            }
-        }
-    }
+	export function updateCoordText(hexId) {
+		generateCoordText(hexId);
+	}
 
-    export function updateAllCoordsText() {
-        Object.entries(texts).forEach( ([hexId, text]) => {
-            generateCoordText(hexId)
-        })
-    }
+	function textExists(hexId: string) {
+		return texts[hexId] != null;
+	}
 
-    export function updateCoordText(hexId) {
-        generateCoordText(hexId)
-    }
+	export function cullUnusedCoordinates() {
+		Object.keys(texts).forEach((hexId) => {
+			if (tfield.hexes[hexId] == null) {
+				eliminateCoord(hexId);
+			}
+		});
+	}
 
-    function textExists(hexId: string) {
-        return texts[hexId] != null
-    }
-
-    export function cullUnusedCoordinates() {
-        Object.keys(texts).forEach(hexId => {
-            if (tfield.hexes[hexId] == null) { eliminateCoord(hexId) }
-        })
-    }
-
-    onMount(() => {
-        cullUnusedCoordinates()
-        generateAllCoords( data_coordinates.system )
-    })
-
+	onMount(() => {
+		cullUnusedCoordinates();
+		generateAllCoords(data_coordinates.system);
+	});
 </script>
 
-
 {#if data_coordinates.shown}
-    <Container instance={cont_textContainer}>
-    </Container>
+	<Container instance={cont_textContainer} />
 {/if}

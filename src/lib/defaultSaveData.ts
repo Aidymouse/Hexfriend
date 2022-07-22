@@ -1,17 +1,13 @@
+import { coords_qToCube, genHexId } from '../helpers/hexHelpers';
+import type { Iconset } from '../types/icon';
+import { map_type } from '../types/settings';
 import type { TerrainHexField } from '../types/terrain';
 import type { Tile, Tileset } from '../types/tilesets';
-import { map_type } from '../types/settings';
-
-import { coords_qToCube, genHexId } from '../helpers/hexHelpers';
-
-import { DEFAULTTILESET } from './defaultTileset';
 import { DEFAULTICONSET } from './defaultIconset';
-
-import type { Iconset } from '../types/icon';
-import type { coordinates_data } from 'src/types/data';
+import { DEFAULTTILESET } from './defaultTileset';
 import { coord_system } from '/src/types/cordinates';
-
 import * as PIXI from 'pixi.js';
+import type { coordinates_data } from 'src/types/data';
 
 interface saveData {
 	saveVersion: number;
