@@ -1,7 +1,7 @@
 <script lang="ts" >
     import type { saveData } from "./defaultSaveData";
     import { map_type } from "../types/settings";
-    import type { coordinates_data } from "../types/data";
+    import type { coordinates_data, terrain_data, trace_data } from "../types/data";
     import type { TerrainHexField } from "../types/terrain";
 
     import SelectGrid from "../components/SelectGrid.svelte";
@@ -25,6 +25,7 @@
     export let renderGrid: Function
     export let redrawEntireMap: Function
 
+    // For Coordinates
     export let comp_coordsLayer
     export let data_coordinates: coordinates_data
 
@@ -258,6 +259,8 @@
 
     }
 
+
+
 </script>
 
 <button id="close-tab" class:shown={showSettings} on:click={()=>{showSettings = false}} title={"Close Settings"}> <img src="/assets/img/tools/back.png" alt={"Back"}> </button>
@@ -331,13 +334,13 @@
             {#if tfield.orientation == "flatTop"}
                 <p>Raised Column</p>
                 <div style={"height: 100%; display: flex; align-items: center;"}>
-                    <SelectGrid values={["even", "odd"]} filenamePrefix={"raisedColumn"} bind:value={tfield.raised} on:change={() => { comp_terrainField.square_updateRaisedColumn() }}/>
+                    <SelectGrid values={["even", "odd"]} filenamePrefix={"raisedcolumn"} bind:value={tfield.raised} on:change={() => { comp_terrainField.square_updateRaisedColumn() }}/>
                 </div>
 
             {:else if tfield.orientation == "pointyTop"}
                 <p>Indented Row</p>
                 <div style={"height: 100%; display: flex; align-items: center;"}>
-                    <SelectGrid values={["even", "odd"]} filenamePrefix={"indentedRow"} bind:value={tfield.raised} on:change={() => { comp_terrainField.square_changeIndentedRow() }} />
+                    <SelectGrid values={["even", "odd"]} filenamePrefix={"indentedrow"} bind:value={tfield.raised} on:change={() => { comp_terrainField.square_changeIndentedRow() }} />
                 </div>
                 
             {/if}
@@ -409,8 +412,6 @@
         {/if}
     </div>
 
-
-
     <h2>Tilesets</h2>
     <div id="tilesets">
         {#each loadedTilesets as tileset (tileset.id)}
@@ -466,9 +467,9 @@
 
     <h2>About</h2>
     <p class="helperText">
-        Hexfriend version 1.0 – "Hex Cometh"
+        Hexfriend version 1.1 – "Em Vee Pee"
         <br>
-        By Aidymouse
+        By Aidymouse and all the wonderful contributors
     </p>
 
     <p class="helperText">

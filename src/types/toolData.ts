@@ -1,41 +1,40 @@
-import type { Tile } from './tilesets'
+import type { Tile } from './tilesets';
 
 interface path {
-    stroke: number
-    strokeThickness: number
-    points: number[]
+	stroke: number;
+	strokeThickness: number;
+	points: number[];
 }
 
 export enum tools {
-    TERRAIN = "terrain",
-    ICON = "icon",
-    PATH = "path",
-    TEXT = "text",
-    ERASER = "eraser"
+	TERRAIN = 'terrain',
+	ICON = 'icon',
+	PATH = 'path',
+	TEXT = 'text',
+	ERASER = 'eraser',
 }
 
 interface ToolData {
-    selectedTool: tools,
+	selectedTool: tools;
 
-    terrain: {
-        tile: Tile
-    },
+	terrain: {
+		tile: Tile;
+	};
 
-    icon: {
-        icon,
-        scale: number
-    },
+	icon: {
+		icon;
+		scale: number;
+	};
 
-    path: {
-        color: string,
-        width: number,
-        selectedPath
-    },
+	path: {
+		color: string;
+		width: number;
+		selectedPath;
+	};
 
-    controls: {
-        mouseDown: boolean[]
-    }
-    
+	controls: {
+		mouseDown: boolean[];
+	};
 }
 
-export type { ToolData }
+export type { ToolData };

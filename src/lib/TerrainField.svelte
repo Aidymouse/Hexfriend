@@ -611,6 +611,9 @@
     /* PAINT */
     export function paintFromTile(hexId, tile: Tile) {
         if (!hexExists(hexId)) return
+        
+        if ( tilesMatch(tfield.hexes[hexId].tile, tile) ) return
+        
         tfield.hexes[hexId].tile = tile ? {...tile, symbol: tile.symbol ? {...tile.symbol} : null} : null
         renderHex(hexId)
     }    
@@ -625,6 +628,8 @@
             let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised)
 
             let clickedId = genHexId( clickedCoords.q, clickedCoords.r, clickedCoords.s )
+
+
 
             paintFromTile(clickedId, data_terrain.tile)
         }
@@ -885,9 +890,11 @@
 </script>
 
 
-<Graphics instance={terrainGraphics} draw={g=>{ /* too slow to draw here! we have to hanndle it manually. See the render methods */ }}/>
-<Container instance = {symbolsContainer} />
+
+<Graphics instance={terrainGraphics}   draw={g=>{ /* too slow to draw here! we have to hanndle it manually. See the render methods */ }}/>
+<Container instance = {symbolsContainer}  />
 
 {#if tfield.grid.shown}
     <Graphics instance={gridGraphics} draw={g=>{ /* too slow to draw here! we have to hanndle it manually. See the render methods */ }}/>
 {/if}
+

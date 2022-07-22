@@ -44,7 +44,7 @@
   import type { Iconset } from './types/icon';
   import type { TerrainHexField } from './types/terrain'
   import type { saveData } from './lib/defaultSaveData'
-  import type { coordinates_data, icon_data, text_data, terrain_data, path_data } from './types/data';
+  import type { coordinates_data, icon_data, text_data, terrain_data, path_data, trace_data } from './types/data';
   import { coord_system } from './types/cordinates';
 
   import {tools} from './types/toolData'
@@ -217,7 +217,8 @@
     
     usingEyedropper: false,
     usingPaintbucket: false,
-    usingEraser: false
+    usingEraser: false,
+    renderOpacity: 1
   }
 
   let data_icon: icon_data = {
@@ -362,6 +363,19 @@
 
 
 
+  
+
+  
+  function createNewMap() {
+    
+    /* TODO: Save Data Checking */
+    
+    load(JSON.parse(JSON.stringify(DEFAULTSAVEDATA)), null)
+    
+    showSavedMaps = false
+    
+  }
+
   async function save() {
 
     if (loadedSave.title == "") {
@@ -427,16 +441,6 @@
 
     // await tick() // The terrain field needs time to hook onto 
     //comp_terrainField.renderAllHexes() 
-  }
-
-  function createNewMap() {
-
-    /* TODO: Save Data Checking */
-
-    load(JSON.parse(JSON.stringify(DEFAULTSAVEDATA)), null)
-
-    showSavedMaps = false
-  
   }
   
   function loadSave(data: saveData, id: number | null) {
@@ -578,7 +582,6 @@
   
   loadSave(JSON.parse(JSON.stringify(DEFAULTSAVEDATA)), null); // Same as creating a new map
 
-  /* HOT ZONE */
 
 </script>
 
@@ -689,7 +692,9 @@
       {comp_iconLayer}
       {comp_pathLayer}
       {comp_textLayer}
+
       bind:data_coordinates
+      
       renderAllHexes={() => {comp_terrainField.renderAllHexes()}}
       renderGrid={() => { comp_terrainField.renderGrid() }}
       redrawEntireMap={() => { redrawEntireMap() }}
