@@ -1,5 +1,6 @@
 import type { map_type } from './settings';
 import type { Tile } from './tilesets';
+import type { hex_id } from './toolData';
 
 // Hexes are the data that get drawn as terrain
 export interface TerrainHex {
@@ -30,5 +31,5 @@ export interface TerrainHexField {
 	orientation: 'flatTop' | 'pointyTop';
 	blankHexColor: number;
 
-	hexes: { [key: string]: TerrainHex };
+	hexes: { [key: hex_id]: TerrainHex };
 }

@@ -1,10 +1,10 @@
 <script lang="ts">
-	import ColorInputPixi from '../components/ColorInputPixi.svelte';
-	import { getHexPath } from '../helpers/hexHelpers';
+	import ColorInputPixi from '/src/components/ColorInputPixi.svelte';
+	import { getHexPath } from '/src/helpers/hexHelpers';
 	import * as PIXI from 'pixi.js';
-	import type { terrain_data } from 'src/types/data';
-	import type { TerrainHexField } from 'src/types/terrain';
-	import type { Tile } from 'src/types/tilesets';
+	import type { terrain_data } from '/src/types/data';
+	import type { TerrainHexField } from '/src/types/terrain';
+	import type { Tile } from '/src/types/tilesets';
 
 	export let loadedTilesets;
 	export let data_terrain: terrain_data;

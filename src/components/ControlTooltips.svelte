@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { tools } from '/src/types/toolData';
-	import type { icon_data, path_data, terrain_data, text_data } from 'src/types/data';
+	import { tools } from '../types/toolData';
+	import type { icon_data, path_data, terrain_data, text_data } from '/src/types/data';
 
 	export let selectedTool: tools;
 	export let data_terrain: terrain_data;

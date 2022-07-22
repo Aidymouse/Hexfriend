@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { hexOrientation } from '../helpers/hexHelpers';
-	import { getHexPathRadius } from '../helpers/hexHelpers';
-	import { download } from '../lib/download2';
+	import type { hexOrientation } from '/src/helpers/hexHelpers';
+	import { getHexPathRadius } from '/src/helpers/hexHelpers';
+	import { download } from '/src/lib/download2';
 	import ColorInputPixi from './ColorInputPixi.svelte';
 	import type { Icon, Iconset } from '/src/types/icon';
 	import * as PIXI from 'pixi.js';

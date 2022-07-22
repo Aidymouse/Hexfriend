@@ -14,6 +14,8 @@ export enum tools {
 	ERASER = 'eraser',
 }
 
+type hex_id = `${number}:${number}:${number}`;
+
 interface ToolData {
 	selectedTool: tools;
 
@@ -37,4 +39,4 @@ interface ToolData {
 	};
 }
 
-export type { ToolData };
+export type { ToolData, hex_id };

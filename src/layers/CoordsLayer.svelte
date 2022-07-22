@@ -3,10 +3,11 @@
 	import { coords_cubeToq, coords_cubeTor } from '/src/helpers/hexHelpers';
 	import { coord_system } from '/src/types/cordinates';
 	import * as PIXI from 'pixi.js';
-	import type { coordinates_data } from 'src/types/data';
-	import type { TerrainHexField } from 'src/types/terrain';
+	import type { coordinates_data } from '/src/types/data';
+	import type { TerrainHexField } from '/src/types/terrain';
 	import { onMount } from 'svelte';
 	import { Container, Text } from 'svelte-pixi';
+import type { hex_id } from 'src/types/toolData';
 
 	interface coordText {
 		pixiText: PIXI.Text;
@@ -26,12 +27,12 @@
 	export let tfield: TerrainHexField;
 	export let data_coordinates: coordinates_data;
 
-	function breakDownHexID(hexId: string) {
+	function breakDownHexID(hexId: hex_id) {
 		let brokenId = hexId.split(':');
 		return { q: Number(brokenId[0]), r: Number(brokenId[1]), s: Number(brokenId[2]) };
 	}
 
-	function createTextIfNoneExists(hexId: string) {
+	function createTextIfNoneExists(hexId: hex_id) {
 		//texts[hexId] = { text: "", x: 0, y: 0, parts: [] }
 
 		if (!textExists(hexId)) {
@@ -52,7 +53,7 @@
 		updateAllCoordPositions();
 	}
 
-	export function generateCoord(hexId: string, system: coord_system = data_coordinates.system) {
+	export function generateCoord(hexId: hex_id, system: coord_system = data_coordinates.system) {
 		createTextIfNoneExists(hexId);
 
 		generateCoordText(hexId);
@@ -66,7 +67,7 @@
 		});
 	}
 
-	function updateCoordPosition(hexId: string) {
+	function updateCoordPosition(hexId: hex_id) {
 		let text = texts[hexId];
 
 		let idParts = breakDownHexID(hexId);
@@ -129,7 +130,7 @@
 		generateCoordText(hexId);
 	}
 
-	function textExists(hexId: string) {
+	function textExists(hexId: hex_id) {
 		return texts[hexId] != null;
 	}
 

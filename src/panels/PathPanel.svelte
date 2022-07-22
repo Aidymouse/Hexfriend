@@ -1,10 +1,10 @@
 <script lang="ts">
-	import Checkbox from '../components/Checkbox.svelte';
-	import ColorInputPixi from '../components/ColorInputPixi.svelte';
-	import SelectGrid from '../components/SelectGrid.svelte';
+	import Checkbox from '/src/components/Checkbox.svelte';
+	import ColorInputPixi from '/src/components/ColorInputPixi.svelte';
+	import SelectGrid from '/src/components/SelectGrid.svelte';
 	import * as PIXI from 'pixi.js';
-	import type { path_data } from 'src/types/data';
-	import type { path, path_style } from 'src/types/path';
+	import type { path_data } from '/src/types/data';
+	import type { path, path_style } from '/src/types/path';
 
 	export let data_path: path_data;
 	export let comp_pathLayer;

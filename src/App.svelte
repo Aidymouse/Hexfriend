@@ -73,13 +73,13 @@
   import ToolButtons from './components/ToolButtons.svelte'
   import TilesetCreator from './components/TilesetCreator.svelte'
   import IconsetCreator from './components/IconsetCreator.svelte';
-  import TerrainGenerator from './lib/TerrainGenerator.svelte';  
+  import TerrainGenerator from './components/TerrainGenerator.svelte';  
   import SavedMaps from './components/SavedMaps.svelte';
   import MapSettings from './components/MapSettings.svelte';
-  import Controls from './lib/ControlTooltips.svelte';
+  import Controls from './components/ControlTooltips.svelte';
 
   // Methods
-  import { collapseWaveGen } from './lib/terrainGenerator'
+  //import { collapseWaveGen } from './lib/terrainGenerator'
   import { download } from './lib/download2';
 
   // Data
@@ -99,11 +99,11 @@
   let offsetContainer = new PIXI.Container();
 
   /* STUFF TO BIND TO */
-  let comp_terrainField
-  let comp_iconLayer
-  let comp_pathLayer
-  let comp_textLayer
-  let comp_coordsLayer
+  let comp_terrainField: TerrainField
+  let comp_iconLayer: IconLayer
+  let comp_pathLayer: PathLayer
+  let comp_textLayer: TextLayer
+  let comp_coordsLayer: CoordsLayer
 
   //offsetContainer.addChild(terrainGraphics);
 
@@ -115,12 +115,14 @@
     resizeTo: window
   });
 
+  //PIXI.settings.RESOLUTION = 4
+
   let showSavedMaps = false
 
   let loading = true
 
   let loadedTilesets: Tileset[]
-  let loadedIconsets
+  let loadedIconsets: Iconset[]
   let tfield: TerrainHexField
   
 
@@ -298,27 +300,31 @@
 
     if (controls.mouseDown[2]) pan.startPan(e)
 
-    switch (selectedTool) {
-      case tools.TERRAIN:
-        if (controls.mouseDown[0]) comp_terrainField.pointerdown()
-        break
-      
-      case "icon":
-        if (controls.mouseDown[0]) comp_iconLayer.pointerdown()
-        break
+    if (controls.mouseDown[0]) {
 
-      case "path":
-        if (controls.mouseDown[0]) comp_pathLayer.pointerdown()
-        break
+      switch (selectedTool) {
+        case tools.TERRAIN:
+          comp_terrainField.pointerdown()
+          break
+        
+        case "icon":
+          comp_iconLayer.pointerdown()
+          break
+  
+        case "path":
+          comp_pathLayer.pointerdown()
+          break
+  
+        case "text":
+          comp_textLayer.pointerdown()
+          break
+  
+        case "eraser":
+          comp_terrainField.eraseAtMouse()
+          /* Icons are handled in the IconLayer */
+          break
+      }
 
-      case "text":
-        if (controls.mouseDown[0]) comp_textLayer.pointerdown()
-        break
-
-      case "eraser":
-        if (controls.mouseDown[0]) comp_terrainField.erase()
-        /* Icons are handled in the IconLayer */
-        break
     }
 
   }
@@ -348,35 +354,24 @@
         break
       
       case tools.ERASER:
-        if (controls.mouseDown[0]) comp_terrainField.erase()
+        if (controls.mouseDown[0]) comp_terrainField.eraseAtMouse()
         /* Icons are handled differently in the icon handler */
         break
     }
   }
-
-
-
-  
-
-  
-  
-
-
-
-  
 
   
   function createNewMap() {
     
     /* TODO: Save Data Checking */
     
-    load(JSON.parse(JSON.stringify(DEFAULTSAVEDATA)), null)
+    loadInit(JSON.parse(JSON.stringify(DEFAULTSAVEDATA)), null)
     
     showSavedMaps = false
     
   }
 
-  async function save() {
+  async function saveToDexie() {
 
     if (loadedSave.title == "") {
       let t = prompt("Map Title:")
@@ -425,7 +420,7 @@
 
   }
 
-  function load(data: saveData, id: number | null) {
+  function loadInit(data: saveData, id: number | null) {
     
     // Clean up
     console.log(`Loaded ${id}`)
@@ -579,9 +574,7 @@
   }
 
 
-  
-  loadSave(JSON.parse(JSON.stringify(DEFAULTSAVEDATA)), null); // Same as creating a new map
-
+  createNewMap()
 
 </script>
 
@@ -671,14 +664,14 @@
 
   <div id="setting-buttons">
     <div id="save-buttons">
-      <button on:click={save} title={"Save"} > <img src="assets/img/tools/save.png" alt="Save"> </button>
+      <button on:click={saveToDexie} title={"Save"} > <img src="assets/img/tools/save.png" alt="Save"> </button>
     </div>
     <button on:click={() => {showSavedMaps = true}} title={"Maps"} ><img src="assets/img/tools/maps.png" alt="Maps"></button>
     <button on:click={()=>{showSettings = true}} title={"Map Settings"} ><img src="assets/img/tools/settings.png" alt="Map Settings"></button>
   </div>
     
   {#if showSavedMaps}
-    <SavedMaps bind:showSavedMaps {createNewMap} {load} />
+    <SavedMaps bind:showSavedMaps {createNewMap} load={loadInit} />
   {/if}
 
   <MapSettings 
@@ -699,12 +692,12 @@
       renderGrid={() => { comp_terrainField.renderGrid() }}
       redrawEntireMap={() => { redrawEntireMap() }}
       exportMap={exportMap}
-      {load}
+      load={loadInit}
       
       bind:loadedTilesets
       bind:loadedIconsets
 
-      loadTilesetTextures={ (tileset) => { loadTilesetTextures(tileset) } }
+      loadTilesetTextures={ loadTilesetTextures }
       loadIconsetTextures={ (iconset) => { loadIconsetTextures(iconset) } }
     />
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as PIXI from 'pixi.js';
-	import type { text_data } from 'src/types/data';
+	import type { text_data } from '/src/types/data';
 	import { Graphics, Text } from 'svelte-pixi';
 
 	export let pan;
@@ -30,7 +30,7 @@
 			selectText();
 			setTimeout(() => {
 				data_text.editorRef.focus();
-			}, 10); /* I wish I didn't have to do this, and I'm sure it's terrible, but it doesnt work with it :/ */
+			}, 10); /* I wish I didn't have to do this, and I'm sure it's terrible, but it doesnt work without it :/ */
 		} else if (data_text.selectedText) {
 			if (data_text.selectedText.text == '') deleteText(data_text.selectedText);
 			data_text.selectedText = null;

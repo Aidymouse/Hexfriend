@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { coords_cubeToWorld, coords_worldToCube, cube_round } from '../helpers/hexHelpers';
+	import { coords_cubeToWorld, coords_worldToCube, cube_round } from '/src/helpers/hexHelpers';
 	import * as PIXI from 'pixi.js';
-	import type { path_data } from 'src/types/data';
-	import type { path } from 'src/types/path';
-	import type { TerrainHexField } from 'src/types/terrain';
+	import type { path_data } from '/src/types/data';
+	import type { path } from '/src/types/path';
+	import type { TerrainHexField } from '/src/types/terrain';
 	import { Container, Graphics } from 'svelte-pixi';
 
 	export let controls;
@@ -26,7 +26,7 @@
 		paths = paths;
 	}
 
-	export function pointerdown(e: PointerEvent) {
+	export function pointerdown() {
 		if (controls.mouseDown[0]) {
 			if (data_path.selectedPath) {
 				let pX = pan.worldX;

@@ -9,29 +9,33 @@
 		genHexId_cordsObj,
 		getHexPath,
 		getNeighbours,
-	} from '../helpers/hexHelpers';
-	import { collapseWaveGen } from './terrainGenerator';
+	} from '/src/helpers/hexHelpers';
+	import { collapseWaveGen } from '/src/lib/terrainGenerator';
 	import { map_type } from '/src/types/settings';
 	import * as PIXI from 'pixi.js';
-	import type { TerrainHex, TerrainHexField } from 'src/types/terrain';
-	import type { Tile } from 'src/types/tilesets';
+	import type { TerrainHex, TerrainHexField } from '/src/types/terrain';
+	import type { Tile } from '/src/types/tilesets';
 	import { onMount } from 'svelte';
 	import { Container, Graphics } from 'svelte-pixi';
+	import CoordsLayer from '/src/layers/CoordsLayer.svelte';
+	import type { terrain_data } from 'src/types/data';
+import type { hex_id } from 'src/types/toolData';
+import type { TileSymbol } from 'src/types/tilesets';
 
 	let terrainGraphics = new PIXI.Graphics();
 	let symbolsContainer = new PIXI.Container();
 	let gridGraphics = new PIXI.Graphics();
 
-	let terrainSprites = {};
+	let terrainSprites: {[key: hex_id]: PIXI.Sprite} = {};
 
 	export let pan;
 	export let controls;
-	export let L;
+	export let L: PIXI.Loader;
 	export let tfield: TerrainHexField;
 
-	export let comp_coordsLayer;
+	export let comp_coordsLayer: CoordsLayer;
 
-	export let data_terrain;
+	export let data_terrain: terrain_data;
 
 	export let symbolTextureLookupTable;
 
@@ -453,7 +457,7 @@
 		comp_coordsLayer.cullUnusedCoordinates();
 	}
 
-	function findSymbolScale(symbol) {
+	function findSymbolScale(symbol: TileSymbol) {
 		if (tfield.hexWidth < tfield.hexHeight) {
 			let s = (tfield.hexWidth * symbol.pHex) / 100 / symbol.texWidth;
 			return {
@@ -476,7 +480,7 @@
 
 		gridGraphics.lineStyle(tfield.grid.thickness, tfield.grid.stroke);
 
-		Object.keys(tfield.hexes).forEach((hexId) => {
+		Object.keys(tfield.hexes).forEach((hexId: hex_id) => {
 			let hex = tfield.hexes[hexId];
 
 			let hexC = coords_cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised);
@@ -487,20 +491,20 @@
 
 	export function renderSelectiveHexes(callback: Function) {
 		// Re-renders hexes that pass true
-		Object.keys(tfield.hexes).forEach((hexId) => {
+		Object.keys(tfield.hexes).forEach((hexId: hex_id) => {
 			if (callback(tfield.hexes[hexId])) renderHex(hexId);
 		});
 	}
 
 	export async function renderAllHexes() {
 		terrainGraphics.clear();
-		Object.keys(tfield.hexes).forEach((hexId) => {
+		Object.keys(tfield.hexes).forEach((hexId: hex_id) => {
 			renderHex(hexId);
 		});
 		renderGrid();
 	}
 
-	async function renderHex(hexId) {
+	async function renderHex(hexId: hex_id) {
 		let hex = tfield.hexes[hexId];
 
 		let hexC = coords_cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised);
@@ -526,25 +530,35 @@
 		terrainGraphics.endFill();
 
 		if (hex.tile.symbol != null) {
-			// Optimize here - only update icon if it needs updating
+			// Could optimize here - only update icon if it needs updating
 
 			if (terrainSprites[hexId]) {
-				symbolsContainer.removeChild(terrainSprites[hexId]);
-				terrainSprites[hexId].destroy();
-				delete terrainSprites[hexId];
+				//symbolsContainer.removeChild(terrainSprites[hexId]);
+				//terrainSprites[hexId].destroy();
+				//delete terrainSprites[hexId];
+			
+				let ns = terrainSprites[hexId]
+				
+				ns.texture = L.resources[getSymbolTextureId(hex.tile.id)].texture;
+				ns.scale = findSymbolScale(hex.tile.symbol);
+				ns.tint = hex.tile.symbol.color;
+
+
+			} else {
+				// Make a new sprite
+				let ns = new PIXI.Sprite();
+				ns.texture = L.resources[getSymbolTextureId(hex.tile.id)].texture;
+				let hc = hexC; //coords_cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+				ns.position.set(hc.x, hc.y);
+				ns.anchor.set(0.5);
+				ns.tint = hex.tile.symbol.color;
+				ns.scale = findSymbolScale(hex.tile.symbol);
+	
+				symbolsContainer.addChild(ns);
+	
+				terrainSprites[hexId] = ns;
 			}
 
-			let ns = new PIXI.Sprite();
-			ns.texture = L.resources[getSymbolTextureId(hex.tile.id)].texture;
-			let hc = hexC; //coords_cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
-			ns.position.set(hc.x, hc.y);
-			ns.anchor.set(0.5);
-			ns.tint = hex.tile.symbol.color;
-			ns.scale = findSymbolScale(hex.tile.symbol);
-
-			symbolsContainer.addChild(ns);
-
-			terrainSprites[hexId] = ns;
 		} else {
 			if (terrainSprites[hexId]) {
 				symbolsContainer.removeChild(terrainSprites[hexId]);
@@ -564,7 +578,7 @@
 	}
 
 	/* PAINT */
-	export function paintFromTile(hexId, tile: Tile) {
+	export function paintFromTile(hexId: hex_id, tile: Tile) {
 		if (!hexExists(hexId)) return;
 
 		if (tilesMatch(tfield.hexes[hexId].tile, tile)) return;
@@ -587,21 +601,21 @@
 		}
 	}
 
-	function paintHex(hexId: string) {
+	function paintHex(hexId: hex_id) {
 		//data_terrain = data_terrain
 
 		paintFromTile(hexId, data_terrain.tile);
 	}
 
 	/* TESTS? */
-	function hexExists(hexId) {
+	function hexExists(hexId: hex_id) {
 		// If the hex is not rendereable, it doesnt exist.
 		return tfield.hexes[hexId] != undefined;
 	}
 
 	/* ACTIONS */
 	export function removeAllTilesOfSet(setId) {
-		Object.entries(tfield.hexes).forEach(([hexId, hex]) => {
+		Object.entries(tfield.hexes).forEach(([hexId, hex]: [hex_id, TerrainHex]) => {
 			if (!hex.tile) return;
 
 			let hexSetId = hex.tile.id.split('_')[0];
@@ -630,7 +644,7 @@
 		}
 	}
 
-	export function erase() {
+	export function eraseAtMouse() {
 		let clickedCoords = coords_worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised);
 
 		let clickedId = genHexId(clickedCoords.q, clickedCoords.r, clickedCoords.s);
@@ -638,7 +652,7 @@
 		if (hexExists(clickedId)) eraseHex(clickedId);
 	}
 
-	export function eraseHex(hexId: string) {
+	export function eraseHex(hexId: hex_id) {
 		tfield.hexes[hexId].tile = null;
 		renderHex(hexId);
 	}
@@ -655,7 +669,7 @@
 		// Check if hex in data matches the clicked style. If it does, abort painting!
 		// Should be done in paint terrain as well
 
-		getContiguousHexIdsOfSameType(clickedId).forEach((hexId) => {
+		getContiguousHexIdsOfSameType(clickedId).forEach((hexId: hex_id) => {
 			paintHex(hexId);
 		});
 	}
@@ -671,12 +685,12 @@
 		if (tfield.hexes[clickedId].tile == null) return;
 
 		let hexes = getContiguousHexIdsOfSameType(clickedId);
-		hexes.forEach((hexId) => {
+		hexes.forEach((hexId: hex_id) => {
 			eraseHex(hexId);
 		});
 	}
 
-	function eliminateHex(hexId: string) {
+	function eliminateHex(hexId: hex_id) {
 		if (terrainSprites[hexId]) {
 			symbolsContainer.removeChild(terrainSprites[hexId]);
 			terrainSprites[hexId].destroy();
@@ -689,7 +703,7 @@
 	}
 
 	/* UNCATEGORIZED */
-	function hexesMatch(hexId1, hexId2): boolean {
+	function hexesMatch(hexId1: hex_id, hexId2: hex_id): boolean {
 		if (!hexExists(hexId1)) return false;
 		if (!hexExists(hexId2)) return false;
 
@@ -718,7 +732,7 @@
 		return true;
 	}
 
-	function hexMatchesData(hexId): boolean {
+	function hexMatchesData(hexId: hex_id): boolean {
 		if (!hexExists(hexId)) return false;
 
 		let hex = tfield.hexes[hexId];
@@ -735,7 +749,7 @@
 		};
 	}
 
-	function getContiguousHexIdsOfSameType(hexId: string): string[] {
+	function getContiguousHexIdsOfSameType(hexId: hex_id): string[] {
 		/*
         let x = pan.worldX
         let y = pan.worldY
@@ -760,7 +774,7 @@
 
 			// Add neighbour to hexStack
 			let neighbourIds = getNeighbours(cHex.q, cHex.r, cHex.s);
-			neighbourIds.forEach((nId) => {
+			neighbourIds.forEach((nId: hex_id) => {
 				if (seenIds.find((sId) => sId == nId)) return;
 				if (!hexExists(nId)) return;
 
@@ -785,14 +799,14 @@
 		} else if (data_terrain.usingPaintbucket) {
 			paintbucket();
 		} else if (data_terrain.usingEraser) {
-			erase();
+			eraseAtMouse();
 		} else {
 			placeTerrain();
 		}
 	}
 
 	export function clearTerrainSprites() {
-		Object.keys(terrainSprites).forEach((hexId) => {
+		Object.keys(terrainSprites).forEach((hexId: hex_id) => {
 			symbolsContainer.removeChild(terrainSprites[hexId]);
 			terrainSprites[hexId].destroy();
 			delete terrainSprites[hexId];

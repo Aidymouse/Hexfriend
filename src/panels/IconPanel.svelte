@@ -1,19 +1,17 @@
 <script lang="ts">
-	import Checkbox from '../components/Checkbox.svelte';
-	import ColorInputPixi from '../components/ColorInputPixi.svelte';
-	import type { Icon, Iconset } from '../types/icon';
+	import Checkbox from '/src/components/Checkbox.svelte';
+	import ColorInputPixi from '/src/components/ColorInputPixi.svelte';
+	import type { Icon, Iconset } from '/src/types/icon';
 	import * as PIXI from 'pixi.js';
-	import type { icon_data } from 'src/types/data';
+	import type { icon_data } from '/src/types/data';
 
 	export let loadedIconsets: Iconset[];
-	export let L;
-	export let app;
+	export let L: PIXI.Loader;
+	export let app: PIXI.Application;
 
 	export let data_icon: icon_data;
 
 	export let iconTextureLookupTable;
-
-	let selectedData = loadedIconsets[0].icons[0];
 
 	let iconPreview = '';
 	$: {
@@ -22,7 +20,6 @@
 	}
 
 	function selectIcon(iconData: Icon) {
-		selectedData = iconData;
 
 		data_icon.texId = iconData.texId;
 		data_icon.color = iconData.color;

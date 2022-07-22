@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { coords_cubeToWorld, coords_worldToCube } from '../helpers/hexHelpers';
+	import { coords_cubeToWorld, coords_worldToCube } from '/src/helpers/hexHelpers';
 	import type { icon_data } from '/src/types/data';
 	import type * as PIXI from 'pixi.js';
-	import type { TerrainHexField } from 'src/types/terrain';
-	import type { tools } from 'src/types/toolData';
+	import type { TerrainHexField } from '/src/types/terrain';
+	import type { tools } from '/src/types/toolData';
 	import { Sprite } from 'svelte-pixi';
 
 	export let icons = [];

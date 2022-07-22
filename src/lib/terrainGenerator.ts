@@ -1,10 +1,13 @@
 // Every hex has a percentange chance that its neighbour will be a different terrain type
 
+import type { TerrainHexField } from "src/types/terrain";
+import type { Tileset } from "src/types/tilesets";
+
 /* Terrain generating through wave function collapse! */
 
 /* Each hex needs a list of values it can possibly be, listed as terrain Id */
 
-let testGen = {
+let gf_test = {
 	/* Terraom Id: [can connect to] */
 	/* NOT default that all tiles can connect to themselves */
 	default_Plains: ['default_Beach', 'default_Tree', 'default_hills', 'default_Plains'],
@@ -17,13 +20,13 @@ let testGen = {
 	'default_Deep-Water': ['default_Water', 'default_Deep-Water'],
 };
 
-let forested = {
+let gf_forested = {
 	default_Plains: ['default_Tree', 'default_forest'],
 	default_Tree: ['default_forest', 'default_Tree', 'default_Plains'],
 	default_forest: ['default_forest', 'default_Tree'],
 };
 
-export function collapseWaveGen(hexesOut, rules = testGen) {
+function collapseWaveGen(hexesOut: number, rules = gf_test) {
 	// Generate Hexes
 	let genHexes = {};
 	let visitedHexIds = [];
@@ -130,7 +133,7 @@ function getHexNeighbours(q: number, r: number, s: number): string[] {
 	];
 }
 
-export function generateTerrain(tfield, tileset) {
+function generateTerrain(tfield: TerrainHexField, tileset: Tileset) {
 	let addedNeighbours = [];
 	let coloredHexes = []; // hexid's
 
@@ -197,3 +200,6 @@ function colorWith(hex, tileid, tileset) {
 		hex.symbolId = null;
 	}
 }
+
+
+export { generateTerrain, collapseWaveGen }

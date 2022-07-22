@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { checkboxBase64 } from '../types/data';
+	import { checkboxBase64 } from '/src/types/data';
 
 	export let checked: boolean;
 

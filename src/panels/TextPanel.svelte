@@ -1,22 +1,23 @@
 <script lang="ts">
-	import ColorInput from '../components/ColorInput.svelte';
-	import CustomValueToggle from '../components/CustomValueToggle.svelte';
-	import SelectGrid from '../components/SelectGrid.svelte';
+	import ColorInput from '/src/components/ColorInput.svelte';
+	import CustomValueToggle from '/src/components/CustomValueToggle.svelte';
+	import SelectGrid from '/src/components/SelectGrid.svelte';
 	import type * as PIXI from 'pixi.js';
-	import type { text_data } from 'src/types/data';
-	import type { text_style } from 'src/types/text';
+	import type { text_data } from '/src/types/data';
+	import type { text_style } from '/src/types/text';
+	import type TextLayer from '/src/layers/TextLayer.svelte';
 
 	export let data_text: text_data;
-	export let comp_textLayer;
+	export let comp_textLayer: TextLayer;
 
 	/* This is fucking barbaric... but I can't find a way to make to make it work */
-	function focus(node) {
+	function focus(node: HTMLTextAreaElement) {
 		setTimeout(() => {
 			node.focus();
 		}, 10);
 	}
 
-	export let textStyles;
+	export let textStyles: text_style[];
 
 	function selectedMatches(style: text_style): boolean {
 		return JSON.stringify(style) == JSON.stringify(data_text.style);

@@ -1,9 +1,7 @@
 <script lang="ts">
-    
-    import type { saveData } from '../lib/defaultSaveData';
 
     import {liveQuery} from 'dexie'
-    import {db} from '../lib/db'
+    import {db} from '/src/lib/db'
 
     let saves = liveQuery(
         () => db.mapSaves.toArray()
@@ -42,15 +40,13 @@
         
         <div class="map-save" id="new-map-button" on:click={() => { createNewMap() }}>+</div>
         
-        
-        
         {#each $saves || [] as save (save.id)}
-        <div class="map-save">
-            <div on:click={ () => { clickedMap(save.id) } }>
-                <div class="image-container" >
+            <div class="map-save">
+                <div on:click={ () => { clickedMap(save.id) } }>
+                    <div class="image-container" >
                         <img src={save.previewBase64} alt={"Map Preview"}>
                     </div>
-                    
+                        
                     <p>{save.mapTitle}</p>
                 </div>
                 <button class="delete-button" on:click={()=>{deleteMap(save.id)}}> <img src="/assets/img/tools/trash.png"> </button>
