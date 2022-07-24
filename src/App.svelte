@@ -257,11 +257,11 @@
 
   // Never cleared, to stop duplicate textures being added
   // Theoretically a memory leak... but bounded by how many unique tiles can be loaded. Shouldn't be a problem?
-  let symbolTextureLookupTable = {
+  let symbolTextureLookupTable: {[key: string]: string} = {
     // tile id: id of tile who's texture we use
   }
 
-  let iconTextureLookupTable = {
+  let iconTextureLookupTable: {[key: string]: string} = {
     // icon texId: id of tile who's texture we use
   }
 
@@ -367,7 +367,7 @@
     
     loadInit(JSON.parse(JSON.stringify(DEFAULTSAVEDATA)), null)
     
-    showSavedMaps = false
+    
     
   }
 
@@ -449,14 +449,14 @@
     // Load Textures
     loadedTilesets.forEach(tileset => {
 
-      loadTilesetTextures(tileset, false)
+      addTilesetTextures(tileset, L)
     
     })
     
     // Load Icons
     loadedIconsets.forEach( (iconset: Iconset) => {
 
-      loadIconsetTextures(iconset, false)
+      addIconsetTextures(iconset, L)
 
     })
 
@@ -469,8 +469,6 @@
 
       let firstTile = loadedTilesets[0].tiles[0]
       data_terrain.tile = {...firstTile, symbol: firstTile.symbol ? {...firstTile.symbol} : null }
-      //bgColor = firstTile.bgColor
-      //data_terrain.symbol = firstTile.symbol ? {...firstTile.symbol} : null
   
       let firstIcon = loadedIconsets[0].icons[0]
       data_icon.color = firstIcon.color
@@ -504,7 +502,7 @@
       comp_terrainField.renderAllHexes();
 
       //comp_coordsLayer.eraseAllCoordinates();
-      comp_coordsLayer.generateAllCoords();
+      //comp_coordsLayer.generateAllCoords();
       
     });
 
@@ -515,36 +513,30 @@
     //loadedId = id
   }
   
-  function loadTilesetTextures(tileset: Tileset, loadImmediately: boolean = true) {
+  function addTilesetTextures(tileset: Tileset, loader: PIXI.Loader) {
 
     tileset.tiles.forEach(async tile => {
 
       //console.log(tile.symbol.texId)
 
-      if (tile.symbol) {
+      if (!tile.symbol) return
 
-        let entry = Object.entries(L.resources).find( ([id, r]) => r.url == tile.symbol.base64)
+      let entry = Object.entries(L.resources).find( ([id, r]) => r.url == tile.symbol.base64)
+      if (entry) {
+        // Texture already exists! Add this tile's ID to the lookup table
+        symbolTextureLookupTable[tile.id] = entry[0]
 
-        if (entry) {
-          // Texture already exists! Add this tile's ID to the lookup table
-          symbolTextureLookupTable[tile.id] = entry[0]
-
-        } else {
-          L.add(tile.id, tile.symbol.base64)
-        }
-
+      } else {
+        loader.add(tile.id, tile.symbol.base64)
       }
 
 
     })
 
-    if (!loadImmediately) return
-
-    L.load();
 
   }
 
-  function loadIconsetTextures(iconset: Iconset, loadImmediately: boolean = true) {
+  function addIconsetTextures(iconset: Iconset, loader: PIXI.Loader) {
 
     iconset.icons.forEach(async icon => {
 
@@ -557,19 +549,12 @@
         iconTextureLookupTable[icon.texId] = entry[0]
 
       } else {
-        L.add(icon.texId, icon.base64)
+        loader.add(icon.texId, icon.base64)
       }
 
 
 
     })
-
-
-    if (!loadImmediately) return
-
-    L.load( () => {
-      console.log("Gaming.")
-    });
 
   }
 
@@ -693,12 +678,14 @@
       redrawEntireMap={() => { redrawEntireMap() }}
       exportMap={exportMap}
       load={loadInit}
+
+      {L}
       
       bind:loadedTilesets
       bind:loadedIconsets
 
-      loadTilesetTextures={ loadTilesetTextures }
-      loadIconsetTextures={ (iconset) => { loadIconsetTextures(iconset) } }
+      { addTilesetTextures }
+      { addIconsetTextures }
     />
 
   <Controls 

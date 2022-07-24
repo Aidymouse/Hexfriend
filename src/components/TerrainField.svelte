@@ -529,47 +529,41 @@ import type { TileSymbol } from 'src/types/tilesets';
 		terrainGraphics.drawPolygon(getHexPath(tfield.hexWidth, tfield.hexHeight, tfield.orientation, hexC.x, hexC.y));
 		terrainGraphics.endFill();
 
-		if (hex.tile.symbol != null) {
-			// Could optimize here - only update icon if it needs updating
+		if (hex.tile.symbol == null && terrainSprites[hexId]) {
+			symbolsContainer.removeChild(terrainSprites[hexId]);
+			terrainSprites[hexId].destroy();
+			delete terrainSprites[hexId];
+			return;
+		}
 
-			if (terrainSprites[hexId]) {
-				//symbolsContainer.removeChild(terrainSprites[hexId]);
-				//terrainSprites[hexId].destroy();
-				//delete terrainSprites[hexId];
+		if (terrainSprites[hexId]) {
+			// Re-use the sprite that already exists
+			let ns = terrainSprites[hexId]
 			
-				let ns = terrainSprites[hexId]
-				
-				ns.texture = L.resources[getSymbolTextureId(hex.tile.id)].texture;
-				ns.scale = findSymbolScale(hex.tile.symbol);
-				ns.tint = hex.tile.symbol.color;
+			ns.texture = L.resources[getSymbolTextureId(hex.tile.id)].texture;
+			ns.scale = findSymbolScale(hex.tile.symbol);
+			ns.tint = hex.tile.symbol.color;
 
-
-			} else {
-				// Make a new sprite
-				let ns = new PIXI.Sprite();
-				ns.texture = L.resources[getSymbolTextureId(hex.tile.id)].texture;
-				let hc = hexC; //coords_cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
-				ns.position.set(hc.x, hc.y);
-				ns.anchor.set(0.5);
-				ns.tint = hex.tile.symbol.color;
-				ns.scale = findSymbolScale(hex.tile.symbol);
-	
-				symbolsContainer.addChild(ns);
-	
-				terrainSprites[hexId] = ns;
-			}
 
 		} else {
-			if (terrainSprites[hexId]) {
-				symbolsContainer.removeChild(terrainSprites[hexId]);
-				terrainSprites[hexId].destroy();
-				delete terrainSprites[hexId];
-			}
+			// Make a new sprite
+			let ns = new PIXI.Sprite();
+			ns.anchor.set(0.5);
+			let hc = hexC; //coords_cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+			ns.position.set(hc.x, hc.y);
+
+			ns.texture = L.resources[getSymbolTextureId(hex.tile.id)].texture;
+			ns.tint = hex.tile.symbol.color;
+			ns.scale = findSymbolScale(hex.tile.symbol);
+
+			symbolsContainer.addChild(ns);
+			terrainSprites[hexId] = ns;
 		}
+
 	}
 
 	function getSymbolTextureId(tileId: string) {
-		// If tileId appears in the lookup table, use the lookup table version instead
+		// If tileId appears as a key in the lookup table, use the lookup table version instead
 		if (Object.keys(symbolTextureLookupTable).find((k) => k == tileId)) {
 			return symbolTextureLookupTable[tileId];
 		}

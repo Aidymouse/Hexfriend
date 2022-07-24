@@ -9,33 +9,40 @@
 	import { coord_system } from '/src/types/cordinates';
 	import type { Iconset } from '/src/types/icon';
 	import type { Tileset } from '/src/types/tilesets';
+	import type TextLayer from 'src/layers/TextLayer.svelte';
+	import type PathLayer from 'src/layers/PathLayer.svelte';
+	import type IconLayer from 'src/layers/IconLayer.svelte';
+	import type CoordsLayer from 'src/layers/CoordsLayer.svelte';
+	import type * as PIXI from 'pixi.js'
 
 	export let loadedSave: saveData;
-	export let showSettings;
+	export let showSettings: boolean;
 	export let appState;
-	export let showTerrainGenerator;
+	export let showTerrainGenerator: boolean;
 
 	export let exportMap: Function;
 
 	export let tfield: TerrainHexField;
-	export let comp_terrainField;
+	export let comp_terrainField: TerrainHexField;
 	export let renderAllHexes: Function;
 	export let renderGrid: Function;
 	export let redrawEntireMap: Function;
 
 	// For Coordinates
-	export let comp_coordsLayer;
+	export let comp_coordsLayer: CoordsLayer;
 	export let data_coordinates: coordinates_data;
 
 	//export let data_terrain: terrain_data
-	export let loadedTilesets;
-	export let loadTilesetTextures: Function;
-	export let loadedIconsets;
-	export let loadIconsetTextures: Function;
+	export let loadedTilesets: Tileset[];
+	export let addTilesetTextures: Function;
+	export let loadedIconsets: Iconset[];
+	export let addIconsetTextures: Function;
 
-	export let comp_iconLayer;
-	export let comp_pathLayer;
-	export let comp_textLayer;
+	export let L: PIXI.Loader
+
+	export let comp_iconLayer: IconLayer;
+	export let comp_pathLayer: PathLayer;
+	export let comp_textLayer: TextLayer;
 
 	export let load: Function;
 
@@ -77,7 +84,7 @@
 			loadedTilesets = loadedTilesets;
 
 			/* We also have to load all of these textures */
-			loadTilesetTextures(setToImport);
+			addTilesetTextures(setToImport, L);
 		};
 	}
 
@@ -90,7 +97,7 @@
 		loadedTilesets = loadedTilesets.filter((ts: Tileset) => ts.id != setId);
 	}
 
-	let iconsetFiles;
+	let iconsetFiles: FileList;
 
 	function importIconset() {
 		let importFile = iconsetFiles[0];
@@ -113,7 +120,7 @@
 			loadedIconsets = loadedIconsets;
 
 			/* We also have to load all of these textures */
-			loadIconsetTextures(setToImport);
+			addIconsetTextures(setToImport, L);
 		};
 	}
 

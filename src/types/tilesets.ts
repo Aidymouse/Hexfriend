@@ -15,12 +15,17 @@ interface TileSymbol {
 	base64: string;
 }
 
+type tileset_name = string
+type tile_id = `${tileset_name}_${string}`
+
 interface Tileset {
-	name: string;
-	id: string;
+	name: tileset_name;
+	id: tile_id;
 	author: string;
 	version: number;
 	tiles: Tile[];
 }
+
+
 
 export type { Tile, TileSymbol, Tileset };

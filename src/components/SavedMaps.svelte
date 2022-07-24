@@ -38,7 +38,7 @@
     
     <div id="maps">
         
-        <div class="map-save" id="new-map-button" on:click={() => { createNewMap() }}>+</div>
+        <div class="map-save" id="new-map-button" on:click={() => { createNewMap(); showSavedMaps=false }}>+</div>
         
         {#each $saves || [] as save (save.id)}
             <div class="map-save">
