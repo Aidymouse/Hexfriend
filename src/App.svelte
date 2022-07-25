@@ -45,7 +45,7 @@
   import type { TerrainHexField } from './types/terrain'
   import type { saveData } from './lib/defaultSaveData'
   import type { coordinates_data, icon_data, text_data, terrain_data, path_data, trace_data } from './types/data';
-  import { coord_system } from './types/cordinates';
+  import { coord_system } from './types/coordinates';
 
   import {tools} from './types/toolData'
 

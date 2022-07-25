@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { coords_cubeToWorld } from '/src/helpers/hexHelpers';
-	import { coords_cubeToq, coords_cubeTor } from '/src/helpers/hexHelpers';
-	import { coord_system } from '/src/types/cordinates';
+	import { coords_cubeToWorld } from '../helpers/hexHelpers';
+	import { coords_cubeToq, coords_cubeTor } from '../helpers/hexHelpers';
+	import { coord_system } from '../types/coordinates';
 	import * as PIXI from 'pixi.js';
-	import type { coordinates_data } from '/src/types/data';
-	import type { TerrainHexField } from '/src/types/terrain';
+	import type { coordinates_data } from '../types/data';
+	import type { TerrainHexField } from '../types/terrain';
 	import { onMount } from 'svelte';
 	import { Container, Text } from 'svelte-pixi';
-import type { hex_id } from 'src/types/toolData';
+import type { hex_id } from '../types/toolData';
 
 	interface coordText {
 		pixiText: PIXI.Text;

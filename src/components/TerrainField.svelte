@@ -9,18 +9,19 @@
 		genHexId_cordsObj,
 		getHexPath,
 		getNeighbours,
-	} from '/src/helpers/hexHelpers';
-	import { collapseWaveGen } from '/src/lib/terrainGenerator';
-	import { map_type } from '/src/types/settings';
+	} from '../helpers/hexHelpers';
+	import { collapseWaveGen } from '../lib/terrainGenerator';
+	import { map_type } from '../types/settings';
 	import * as PIXI from 'pixi.js';
-	import type { TerrainHex, TerrainHexField } from '/src/types/terrain';
-	import type { Tile } from '/src/types/tilesets';
+	import type { TerrainHex, TerrainHexField } from '../types/terrain';
+	import type { Tile } from '../types/tilesets';
 	import { onMount } from 'svelte';
 	import { Container, Graphics } from 'svelte-pixi';
-	import CoordsLayer from '/src/layers/CoordsLayer.svelte';
-	import type { terrain_data } from 'src/types/data';
-import type { hex_id } from 'src/types/toolData';
-import type { TileSymbol } from 'src/types/tilesets';
+	import type { terrain_data } from '../types/data';
+	import type { hex_id } from '../types/toolData';
+	import type { TileSymbol } from '../types/tilesets';
+	import CoordsLayer from '../layers/CoordsLayer.svelte';
+	import type { cube_coords } from '../types/coordinates';
 
 	let terrainGraphics = new PIXI.Graphics();
 	let symbolsContainer = new PIXI.Container();
@@ -50,8 +51,8 @@ import type { TileSymbol } from 'src/types/tilesets';
 		if (tfield.raised == 'odd') {
 			for (let col = 1; col < tfield.columns; col += 2) {
 				// Create hex at bottom of column
-				let newHexCoords = coords_qToCube('odd', col, tfield.rows - 1);
-				let newId = genHexId_cordsObj(newHexCoords);
+				let newHexCoords: cube_coords = coords_qToCube('odd', col, tfield.rows - 1);
+				let newId: hex_id = genHexId_cordsObj(newHexCoords);
 				tfield.hexes[newId] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, tile: null };
 				comp_coordsLayer.generateCoord(newId);
 
@@ -529,10 +530,14 @@ import type { TileSymbol } from 'src/types/tilesets';
 		terrainGraphics.drawPolygon(getHexPath(tfield.hexWidth, tfield.hexHeight, tfield.orientation, hexC.x, hexC.y));
 		terrainGraphics.endFill();
 
-		if (hex.tile.symbol == null && terrainSprites[hexId]) {
-			symbolsContainer.removeChild(terrainSprites[hexId]);
-			terrainSprites[hexId].destroy();
-			delete terrainSprites[hexId];
+		if (hex.tile.symbol == null) {
+
+			if (terrainSprites[hexId]) {
+				symbolsContainer.removeChild(terrainSprites[hexId]);
+				terrainSprites[hexId].destroy();
+				delete terrainSprites[hexId];
+			}
+
 			return;
 		}
 

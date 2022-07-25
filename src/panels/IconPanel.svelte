@@ -1,9 +1,9 @@
 <script lang="ts">
-	import Checkbox from '/src/components/Checkbox.svelte';
-	import ColorInputPixi from '/src/components/ColorInputPixi.svelte';
-	import type { Icon, Iconset } from '/src/types/icon';
+	import Checkbox from '../components/Checkbox.svelte';
+	import ColorInputPixi from '../components/ColorInputPixi.svelte';
+	import type { Icon, Iconset } from '../types/icon';
 	import * as PIXI from 'pixi.js';
-	import type { icon_data } from '/src/types/data';
+	import type { icon_data } from '../types/data';
 
 	export let loadedIconsets: Iconset[];
 	export let L: PIXI.Loader;

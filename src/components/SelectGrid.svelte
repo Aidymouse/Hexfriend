@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { capitialize } from '/src/helpers/string';
+	import { capitialize } from '../helpers/string';
 	import { createEventDispatcher } from 'svelte';
 
 	let dispatch = createEventDispatcher();

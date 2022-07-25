@@ -1,18 +1,18 @@
 <script lang="ts">
-	import Checkbox from '/src/components/Checkbox.svelte';
-	import ColorInputPixi from '/src/components/ColorInputPixi.svelte';
-	import SelectGrid from '/src/components/SelectGrid.svelte';
-	import type { coordinates_data, terrain_data, trace_data } from '/src/types/data';
-	import { map_type } from '/src/types/settings';
-	import type { TerrainHexField } from '/src/types/terrain';
-	import type { saveData } from '/src/lib/defaultSaveData';
-	import { coord_system } from '/src/types/cordinates';
-	import type { Iconset } from '/src/types/icon';
-	import type { Tileset } from '/src/types/tilesets';
-	import type TextLayer from 'src/layers/TextLayer.svelte';
-	import type PathLayer from 'src/layers/PathLayer.svelte';
-	import type IconLayer from 'src/layers/IconLayer.svelte';
-	import type CoordsLayer from 'src/layers/CoordsLayer.svelte';
+	import Checkbox from '../components/Checkbox.svelte';
+	import ColorInputPixi from '../components/ColorInputPixi.svelte';
+	import SelectGrid from '../components/SelectGrid.svelte';
+	import type { coordinates_data, terrain_data, trace_data } from '../types/data';
+	import { map_type } from '../types/settings';
+	import type { TerrainHexField } from '../types/terrain';
+	import type { saveData } from '../lib/defaultSaveData';
+	import { coord_system } from '../types/coordinates';
+	import type { Iconset } from '../types/icon';
+	import type { Tileset } from '../types/tilesets';
+	import type TextLayer from '../layers/TextLayer.svelte';
+	import type PathLayer from '../layers/PathLayer.svelte';
+	import type IconLayer from '../layers/IconLayer.svelte';
+	import type CoordsLayer from '../layers/CoordsLayer.svelte';
 	import type * as PIXI from 'pixi.js'
 
 	export let loadedSave: saveData;

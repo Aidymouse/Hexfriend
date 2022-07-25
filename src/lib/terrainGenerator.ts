@@ -1,7 +1,7 @@
 // Every hex has a percentange chance that its neighbour will be a different terrain type
 
-import type { TerrainHexField } from "src/types/terrain";
-import type { Tileset } from "src/types/tilesets";
+import type { TerrainHexField } from "../types/terrain";
+import type { Tileset } from "../types/tilesets";
 
 /* Terrain generating through wave function collapse! */
 

@@ -24,7 +24,7 @@
 		"@trivago/prettier-plugin-sort-imports": "^3.3.0",
 		"dexie": "^3.2.1",
 		"gh-pages": "^4.0.0",
-		"pixi.js": "^6.2.2",
+		"pixi.js": "^5.3.12",
 		"prettier-plugin-svelte": "^2.7.0",
 		"svelte-pixi": "0.0.5"
 	}

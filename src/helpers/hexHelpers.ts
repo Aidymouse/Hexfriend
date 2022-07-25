@@ -1,5 +1,6 @@
 import { hex2rgb } from '@pixi/utils';
-import type { TerrainHex } from '/src/types/terrain';
+import type { hex_id } from '../types/toolData';
+import type { TerrainHex } from '../types/terrain';
 
 export type hexOrientation = 'flatTop' | 'pointyTop';
 type cubeCoords = { q: number; r: number; s: number };
@@ -60,11 +61,11 @@ export function genHexId(q: number, r: number, s: number): string {
 	return q.toString() + ':' + r.toString() + ':' + s.toString();
 }
 
-export function genHexId_cordsObj(coords: { q: number; r: number; s: number }) {
+export function genHexId_cordsObj(coords: { q: number; r: number; s: number }): hex_id {
 	let q = coords.q;
 	let r = coords.r;
 	let s = coords.s;
-	return q.toString() + ':' + r.toString() + ':' + s.toString();
+	return `${q}:${r}:${s}`
 }
 
 /* NEIGHBOURS */

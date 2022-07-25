@@ -1,12 +1,13 @@
 <script lang="ts">
-	import { coords_cubeToWorld, coords_worldToCube } from '/src/helpers/hexHelpers';
-	import type { icon_data } from '/src/types/data';
+	import { coords_cubeToWorld, coords_worldToCube } from '../helpers/hexHelpers';
+	import type { icon_data } from '../types/data';
 	import type * as PIXI from 'pixi.js';
-	import type { TerrainHexField } from '/src/types/terrain';
-	import type { tools } from '/src/types/toolData';
+	import type { TerrainHexField } from '../types/terrain';
+	import type { tools } from '../types/toolData';
 	import { Sprite } from 'svelte-pixi';
+	import type { IconLayerIcon } from '../types/icon'
 
-	export let icons = [];
+	export let icons: IconLayerIcon[] = [];
 
 	export let L: PIXI.Loader;
 	export let pan;
@@ -15,7 +16,7 @@
 	export let controls;
 
 	export let data_icon: icon_data;
-	export let iconTextureLookupTable;
+	export let iconTextureLookupTable: {[key: string]: string};
 
 	let iconId: number = 0;
 	icons.forEach((i) => (iconId = Math.max(iconId, i.id)));

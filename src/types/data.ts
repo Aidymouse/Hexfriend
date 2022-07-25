@@ -1,4 +1,4 @@
-import type { coord_system } from './cordinates';
+import type { coord_system } from './coordinates';
 import type { path, path_style } from './path';
 import type { HF_text, text_style } from './text';
 import type { Tile, TileSymbol } from './tilesets';

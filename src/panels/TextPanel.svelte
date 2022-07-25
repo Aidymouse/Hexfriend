@@ -1,11 +1,11 @@
 <script lang="ts">
-	import ColorInput from '/src/components/ColorInput.svelte';
-	import CustomValueToggle from '/src/components/CustomValueToggle.svelte';
-	import SelectGrid from '/src/components/SelectGrid.svelte';
+	import ColorInput from '../components/ColorInput.svelte';
+	import CustomValueToggle from '../components/CustomValueToggle.svelte';
+	import SelectGrid from '../components/SelectGrid.svelte';
 	import type * as PIXI from 'pixi.js';
-	import type { text_data } from '/src/types/data';
-	import type { text_style } from '/src/types/text';
-	import type TextLayer from '/src/layers/TextLayer.svelte';
+	import type { text_data } from '../types/data';
+	import type { text_style } from '../types/text';
+	import type TextLayer from '../layers/TextLayer.svelte';
 
 	export let data_text: text_data;
 	export let comp_textLayer: TextLayer;

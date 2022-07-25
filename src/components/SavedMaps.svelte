@@ -1,7 +1,7 @@
 <script lang="ts">
 
     import {liveQuery} from 'dexie'
-    import {db} from '/src/lib/db'
+    import {db} from '../lib/db'
 
     let saves = liveQuery(
         () => db.mapSaves.toArray()
