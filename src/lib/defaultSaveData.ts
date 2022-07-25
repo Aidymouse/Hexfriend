@@ -1,34 +1,18 @@
 import { coords_qToCube, genHexId } from '../helpers/hexHelpers';
 import type { Iconset } from '../types/icon';
 import { map_type } from '../types/settings';
-import type { TerrainHexField } from '../types/terrain';
+import type { terrain_field } from '../types/terrain';
 import type { Tile, Tileset } from '../types/tilesets';
 import { DEFAULTICONSET } from './defaultIconset';
 import { DEFAULTTILESET } from './defaultTileset';
 import { coord_system } from '../types/coordinates';
-import * as PIXI from 'pixi.js';
 import type { coordinates_data } from '../types/data';
 
-interface saveData {
-	saveVersion: number;
-	title: string;
-
-	coords: coordinates_data;
-
-	TerrainField: TerrainHexField;
-	tilesets: Tileset[];
-	iconsets: Iconset[];
-	paths: [];
-	texts: [];
-	icons: [];
-
-	pathStyles: any[];
-	textStyles: any[];
-}
+import type { save_data } from '../types/savedata';
 
 const CURRENTSAVEVERSION = 1;
 
-let DEFAULTSAVEDATA: saveData = {
+let DEFAULTSAVEDATA: save_data = {
 	saveVersion: CURRENTSAVEVERSION,
 	title: '',
 
@@ -191,4 +175,3 @@ for (let col = 0; col < DEFAULTSAVEDATA.TerrainField.columns; col++) {
 }
 
 export default DEFAULTSAVEDATA;
-export type { saveData };

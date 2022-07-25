@@ -1,3 +1,4 @@
+/*
 export interface text_style {
 	fontFamily: string;
 	fill: string;
@@ -9,12 +10,18 @@ export interface text_style {
 	fontStyle: string;
 	fontWeight: 'normal' | 'bold' | number;
 }
+*/
 
 /* HF stands for Hexfriend */
 export interface HF_text {
 	id: number;
 	text: string;
-	style: text_style;
+	style: PIXI.Text['style'];
 	x: number;
 	y: number;
+}
+
+export interface listed_text_style {
+	display: string;
+	style: PIXI.Text['style'];
 }

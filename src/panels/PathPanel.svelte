@@ -4,10 +4,11 @@
 	import SelectGrid from '../components/SelectGrid.svelte';
 	import * as PIXI from 'pixi.js';
 	import type { path_data } from '../types/data';
-	import type { path, path_style } from '../types/path';
+	import type { listed_path_style } from '../types/path';
+	import type PathLayer from '../layers/PathLayer.svelte';
 
 	export let data_path: path_data;
-	export let comp_pathLayer;
+	export let comp_pathLayer: PathLayer;
 
 	$: {
 		if (data_path.selectedPath) {
@@ -17,9 +18,9 @@
 		pathStyles = pathStyles;
 	}
 
-	export let pathStyles;
+	export let pathStyles: listed_path_style[];
 
-	function styleMatchesData(pathStyle: path_style) {
+	function styleMatchesData(pathStyle: PIXI.LineStyle) {
 		if (pathStyle.color != data_path.style.color) return false;
 		if (pathStyle.width != data_path.style.width) return false;
 		if (pathStyle.cap != data_path.style.cap) return false;
@@ -39,7 +40,7 @@
 <div class="panel">
 	<div id="controls">
 		<label for="pathColor">Color</label>
-		<ColorInputPixi bind:value={data_path.style.color} name={'pathColor'} />
+		<ColorInputPixi bind:value={data_path.style.color} id={'pathColor'} />
 
 		<label for="pathThickness">Thickness</label>
 		<input id="pathThickness" type="number" bind:value={data_path.style.width} />
@@ -56,7 +57,7 @@
 			<img src="/assets/img/tools/snap.png" alt={'Snap'} />
 		</button>
 
-		<label>Line Cap</label>
+		<p class="control-label">Line Cap</p>
 		<span>
 			<SelectGrid
 				values={[PIXI.LINE_CAP.ROUND, PIXI.LINE_CAP.BUTT, PIXI.LINE_CAP.SQUARE]}
@@ -65,7 +66,7 @@
 			/>
 		</span>
 
-		<label>Line End</label>
+		<p class="control-label">Line End</p>
 		<span>
 			<SelectGrid
 				values={[PIXI.LINE_JOIN.ROUND, PIXI.LINE_JOIN.MITER, PIXI.LINE_JOIN.BEVEL]}
@@ -88,7 +89,7 @@
 				}}>Remove Last Point</button
 			>
 			<button
-				style="color: red;"
+				style="color: #FF6666;"
 				on:click={() => {
 					comp_pathLayer.deletePath(data_path.selectedPath);
 				}}>Delete Path</button
@@ -118,10 +119,8 @@
 			</button>
 		</div>
 	</div>
-	<!--
 
-
-        -->
+	
 </div>
 
 <style>
@@ -130,6 +129,10 @@
 	}
 	div {
 		color: white;
+	}
+
+	.control-label {
+		margin: 0;
 	}
 
 	.small-panel-button {
@@ -172,11 +175,6 @@
 	#path-styles {
 		padding: 10px;
 		background-color: #555555;
-	}
-
-	#path-styles p {
-		margin: 0;
-		margin-bottom: 5px;
 	}
 
 	.selected {

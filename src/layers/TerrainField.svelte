@@ -13,14 +13,14 @@
 	import { collapseWaveGen } from '../lib/terrainGenerator';
 	import { map_type } from '../types/settings';
 	import * as PIXI from 'pixi.js';
-	import type { TerrainHex, TerrainHexField } from '../types/terrain';
+	import type { TerrainHex, terrain_field } from '../types/terrain';
 	import type { Tile } from '../types/tilesets';
 	import { onMount } from 'svelte';
 	import { Container, Graphics } from 'svelte-pixi';
 	import type { terrain_data } from '../types/data';
 	import type { hex_id } from '../types/toolData';
 	import type { TileSymbol } from '../types/tilesets';
-	import CoordsLayer from '../layers/CoordsLayer.svelte';
+	import type CoordsLayer from './CoordsLayer.svelte';
 	import type { cube_coords } from '../types/coordinates';
 
 	let terrainGraphics = new PIXI.Graphics();
@@ -32,7 +32,7 @@
 	export let pan;
 	export let controls;
 	export let L: PIXI.Loader;
-	export let tfield: TerrainHexField;
+	export let tfield: terrain_field;
 
 	export let comp_coordsLayer: CoordsLayer;
 
@@ -182,7 +182,7 @@
 		clearTerrainSprites();
 		renderAllHexes();
 
-		comp_coordsLayer.generateAllCoords();
+		//comp_coordsLayer.generateAllCoords();
 	}
 
 	export function square_expandMapDimension(direction: 'left' | 'right' | 'top' | 'bottom', amount: number) {

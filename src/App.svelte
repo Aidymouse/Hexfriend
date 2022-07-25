@@ -42,8 +42,8 @@
 
   import type { Tileset } from './types/tilesets'
   import type { Iconset } from './types/icon';
-  import type { TerrainHexField } from './types/terrain'
-  import type { saveData } from './lib/defaultSaveData'
+  import type { terrain_field } from './types/terrain'
+  import type { save_data } from './types/savedata'
   import type { coordinates_data, icon_data, text_data, terrain_data, path_data, trace_data } from './types/data';
   import { coord_system } from './types/coordinates';
 
@@ -57,7 +57,7 @@
   import { getHexPath, coords_cubeToWorld } from './helpers/hexHelpers'
 
   // Layers
-  import TerrainField from './components/TerrainField.svelte'
+  import TerrainField from './layers/TerrainField.svelte'
   import IconLayer from './layers/IconLayer.svelte'
   import PathLayer from './layers/PathLayer.svelte'
   import TextLayer from './layers/TextLayer.svelte'
@@ -88,7 +88,7 @@
 
   /* STATE */
 
-  let loadedSave: saveData = DEFAULTSAVEDATA
+  let loadedSave: save_data = DEFAULTSAVEDATA
   let loadedId: number | null = null;
 
   let appState: "normal" | "tilesetCreator" | "iconsetCreator" = "normal"
@@ -123,7 +123,7 @@
 
   let loadedTilesets: Tileset[]
   let loadedIconsets: Iconset[]
-  let tfield: TerrainHexField
+  let tfield: terrain_field
   
 
   /* PANNING */
@@ -420,7 +420,7 @@
 
   }
 
-  function loadInit(data: saveData, id: number | null) {
+  function loadInit(data: save_data, id: number | null) {
     
     // Clean up
     console.log(`Loaded ${id}`)
@@ -438,7 +438,7 @@
     //comp_terrainField.renderAllHexes() 
   }
   
-  function loadSave(data: saveData, id: number | null) {
+  function loadSave(data: save_data, id: number | null) {
 
     loadedTilesets = data.tilesets;
     loadedIconsets = data.iconsets;

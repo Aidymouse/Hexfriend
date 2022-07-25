@@ -4,7 +4,7 @@
 	import SelectGrid from '../components/SelectGrid.svelte';
 	import type * as PIXI from 'pixi.js';
 	import type { text_data } from '../types/data';
-	import type { text_style } from '../types/text';
+	import type { listed_text_style } from '../types/text';
 	import type TextLayer from '../layers/TextLayer.svelte';
 
 	export let data_text: text_data;
@@ -17,9 +17,9 @@
 		}, 10);
 	}
 
-	export let textStyles: text_style[];
+	export let textStyles: listed_text_style[];
 
-	function selectedMatches(style: text_style): boolean {
+	function selectedMatches(style: listed_text_style): boolean {
 		return JSON.stringify(style) == JSON.stringify(data_text.style);
 	}
 
@@ -187,11 +187,6 @@
 	#text-styles {
 		padding: 10px;
 		background-color: #555555;
-	}
-
-	#text-styles p {
-		margin: 0;
-		margin-bottom: 5px;
 	}
 
 	#font-style-options {

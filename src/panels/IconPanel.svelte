@@ -58,7 +58,7 @@
 	<div id="icon-preview">
 		<img src={iconPreview} alt={'Icon Preview'} />
 
-		<ColorInputPixi bind:value={data_icon.color} w={25} h={25} label={'Icon Color'} name={'iconPanelColor'} />
+		<ColorInputPixi bind:value={data_icon.color} w={25} h={25} label={'Icon Color'} id={'iconPanelColor'} />
 
 		<Checkbox name={'cb_snapIcon'} label="Snap To Hex Center" bind:checked={data_icon.snapToHex} />
 

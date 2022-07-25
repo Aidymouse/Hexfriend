@@ -2,7 +2,7 @@
 	import { genHexId, getNeighbours } from '../helpers/hexHelpers';
 	import { download } from '../lib/download2';
 	import type { Tile, Tileset } from '../types/tilesets';
-	import type { TerrainHex, TerrainHexField } from '../types/terrain';
+	import type { TerrainHex, terrain_field } from '../types/terrain';
 
 	function rand(min: number, max: number): number {
 		min = Math.ceil(min);
@@ -204,7 +204,7 @@
 	}
 
 	export let loadedTilesets: Tileset[];
-	export let tfield: TerrainHexField;
+	export let tfield: terrain_field;
 	export let comp_terrainField;
 	export let showTerrainGenerator: boolean;
 

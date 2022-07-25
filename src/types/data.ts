@@ -1,6 +1,6 @@
 import type { coord_system } from './coordinates';
 import type { path, path_style } from './path';
-import type { HF_text, text_style } from './text';
+import type { HF_text } from './text';
 import type { Tile, TileSymbol } from './tilesets';
 import type * as PIXI from 'pixi.js';
 
@@ -29,7 +29,7 @@ export interface coordinates_data {
 }
 
 export interface text_data {
-	style: text_style;
+	style: PIXI.Text['style'];
 	selectedText?: HF_text;
 	editorRef: any;
 	usingTextTool: boolean;

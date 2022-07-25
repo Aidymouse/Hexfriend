@@ -1,6 +1,6 @@
 // Every hex has a percentange chance that its neighbour will be a different terrain type
 
-import type { TerrainHexField } from "../types/terrain";
+import type { terrain_field } from "../types/terrain";
 import type { Tileset } from "../types/tilesets";
 
 /* Terrain generating through wave function collapse! */
@@ -133,7 +133,7 @@ function getHexNeighbours(q: number, r: number, s: number): string[] {
 	];
 }
 
-function generateTerrain(tfield: TerrainHexField, tileset: Tileset) {
+function generateTerrain(tfield: terrain_field, tileset: Tileset) {
 	let addedNeighbours = [];
 	let coloredHexes = []; // hexid's
 

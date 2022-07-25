@@ -3,13 +3,13 @@
 	import * as PIXI from 'pixi.js';
 	import type { path_data } from '../types/data';
 	import type { path } from '../types/path';
-	import type { TerrainHexField } from '../types/terrain';
+	import type { terrain_field } from '../types/terrain';
 	import { Container, Graphics } from 'svelte-pixi';
 
 	export let controls;
 	export let pan;
 	export let selectedTool;
-	export let tfield: TerrainHexField; // required for snapping
+	export let tfield: terrain_field; // required for snapping
 
 	export let data_path: path_data;
 

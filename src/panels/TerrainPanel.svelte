@@ -3,17 +3,17 @@
 	import { getHexPath } from '../helpers/hexHelpers';
 	import * as PIXI from 'pixi.js';
 	import type { terrain_data } from '../types/data';
-	import type { TerrainHexField } from '../types/terrain';
-	import type { Tile } from '../types/tilesets';
+	import type { terrain_field } from '../types/terrain';
+	import type { Tile, Tileset } from '../types/tilesets';
 
-	export let loadedTilesets;
+	export let loadedTilesets: Tileset[];
 	export let data_terrain: terrain_data;
 
-	export let tfield: TerrainHexField;
+	export let tfield: terrain_field;
 	export let app: PIXI.Application;
 	export let L: PIXI.Loader;
 
-	export let symbolTextureLookupTable;
+	export let symbolTextureLookupTable: {[key: string]: string};
 
 	$: {
 		tilePreview = generateTilePreview(data_terrain);
@@ -46,15 +46,15 @@
 		return tileId;
 	}
 
-	function findSymbolScale(symbol, hW, hH) {
-		if (hW < hH) {
-			let s = (hW * symbol.pHex) / 100 / symbol.texWidth;
+	function findSymbolScale(symbol, hexWidth: number, hexHeight: number) {
+		if (hexWidth < hexHeight) {
+			let s = (hexWidth * symbol.pHex) / 100 / symbol.texWidth;
 			return {
 				x: s,
 				y: s,
 			};
 		} else {
-			let s = (hH * symbol.pHex) / 100 / symbol.texHeight;
+			let s = (hexHeight * symbol.pHex) / 100 / symbol.texHeight;
 			return {
 				x: s,
 				y: s,
@@ -66,21 +66,21 @@
 		g.clear();
 		g.beginFill(data_terrain.tile ? data_terrain.tile.bgColor : tfield.blankHexColor);
 
-		let hW = 50;
-		let hH = 45;
+		let hexWidth = 50;
+		let hexHeight = 45;
 
 		if (tfield.orientation == 'pointyTop') {
-			hW = 45;
-			hH = 50;
+			hexWidth = 45;
+			hexHeight = 50;
 		}
 
-		g.drawPolygon(getHexPath(hW, hH, tfield.orientation, 0, 0));
+		g.drawPolygon(getHexPath(hexWidth, hexHeight, tfield.orientation, 0, 0));
 		g.endFill();
 
 		if (data_terrain.tile && data_terrain.tile.symbol) {
 			s.texture = L.resources[getSymbolTextureId(data_terrain.tile.id)].texture;
 			s.tint = data_terrain.tile.symbol.color;
-			s.scale = findSymbolScale(data_terrain.tile.symbol, hW, hH);
+			s.scale = findSymbolScale(data_terrain.tile.symbol, hexWidth, hexHeight);
 			s.anchor.set(0.5);
 		} else {
 			s.texture = null;
@@ -98,6 +98,7 @@
 	function tilesMatch(tile1: Tile, tile2: Tile): boolean {
 		if (tile1 == null && tile2 != null) return false;
 		if (tile1 != null && tile2 == null) return false;
+
 		if (tile1 == null && tile2 == null) return true; // Both are blank
 
 		// Return false if one has a symbol and one does not
@@ -126,10 +127,10 @@
 			/>
 		</div>
 
-		<ColorInputPixi bind:value={data_terrain.tile.bgColor} name={'terrainColor'} label={'Terrain Color'} />
+		<ColorInputPixi bind:value={data_terrain.tile.bgColor} id={'terrainColor'} label={'Terrain Color'} />
 
 		{#if data_terrain.tile.symbol}
-			<ColorInputPixi bind:value={data_terrain.tile.symbol.color} name={'symbolColor'} label={'Symbol Color'} />
+			<ColorInputPixi bind:value={data_terrain.tile.symbol.color} id={'symbolColor'} label={'Symbol Color'} />
 		{/if}
 
 		<button

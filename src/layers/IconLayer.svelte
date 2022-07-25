@@ -2,7 +2,7 @@
 	import { coords_cubeToWorld, coords_worldToCube } from '../helpers/hexHelpers';
 	import type { icon_data } from '../types/data';
 	import type * as PIXI from 'pixi.js';
-	import type { TerrainHexField } from '../types/terrain';
+	import type { terrain_field } from '../types/terrain';
 	import type { tools } from '../types/toolData';
 	import { Sprite } from 'svelte-pixi';
 	import type { IconLayerIcon } from '../types/icon'
@@ -11,7 +11,7 @@
 
 	export let L: PIXI.Loader;
 	export let pan;
-	export let tfield: TerrainHexField;
+	export let tfield: terrain_field;
 	export let selectedTool: tools;
 	export let controls;
 

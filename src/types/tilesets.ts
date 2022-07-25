@@ -2,8 +2,9 @@
 interface Tile {
 	display: string;
 	bgColor: number;
-	id: string; // ID doubles up as symbol id, but only us it as such if there is a symbol!
+	id: tile_id; // ID doubles up as symbol id, but only us it as such if there is a symbol!
 	symbol: TileSymbol | null;
+	preview: string;
 }
 
 interface TileSymbol {
@@ -20,7 +21,7 @@ type tile_id = `${tileset_name}_${string}`
 
 interface Tileset {
 	name: tileset_name;
-	id: tile_id;
+	id: string;
 	author: string;
 	version: number;
 	tiles: Tile[];

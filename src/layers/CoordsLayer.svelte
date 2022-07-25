@@ -4,7 +4,7 @@
 	import { coord_system } from '../types/coordinates';
 	import * as PIXI from 'pixi.js';
 	import type { coordinates_data } from '../types/data';
-	import type { TerrainHexField } from '../types/terrain';
+	import type { terrain_field } from '../types/terrain';
 	import { onMount } from 'svelte';
 	import { Container, Text } from 'svelte-pixi';
 import type { hex_id } from '../types/toolData';
@@ -24,7 +24,7 @@ import type { hex_id } from '../types/toolData';
 
 	let cont_textContainer = new PIXI.Container();
 
-	export let tfield: TerrainHexField;
+	export let tfield: terrain_field;
 	export let data_coordinates: coordinates_data;
 
 	function breakDownHexID(hexId: hex_id) {

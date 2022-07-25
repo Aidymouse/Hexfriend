@@ -7,7 +7,7 @@
 	export let value: number = 0x000000;
 
 	export let label: string = null;
-	export let name: string = null;
+	export let id: string = null;
 
 	export let w = 25;
 	export let h = 25;
@@ -30,11 +30,11 @@
 
 <span>
 	<div style="--bg-color: {stringValue}; width: {w}px; height: {h}px">
-		<input type="color" bind:value={stringValue} id={name} />
+		<input type="color" bind:value={stringValue} id={id} />
 	</div>
 
 	{#if label}
-		<label for={name}>{label}</label>
+		<label for={id}>{label}</label>
 	{/if}
 </span>
 

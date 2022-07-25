@@ -12,7 +12,7 @@ export interface TerrainHex {
 	s: number;
 }
 
-export interface TerrainHexField {
+export interface terrain_field {
 	hexWidth: number;
 	hexHeight: number;
 

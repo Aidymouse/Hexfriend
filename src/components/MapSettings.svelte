@@ -4,8 +4,8 @@
 	import SelectGrid from '../components/SelectGrid.svelte';
 	import type { coordinates_data, terrain_data, trace_data } from '../types/data';
 	import { map_type } from '../types/settings';
-	import type { TerrainHexField } from '../types/terrain';
-	import type { saveData } from '../lib/defaultSaveData';
+	import type { terrain_field } from '../types/terrain';
+	import type { save_data } from '../types/savedata';
 	import { coord_system } from '../types/coordinates';
 	import type { Iconset } from '../types/icon';
 	import type { Tileset } from '../types/tilesets';
@@ -14,16 +14,17 @@
 	import type IconLayer from '../layers/IconLayer.svelte';
 	import type CoordsLayer from '../layers/CoordsLayer.svelte';
 	import type * as PIXI from 'pixi.js'
+	import type TerrainField from '../layers/TerrainField.svelte';
 
-	export let loadedSave: saveData;
+	export let loadedSave: save_data;
 	export let showSettings: boolean;
 	export let appState;
 	export let showTerrainGenerator: boolean;
 
 	export let exportMap: Function;
 
-	export let tfield: TerrainHexField;
-	export let comp_terrainField: TerrainHexField;
+	export let tfield: terrain_field;
+	export let comp_terrainField: TerrainField;
 	export let renderAllHexes: Function;
 	export let renderGrid: Function;
 	export let redrawEntireMap: Function;
@@ -111,7 +112,7 @@
 			let setToImport = JSON.parse(eb.target.result);
 
 			/* Check that set hasn't already been imported */
-			if (loadedTilesets.find((is: Iconset) => is.id == setToImport.id) != null) {
+			if (loadedIconsets.find((is: Iconset) => is.id == setToImport.id) != null) {
 				alert("You've already imported this icon set :)");
 				return;
 			}
@@ -298,7 +299,7 @@
 				on:change={() => {
 					renderGrid();
 				}}
-				name={'gridColor'}
+				id={'gridColor'}
 			/>
 		{/if}
 	</div>
@@ -311,7 +312,7 @@
 			on:change={() => {
 				renderAllHexes();
 			}}
-			name={'blankHexColor'}
+			id={'blankHexColor'}
 		/>
 
 		<button
@@ -482,7 +483,7 @@
 					></sup
 				></label
 			>
-			<select id="coordsSystem" bind:value={data_coordinates.system} on:change={comp_coordsLayer.updateAllCoordsText()}>
+			<select id="coordsSystem" bind:value={data_coordinates.system} on:change={comp_coordsLayer.updateAllCoordsText}>
 				<option value={coord_system.ROWCOL}>Column, Row</option>
 				<option value={coord_system.AXIAL}>Axial</option>
 				<option value={coord_system.CUBE}>Cube</option>
@@ -495,7 +496,7 @@
 			<input id="coordFontSize" type="number" bind:value={data_coordinates.style.fontSize} />
 
 			<label for="coordsOutline">Outline Color</label>
-			<ColorInputPixi bind:value={data_coordinates.style.stroke} name={'coordsOutline'} />
+			<ColorInputPixi bind:value={data_coordinates.style.stroke} id={'coordsOutline'} />
 
 			<label for="coordsStrokeThickness">Outline Thickness</label>
 			<input id="coordsStrokeThickness" type="number" bind:value={data_coordinates.style.strokeThickness} />

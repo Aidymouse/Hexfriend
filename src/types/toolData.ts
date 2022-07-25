@@ -1,11 +1,5 @@
 import type { Tile } from './tilesets';
 
-interface path {
-	stroke: number;
-	strokeThickness: number;
-	points: number[];
-}
-
 export enum tools {
 	TERRAIN = 'terrain',
 	ICON = 'icon',

@@ -1,3 +1,4 @@
+/* SAVE DATA */
 export interface Icon {
 	display: string;
 	texId: string;
@@ -18,6 +19,8 @@ export interface Iconset {
 	icons: Icon[];
 }
 
+
+/* USED DURING PROGRAM */
 export interface IconLayerIcon {
 	x: number,
 	y: number,
