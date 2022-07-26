@@ -507,7 +507,7 @@
 
 	function renderHex(hexId: hex_id) {
 		let hex = tfield.hexes[hexId];
-		let hexWorldCoords = coords_cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised);
+		let hexWorldCoords = coords_cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
 
 		if (!hex.tile) {
 			terrainGraphics.beginFill(tfield.blankHexColor);
@@ -591,7 +591,7 @@
 		if (controls.mouseDown[0]) {
 			let x = pan.worldX;
 			let y = pan.worldY;
-			let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised);
+			let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
 
 			let clickedId = genHexId(clickedCoords.q, clickedCoords.r, clickedCoords.s);
 
@@ -664,7 +664,7 @@
 		if (controls.mouseDown[0]) {
 			let x = pan.worldX;
 			let y = pan.worldY;
-			let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised);
+			let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
 
 			let clickedId = genHexId(clickedCoords.q, clickedCoords.r, clickedCoords.s);
 
@@ -680,7 +680,7 @@
 	}
 
 	export function eraseAtMouse() {
-		let clickedCoords = coords_worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised);
+		let clickedCoords = coords_worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
 
 		let clickedId = genHexId(clickedCoords.q, clickedCoords.r, clickedCoords.s);
 
@@ -695,7 +695,7 @@
 	function paintbucket() {
 		let x = pan.worldX;
 		let y = pan.worldY;
-		let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised);
+		let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
 
 		let clickedId = genHexId_cordsObj(clickedCoords);
 		if (!hexExists(clickedId)) return;
@@ -713,7 +713,7 @@
 		// Find all like hexes, much like a paintbucket, and perform a specific operation on them, passing in hex id as a parameter
 
 		let clickedId = genHexId_cordsObj(
-			coords_worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised)
+			coords_worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
 		);
 
 		if (!hexExists(clickedId)) return;

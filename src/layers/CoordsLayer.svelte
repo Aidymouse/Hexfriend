@@ -7,7 +7,7 @@
 	import type { terrain_field } from '../types/terrain';
 	import { onMount } from 'svelte';
 	import { Container, Text } from 'svelte-pixi';
-import type { hex_id } from '../types/toolData';
+	import type { hex_id } from '../types/toolData';
 
 	interface coordText {
 		pixiText: PIXI.Text;
@@ -46,7 +46,7 @@ import type { hex_id } from '../types/toolData';
 	export function generateAllCoords(system: coord_system) {
 		cullUnusedCoordinates();
 
-		Object.keys(tfield.hexes).forEach((hexId) => {
+		Object.keys(tfield.hexes).forEach((hexId: hex_id) => {
 			createTextIfNoneExists(hexId);
 			generateCoord(hexId, system);
 		});
@@ -62,7 +62,7 @@ import type { hex_id } from '../types/toolData';
 	}
 
 	export function updateAllCoordPositions() {
-		Object.entries(texts).forEach(([hexId, text]) => {
+		Object.entries(texts).forEach(([hexId, text]: [hex_id, coordText]) => {
 			updateCoordPosition(hexId);
 		});
 	}

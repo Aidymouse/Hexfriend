@@ -52,15 +52,14 @@
 		let iconY = pan.worldY;
 
 		if (data_icon.snapToHex) {
-			let clickedHexCoords = coords_worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised);
+			let clickedHexCoords = coords_worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
 			let iconCoords = coords_cubeToWorld(
 				clickedHexCoords.q,
 				clickedHexCoords.r,
 				clickedHexCoords.s,
 				tfield.orientation,
 				tfield.hexWidth,
-				tfield.hexHeight,
-				tfield.raised
+				tfield.hexHeight
 			);
 			iconX = iconCoords.x;
 			iconY = iconCoords.y;

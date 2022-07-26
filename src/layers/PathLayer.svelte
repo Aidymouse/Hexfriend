@@ -69,15 +69,14 @@
 		let hW = tfield.hexWidth;
 		let hH = tfield.hexHeight;
 
-		let clickedCoords = coords_worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised);
+		let clickedCoords = coords_worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
 		let centerCoords = coords_cubeToWorld(
 			clickedCoords.q,
 			clickedCoords.r,
 			clickedCoords.s,
 			tfield.orientation,
 			tfield.hexWidth,
-			tfield.hexHeight,
-			tfield.raised
+			tfield.hexHeight
 		);
 
 		let closestPoint = { x: Infinity, y: Infinity };
@@ -173,8 +172,8 @@
 		paths = paths;
 	}
 
-	const HOVEREDSELECTORSTYLE = { width: 1, color: 0x555555 };
-	const SELECTEDSELECTORSTYLE = { width: 2, color: 0x333333 };
+	const HOVEREDSELECTORSTYLE: PIXI.LineStyle = { width: 1, color: 0x555555 };
+	const SELECTEDSELECTORSTYLE: PIXI.LineStyle = { width: 2, color: 0x333333 };
 </script>
 
 {#each paths as path (path.id)}
