@@ -54,8 +54,6 @@
   import { tick } from 'svelte'
   import { db } from './lib/db'
 
-  import { getHexPath, coords_cubeToWorld } from './helpers/hexHelpers'
-
   // Layers
   import TerrainField from './layers/TerrainField.svelte'
   import IconLayer from './layers/IconLayer.svelte'

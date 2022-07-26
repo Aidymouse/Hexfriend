@@ -57,8 +57,8 @@ export function getHexPathRadius(radius: number, orientation: hexOrientation = '
 	return getHexPath(w, h, orientation, centerX, centerY);
 }
 
-export function genHexId(q: number, r: number, s: number): string {
-	return q.toString() + ':' + r.toString() + ':' + s.toString();
+export function genHexId(q: number, r: number, s: number): hex_id {
+	return `${q}:${r}:${s}`
 }
 
 export function genHexId_cordsObj(coords: { q: number; r: number; s: number }): hex_id {

@@ -505,16 +505,13 @@
 		renderGrid();
 	}
 
-	async function renderHex(hexId: hex_id) {
+	function renderHex(hexId: hex_id) {
 		let hex = tfield.hexes[hexId];
-
-		let hexC = coords_cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised);
-
-		//if (tfield.mapType == map_type.SQUARE) hexC = computeSquareBasedOffset(hexC, hex.q, hex.r)
+		let hexWorldCoords = coords_cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised);
 
 		if (!hex.tile) {
 			terrainGraphics.beginFill(tfield.blankHexColor);
-			terrainGraphics.drawPolygon(getHexPath(tfield.hexWidth, tfield.hexHeight, tfield.orientation, hexC.x, hexC.y));
+			terrainGraphics.drawPolygon(getHexPath(tfield.hexWidth, tfield.hexHeight, tfield.orientation, hexWorldCoords.x, hexWorldCoords.y));
 			terrainGraphics.endFill();
 
 			if (terrainSprites[hexId]) {
@@ -527,7 +524,7 @@
 		}
 
 		terrainGraphics.beginFill(hex.tile.bgColor);
-		terrainGraphics.drawPolygon(getHexPath(tfield.hexWidth, tfield.hexHeight, tfield.orientation, hexC.x, hexC.y));
+		terrainGraphics.drawPolygon(getHexPath(tfield.hexWidth, tfield.hexHeight, tfield.orientation, hexWorldCoords.x, hexWorldCoords.y));
 		terrainGraphics.endFill();
 
 		if (hex.tile.symbol == null) {
@@ -548,13 +545,15 @@
 			ns.texture = L.resources[getSymbolTextureId(hex.tile.id)].texture;
 			ns.scale = findSymbolScale(hex.tile.symbol);
 			ns.tint = hex.tile.symbol.color;
+			ns.position.set(hexWorldCoords.x, hexWorldCoords.y); // Position is updated even though it's usually the same, but if hex has been resized since last draw the symbol position will be different
+			
 
 
 		} else {
 			// Make a new sprite
 			let ns = new PIXI.Sprite();
 			ns.anchor.set(0.5);
-			let hc = hexC; //coords_cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+			let hc = hexWorldCoords;
 			ns.position.set(hc.x, hc.y);
 
 			ns.texture = L.resources[getSymbolTextureId(hex.tile.id)].texture;
@@ -567,7 +566,7 @@
 
 	}
 
-	function getSymbolTextureId(tileId: string) {
+	function getSymbolTextureId(tileId: string): string {
 		// If tileId appears as a key in the lookup table, use the lookup table version instead
 		if (Object.keys(symbolTextureLookupTable).find((k) => k == tileId)) {
 			return symbolTextureLookupTable[tileId];
@@ -600,20 +599,57 @@
 		}
 	}
 
-	function paintHex(hexId: hex_id) {
+	function paintHexFromData(hexId: hex_id) {
 		//data_terrain = data_terrain
 
 		paintFromTile(hexId, data_terrain.tile);
 	}
 
-	/* TESTS? */
-	function hexExists(hexId: hex_id) {
-		// If the hex is not rendereable, it doesnt exist.
+
+	/* TESTS */
+	function hexExists(hexId: hex_id): boolean {
 		return tfield.hexes[hexId] != undefined;
 	}
 
-	/* ACTIONS */
-	export function removeAllTilesOfSet(setId) {
+	function hexesMatch(hexId1: hex_id, hexId2: hex_id): boolean {
+		if (!hexExists(hexId1)) return false;
+		if (!hexExists(hexId2)) return false;
+
+		let hex1 = tfield.hexes[hexId1];
+		let hex2 = tfield.hexes[hexId2];
+
+		return tilesMatch(hex1.tile, hex2.tile);
+	}
+
+	function tilesMatch(tile1: Tile, tile2: Tile): boolean {
+		if (tile1 == null && tile2 != null) return false;
+		if (tile1 != null && tile2 == null) return false;
+		if (tile1 == null && tile2 == null) return true; // Both are blank
+
+		// Return false if one has a symbol and one does not
+		if (tile1.symbol != null && tile2.symbol == null) return false;
+		if (tile1.symbol == null && tile2.symbol != null) return false;
+
+		if (tile1.bgColor != tile2.bgColor) return false;
+
+		if (tile1.symbol && tile2.symbol) {
+			if (tile1.symbol.color != tile2.symbol.color) return false;
+			if (getSymbolTextureId(tile1.id) != getSymbolTextureId(tile2.id)) return false;
+		}
+
+		return true;
+	}
+
+	function hexMatchesData(hexId: hex_id): boolean {
+		if (!hexExists(hexId)) return false;
+
+		let hex = tfield.hexes[hexId];
+
+		return tilesMatch(hex.tile, data_terrain.tile);
+	}
+
+	/* USER ACTIONS */
+	export function removeAllTilesOfSet(setId: string) {
 		Object.entries(tfield.hexes).forEach(([hexId, hex]: [hex_id, TerrainHex]) => {
 			if (!hex.tile) return;
 
@@ -669,7 +705,7 @@
 		// Should be done in paint terrain as well
 
 		getContiguousHexIdsOfSameType(clickedId).forEach((hexId: hex_id) => {
-			paintHex(hexId);
+			paintHexFromData(hexId);
 		});
 	}
 
@@ -702,105 +738,63 @@
 	}
 
 	/* UNCATEGORIZED */
-	function hexesMatch(hexId1: hex_id, hexId2: hex_id): boolean {
-		if (!hexExists(hexId1)) return false;
-		if (!hexExists(hexId2)) return false;
-
-		let hex1 = tfield.hexes[hexId1];
-		let hex2 = tfield.hexes[hexId2];
-
-		return tilesMatch(hex1.tile, hex2.tile);
-	}
-
-	function tilesMatch(tile1: Tile, tile2: Tile): boolean {
-		if (tile1 == null && tile2 != null) return false;
-		if (tile1 != null && tile2 == null) return false;
-		if (tile1 == null && tile2 == null) return true; // Both are blank
-
-		// Return false if one has a symbol and one does not
-		if (tile1.symbol != null && tile2.symbol == null) return false;
-		if (tile1.symbol == null && tile2.symbol != null) return false;
-
-		if (tile1.bgColor != tile2.bgColor) return false;
-
-		if (tile1.symbol && tile2.symbol) {
-			if (tile1.symbol.color != tile2.symbol.color) return false;
-			if (getSymbolTextureId(tile1.id) != getSymbolTextureId(tile2.id)) return false;
-		}
-
-		return true;
-	}
-
-	function hexMatchesData(hexId: hex_id): boolean {
-		if (!hexExists(hexId)) return false;
-
-		let hex = tfield.hexes[hexId];
-
-		return tilesMatch(hex.tile, data_terrain.tile);
-	}
-
 	function generateBlankTile(): Tile {
 		return {
 			bgColor: tfield.blankHexColor,
 			display: 'Blank',
-			id: 'blank',
+			id: 'noset_blank',
 			symbol: null,
+			preview: ""
 		};
 	}
 
-	function getContiguousHexIdsOfSameType(hexId: hex_id): string[] {
-		/*
-        let x = pan.worldX
-        let y = pan.worldY
+	function getContiguousHexIdsOfSameType(hexId: hex_id): hex_id[] {
 
-        let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised)
+		let startHex = { ...tfield.hexes[hexId] }; // Any neighbours with the same style (same bgColor, symbol and symbolColor) will be changed and their neighbours will be added to the list
 
-        let clickedId = genHexId( clickedCoords.q, clickedCoords.r, clickedCoords.s ) 
-        if (!hexExists(clickedId)) return
-        */
-
-		let baseHex = { ...tfield.hexes[hexId] }; // Any neighbours with the same style (same bgColor, symbol and symbolColor) will be changed and their neighbours will be added to the list
-
-		let seenIds = [genHexId(baseHex.q, baseHex.r, baseHex.s)];
-		let changedIds = [];
+		let seenIds = [genHexId(startHex.q, startHex.r, startHex.s)]; // Seen hexes have been added to the hex stack
+		let visitedIDs = []; // Visited hexes have been gone into and their neighbours looked at
 		let hexStack = [hexId];
 
 		while (hexStack.length > 0) {
-			let cHex = tfield.hexes[hexStack.pop()];
-
-			// Perform operation on current hex
-			//operation( genHexId(cHex.q, cHex.r, cHex.s) )
-
-			// Add neighbour to hexStack
-			let neighbourIds = getNeighbours(cHex.q, cHex.r, cHex.s);
+			let currentHex = tfield.hexes[hexStack.pop()];
+			
+			// Add only matching neighbours to hexStack
+			let neighbourIds = getNeighbours(currentHex.q, currentHex.r, currentHex.s);
 			neighbourIds.forEach((nId: hex_id) => {
-				if (seenIds.find((sId) => sId == nId)) return;
 				if (!hexExists(nId)) return;
-
+				if (seenIds.find((sId) => sId == nId)) return;
+				
 				if (hexesMatch(nId, hexId)) {
 					seenIds.push(nId);
 					hexStack.push(nId);
 				}
 			});
 
-			changedIds.push(genHexId(cHex.q, cHex.r, cHex.s));
+			// Add this hex to the list to return
+			visitedIDs.push(genHexId(currentHex.q, currentHex.r, currentHex.s));
+
 		}
 
-		return changedIds;
+		return visitedIDs;
 	}
 
 	export function pointerdown() {
 		if (data_terrain.usingEyedropper) {
 			eyedrop();
+
 		} else if (data_terrain.usingPaintbucket && data_terrain.usingEraser) {
-			//console.log("Paintbucket Erase!")
 			erasePaintbucket();
+
 		} else if (data_terrain.usingPaintbucket) {
 			paintbucket();
+
 		} else if (data_terrain.usingEraser) {
 			eraseAtMouse();
+
 		} else {
 			placeTerrain();
+
 		}
 	}
 
@@ -821,7 +815,7 @@
 <Graphics
 	instance={terrainGraphics}
 	draw={(g) => {
-		/* too slow to draw here! we have to hanndle it manually. See the render methods */
+		/* too slow to draw here! we have to handle it manually. See the render methods */
 	}}
 />
 <Container instance={symbolsContainer} />
@@ -830,7 +824,7 @@
 	<Graphics
 		instance={gridGraphics}
 		draw={(g) => {
-			/* too slow to draw here! we have to hanndle it manually. See the render methods */
+			/* too slow to draw here! we have to handle it manually. See the render methods */
 		}}
 	/>
 {/if}
