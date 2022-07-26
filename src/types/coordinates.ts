@@ -4,7 +4,6 @@ export enum coord_system {
 	AXIAL,
 }
 
-
 export interface cube_coords {
 	q: number,
 	r: number,

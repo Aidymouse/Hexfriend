@@ -218,9 +218,25 @@
 		grid-template-columns: 60px 1fr;
 		grid-template-rows: 30px 30px;
 		column-gap: 5px;
-		padding: 10px;
 		background-color: #333333;
+		padding: 10px;
 	}
+
+	#preview-image-centerer {
+		grid-row: 1/3;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	#terrain-preview img.flatTop {
+		width: 60px;
+	}
+
+	#terrain-preview img.pointyTop {
+		height: 60px;
+	}
+
 
 	.button-grid {
 		display: grid;
@@ -253,20 +269,7 @@
 		width: 90%;
 	}
 
-	#preview-image-centerer {
-		grid-row: 1/3;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	#terrain-preview img.flatTop {
-		width: 60px;
-	}
-
-	#terrain-preview img.pointyTop {
-		height: 60px;
-	}
+	
 
 	.selected {
 		outline-style: solid;

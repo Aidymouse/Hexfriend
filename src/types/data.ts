@@ -1,7 +1,7 @@
 import type { coord_system } from './coordinates';
-import type { path, path_style } from './path';
+import type { path } from './path';
 import type { HF_text } from './text';
-import type { Tile, TileSymbol } from './tilesets';
+import type { Tile } from './tilesets';
 import type * as PIXI from 'pixi.js';
 
 export interface terrain_data {
@@ -38,7 +38,7 @@ export interface text_data {
 export interface path_data {
 	selectedPath: path;
 	snap: boolean;
-	style: path_style;
+	style: PIXI.LineStyle;
 }
 
 export interface trace_data {

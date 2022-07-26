@@ -330,9 +330,13 @@
 				bind:value={tfield.orientation}
 				on:change={() => {
 					changeOrientation();
+					comp_coordsLayer.cullUnusedCoordinates();
+					comp_coordsLayer.makeCoordsOnBlankHexes();
+					comp_coordsLayer.updateAllCoordPositions();
 				}}
 			/>
 		</div>
+
 		<label for="hexWidth">Hex Width</label>
 		<input
 			id="hexWidth"
@@ -352,6 +356,7 @@
 			on:change={() => {
 				redrawEntireMap();
 				comp_coordsLayer.updateAllCoordPositions();
+				comp_coordsLayer.cullUnusedCoordinates();
 			}}
 		/>
 
@@ -373,6 +378,7 @@
 						bind:value={tfield.raised}
 						on:change={() => {
 							comp_terrainField.square_updateRaisedColumn();
+							comp_coordsLayer.cullUnusedCoordinates();
 						}}
 					/>
 				</div>
@@ -380,11 +386,12 @@
 				<p>Indented Row</p>
 				<div style={'height: 100%; display: flex; align-items: center;'}>
 					<SelectGrid
-						values={['even', 'odd']}
+					values={['even', 'odd']}
 						filenamePrefix={'indentedrow'}
 						bind:value={tfield.raised}
 						on:change={() => {
 							comp_terrainField.square_changeIndentedRow();
+							comp_coordsLayer.cullUnusedCoordinates();
 						}}
 					/>
 				</div>
@@ -490,7 +497,7 @@
 			</select>
 
 			<label for="coordsFill">Color</label>
-			<ColorInputPixi bind:value={data_coordinates.style.fill} name={'coordsFill'} />
+			<ColorInputPixi bind:value={data_coordinates.style.fill} id={'coordsFill'} />
 
 			<label for="coordFontSize">Font Size</label>
 			<input id="coordFontSize" type="number" bind:value={data_coordinates.style.fontSize} />

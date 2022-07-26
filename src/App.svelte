@@ -83,6 +83,8 @@
   // Data
   import DEFAULTSAVEDATA from './lib/defaultSaveData'
   
+  // GLOBAL STYLES
+  import './styles/inputs.css'
 
   /* STATE */
 
@@ -620,7 +622,7 @@
     <TerrainPanel {loadedTilesets} {tfield} {app} {L} bind:data_terrain {symbolTextureLookupTable} />
   
   {:else if selectedTool == "icon"}
-    <IconPanel {L} {app} {loadedIconsets} bind:data_icon {iconTextureLookupTable} />
+    <IconPanel {L} {app} {loadedIconsets} bind:data_icon {iconTextureLookupTable} {tfield} />
   
   {:else if selectedTool == "path"}
     <PathPanel bind:data_path {comp_pathLayer} bind:pathStyles={loadedSave.pathStyles} />
@@ -709,8 +711,8 @@
 
 
 
-
 <style>
+
   :root {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
       Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -722,22 +724,15 @@
     overflow: hidden;
   }
 
-  :global(.green-button) {
-    border-color: #648d2e;
-    background-color: #8cc63f;
-    color: white;
-  }
-
-  :global(.green-button:hover) {
-    border: none;
-    background-color: #648d2e;
-  }
-
   :global(h2) {
     font-family: 'Segoe UI';
     font-weight: normal;
     border-bottom: solid 2px #555555;
   }
+
+  
+
+  
 
   :global(html) {
     height: 100%;
@@ -779,88 +774,7 @@
     right: 10px;
   }
 
-  /* GLOBAL BUTTON STYLING */
-  :global(button) {
-    border: solid 1px #777777;
-    border-radius: 3px;
-    background-color: #333333;
-    color: white;
-    padding: 5px;
-    transition-duration: .2s;
-  }
 
-  :global(button:hover) {
-    background-color: #555555;
-  }
-  
-  :global(button:active) {
-    background-color: #444444;
-  }
-
-  /* GLOBAL INPUT STYLE */
-  :global(input) {
-    background-color: #777777;
-    border: 0;
-    border-bottom: solid 2px #222222;
-    transition-duration: .2s;
-    transition-property: border-color;
-    color: #f2f2f2;
-  }
-
-  :global(input[type=text]) {
-    padding: 5px;
-  }
-
-  :global(input[type=number]) {
-    padding: 5px;
-  }
-
-  :global(input:focus) {
-    border-color: #8cc63f;
-    transition-duration: .2s;
-    transition-property: border-color;
-    outline: none;
-  }
-
-
-  :global(textarea) {
-    outline: none;
-    color: #f2f2f2;
-    background-color: #333333;
-    border-radius: 3px;
-  }
-
-  :global(textarea:focus) {
-    outline-style: solid;
-    outline-width: 1px;
-    outline-color: #8cc63f;
-    border-color: #8cc63f
-  }
-
-  :global(select) {
-    background-color: #777777;
-    color: #f2f2f2;
-    padding: 5px;
-    border-radius: 3px;
-  }
-
-  :global(button:disabled) {
-    border: solid 1px #222222;
-    background-color: #222222;
-    color: #777777;
-  }
-
-  :global(button:disabled:hover) {
-    border: solid 1px #222222;
-    background-color: #222222;
-  }
-
-  :global(.selected) {
-    outline-style: solid;
-    outline-width: 1px;
-    outline-color: #8cc63f;
-    border-color: #8cc63f
-  }
 
 
   /* GLOBAL SCROLL BAR */

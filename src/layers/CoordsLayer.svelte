@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { coords_cubeToWorld } from '../helpers/hexHelpers';
+	import { coords_cubeToWorld, genHexId } from '../helpers/hexHelpers';
 	import { coords_cubeToq, coords_cubeTor } from '../helpers/hexHelpers';
 	import { coord_system } from '../types/coordinates';
 	import * as PIXI from 'pixi.js';
 	import type { coordinates_data } from '../types/data';
-	import type { terrain_field } from '../types/terrain';
+	import type { TerrainHex, terrain_field } from '../types/terrain';
 	import { onMount } from 'svelte';
 	import { Container, Text } from 'svelte-pixi';
 	import type { hex_id } from '../types/toolData';
@@ -20,7 +20,7 @@
 		});
 	}
 
-	let texts: { [key: string]: coordText } = {}; // hex id: coordText
+	let texts: { [key: hex_id]: coordText } = {}; // hex id: coordText
 
 	let cont_textContainer = new PIXI.Container();
 
@@ -77,13 +77,13 @@
 		text.pixiText.position.y = newPos.y + tfield.hexHeight / 2 - data_coordinates.gap;
 	}
 
-	export function eliminateCoord(hexId) {
+	export function eliminateCoord(hexId: hex_id) {
 		cont_textContainer.removeChild(texts[hexId].pixiText);
 		texts[hexId].pixiText.destroy();
 		delete texts[hexId];
 	}
 
-	function generateCoordText(hexId, system: coord_system = data_coordinates.system) {
+	function generateCoordText(hexId: hex_id, system: coord_system = data_coordinates.system) {
 		switch (system) {
 			case coord_system.CUBE: {
 				let idParts = breakDownHexID(hexId);
@@ -120,13 +120,20 @@
 		}
 	}
 
+	export function makeCoordsOnBlankHexes() {
+		Object.entries(tfield.hexes).forEach(([hexId, hex]: [hex_id, TerrainHex]) => {
+			createTextIfNoneExists(hexId)
+			generateCoord(hexId)
+		})
+	}
+
 	export function updateAllCoordsText() {
-		Object.entries(texts).forEach(([hexId, text]) => {
+		Object.entries(texts).forEach(([hexId, text]: [hex_id, coordText]) => {
 			generateCoordText(hexId);
 		});
 	}
 
-	export function updateCoordText(hexId) {
+	export function updateCoordText(hexId: hex_id) {
 		generateCoordText(hexId);
 	}
 
@@ -135,7 +142,7 @@
 	}
 
 	export function cullUnusedCoordinates() {
-		Object.keys(texts).forEach((hexId) => {
+		Object.keys(texts).forEach((hexId: hex_id) => {
 			if (tfield.hexes[hexId] == null) {
 				eliminateCoord(hexId);
 			}

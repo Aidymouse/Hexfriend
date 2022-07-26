@@ -1,9 +1,12 @@
 <script lang="ts">
+	import type { Icon, Iconset } from '../types/icon';
+	import type { icon_data } from '../types/data';
+	import type { terrain_field } from 'src/types/terrain';
+
 	import Checkbox from '../components/Checkbox.svelte';
 	import ColorInputPixi from '../components/ColorInputPixi.svelte';
-	import type { Icon, Iconset } from '../types/icon';
 	import * as PIXI from 'pixi.js';
-	import type { icon_data } from '../types/data';
+	import { getHexPath } from '../helpers/hexHelpers';
 
 	export let loadedIconsets: Iconset[];
 	export let L: PIXI.Loader;
@@ -13,10 +16,14 @@
 
 	export let iconTextureLookupTable;
 
+	export let tfield: terrain_field;
+
 	let iconPreview = '';
 	$: {
 		iconPreview = getIconPreview(data_icon);
 		loadedIconsets = loadedIconsets;
+
+		tfield.orientation = tfield.orientation;
 	}
 
 	function selectIcon(iconData: Icon) {
@@ -29,12 +36,43 @@
 	}
 
 	let s = new PIXI.Sprite();
+	let g = new PIXI.Graphics();
+	let c = new PIXI.Container();
+	c.addChild(g).addChild(s);
+
+	function getIconScale(hexWidth: number, hexHeight: number): number {
+		let scale: number;
+		if (hexWidth < hexHeight) {
+			scale = (hexWidth * (data_icon.pHex / 100)) / L.resources[getIconTextureId(data_icon.texId)].texture.width;
+		} else {
+			scale = (hexHeight * (data_icon.pHex / 100)) / L.resources[getIconTextureId(data_icon.texId)].texture.height;
+		}
+
+		return scale;
+	}
 
 	function getIconPreview(iconData: icon_data): string {
+		let hW = 50;
+		let hH = 45;
+
+		if (tfield.orientation == "pointyTop") {
+			hW = 45;
+			hH = 50;
+		}
+
+		let path = getHexPath(hW, hH, tfield.orientation, 0, 0)
+		g.clear()
+		g.beginFill(0xf2f2f2);
+		g.drawPolygon(path);
+		g.endFill();
+
 		s.texture = L.resources[getIconTextureId(iconData.texId)].texture;
 		s.tint = iconData.color;
+		s.anchor.set(0.5, 0.5);
+		s.scale.set( getIconScale(hW, hH) )
 
-		let b64 = app.renderer.plugins.extract.base64(s); //PIXI.autoDetectRenderer().plugins.extract.base64(c)
+
+		let b64 = app.renderer.plugins.extract.base64(c); //PIXI.autoDetectRenderer().plugins.extract.base64(c)
 
 		return b64;
 	}
@@ -56,11 +94,20 @@
 
 <div class="panel">
 	<div id="icon-preview">
-		<img src={iconPreview} alt={'Icon Preview'} />
+		<div id="preview-image-centerer">
+			<img 
+				src={iconPreview}
+				alt={'Icon Preview'} 
+				class:flatTop={tfield.orientation == 'flatTop'}
+				class:pointyTop={tfield.orientation == 'pointyTop'}
+			/>
+		</div>
 
 		<ColorInputPixi bind:value={data_icon.color} w={25} h={25} label={'Icon Color'} id={'iconPanelColor'} />
 
 		<Checkbox name={'cb_snapIcon'} label="Snap To Hex Center" bind:checked={data_icon.snapToHex} />
+
+		<input type="range" min={10} max={100} bind:value={data_icon.pHex} style="grid-column: 1/3; margin-bottom: 0;">
 
 		<button
 			id="eraser"
@@ -98,10 +145,7 @@
 </div>
 
 <style>
-	img {
-		height: 60px;
-		grid-row: 1/3;
-	}
+
 
 	div {
 		color: white;
@@ -116,12 +160,29 @@
 
 	#icon-preview {
 		display: grid;
-		grid-template-rows: 30px 30px;
 		grid-template-columns: 60px 1fr;
+		grid-template-rows: 30px 30px;
 		column-gap: 5px;
 		background-color: #333333;
 		padding: 10px;
 	}
+
+	#preview-image-centerer {
+		grid-row: 1/3;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	#icon-preview img.flatTop {
+		width: 60px;
+	}
+
+	#icon-preview img.pointyTop {
+		height: 60px;
+	}
+
+	
 
 	#buttons {
 		background-color: #555555;
