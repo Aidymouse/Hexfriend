@@ -1,10 +1,10 @@
 <script lang="ts">
 	import ColorInputPixi from '../components/ColorInputPixi.svelte';
 	import { getHexPath } from '../helpers/hexHelpers';
-	import * as PIXI from 'pixi.js';
 	import type { terrain_data } from '../types/data';
 	import type { terrain_field } from '../types/terrain';
 	import type { Tile, Tileset } from '../types/tilesets';
+	import * as PIXI from 'pixi.js';
 
 	export let loadedTilesets: Tileset[];
 	export let data_terrain: terrain_data;
@@ -13,7 +13,7 @@
 	export let app: PIXI.Application;
 	export let L: PIXI.Loader;
 
-	export let symbolTextureLookupTable: {[key: string]: string};
+	export let symbolTextureLookupTable: { [key: string]: string };
 
 	$: {
 		tilePreview = generateTilePreview(data_terrain);
@@ -168,7 +168,7 @@
 		</button>
 	</div>
 
-	<div id="buttons">
+	<div id="buttons" class="scroll-container">
 		{#each loadedTilesets as tileset (tileset.id)}
 			{#if tileset.id != 'default'}
 				<h2>{tileset.name}</h2>
@@ -185,6 +185,20 @@
 </div>
 
 <style>
+
+	.panel {
+		display: grid;
+		grid-template-columns: 1fr;
+		grid-template-rows: auto 1fr;
+	}
+
+	.scroll-container {
+		min-height: 30%;
+		max-height: 100%;
+		height: auto;
+		overflow-y: scroll;
+	}
+
 	.small-panel-button {
 		position: absolute;
 		width: 25px;
@@ -237,7 +251,6 @@
 		height: 60px;
 	}
 
-
 	.button-grid {
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
@@ -268,8 +281,6 @@
 	#buttons button img {
 		width: 90%;
 	}
-
-	
 
 	.selected {
 		outline-style: solid;

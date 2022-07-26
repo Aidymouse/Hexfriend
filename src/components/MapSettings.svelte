@@ -2,19 +2,19 @@
 	import Checkbox from '../components/Checkbox.svelte';
 	import ColorInputPixi from '../components/ColorInputPixi.svelte';
 	import SelectGrid from '../components/SelectGrid.svelte';
+	import type CoordsLayer from '../layers/CoordsLayer.svelte';
+	import type IconLayer from '../layers/IconLayer.svelte';
+	import type PathLayer from '../layers/PathLayer.svelte';
+	import type TerrainField from '../layers/TerrainField.svelte';
+	import type TextLayer from '../layers/TextLayer.svelte';
+	import { coord_system } from '../types/coordinates';
 	import type { coordinates_data, terrain_data, trace_data } from '../types/data';
+	import type { Iconset } from '../types/icon';
+	import type { save_data } from '../types/savedata';
 	import { map_type } from '../types/settings';
 	import type { terrain_field } from '../types/terrain';
-	import type { save_data } from '../types/savedata';
-	import { coord_system } from '../types/coordinates';
-	import type { Iconset } from '../types/icon';
 	import type { Tileset } from '../types/tilesets';
-	import type TextLayer from '../layers/TextLayer.svelte';
-	import type PathLayer from '../layers/PathLayer.svelte';
-	import type IconLayer from '../layers/IconLayer.svelte';
-	import type CoordsLayer from '../layers/CoordsLayer.svelte';
-	import type * as PIXI from 'pixi.js'
-	import type TerrainField from '../layers/TerrainField.svelte';
+	import type * as PIXI from 'pixi.js';
 
 	export let loadedSave: save_data;
 	export let showSettings: boolean;
@@ -39,7 +39,7 @@
 	export let loadedIconsets: Iconset[];
 	export let addIconsetTextures: Function;
 
-	export let L: PIXI.Loader
+	export let L: PIXI.Loader;
 
 	export let comp_iconLayer: IconLayer;
 	export let comp_pathLayer: PathLayer;
@@ -331,8 +331,8 @@
 				on:change={() => {
 					changeOrientation();
 					comp_coordsLayer.cullUnusedCoordinates();
-					comp_coordsLayer.makeCoordsOnBlankHexes();
 					comp_coordsLayer.updateAllCoordPositions();
+					comp_coordsLayer.populateBlankHexes();
 				}}
 			/>
 		</div>
@@ -386,7 +386,7 @@
 				<p>Indented Row</p>
 				<div style={'height: 100%; display: flex; align-items: center;'}>
 					<SelectGrid
-					values={['even', 'odd']}
+						values={['even', 'odd']}
 						filenamePrefix={'indentedrow'}
 						bind:value={tfield.raised}
 						on:change={() => {

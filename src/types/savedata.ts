@@ -1,7 +1,7 @@
-import type { coordinates_data } from "./data";
-import type { Iconset } from "./icon";
-import type { terrain_field } from "./terrain";
-import type { Tileset } from "./tilesets";
+import type { coordinates_data } from './data';
+import type { Iconset } from './icon';
+import type { terrain_field } from './terrain';
+import type { Tileset } from './tilesets';
 
 export interface save_data {
 	saveVersion: number;

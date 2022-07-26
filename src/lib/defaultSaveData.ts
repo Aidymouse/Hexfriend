@@ -1,14 +1,13 @@
 import { coords_qToCube, genHexId } from '../helpers/hexHelpers';
+import { coord_system } from '../types/coordinates';
+import type { coordinates_data } from '../types/data';
 import type { Iconset } from '../types/icon';
+import type { save_data } from '../types/savedata';
 import { map_type } from '../types/settings';
 import type { terrain_field } from '../types/terrain';
 import type { Tile, Tileset } from '../types/tilesets';
 import { DEFAULTICONSET } from './defaultIconset';
 import { DEFAULTTILESET } from './defaultTileset';
-import { coord_system } from '../types/coordinates';
-import type { coordinates_data } from '../types/data';
-
-import type { save_data } from '../types/savedata';
 
 const CURRENTSAVEVERSION = 1;
 

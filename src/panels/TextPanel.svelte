@@ -2,10 +2,10 @@
 	import ColorInput from '../components/ColorInput.svelte';
 	import CustomValueToggle from '../components/CustomValueToggle.svelte';
 	import SelectGrid from '../components/SelectGrid.svelte';
-	import type * as PIXI from 'pixi.js';
+	import type TextLayer from '../layers/TextLayer.svelte';
 	import type { text_data } from '../types/data';
 	import type { listed_text_style } from '../types/text';
-	import type TextLayer from '../layers/TextLayer.svelte';
+	import type * as PIXI from 'pixi.js';
 
 	export let data_text: text_data;
 	export let comp_textLayer: TextLayer;

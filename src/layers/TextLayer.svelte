@@ -1,6 +1,6 @@
 <script lang="ts">
-	import * as PIXI from 'pixi.js';
 	import type { text_data } from '../types/data';
+	import * as PIXI from 'pixi.js';
 	import { Graphics, Text } from 'svelte-pixi';
 
 	export let pan;

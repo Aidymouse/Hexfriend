@@ -5,7 +5,7 @@ export enum coord_system {
 }
 
 export interface cube_coords {
-	q: number,
-	r: number,
-	s: number
+	q: number;
+	r: number;
+	s: number;
 }

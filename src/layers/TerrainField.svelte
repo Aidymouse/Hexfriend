@@ -11,23 +11,23 @@
 		getNeighbours,
 	} from '../helpers/hexHelpers';
 	import { collapseWaveGen } from '../lib/terrainGenerator';
+	import type { cube_coords } from '../types/coordinates';
+	import type { terrain_data } from '../types/data';
 	import { map_type } from '../types/settings';
-	import * as PIXI from 'pixi.js';
 	import type { TerrainHex, terrain_field } from '../types/terrain';
 	import type { Tile } from '../types/tilesets';
+	import type { TileSymbol } from '../types/tilesets';
+	import type { hex_id } from '../types/toolData';
+	import type CoordsLayer from './CoordsLayer.svelte';
+	import * as PIXI from 'pixi.js';
 	import { onMount } from 'svelte';
 	import { Container, Graphics } from 'svelte-pixi';
-	import type { terrain_data } from '../types/data';
-	import type { hex_id } from '../types/toolData';
-	import type { TileSymbol } from '../types/tilesets';
-	import type CoordsLayer from './CoordsLayer.svelte';
-	import type { cube_coords } from '../types/coordinates';
 
 	let terrainGraphics = new PIXI.Graphics();
 	let symbolsContainer = new PIXI.Container();
 	let gridGraphics = new PIXI.Graphics();
 
-	let terrainSprites: {[key: hex_id]: PIXI.Sprite} = {};
+	let terrainSprites: { [key: hex_id]: PIXI.Sprite } = {};
 
 	export let pan;
 	export let controls;
@@ -54,7 +54,7 @@
 				let newHexCoords: cube_coords = coords_qToCube('odd', col, tfield.rows - 1);
 				let newId: hex_id = genHexId_cordsObj(newHexCoords);
 				tfield.hexes[newId] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, tile: null };
-				comp_coordsLayer.generateCoord(newId);
+				comp_coordsLayer.generateNewCoord(newId);
 
 				// Move all hexes one down
 				for (let row = tfield.rows - 1; row >= 0; row--) {
@@ -79,7 +79,7 @@
 				let newHexCoords = coords_qToCube('even', col, 0);
 				let newId = genHexId_cordsObj(newHexCoords);
 				tfield.hexes[newId] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, tile: null };
-				comp_coordsLayer.generateCoord(newId);
+				comp_coordsLayer.generateNewCoord(newId);
 
 				// Move all hexes one up
 				for (let row = 0; row < tfield.rows; row++) {
@@ -110,7 +110,7 @@
 				let newHexCoords = coords_rToCube('odd', tfield.columns - 1, row);
 				let newId = genHexId_cordsObj(newHexCoords);
 				tfield.hexes[newId] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, tile: null };
-				comp_coordsLayer.generateCoord(newId);
+				comp_coordsLayer.generateNewCoord(newId);
 
 				// Move all hexes one right
 				for (let col = tfield.columns - 1; col >= 0; col--) {
@@ -135,7 +135,7 @@
 				let newHexCoords = coords_rToCube('even', 0, row);
 				let newId = genHexId_cordsObj(newHexCoords);
 				tfield.hexes[newId] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, tile: null };
-				comp_coordsLayer.generateCoord(newId);
+				comp_coordsLayer.generateNewCoord(newId);
 
 				// Move all hexes one up
 				for (let col = 0; col < tfield.columns; col++) {
@@ -181,8 +181,6 @@
 		//for (var i = symbolsContainer.children.length - 1; i >= 0; i--) {symbolsContainer.removeChild(symbolsContainer.children[i]);};
 		clearTerrainSprites();
 		renderAllHexes();
-
-		//comp_coordsLayer.generateAllCoords();
 	}
 
 	export function square_expandMapDimension(direction: 'left' | 'right' | 'top' | 'bottom', amount: number) {
@@ -245,7 +243,7 @@
 						: coords_rToCube(tfield.raised, tfield.columns, row);
 
 				tfield.hexes[genHexId_cordsObj(newHexCoords)] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, tile: null };
-				comp_coordsLayer.generateCoord(genHexId_cordsObj(newHexCoords));
+				comp_coordsLayer.generateNewCoord(genHexId_cordsObj(newHexCoords));
 			}
 
 			tfield.columns += 1;
@@ -285,7 +283,7 @@
 						: coords_rToCube(tfield.raised, col, tfield.rows + row);
 
 				tfield.hexes[genHexId_cordsObj(newHexCoords)] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, tile: null };
-				comp_coordsLayer.generateCoord(genHexId_cordsObj(newHexCoords));
+				comp_coordsLayer.generateNewCoord(genHexId_cordsObj(newHexCoords));
 			}
 		}
 		tfield.rows += amount;
@@ -528,7 +526,6 @@
 		terrainGraphics.endFill();
 
 		if (hex.tile.symbol == null) {
-
 			if (terrainSprites[hexId]) {
 				symbolsContainer.removeChild(terrainSprites[hexId]);
 				terrainSprites[hexId].destroy();
@@ -540,15 +537,12 @@
 
 		if (terrainSprites[hexId]) {
 			// Re-use the sprite that already exists
-			let ns = terrainSprites[hexId]
-			
+			let ns = terrainSprites[hexId];
+
 			ns.texture = L.resources[getSymbolTextureId(hex.tile.id)].texture;
 			ns.scale = findSymbolScale(hex.tile.symbol);
 			ns.tint = hex.tile.symbol.color;
 			ns.position.set(hexWorldCoords.x, hexWorldCoords.y); // Position is updated even though it's usually the same, but if hex has been resized since last draw the symbol position will be different
-			
-
-
 		} else {
 			// Make a new sprite
 			let ns = new PIXI.Sprite();
@@ -563,7 +557,6 @@
 			symbolsContainer.addChild(ns);
 			terrainSprites[hexId] = ns;
 		}
-
 	}
 
 	function getSymbolTextureId(tileId: string): string {
@@ -604,7 +597,6 @@
 
 		paintFromTile(hexId, data_terrain.tile);
 	}
-
 
 	/* TESTS */
 	function hexExists(hexId: hex_id): boolean {
@@ -712,9 +704,7 @@
 	function erasePaintbucket() {
 		// Find all like hexes, much like a paintbucket, and perform a specific operation on them, passing in hex id as a parameter
 
-		let clickedId = genHexId_cordsObj(
-			coords_worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
-		);
+		let clickedId = genHexId_cordsObj(coords_worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight));
 
 		if (!hexExists(clickedId)) return;
 		if (tfield.hexes[clickedId].tile == null) return;
@@ -744,12 +734,11 @@
 			display: 'Blank',
 			id: 'noset_blank',
 			symbol: null,
-			preview: ""
+			preview: '',
 		};
 	}
 
 	function getContiguousHexIdsOfSameType(hexId: hex_id): hex_id[] {
-
 		let startHex = { ...tfield.hexes[hexId] }; // Any neighbours with the same style (same bgColor, symbol and symbolColor) will be changed and their neighbours will be added to the list
 
 		let seenIds = [genHexId(startHex.q, startHex.r, startHex.s)]; // Seen hexes have been added to the hex stack
@@ -758,13 +747,13 @@
 
 		while (hexStack.length > 0) {
 			let currentHex = tfield.hexes[hexStack.pop()];
-			
+
 			// Add only matching neighbours to hexStack
 			let neighbourIds = getNeighbours(currentHex.q, currentHex.r, currentHex.s);
 			neighbourIds.forEach((nId: hex_id) => {
 				if (!hexExists(nId)) return;
 				if (seenIds.find((sId) => sId == nId)) return;
-				
+
 				if (hexesMatch(nId, hexId)) {
 					seenIds.push(nId);
 					hexStack.push(nId);
@@ -773,7 +762,6 @@
 
 			// Add this hex to the list to return
 			visitedIDs.push(genHexId(currentHex.q, currentHex.r, currentHex.s));
-
 		}
 
 		return visitedIDs;
@@ -782,19 +770,14 @@
 	export function pointerdown() {
 		if (data_terrain.usingEyedropper) {
 			eyedrop();
-
 		} else if (data_terrain.usingPaintbucket && data_terrain.usingEraser) {
 			erasePaintbucket();
-
 		} else if (data_terrain.usingPaintbucket) {
 			paintbucket();
-
 		} else if (data_terrain.usingEraser) {
 			eraseAtMouse();
-
 		} else {
 			placeTerrain();
-
 		}
 	}
 

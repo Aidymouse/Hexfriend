@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { genHexId, getNeighbours } from '../helpers/hexHelpers';
 	import { download } from '../lib/download2';
-	import type { Tile, Tileset } from '../types/tilesets';
 	import type { TerrainHex, terrain_field } from '../types/terrain';
+	import type { Tile, Tileset } from '../types/tilesets';
 
 	function rand(min: number, max: number): number {
 		min = Math.ceil(min);

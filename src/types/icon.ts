@@ -19,13 +19,12 @@ export interface Iconset {
 	icons: Icon[];
 }
 
-
 /* USED DURING PROGRAM */
 export interface IconLayerIcon {
-	x: number,
-	y: number,
-	color: number,
-	scale: number,
-	id: number,
-	texId: string
+	x: number;
+	y: number;
+	color: number;
+	scale: number;
+	id: number;
+	texId: string;
 }

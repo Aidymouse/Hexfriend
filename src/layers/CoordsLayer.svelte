@@ -1,13 +1,14 @@
 <script lang="ts">
+	// Small random bug that i'll come investigate later: if you change orientation, then raised col/indented row, then change orientation again, hex at (col.row) (1.0) or (1.1) will be duplicated??
 	import { coords_cubeToWorld, genHexId } from '../helpers/hexHelpers';
 	import { coords_cubeToq, coords_cubeTor } from '../helpers/hexHelpers';
 	import { coord_system } from '../types/coordinates';
-	import * as PIXI from 'pixi.js';
 	import type { coordinates_data } from '../types/data';
 	import type { TerrainHex, terrain_field } from '../types/terrain';
+	import type { hex_id } from '../types/toolData';
+	import * as PIXI from 'pixi.js';
 	import { onMount } from 'svelte';
 	import { Container, Text } from 'svelte-pixi';
-	import type { hex_id } from '../types/toolData';
 
 	interface coordText {
 		pixiText: PIXI.Text;
@@ -15,12 +16,12 @@
 	}
 
 	$: {
-		Object.entries(texts).forEach(([hexId, text]) => {
+		Object.entries(coordTexts).forEach(([hexId, text]) => {
 			text.pixiText.style = data_coordinates.style;
 		});
 	}
 
-	let texts: { [key: hex_id]: coordText } = {}; // hex id: coordText
+	let coordTexts: { [key: hex_id]: coordText } = {}; // hex id: coordText
 
 	let cont_textContainer = new PIXI.Container();
 
@@ -32,43 +33,50 @@
 		return { q: Number(brokenId[0]), r: Number(brokenId[1]), s: Number(brokenId[2]) };
 	}
 
-	function createTextIfNoneExists(hexId: hex_id) {
-		//texts[hexId] = { text: "", x: 0, y: 0, parts: [] }
-
-		if (!textExists(hexId)) {
-			texts[hexId] = { pixiText: new PIXI.Text('', data_coordinates.style), parts: [] };
-			texts[hexId].pixiText.anchor.x = 0.5;
-			texts[hexId].pixiText.anchor.y = 1;
-			cont_textContainer.addChild(texts[hexId].pixiText);
-		}
+	function coordTextExists(hexId: hex_id) {
+		return coordTexts[hexId] != null;
 	}
 
-	export function generateAllCoords(system: coord_system) {
-		cullUnusedCoordinates();
-
+	function generateAllCoords(system: coord_system) {
 		Object.keys(tfield.hexes).forEach((hexId: hex_id) => {
-			createTextIfNoneExists(hexId);
-			generateCoord(hexId, system);
+			generateNewCoord(hexId, system);
 		});
-		updateAllCoordPositions();
 	}
 
-	export function generateCoord(hexId: hex_id, system: coord_system = data_coordinates.system) {
-		createTextIfNoneExists(hexId);
+	export function populateBlankHexes() {
+		Object.keys(tfield.hexes).forEach((hexId: hex_id) => {
+			if (!coordTextExists(hexId)) generateNewCoord(hexId);
+		});
+	}
 
-		generateCoordText(hexId);
+	export function generateNewCoord(hexId: hex_id, system: coord_system = data_coordinates.system) {
+		// The title is a little misleading, but it's essentially correct
+		// But, we don't have any reason to make coords more than once. This optimization
+		if (coordTextExists(hexId)) {
+			console.log(`You already have a text at ${hexId}! Use updateCoord() instead, goofball.`);
+		}
+
+		coordTexts[hexId] = { pixiText: new PIXI.Text('', data_coordinates.style), parts: [] };
+		coordTexts[hexId].pixiText.anchor.x = 0.5;
+		coordTexts[hexId].pixiText.anchor.y = 1;
+		cont_textContainer.addChild(coordTexts[hexId].pixiText);
+
+		let generated = generateCoordTextAndParts(hexId);
+
+		coordTexts[hexId].pixiText.text = generated.text;
+		coordTexts[hexId].parts = [...generated.parts];
 
 		updateCoordPosition(hexId);
 	}
 
 	export function updateAllCoordPositions() {
-		Object.entries(texts).forEach(([hexId, text]: [hex_id, coordText]) => {
+		Object.keys(coordTexts).forEach((hexId: hex_id) => {
 			updateCoordPosition(hexId);
 		});
 	}
 
 	function updateCoordPosition(hexId: hex_id) {
-		let text = texts[hexId];
+		let text = coordTexts[hexId];
 
 		let idParts = breakDownHexID(hexId);
 		let newPos = coords_cubeToWorld(idParts.q, idParts.r, idParts.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
@@ -78,21 +86,22 @@
 	}
 
 	export function eliminateCoord(hexId: hex_id) {
-		cont_textContainer.removeChild(texts[hexId].pixiText);
-		texts[hexId].pixiText.destroy();
-		delete texts[hexId];
+		cont_textContainer.removeChild(coordTexts[hexId].pixiText);
+		coordTexts[hexId].pixiText.destroy();
+		delete coordTexts[hexId];
 	}
 
-	function generateCoordText(hexId: hex_id, system: coord_system = data_coordinates.system) {
+	function generateCoordTextAndParts(hexId: hex_id, system: coord_system = data_coordinates.system): { parts: number[]; text: string } {
 		switch (system) {
 			case coord_system.CUBE: {
 				let idParts = breakDownHexID(hexId);
 
-				texts[hexId].parts = [idParts.q, idParts.r, idParts.s];
-				texts[
-					hexId
-				].pixiText.text = `${texts[hexId].parts[0]}${data_coordinates.seperator}${texts[hexId].parts[1]}${data_coordinates.seperator}${texts[hexId].parts[2]}`;
-				break;
+				let parts = [idParts.q, idParts.r, idParts.s];
+
+				return {
+					parts: [idParts.q, idParts.r, idParts.s],
+					text: `${parts[0]}${data_coordinates.seperator}${parts[1]}${data_coordinates.seperator}${parts[2]}`,
+				};
 			}
 
 			case coord_system.ROWCOL: {
@@ -102,47 +111,42 @@
 						? coords_cubeToq(tfield.raised, cube.q, cube.r, cube.s)
 						: coords_cubeTor(tfield.raised, cube.q, cube.r, cube.s);
 
-				texts[hexId].parts = [idParts.col, idParts.row];
-				texts[hexId].pixiText.text = `${texts[hexId].parts[0]}${data_coordinates.seperator}${texts[hexId].parts[1]}`;
+				let parts = [idParts.col, idParts.row];
 
-				break;
+				return {
+					parts: [idParts.col, idParts.row],
+					text: `${parts[0]}${data_coordinates.seperator}${parts[1]}`,
+				};
 			}
 
 			case coord_system.AXIAL: {
 				let cube = breakDownHexID(hexId);
 
 				//let newPos = coords_cubeToWorld(cube.q, cube.r, cube.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+				let parts = [cube.q, cube.r];
 
-				texts[hexId].parts = [cube.q, cube.r];
-				texts[hexId].pixiText.text = `${texts[hexId].parts[0]}${data_coordinates.seperator}${texts[hexId].parts[1]}`;
-				break;
+				return {
+					parts: [cube.q, cube.r],
+					text: `${parts[0]}${data_coordinates.seperator}${parts[1]}`,
+				};
 			}
 		}
 	}
 
-	export function makeCoordsOnBlankHexes() {
-		Object.entries(tfield.hexes).forEach(([hexId, hex]: [hex_id, TerrainHex]) => {
-			createTextIfNoneExists(hexId)
-			generateCoord(hexId)
-		})
-	}
-
 	export function updateAllCoordsText() {
-		Object.entries(texts).forEach(([hexId, text]: [hex_id, coordText]) => {
-			generateCoordText(hexId);
+		Object.keys(coordTexts).forEach((hexId: hex_id) => {
+			updateCoordText(hexId);
 		});
 	}
 
-	export function updateCoordText(hexId: hex_id) {
-		generateCoordText(hexId);
-	}
-
-	function textExists(hexId: hex_id) {
-		return texts[hexId] != null;
+	function updateCoordText(hexId: hex_id) {
+		let generated = generateCoordTextAndParts(hexId);
+		coordTexts[hexId].parts = [...generated.parts];
+		coordTexts[hexId].pixiText.text = generated.text;
 	}
 
 	export function cullUnusedCoordinates() {
-		Object.keys(texts).forEach((hexId: hex_id) => {
+		Object.keys(coordTexts).forEach((hexId: hex_id) => {
 			if (tfield.hexes[hexId] == null) {
 				eliminateCoord(hexId);
 			}

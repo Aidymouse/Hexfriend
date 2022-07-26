@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { coords_cubeToWorld, coords_worldToCube, cube_round } from '../helpers/hexHelpers';
-	import * as PIXI from 'pixi.js';
 	import type { path_data } from '../types/data';
 	import type { path } from '../types/path';
 	import type { terrain_field } from '../types/terrain';
+	import * as PIXI from 'pixi.js';
 	import { Container, Graphics } from 'svelte-pixi';
 
 	export let controls;

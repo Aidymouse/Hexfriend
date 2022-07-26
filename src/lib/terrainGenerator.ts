@@ -1,7 +1,6 @@
 // Every hex has a percentange chance that its neighbour will be a different terrain type
-
-import type { terrain_field } from "../types/terrain";
-import type { Tileset } from "../types/tilesets";
+import type { terrain_field } from '../types/terrain';
+import type { Tileset } from '../types/tilesets';
 
 /* Terrain generating through wave function collapse! */
 
@@ -201,5 +200,4 @@ function colorWith(hex, tileid, tileset) {
 	}
 }
 
-
-export { generateTerrain, collapseWaveGen }
+export { generateTerrain, collapseWaveGen };

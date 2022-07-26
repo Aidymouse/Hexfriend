@@ -16,8 +16,8 @@ interface TileSymbol {
 	base64: string;
 }
 
-type tileset_name = string
-type tile_id = `${tileset_name}_${string}`
+type tileset_name = string;
+type tile_id = `${tileset_name}_${string}`;
 
 interface Tileset {
 	name: tileset_name;
@@ -26,7 +26,5 @@ interface Tileset {
 	version: number;
 	tiles: Tile[];
 }
-
-
 
 export type { Tile, TileSymbol, Tileset };

@@ -1,0 +1,14 @@
+.panel {
+    background-color: #333333;
+    border-radius: 4px;
+    overflow: hidden;
+    width: 300px;
+    box-sizing: border-box;
+    position: fixed;
+    top: 10px;
+    right: 10px;
+
+    max-height: 80%;
+    height: auto;
+}
+

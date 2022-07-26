@@ -2,8 +2,8 @@
 	import type { hexOrientation } from '../helpers/hexHelpers';
 	import { getHexPathRadius } from '../helpers/hexHelpers';
 	import { download } from '../lib/download2';
-	import ColorInputPixi from './ColorInputPixi.svelte';
 	import type { Icon, Iconset } from '../types/icon';
+	import ColorInputPixi from './ColorInputPixi.svelte';
 	import * as PIXI from 'pixi.js';
 	import { tick } from 'svelte';
 	import { Graphics, Pixi, Sprite } from 'svelte-pixi';

@@ -1,4 +1,5 @@
 import sveltePreprocess from 'svelte-preprocess';
+
 //import adapter from '@sveltejs/adapter-auto';
 //import { resolve } from 'path';
 

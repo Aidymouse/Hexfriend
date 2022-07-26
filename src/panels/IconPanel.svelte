@@ -1,12 +1,11 @@
 <script lang="ts">
-	import type { Icon, Iconset } from '../types/icon';
-	import type { icon_data } from '../types/data';
-	import type { terrain_field } from 'src/types/terrain';
-
 	import Checkbox from '../components/Checkbox.svelte';
 	import ColorInputPixi from '../components/ColorInputPixi.svelte';
-	import * as PIXI from 'pixi.js';
 	import { getHexPath } from '../helpers/hexHelpers';
+	import type { icon_data } from '../types/data';
+	import type { Icon, Iconset } from '../types/icon';
+	import * as PIXI from 'pixi.js';
+	import type { terrain_field } from 'src/types/terrain';
 
 	export let loadedIconsets: Iconset[];
 	export let L: PIXI.Loader;
@@ -27,7 +26,6 @@
 	}
 
 	function selectIcon(iconData: Icon) {
-
 		data_icon.texId = iconData.texId;
 		data_icon.color = iconData.color;
 		data_icon.pHex = iconData.pHex;
@@ -55,22 +53,21 @@
 		let hW = 50;
 		let hH = 45;
 
-		if (tfield.orientation == "pointyTop") {
+		if (tfield.orientation == 'pointyTop') {
 			hW = 45;
 			hH = 50;
 		}
 
-		let path = getHexPath(hW, hH, tfield.orientation, 0, 0)
-		g.clear()
-		g.beginFill(0xf2f2f2);
+		let path = getHexPath(hW, hH, tfield.orientation, 0, 0);
+		g.clear();
+		g.beginFill(tfield.blankHexColor);
 		g.drawPolygon(path);
 		g.endFill();
 
 		s.texture = L.resources[getIconTextureId(iconData.texId)].texture;
 		s.tint = iconData.color;
 		s.anchor.set(0.5, 0.5);
-		s.scale.set( getIconScale(hW, hH) )
-
+		s.scale.set(getIconScale(hW, hH));
 
 		let b64 = app.renderer.plugins.extract.base64(c); //PIXI.autoDetectRenderer().plugins.extract.base64(c)
 
@@ -95,9 +92,9 @@
 <div class="panel">
 	<div id="icon-preview">
 		<div id="preview-image-centerer">
-			<img 
+			<img
 				src={iconPreview}
-				alt={'Icon Preview'} 
+				alt={'Icon Preview'}
 				class:flatTop={tfield.orientation == 'flatTop'}
 				class:pointyTop={tfield.orientation == 'pointyTop'}
 			/>
@@ -107,7 +104,7 @@
 
 		<Checkbox name={'cb_snapIcon'} label="Snap To Hex Center" bind:checked={data_icon.snapToHex} />
 
-		<input type="range" min={10} max={100} bind:value={data_icon.pHex} style="grid-column: 1/3; margin-bottom: 0;">
+		<input type="range" min={10} max={100} bind:value={data_icon.pHex} style="grid-column: 1/3; margin-bottom: 0;" />
 
 		<button
 			id="eraser"
@@ -145,8 +142,6 @@
 </div>
 
 <style>
-
-
 	div {
 		color: white;
 	}
@@ -181,8 +176,6 @@
 	#icon-preview img.pointyTop {
 		height: 60px;
 	}
-
-	
 
 	#buttons {
 		background-color: #555555;

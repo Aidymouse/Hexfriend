@@ -2,10 +2,10 @@
 	import Checkbox from '../components/Checkbox.svelte';
 	import ColorInputPixi from '../components/ColorInputPixi.svelte';
 	import SelectGrid from '../components/SelectGrid.svelte';
-	import * as PIXI from 'pixi.js';
+	import type PathLayer from '../layers/PathLayer.svelte';
 	import type { path_data } from '../types/data';
 	import type { listed_path_style } from '../types/path';
-	import type PathLayer from '../layers/PathLayer.svelte';
+	import * as PIXI from 'pixi.js';
 
 	export let data_path: path_data;
 	export let comp_pathLayer: PathLayer;
@@ -119,8 +119,6 @@
 			</button>
 		</div>
 	</div>
-
-	
 </div>
 
 <style>

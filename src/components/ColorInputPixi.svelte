@@ -30,7 +30,7 @@
 
 <span>
 	<div style="--bg-color: {stringValue}; width: {w}px; height: {h}px">
-		<input type="color" bind:value={stringValue} id={id} />
+		<input type="color" bind:value={stringValue} {id} />
 	</div>
 
 	{#if label}

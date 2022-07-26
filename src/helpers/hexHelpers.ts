@@ -1,6 +1,6 @@
-import { hex2rgb } from '@pixi/utils';
-import type { hex_id } from '../types/toolData';
 import type { TerrainHex } from '../types/terrain';
+import type { hex_id } from '../types/toolData';
+import { hex2rgb } from '@pixi/utils';
 
 export type hexOrientation = 'flatTop' | 'pointyTop';
 type cubeCoords = { q: number; r: number; s: number };
@@ -58,14 +58,14 @@ export function getHexPathRadius(radius: number, orientation: hexOrientation = '
 }
 
 export function genHexId(q: number, r: number, s: number): hex_id {
-	return `${q}:${r}:${s}`
+	return `${q}:${r}:${s}`;
 }
 
 export function genHexId_cordsObj(coords: { q: number; r: number; s: number }): hex_id {
 	let q = coords.q;
 	let r = coords.r;
 	let s = coords.s;
-	return `${q}:${r}:${s}`
+	return `${q}:${r}:${s}`;
 }
 
 /* NEIGHBOURS */
@@ -105,13 +105,7 @@ export function cube_round(frac: cubeCoords): cubeCoords {
 	return { q: q, r: r, s: s };
 }
 
-export function coords_worldToCube(
-	worldX: number,
-	worldY: number,
-	hexOrientation: hexOrientation,
-	hexWidth: number,
-	hexHeight: number
-): cubeCoords {
+export function coords_worldToCube(worldX: number, worldY: number, hexOrientation: hexOrientation, hexWidth: number, hexHeight: number): cubeCoords {
 	if (hexOrientation == 'flatTop') {
 		// This is the inversion of the axialToWorld
 		// Of course, substituting -q-r in as S
@@ -123,7 +117,6 @@ export function coords_worldToCube(
 
 		return roundedCoords;
 	} else if (hexOrientation == 'pointyTop') {
-
 		let r = worldY / (hexHeight * 0.75);
 		let q = ((2 * worldX) / hexWidth - r) / 2;
 
@@ -152,7 +145,7 @@ export function coords_cubeToWorld(
 	} else if (hexOrientation == 'pointyTop') {
 		let hx = (q * hexWidth) / 2 - (s * hexWidth) / 2;
 		let hy = r * hexHeight * 0.75;
-		
+
 		return {
 			x: hx,
 			y: hy,
