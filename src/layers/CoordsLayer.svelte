@@ -50,8 +50,6 @@
 	}
 
 	export function generateNewCoord(hexId: hex_id, system: coord_system = data_coordinates.system) {
-		// The title is a little misleading, but it's essentially correct
-		// But, we don't have any reason to make coords more than once. This optimization
 		if (coordTextExists(hexId)) {
 			console.log(`You already have a text at ${hexId}! Use updateCoord() instead, goofball.`);
 		}
@@ -139,7 +137,7 @@
 		});
 	}
 
-	function updateCoordText(hexId: hex_id) {
+	export function updateCoordText(hexId: hex_id) {
 		let generated = generateCoordTextAndParts(hexId);
 		coordTexts[hexId].parts = [...generated.parts];
 		coordTexts[hexId].pixiText.text = generated.text;

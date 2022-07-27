@@ -61,6 +61,8 @@
 	// GLOBAL STYLES
 	import './styles/inputs.css';
 	import './styles/panels.css';
+	import './styles/scrollbar.css';
+
 	import { coord_system } from './types/coordinates';
 	import type { coordinates_data, icon_data, path_data, terrain_data, text_data, trace_data } from './types/data';
 	import type { Iconset } from './types/icon';
@@ -682,31 +684,7 @@
 	}
 
 
-	/* GLOBAL SCROLL BAR */
-
-	/* width */
-	:global(::-webkit-scrollbar) {
-		width: 8px;
-	}
-
-	/* Track */
-	:global(::-webkit-scrollbar-track) {
-		display: none;
-		opacity: 0;
-	}
-
-	/* Handle */
-	:global(::-webkit-scrollbar-thumb) {
-		background: #f2f2f2;
-		opacity: 0;
-		border-radius: 4px;
-		width: 8px;
-	}
-
-	/* Handle on hover */
-	:global(::-webkit-scrollbar-thumb:hover) {
-		opacity: 1;
-	}
+	
 
 	/* GLOBAL Checkbox */
 

@@ -614,7 +614,7 @@
 
 	<h2>About</h2>
 	<p class="helperText">
-		Hexfriend version 1.1 – "Em Vee Pee"
+		Hexfriend version 1.1.1 – "Wake up, Hexfriend!"
 		<br />
 		By Aidymouse and all the wonderful contributors
 	</p>
@@ -623,7 +623,7 @@
 		Hexfriend is built with Svelte, Pixi JS and Typescript. Check out the <a href="https://www.github.com/Aidymouse/Hexfriend">Github</a>
 	</p>
 
-	<p class="helperText" style="text-align: center; font-size: 20pt;">☺</p>
+	<p class="helperText" style="text-align: center; font-size: 20pt; font-style: normal">☺</p>
 </div>
 
 <style>
