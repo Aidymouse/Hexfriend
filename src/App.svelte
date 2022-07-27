@@ -1,37 +1,31 @@
 <script lang="ts">
 	/* COLORS
-   hexfriend green: #8cc63f
-  hexfiend red: #FF6666
- */
+hexfriend green: #8cc63f
+hexfiend red: #FF6666
+*/
 
 	/* TODO 
-
-  
-   // CORE FUNCTIONS
-  - hex coordinates on map - fix pointy top + more coordinate systems
-  - tooltips
-  - move icons when resizing map
-  
-  - keyboard shortcuts
-  - import iconsets
-  
-  // POLISH / ROADMAP
-  // not ranked
-  - terrain generator function validation
-  - terrain generator
-  - floating loaders - better feedback
-  - save data checking (if loading, making new map, quitting)
-  - export at different sizes
-  - tooltips
-  - dashed line
-  - more fonts
- */
+// CORE FUNCTIONS
+- hex coordinates on map - fix pointy top + more coordinate systems
+- tooltips
+- move icons when resizing map
+- keyboard shortcuts
+- import iconsets
+// POLISH / ROADMAP
+// not ranked
+- terrain generator function validation
+- terrain generator
+- floating loaders - better feedback
+- save data checking (if loading, making new map, quitting)
+- export at different sizes
+- tooltips
+- dashed line
+- more fonts
+*/
 
 	/* BUGS 
-
-  - symbol size is weird in preview when hex size is big
-  - coordinates show under some stuff for some reason
-
+- symbol size is weird in preview when hex size is big
+- coordinates show under some stuff for some reason
 */
 	import Controls from './components/ControlTooltips.svelte';
 	import IconsetCreator from './components/IconsetCreator.svelte';
@@ -62,7 +56,6 @@
 	import './styles/inputs.css';
 	import './styles/panels.css';
 	import './styles/scrollbar.css';
-
 	import { coord_system } from './types/coordinates';
 	import type { coordinates_data, icon_data, path_data, terrain_data, text_data, trace_data } from './types/data';
 	import type { Iconset } from './types/icon';
@@ -168,6 +161,21 @@
 				pan.zoomScale *= zoomFactor;
 			} else {
 				pan.zoomScale /= zoomFactor;
+			}
+
+			// controls how far you can zoom out (smaller number is farther out)
+			let minZoom = (window.innerWidth + window.innerHeight) / 2;
+			minZoom /= ((tfield.hexWidth + tfield.hexHeight) / 2) * ((tfield.columns + tfield.rows) / 2) * 2;
+			if (pan.zoomScale < minZoom) {
+				pan.zoomScale = minZoom;
+			}
+			// controls how far you can zoom in (bigger number is closer in)
+			let maxZoom = (window.innerWidth + window.innerHeight) / 2;
+			// TODO: use tile size
+			// maxZoom /= 100 * 2;
+			maxZoom /= ((tfield.hexWidth + tfield.hexHeight) / 2) * 4;
+			if (maxZoom < pan.zoomScale) {
+				pan.zoomScale = maxZoom;
 			}
 
 			// Move the screen
@@ -682,9 +690,6 @@
 		box-sizing: border-box;
 		padding: 0;
 	}
-
-
-	
 
 	/* GLOBAL Checkbox */
 
