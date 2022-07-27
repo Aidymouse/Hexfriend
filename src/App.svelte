@@ -35,21 +35,22 @@ hexfiend red: #FF6666
 	import TilesetCreator from './components/TilesetCreator.svelte';
 	// Like, whatever
 	import ToolButtons from './components/ToolButtons.svelte';
+	// Layers
 	import CoordsLayer from './layers/CoordsLayer.svelte';
 	import IconLayer from './layers/IconLayer.svelte';
 	import PathLayer from './layers/PathLayer.svelte';
-	// Layers
 	import TerrainLayer from './layers/TerrainLayer.svelte';
 	import TextLayer from './layers/TextLayer.svelte';
 	import { db } from './lib/db';
+	import Loader from './components/Loader.svelte';
 	// Data
 	import DEFAULTSAVEDATA from './lib/defaultSaveData';
 	// Methods
 	//import { collapseWaveGen } from './lib/terrainGenerator'
 	import { download } from './lib/download2';
+	// Panels
 	import IconPanel from './panels/IconPanel.svelte';
 	import PathPanel from './panels/PathPanel.svelte';
-	// Panels
 	import TerrainPanel from './panels/TerrainPanel.svelte';
 	import TextPanel from './panels/TextPanel.svelte';
 	// GLOBAL STYLES
@@ -76,6 +77,7 @@ hexfiend red: #FF6666
 
 	let showSettings = false;
 	let showTerrainGenerator = false;
+	let showLoader: boolean = false;
 
 	let offsetContainer = new PIXI.Container();
 
@@ -96,7 +98,7 @@ hexfiend red: #FF6666
 		resizeTo: window,
 	});
 
-	//PIXI.settings.RESOLUTION = 4
+	PIXI.settings.RESOLUTION = 4
 
 	let showSavedMaps = false;
 
@@ -136,15 +138,15 @@ hexfiend red: #FF6666
 		},
 
 		handle: function (e: PointerEvent) {
-			pan.screenX = e.clientX; //e.detail.data.global.x
-			pan.screenY = e.clientY; //e.detail.data.global.y
+			pan.screenX = e.clientX;
+			pan.screenY = e.clientY;
 
 			if (pan.panning) {
-				pan.offsetX += e.clientX - pan.oldX; //e.detail.data.global.x - pan.oldX
-				pan.offsetY += e.clientY - pan.oldY; //e.detail.data.global.y - pan.oldY
+				pan.offsetX += e.clientX - pan.oldX;
+				pan.offsetY += e.clientY - pan.oldY;
 
-				pan.oldX = e.clientX; //e.detail.data.global.x
-				pan.oldY = e.clientY; //e.detail.data.global.y
+				pan.oldX = e.clientX;
+				pan.oldY = e.clientY;
 			}
 		},
 
@@ -264,20 +266,24 @@ hexfiend red: #FF6666
 	};
 
 	function exportMap(exportType) {
-		console.log(exportType);
+		
+		showLoader = true;
+
 		switch (exportType) {
 			case 'image/png':
 				download(
 					app.renderer.plugins.extract.base64(offsetContainer),
 					`${loadedSave.title ? loadedSave.title : 'Untitled Hexfriend'}`,
 					exportType
-				);
+					);
 				break;
 
 			case 'application/json':
 				download(JSON.stringify(loadedSave), `${loadedSave.title ? loadedSave.title : 'Untitled Hexfriend'}.hexfriend`, exportType);
 				break;
 		}
+
+		showLoader = false;
 	}
 
 	function redrawEntireMap() {
@@ -467,6 +473,14 @@ hexfiend red: #FF6666
 
 			loading = false;
 			await tick();
+
+			// Final Layer Setup
+			comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
+
+			comp_coordsLayer.cullUnusedCoordinates();
+			comp_coordsLayer.updateAllCoordPositions();
+			comp_coordsLayer.populateBlankHexes();
+			
 			comp_terrainLayer.clearTerrainSprites();
 			comp_terrainLayer.renderAllHexes();
 		});
@@ -512,6 +526,7 @@ hexfiend red: #FF6666
 </script>
 
 {#if appState == 'normal' && !loading}
+	
 	<main
 		on:contextmenu|preventDefault={(e) => {}}
 		on:wheel={(e) => {
@@ -527,6 +542,9 @@ hexfiend red: #FF6666
 			pointerup(e);
 		}}
 	>
+
+		
+
 		<Pixi {app}>
 			<Container instance={offsetContainer} x={pan.offsetX} y={pan.offsetY} scale={{ x: pan.zoomScale, y: pan.zoomScale }}>
 				<TerrainLayer
@@ -641,6 +659,11 @@ hexfiend red: #FF6666
 	/>
 
 	<Controls {selectedTool} {data_terrain} {data_icon} {data_path} {data_text} />
+
+	{#if showLoader}
+		<Loader />
+	{/if}
+
 {:else if appState == 'tilesetCreator'}
 	<TilesetCreator bind:appState />
 {:else if appState == 'iconsetCreator'}

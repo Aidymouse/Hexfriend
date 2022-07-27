@@ -113,7 +113,7 @@
 
 				return {
 					parts: [idParts.col, idParts.row],
-					text: `${parts[0]}${data_coordinates.seperator}${parts[1]}`,
+					text: `${parts[0] < 10 ? 0 : ""}${parts[0]}${data_coordinates.seperator}${parts[1] < 10 ? 0 : ""}${parts[1]}`,
 				};
 			}
 

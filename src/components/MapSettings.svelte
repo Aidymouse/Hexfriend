@@ -47,6 +47,8 @@
 
 	export let load: Function;
 
+	let retainIconPosition: boolean = true
+
 	let exportType: 'Export As...' | 'image/png' | 'application/json' = 'Export As...';
 
 	function changeOrientation() {
@@ -330,8 +332,12 @@
 				bind:value={tfield.orientation}
 				on:change={() => {
 					changeOrientation();
+
+					if (retainIconPosition) comp_iconLayer.retainIconPositionOnOrientationChange(tfield.orientation);
+
 					comp_coordsLayer.cullUnusedCoordinates();
 					comp_coordsLayer.updateAllCoordPositions();
+					comp_coordsLayer.updateAllCoordsText();
 					comp_coordsLayer.populateBlankHexes();
 				}}
 			/>
@@ -342,9 +348,16 @@
 			id="hexWidth"
 			type="number"
 			bind:value={tfield.hexWidth}
+			
+			on:focus={() => {
+				comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight)
+			}}
+
 			on:change={() => {
 				redrawEntireMap();
 				comp_coordsLayer.updateAllCoordPositions();
+				if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize(tfield.hexWidth, tfield.hexHeight)
+				comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight)
 			}}
 		/>
 
@@ -353,12 +366,18 @@
 			id="hexHeight"
 			type="number"
 			bind:value={tfield.hexHeight}
+			on:focus={() => {
+				comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight)
+			}}
 			on:change={() => {
 				redrawEntireMap();
 				comp_coordsLayer.updateAllCoordPositions();
-				comp_coordsLayer.cullUnusedCoordinates();
+				if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize(tfield.hexWidth, tfield.hexHeight)
+				comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight)
 			}}
 		/>
+
+		
 
 		<!--
         <label for="mapType">Map Type</label>
@@ -397,7 +416,13 @@
 				</div>
 			{/if}
 		{/if}
+		
+		<label for="retainIcon" title="Icons will atempt to remain in their hex when transformations occur">Retain Icon Position</label>
+		<Checkbox bind:checked={retainIconPosition} name="retainIcon" />
+	
 	</div>
+
+
 
 	<h2>Map Dimensions</h2>
 	<section id="map-dimensions-container">

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { coords_cubeToWorld, coords_worldToCube } from '../helpers/hexHelpers';
+	import { coords_cubeToq, coords_cubeTor, coords_cubeToWorld, coords_qToCube, coords_rToCube, coords_worldToCube, hexOrientation } from '../helpers/hexHelpers';
 	import type { icon_data } from '../types/data';
 	import type { IconLayerIcon } from '../types/icon';
 	import type { terrain_field } from '../types/terrain';
@@ -70,7 +70,7 @@
 		icons = icons;
 	}
 
-	function deleteIcon(icon) {
+	function deleteIcon(icon: IconLayerIcon) {
 		let iconIndex = icons.indexOf(icon);
 		icons.splice(iconIndex, 1);
 		icons = icons;
@@ -92,6 +92,94 @@
 
 		icons = icons;
 	}
+
+	let oldHexWidth: number
+	let oldHexHeight: number
+	// This is called during layer set up when maps are loaded, or when hex fields are focused on.
+	export function saveOldHexMeasurements(hexWidth: number, hexHeight: number) {
+		oldHexWidth = hexWidth;
+		oldHexHeight = hexHeight;
+	}
+
+	export function retainIconPositionOnHexResize(newHexWidth: number, newHexHeight: number) {
+		// Find proprtional horizontal and vertical distance from center of nearest hex, and retain the position with the new width and height
+
+		icons.forEach((icon: IconLayerIcon) => {
+
+			let closestHexCubeCoords = coords_worldToCube(icon.x, icon.y, tfield.orientation, oldHexWidth, oldHexHeight)
+			let closestHexPos = coords_cubeToWorld(closestHexCubeCoords.q, closestHexCubeCoords.r, closestHexCubeCoords.s, tfield.orientation, oldHexWidth, oldHexHeight)
+			
+			let distanceFromHexLeft = oldHexWidth / 2 + icon.x - closestHexPos.x
+			let distanceFromHexTop = oldHexHeight/2 + icon.y - closestHexPos.y
+			
+			let proportionalHorizontalDistance = distanceFromHexLeft / oldHexWidth 
+			let proportionalVerticalDistance = distanceFromHexTop / oldHexHeight 
+			
+			let closestHexPosNew = coords_cubeToWorld(closestHexCubeCoords.q, closestHexCubeCoords.r, closestHexCubeCoords.s, tfield.orientation, newHexWidth, newHexHeight)
+			
+			icon.x = closestHexPosNew.x - (newHexWidth/2) + newHexWidth * proportionalHorizontalDistance
+			icon.y = closestHexPosNew.y - (newHexHeight/2) + newHexHeight * proportionalVerticalDistance
+
+		})
+
+		icons = icons
+
+		oldHexWidth = newHexWidth
+		oldHexHeight = newHexHeight
+
+	}
+
+	export function retainIconPositionOnOrientationChange(newOrientation: hexOrientation) {
+		// Only really works on square maps afaik
+		// Because it relies on row/col coords
+		console.log(oldHexWidth, oldHexHeight)
+
+		icons.forEach((icon: IconLayerIcon) => {
+
+
+			let oldOrientation: hexOrientation = newOrientation == "flatTop" ? "pointyTop" : "flatTop"
+
+			let closestHexCubeCoords = coords_worldToCube(icon.x, icon.y, oldOrientation, oldHexWidth, oldHexHeight)
+			let closestHexPos = coords_cubeToWorld(closestHexCubeCoords.q, closestHexCubeCoords.r, closestHexCubeCoords.s, oldOrientation, oldHexWidth, oldHexHeight)
+			
+
+			let distanceFromHexLeft = tfield.hexWidth / 2 + icon.x - closestHexPos.x
+			let distanceFromHexTop = tfield.hexHeight / 2 + icon.y - closestHexPos.y
+			
+			let proportionalHorizontalDistance = distanceFromHexLeft / oldHexWidth 
+			let proportionalVerticalDistance = distanceFromHexTop / oldHexHeight 
+
+
+			let conservedClosestHexRowCol = oldOrientation == "flatTop" 
+				? coords_cubeToq(tfield.raised, closestHexCubeCoords.q, closestHexCubeCoords.r, closestHexCubeCoords.s)
+				: coords_cubeTor(tfield.raised, closestHexCubeCoords.q, closestHexCubeCoords.r, closestHexCubeCoords.s) 
+
+
+
+			let newHexCubeCoords = tfield.orientation == "flatTop"
+				? coords_qToCube(tfield.raised, conservedClosestHexRowCol.col, conservedClosestHexRowCol.row)
+				: coords_rToCube(tfield.raised, conservedClosestHexRowCol.col, conservedClosestHexRowCol.row)
+
+			let newHexPos = coords_cubeToWorld(newHexCubeCoords.q, newHexCubeCoords.r, newHexCubeCoords.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+
+			
+			//let closestHexPosNew = coords_cubeToWorld(closestHexCubeCoords.q, closestHexCubeCoords.r, closestHexCubeCoords.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+			
+			// Slips slightly... why??
+			icon.x = newHexPos.x - (tfield.hexWidth/2) + tfield.hexWidth * proportionalHorizontalDistance
+			icon.y = newHexPos.y - (tfield.hexHeight/2) + tfield.hexHeight * proportionalVerticalDistance
+
+			
+
+		})
+
+		icons = icons
+
+		oldHexWidth = tfield.hexWidth
+		oldHexHeight = tfield.hexHeight
+
+	}
+
 </script>
 
 {#each icons as icon (icon.id)}
