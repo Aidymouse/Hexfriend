@@ -3,7 +3,7 @@
 	import type { hexOrientation } from '../helpers/hexHelpers';
 	import { getHexPathRadius } from '../helpers/hexHelpers';
 	import { download } from '../lib/download2';
-	import type { Tile, Tileset } from '../types/tilesets';
+	import type { Tile, Tileset, TileSymbol } from '../types/tilesets';
 	import * as PIXI from 'pixi.js';
 	import { tick } from 'svelte';
 	import { Graphics, Pixi, Sprite } from 'svelte-pixi';
@@ -12,6 +12,7 @@
 		width: 300,
 		height: 300,
 		backgroundAlpha: 0,
+		transparent: true,
 	});
 
 	export let appState;
@@ -135,7 +136,7 @@
 		};
 	}
 
-	function getSymbolScale(symbol, radius = 150) {
+	function getSymbolScale(symbol: TileSymbol, radius = 150) {
 		let h, w;
 		if (orientation == 'pointyTop') {
 			h = radius * 2;

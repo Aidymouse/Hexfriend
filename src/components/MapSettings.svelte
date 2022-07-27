@@ -5,7 +5,7 @@
 	import type CoordsLayer from '../layers/CoordsLayer.svelte';
 	import type IconLayer from '../layers/IconLayer.svelte';
 	import type PathLayer from '../layers/PathLayer.svelte';
-	import type TerrainField from '../layers/TerrainField.svelte';
+	import type TerrainLayer from '../layers/TerrainLayer.svelte';
 	import type TextLayer from '../layers/TextLayer.svelte';
 	import { coord_system } from '../types/coordinates';
 	import type { coordinates_data, terrain_data, trace_data } from '../types/data';
@@ -24,7 +24,7 @@
 	export let exportMap: Function;
 
 	export let tfield: terrain_field;
-	export let comp_terrainField: TerrainField;
+	export let comp_terrainLayer: TerrainLayer;
 	export let renderAllHexes: Function;
 	export let renderGrid: Function;
 	export let redrawEntireMap: Function;
@@ -55,7 +55,7 @@
 		tfield.hexHeight = t;
 		//tfield.hexWidth, tfield.hexHeight = tfield.hexHeight, tfield.hexWidth
 
-		comp_terrainField.changeOrientation();
+		comp_terrainLayer.changeOrientation();
 
 		//redrawEntireMap()
 	}
@@ -90,7 +90,7 @@
 	}
 
 	function removeTileset(setId: string) {
-		//comp_terrainField.removeAllTilesOfSet(setId)
+		//comp_terrainLayer.removeAllTilesOfSet(setId)
 
 		// This line will need to change if the default tileset ever gets removeable
 		//data_terrain.tile = {...loadedTilesets[0].tiles[0]}
@@ -126,7 +126,7 @@
 	}
 
 	function expandMapDimension(direction, amount) {
-		comp_terrainField.square_expandMapDimension(direction, amount);
+		comp_terrainLayer.square_expandMapDimension(direction, amount);
 
 		let xMod = 0;
 		let yMod = 0;
@@ -177,7 +177,7 @@
 			if (amount == 0) return;
 		}
 
-		comp_terrainField.square_reduceMapDimension(direction, amount);
+		comp_terrainLayer.square_reduceMapDimension(direction, amount);
 
 		let xMod = 0;
 		let yMod = 0;
@@ -377,7 +377,7 @@
 						filenamePrefix={'raisedcolumn'}
 						bind:value={tfield.raised}
 						on:change={() => {
-							comp_terrainField.square_updateRaisedColumn();
+							comp_terrainLayer.square_updateRaisedColumn();
 							comp_coordsLayer.cullUnusedCoordinates();
 						}}
 					/>
@@ -390,7 +390,7 @@
 						filenamePrefix={'indentedrow'}
 						bind:value={tfield.raised}
 						on:change={() => {
-							comp_terrainField.square_changeIndentedRow();
+							comp_terrainLayer.square_changeIndentedRow();
 							comp_coordsLayer.cullUnusedCoordinates();
 						}}
 					/>

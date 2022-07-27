@@ -39,7 +39,7 @@ hexfiend red: #FF6666
 	import IconLayer from './layers/IconLayer.svelte';
 	import PathLayer from './layers/PathLayer.svelte';
 	// Layers
-	import TerrainField from './layers/TerrainField.svelte';
+	import TerrainLayer from './layers/TerrainLayer.svelte';
 	import TextLayer from './layers/TextLayer.svelte';
 	import { db } from './lib/db';
 	// Data
@@ -80,7 +80,7 @@ hexfiend red: #FF6666
 	let offsetContainer = new PIXI.Container();
 
 	/* STUFF TO BIND TO */
-	let comp_terrainField: TerrainField;
+	let comp_terrainLayer: TerrainLayer;
 	let comp_iconLayer: IconLayer;
 	let comp_pathLayer: PathLayer;
 	let comp_textLayer: TextLayer;
@@ -282,7 +282,7 @@ hexfiend red: #FF6666
 
 	function redrawEntireMap() {
 		// Refreshes all hexes and coordinates
-		comp_terrainField.renderAllHexes();
+		comp_terrainLayer.renderAllHexes();
 	}
 
 	/* TOOL METHODS */
@@ -296,7 +296,7 @@ hexfiend red: #FF6666
 		if (controls.mouseDown[0]) {
 			switch (selectedTool) {
 				case tools.TERRAIN:
-					comp_terrainField.pointerdown();
+					comp_terrainLayer.pointerdown();
 					break;
 
 				case 'icon':
@@ -312,7 +312,7 @@ hexfiend red: #FF6666
 					break;
 
 				case 'eraser':
-					comp_terrainField.eraseAtMouse();
+					comp_terrainLayer.eraseAtMouse();
 					/* Icons are handled in the IconLayer */
 					break;
 			}
@@ -336,7 +336,7 @@ hexfiend red: #FF6666
 
 		switch (selectedTool) {
 			case tools.TERRAIN:
-				if (controls.mouseDown[0]) comp_terrainField.pointerdown();
+				if (controls.mouseDown[0]) comp_terrainLayer.pointerdown();
 				break;
 
 			case tools.TEXT:
@@ -344,7 +344,7 @@ hexfiend red: #FF6666
 				break;
 
 			case tools.ERASER:
-				if (controls.mouseDown[0]) comp_terrainField.eraseAtMouse();
+				if (controls.mouseDown[0]) comp_terrainLayer.eraseAtMouse();
 				/* Icons are handled differently in the icon handler */
 				break;
 		}
@@ -414,7 +414,7 @@ hexfiend red: #FF6666
 		//await tick()
 
 		// await tick() // The terrain field needs time to hook onto
-		//comp_terrainField.renderAllHexes()
+		//comp_terrainLayer.renderAllHexes()
 	}
 
 	function loadSave(data: save_data, id: number | null) {
@@ -467,8 +467,8 @@ hexfiend red: #FF6666
 
 			loading = false;
 			await tick();
-			comp_terrainField.clearTerrainSprites();
-			comp_terrainField.renderAllHexes();
+			comp_terrainLayer.clearTerrainSprites();
+			comp_terrainLayer.renderAllHexes();
 		});
 
 		/* Set up tools - would be nice to remember tool settings but this works regardless of loaded tileset */
@@ -529,8 +529,8 @@ hexfiend red: #FF6666
 	>
 		<Pixi {app}>
 			<Container instance={offsetContainer} x={pan.offsetX} y={pan.offsetY} scale={{ x: pan.zoomScale, y: pan.zoomScale }}>
-				<TerrainField
-					bind:this={comp_terrainField}
+				<TerrainLayer
+					bind:this={comp_terrainLayer}
 					bind:data_terrain
 					bind:pan
 					{controls}
@@ -566,7 +566,7 @@ hexfiend red: #FF6666
 
 	<!-- Terrain Buttons -->
 	{#if showTerrainGenerator}
-		<TerrainGenerator {loadedTilesets} {tfield} {comp_terrainField} bind:showTerrainGenerator />
+		<TerrainGenerator {loadedTilesets} {tfield} comp_terrainLayer={comp_terrainLayer} bind:showTerrainGenerator />
 	{:else if selectedTool == 'terrain'}
 		<TerrainPanel {loadedTilesets} {tfield} {app} {L} bind:data_terrain {symbolTextureLookupTable} />
 	{:else if selectedTool == 'icon'}
@@ -616,17 +616,17 @@ hexfiend red: #FF6666
 		bind:showSettings
 		bind:appState
 		bind:showTerrainGenerator
-		{comp_terrainField}
+		comp_terrainLayer={comp_terrainLayer}
 		{comp_coordsLayer}
 		{comp_iconLayer}
 		{comp_pathLayer}
 		{comp_textLayer}
 		bind:data_coordinates
 		renderAllHexes={() => {
-			comp_terrainField.renderAllHexes();
+			comp_terrainLayer.renderAllHexes();
 		}}
 		renderGrid={() => {
-			comp_terrainField.renderGrid();
+			comp_terrainLayer.renderGrid();
 		}}
 		redrawEntireMap={() => {
 			redrawEntireMap();

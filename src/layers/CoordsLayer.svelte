@@ -120,7 +120,6 @@
 			case coord_system.AXIAL: {
 				let cube = breakDownHexID(hexId);
 
-				//let newPos = coords_cubeToWorld(cube.q, cube.r, cube.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
 				let parts = [cube.q, cube.r];
 
 				return {
