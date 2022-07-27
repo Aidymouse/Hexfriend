@@ -10,7 +10,7 @@
 		getHexPath,
 		getNeighbours,
 	} from '../helpers/hexHelpers';
-	import { collapseWaveGen } from '../lib/terrainGenerator';
+	//import { collapseWaveGen } from '../lib/terrainGenerator';
 	import type { cube_coords } from '../types/coordinates';
 	import type { terrain_data } from '../types/data';
 	import { map_type } from '../types/settings';

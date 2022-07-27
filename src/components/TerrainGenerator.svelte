@@ -147,7 +147,7 @@
 		let c = 0;
 		o.forEach((hexId) => {
 			if (generatedTerrain[hexId].terrainId == '!!BLANK!!') {
-				comp_terrainField.eraseHex(hexId);
+				comp_terrainLayer.eraseHex(hexId);
 				return;
 			}
 
@@ -157,11 +157,11 @@
 
 			if (slowAnimation) {
 				setTimeout(() => {
-					comp_terrainField.paintFromTile(hexId, tileToPaint);
+					comp_terrainLayer.paintFromTile(hexId, tileToPaint);
 				}, c * 5);
 				c++;
 			} else {
-				comp_terrainField.paintFromTile(hexId, tileToPaint);
+				comp_terrainLayer.paintFromTile(hexId, tileToPaint);
 			}
 		});
 	}
@@ -205,7 +205,7 @@
 
 	export let loadedTilesets: Tileset[];
 	export let tfield: terrain_field;
-	export let comp_terrainField;
+	export let comp_terrainLayer;
 	export let showTerrainGenerator: boolean;
 
 	let importFiles = [];

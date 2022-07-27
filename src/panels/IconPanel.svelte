@@ -118,7 +118,7 @@
 		</button>
 	</div>
 
-	<div id="buttons">
+	<div id="buttons" class="scroll-container">
 		{#each loadedIconsets as iconset (iconset.id)}
 			{#if iconset.id != 'default'}
 				<h2>{iconset.name}</h2>
@@ -142,6 +142,19 @@
 </div>
 
 <style>
+	.panel {
+		display: grid;
+		grid-template-columns: 1fr;
+		grid-template-rows: auto 1fr;
+	}
+
+	.scroll-container {
+		min-height: 30%;
+		max-height: 100%;
+		height: auto;
+		overflow-y: scroll;
+	}
+
 	div {
 		color: white;
 	}
