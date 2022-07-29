@@ -331,7 +331,11 @@ hexfiend red: #FF6666
 		if (!controls.mouseDown[2]) pan.endPan();
 
 		switch (selectedTool) {
-			case 'text':
+			case tools.ICON:
+				comp_iconLayer.pointerup();
+				break;
+
+			case tools.TEXT:
 				comp_textLayer.pointerup();
 				break;
 		}
@@ -345,6 +349,10 @@ hexfiend red: #FF6666
 				if (controls.mouseDown[0]) comp_terrainLayer.pointerdown();
 				break;
 
+			case tools.ICON:
+				comp_iconLayer.pointermove();
+				break;
+
 			case tools.TEXT:
 				comp_textLayer.pointermove();
 				break;
@@ -354,6 +362,16 @@ hexfiend red: #FF6666
 				/* Icons are handled differently in the icon handler */
 				break;
 		}
+	}
+
+	function pointerOffLayers(e: PointerEvent) {
+
+		switch (selectedTool) {
+			case tools.ICON:
+				comp_iconLayer.pointerout(e)
+				break;
+		}
+
 	}
 
 	function createNewMap() {
@@ -540,6 +558,10 @@ hexfiend red: #FF6666
 		}}
 		on:pointerup={(e) => {
 			pointerup(e);
+		}}
+
+		on:pointerout={(e) => {
+			pointerOffLayers(e);
 		}}
 	>
 
