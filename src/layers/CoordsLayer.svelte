@@ -10,6 +10,8 @@
 	import { onMount } from 'svelte';
 	import { Container, Text } from 'svelte-pixi';
 
+	import * as store_tfield from '../stores/tfield'
+
 	interface coordText {
 		pixiText: PIXI.Text;
 		parts: number[];
@@ -25,7 +27,11 @@
 
 	let cont_textContainer = new PIXI.Container();
 
-	export let tfield: terrain_field;
+	let tfield: terrain_field;
+	store_tfield.store.subscribe(newTField => {
+		tfield = newTField
+	})
+	
 	export let data_coordinates: coordinates_data;
 
 	function breakDownHexID(hexId: hex_id) {

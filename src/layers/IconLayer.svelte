@@ -7,13 +7,24 @@
 	import type * as PIXI from 'pixi.js';
 	import { Container, Sprite } from 'svelte-pixi';
 
+	import * as store_tfield from '../stores/tfield';
+	import * as store_panning from '../stores/panning';
+import type { pan_state } from 'src/types/panning';
+	
 	export let icons: IconLayerIcon[] = [];
 
 	export let L: PIXI.Loader;
-	export let pan;
-	export let tfield: terrain_field;
+	let pan: pan_state;
+	store_panning.store.subscribe((newPan) => {
+		pan = newPan;
+	});
 	export let selectedTool: tools;
 	export let controls;
+
+	let tfield: terrain_field;
+	store_tfield.store.subscribe(newTField => {
+		tfield = newTField
+	})
 
 	export let data_icon: icon_data;
 	export let iconTextureLookupTable: { [key: string]: string };
@@ -52,11 +63,11 @@
 	}
 
 	export function newIcon() {
-		let iconX = pan.worldX;
-		let iconY = pan.worldY;
+		let iconX = store_panning.curWorldX();
+		let iconY = store_panning.curWorldY();
 
 		if (data_icon.snapToHex) {
-			let clickedHexCoords = coords_worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
+			let clickedHexCoords = coords_worldToCube(store_panning.curWorldX(), store_panning.curWorldY(), tfield.orientation, tfield.hexWidth, tfield.hexHeight);
 			let iconCoords = coords_cubeToWorld(
 				clickedHexCoords.q,
 				clickedHexCoords.r,
@@ -101,20 +112,18 @@
 	}
 
 	let cursorOnLayer: boolean = false
-	export function pointerout() {
+	export function pointerout(e: PointerEvent) {
 		cursorOnLayer = false
 	}
 
 	// Floating icons have a few bugs / polish requried:
-		// - Icon sticks around but doesnt move when mouse is not on layer
 		// - Icon appears weirdly when icon layer is switched too, will need to update when layer is switched to
-		// - Scale only updates when the mouse goes back onto the layer. Want it to update smoothly as its chaanged (may be non issue as floating icon wont be seen when mouse is off layer)
 	function createFloatingIcon() {
-		let iconX = pan.worldX;
-		let iconY = pan.worldY;
+		let iconX = store_panning.curWorldX();
+		let iconY = store_panning.curWorldY();
 
 		if (data_icon.snapToHex) {
-			let mouseHexCoords = coords_worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+			let mouseHexCoords = coords_worldToCube(store_panning.curWorldX(), store_panning.curWorldY(), tfield.orientation, tfield.hexWidth, tfield.hexHeight)
 			let iconCoords = coords_cubeToWorld(mouseHexCoords.q, mouseHexCoords.r, mouseHexCoords.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
 
 			iconX = iconCoords.x
@@ -127,15 +136,15 @@
 
 	function updateFloatingIcon() {
 		if (data_icon.snapToHex) {
-			let mouseHexCoords = coords_worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+			let mouseHexCoords = coords_worldToCube(store_panning.curWorldX(), store_panning.curWorldY(), tfield.orientation, tfield.hexWidth, tfield.hexHeight)
 			let iconCoords = coords_cubeToWorld(mouseHexCoords.q, mouseHexCoords.r, mouseHexCoords.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
 
 			floatingIcon.x = iconCoords.x
 			floatingIcon.y = iconCoords.y
 
 		} else {
-			floatingIcon.x = pan.worldX
-			floatingIcon.y = pan.worldY
+			floatingIcon.x = store_panning.curWorldX()
+			floatingIcon.y = store_panning.curWorldY()
 		
 		}
 	}

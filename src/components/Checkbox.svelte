@@ -3,26 +3,21 @@
 
 	export let checked: boolean;
 
-	export let name: string = null;
-	export let label: string = null;
+	export let id: string = null;
 </script>
 
 <span>
 	<div class="cb" class:checked>
-		<input id={name} type="checkbox" bind:checked />
+		<input id={id} type="checkbox" bind:checked />
 		{#if checked}
 			<img src={checkboxBase64} alt="check" />
 		{/if}
 	</div>
-	{#if label}
-		<label for={name}>{label}</label>
-	{/if}
 </span>
 
 <style>
 	span {
 		display: flex;
-		gap: 10px;
 		align-items: center;
 	}
 

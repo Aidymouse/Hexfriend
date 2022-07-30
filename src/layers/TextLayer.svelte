@@ -2,8 +2,13 @@
 	import type { text_data } from '../types/data';
 	import * as PIXI from 'pixi.js';
 	import { Graphics, Text } from 'svelte-pixi';
-
-	export let pan;
+	import * as store_panning from '../stores/panning';
+	import type { pan_state } from 'src/types/panning';
+	
+	let pan: pan_state;
+	store_panning.store.subscribe((newPan) => {
+		pan = newPan;
+	});
 
 	export let data_text: text_data;
 	let hoveredText;
@@ -45,8 +50,8 @@
 		data_text.style = { ...hoveredText.style };
 		data_text.selectedText = hoveredText;
 		dragText = data_text.selectedText;
-		dragX = pan.worldX - hoveredText.x;
-		dragY = pan.worldY - hoveredText.y;
+		dragX = store_panning.curWorldX() - hoveredText.x;
+		dragY = store_panning.curWorldY() - hoveredText.y;
 	}
 
 	export function pointerup() {
@@ -57,14 +62,14 @@
 		if (!data_text.usingTextTool) return;
 
 		if (dragText) {
-			dragText.x = pan.worldX - dragX;
-			dragText.y = pan.worldY - dragY;
+			dragText.x = store_panning.curWorldX() - dragX;
+			dragText.y = store_panning.curWorldY() - dragY;
 			texts = texts;
 		}
 	}
 
 	function newText() {
-		texts.push({ id: textId, text: '', style: { ...data_text.style }, x: pan.worldX, y: pan.worldY });
+		texts.push({ id: textId, text: '', style: { ...data_text.style }, x: store_panning.curWorldX(), y: store_panning.curWorldY() });
 		textId++;
 		texts = texts;
 		data_text.selectedText = texts[texts.length - 1];

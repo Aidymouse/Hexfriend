@@ -6,11 +6,22 @@
 	import * as PIXI from 'pixi.js';
 	import { Container, Graphics } from 'svelte-pixi';
 
+	import * as store_tfield from '../stores/tfield';
+	import * as store_panning from '../stores/panning';
+	import type { pan_state } from 'src/types/panning';
+	
 	export let controls;
-	export let pan;
+	let pan: pan_state;
+	store_panning.store.subscribe((newPan) => {
+		pan = newPan;
+	});
 	export let selectedTool;
-	export let tfield: terrain_field; // required for snapping
 
+	let tfield: terrain_field;
+	store_tfield.store.subscribe(newTField => {
+		tfield = newTField
+	})
+	
 	export let data_path: path_data;
 
 	export let paths: path[] = [];
@@ -29,8 +40,8 @@
 	export function pointerdown() {
 		if (controls.mouseDown[0]) {
 			if (data_path.selectedPath) {
-				let pX = pan.worldX;
-				let pY = pan.worldY;
+				let pX = store_panning.curWorldX();
+				let pY = store_panning.curWorldY();
 				if (data_path.snap) {
 					let sP = getSnapPoint();
 					pX = sP.x;
@@ -69,7 +80,7 @@
 		let hW = tfield.hexWidth;
 		let hH = tfield.hexHeight;
 
-		let clickedCoords = coords_worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
+		let clickedCoords = coords_worldToCube(store_panning.curWorldX(), store_panning.curWorldY(), tfield.orientation, tfield.hexWidth, tfield.hexHeight);
 		let centerCoords = coords_cubeToWorld(
 			clickedCoords.q,
 			clickedCoords.r,
@@ -107,7 +118,7 @@
 		}
 
 		snapPoints.forEach((p) => {
-			let dist = Math.sqrt((p.x - pan.worldX) ** 2 + (p.y - pan.worldY) ** 2);
+			let dist = Math.sqrt((p.x - store_panning.curWorldX()) ** 2 + (p.y - store_panning.curWorldY()) ** 2);
 			if (dist < shortestDist) {
 				closestPoint = p;
 				shortestDist = dist;
@@ -118,8 +129,8 @@
 	}
 
 	function addNewPath() {
-		let pX = pan.worldX;
-		let pY = pan.worldY;
+		let pX = store_panning.curWorldX();
+		let pY = store_panning.curWorldY();
 
 		if (data_path.snap) {
 			let snapPoint = getSnapPoint();

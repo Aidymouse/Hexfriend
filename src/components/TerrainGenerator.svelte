@@ -4,6 +4,30 @@
 	import type { TerrainHex, terrain_field } from '../types/terrain';
 	import type { Tile, Tileset } from '../types/tilesets';
 
+	import * as store_tfield from '../stores/tfield';
+
+	export let loadedTilesets: Tileset[];
+	let tfield: terrain_field;
+	store_tfield.store.subscribe(newTField => {
+		tfield = newTField
+	})
+	export let comp_terrainLayer;
+	export let showTerrainGenerator: boolean;
+
+	let importFiles: FileList;
+
+	let selectedId = '';
+
+	let slowAnimation = false;
+
+	let genFunction = {};
+	// Populate the gen function
+	loadedTilesets.forEach((tileset: Tileset) => {
+		tileset.tiles.forEach((tile: Tile) => {
+			genFunction[tile.id] = [{ id: tile.id, weight: 1 }];
+		});
+	});
+
 	function rand(min: number, max: number): number {
 		min = Math.ceil(min);
 		max = Math.floor(max);
@@ -167,7 +191,7 @@
 	}
 
 	function exportGenFunction() {
-		download(JSON.stringify(genFunction), 'genFunction.hfgf');
+		download(JSON.stringify(genFunction), 'genFunction.hfgf', 'hexfriendgenfunction');
 	}
 
 	function importGenFunction() {
@@ -175,7 +199,7 @@
 
 		let r = new FileReader();
 		r.onload = (eb) => {
-			genFunction = { ...JSON.parse(eb.target.result) };
+			genFunction = { ...JSON.parse(eb.target.result.toString()) };
 		};
 
 		r.readAsText(importFiles[0]);
@@ -203,24 +227,7 @@
 		genFunction = genFunction;
 	}
 
-	export let loadedTilesets: Tileset[];
-	export let tfield: terrain_field;
-	export let comp_terrainLayer;
-	export let showTerrainGenerator: boolean;
-
-	let importFiles = [];
-
-	let selectedId = '';
-
-	let slowAnimation = false;
-
-	let genFunction = {};
-	// Populate the gen function
-	loadedTilesets.forEach((tileset: Tileset) => {
-		tileset.tiles.forEach((tile: Tile) => {
-			genFunction[tile.id] = [{ id: tile.id, weight: 1 }];
-		});
-	});
+	
 </script>
 
 <main>

@@ -6,11 +6,9 @@ hexfiend red: #FF6666
 
 	/* TODO 
 // CORE FUNCTIONS
-- hex coordinates on map - fix pointy top + more coordinate systems
 - tooltips
-- move icons when resizing map
 - keyboard shortcuts
-- import iconsets
+
 // POLISH / ROADMAP
 // not ranked
 - terrain generator function validation
@@ -18,7 +16,6 @@ hexfiend red: #FF6666
 - floating loaders - better feedback
 - save data checking (if loading, making new map, quitting)
 - export at different sizes
-- tooltips
 - dashed line
 - more fonts
 */
@@ -42,7 +39,6 @@ hexfiend red: #FF6666
 	import TerrainLayer from './layers/TerrainLayer.svelte';
 	import TextLayer from './layers/TextLayer.svelte';
 	import { db } from './lib/db';
-	import Loader from './components/Loader.svelte';
 	// Data
 	import DEFAULTSAVEDATA from './lib/defaultSaveData';
 	// Methods
@@ -67,13 +63,23 @@ hexfiend red: #FF6666
 	import * as PIXI from 'pixi.js';
 	import { tick } from 'svelte';
 	import { Container, Pixi } from 'svelte-pixi';
+	import type { pan_state } from './types/panning';
+
+	import * as store_tfield from './stores/tfield';
+	import * as store_panning from './stores/panning';
 
 	/* STATE */
 
 	let loadedSave: save_data = DEFAULTSAVEDATA;
 	let loadedId: number | null = null;
 
-	let appState: 'normal' | 'tilesetCreator' | 'iconsetCreator' = 'normal';
+	enum appstate {
+		NORMAL = 'normal',
+		TILESETCREATOR = 'tilesetCreator',
+		ICONSETCREATOR = 'iconsetCreator'
+	}
+
+	let appState: appstate = appstate.NORMAL;
 
 	let showSettings = false;
 	let showTerrainGenerator = false;
@@ -106,91 +112,16 @@ hexfiend red: #FF6666
 
 	let loadedTilesets: Tileset[];
 	let loadedIconsets: Iconset[];
+	
 	let tfield: terrain_field;
+	store_tfield.store.subscribe((newTField) => {
+		tfield = newTField;
+	});
 
-	/* PANNING */
-	let pan = {
-		panning: false,
-
-		oldX: 0,
-		oldY: 0,
-
-		offsetX: window.innerWidth / 2,
-		offsetY: window.innerHeight / 2,
-
-		screenX: 0,
-		screenY: 0,
-
-		zoomScale: 1,
-
-		get worldX() {
-			return (pan.screenX - pan.offsetX) / pan.zoomScale;
-		},
-
-		get worldY() {
-			return (pan.screenY - pan.offsetY) / pan.zoomScale;
-		},
-
-		startPan: function (e: PointerEvent) {
-			pan.panning = true;
-			pan.oldX = e.clientX;
-			pan.oldY = e.clientY;
-		},
-
-		handle: function (e: PointerEvent) {
-			pan.screenX = e.clientX;
-			pan.screenY = e.clientY;
-
-			if (pan.panning) {
-				pan.offsetX += e.clientX - pan.oldX;
-				pan.offsetY += e.clientY - pan.oldY;
-
-				pan.oldX = e.clientX;
-				pan.oldY = e.clientY;
-			}
-		},
-
-		endPan: function () {
-			pan.panning = false;
-		},
-
-		zoom: function (e: WheelEvent) {
-			let xBeforeZoom = pan.worldX;
-			let yBeforeZoom = pan.worldY;
-
-			let zoomFactor = 1.15;
-			if (e.deltaY < 0) {
-				pan.zoomScale *= zoomFactor;
-			} else {
-				pan.zoomScale /= zoomFactor;
-			}
-
-			// controls how far you can zoom out (smaller number is farther out)
-			let minZoom = (window.innerWidth + window.innerHeight) / 2;
-			minZoom /= ((tfield.hexWidth + tfield.hexHeight) / 2) * ((tfield.columns + tfield.rows) / 2) * 2;
-			if (pan.zoomScale < minZoom) {
-				pan.zoomScale = minZoom;
-			}
-			// controls how far you can zoom in (bigger number is closer in)
-			let maxZoom = (window.innerWidth + window.innerHeight) / 2;
-			// TODO: use tile size
-			// maxZoom /= 100 * 2;
-			maxZoom /= ((tfield.hexWidth + tfield.hexHeight) / 2) * 4;
-			if (maxZoom < pan.zoomScale) {
-				pan.zoomScale = maxZoom;
-			}
-
-			// Move the screen
-			let xAfterZoom = pan.worldX;
-			let yAfterZoom = pan.worldY;
-
-			let dx = (xAfterZoom - xBeforeZoom) * pan.zoomScale;
-			let dy = (yAfterZoom - yBeforeZoom) * pan.zoomScale;
-
-			pan.offsetX += dx;
-			pan.offsetY += dy;
-		},
-	};
+	let pan: pan_state;
+	store_panning.store.subscribe(newPan => {
+		pan = newPan;
+	})
 
 	let controls = {
 		mouseDown: [false, false, false, false, false],
@@ -297,7 +228,7 @@ hexfiend red: #FF6666
 	function pointerdown(e: PointerEvent) {
 		controls.mouseDown[e.button] = true;
 
-		if (controls.mouseDown[2]) pan.startPan(e);
+		if (controls.mouseDown[2]) store_panning.handlers.startPan(e);
 
 		if (controls.mouseDown[0]) {
 			switch (selectedTool) {
@@ -328,7 +259,7 @@ hexfiend red: #FF6666
 	function pointerup(e: PointerEvent) {
 		controls.mouseDown[e.button] = false;
 
-		if (!controls.mouseDown[2]) pan.endPan();
+		if (!controls.mouseDown[2]) store_panning.handlers.endPan();
 
 		switch (selectedTool) {
 			case tools.ICON:
@@ -342,7 +273,7 @@ hexfiend red: #FF6666
 	}
 
 	function pointermove(e: PointerEvent) {
-		pan.handle(e);
+		store_panning.handlers.handle(e);
 
 		switch (selectedTool) {
 			case tools.TERRAIN:
@@ -445,7 +376,9 @@ hexfiend red: #FF6666
 		loadedTilesets = data.tilesets;
 		loadedIconsets = data.iconsets;
 
-		tfield = data.TerrainField;
+		store_tfield.store.set(data.TerrainField)
+		//tfield = data.TerrainField;
+		
 		data_coordinates = data.coords;
 
 		// Load Textures
@@ -475,19 +408,25 @@ hexfiend red: #FF6666
 			let tf = loadedSave.TerrainField;
 
 			//pan.zoomScale = 1
-			if (tf.orientation == 'flatTop') {
-				let mapWidth = tf.columns * tf.hexWidth * 0.75 + tf.hexWidth * 0.25;
-				let mapHeight = (tf.rows - 1) * tf.hexHeight - tf.hexHeight * 0.5;
+			store_panning.store.update(pan => {
 
-				pan.offsetX = window.innerWidth / 2 - (mapWidth / 2) * pan.zoomScale;
-				pan.offsetY = window.innerHeight / 2 - (mapHeight / 2) * pan.zoomScale;
-			} else {
-				let mapHeight = tf.rows * tf.hexHeight * 0.75 + tf.hexHeight * 0.25;
-				let mapWidth = (tf.columns - 1) * tf.hexWidth - tf.hexWidth * 0.5;
+				if (tf.orientation == 'flatTop') {
+					let mapWidth = tf.columns * tf.hexWidth * 0.75 + tf.hexWidth * 0.25;
+					let mapHeight = (tf.rows - 1) * tf.hexHeight - tf.hexHeight * 0.5;
+	
+					pan.offsetX = window.innerWidth / 2 - (mapWidth / 2) * pan.zoomScale;
+					pan.offsetY = window.innerHeight / 2 - (mapHeight / 2) * pan.zoomScale;
+				} else {
+					let mapHeight = tf.rows * tf.hexHeight * 0.75 + tf.hexHeight * 0.25;
+					let mapWidth = (tf.columns - 1) * tf.hexWidth - tf.hexWidth * 0.5;
+	
+					pan.offsetX = window.innerWidth / 2 - (mapWidth / 2) * pan.zoomScale;
+					pan.offsetY = window.innerHeight / 2 - (mapHeight / 2) * pan.zoomScale;
+				}
 
-				pan.offsetX = window.innerWidth / 2 - (mapWidth / 2) * pan.zoomScale;
-				pan.offsetY = window.innerHeight / 2 - (mapHeight / 2) * pan.zoomScale;
-			}
+				return pan;
+				
+			})
 
 			loading = false;
 			await tick();
@@ -543,12 +482,12 @@ hexfiend red: #FF6666
 	createNewMap();
 </script>
 
-{#if appState == 'normal' && !loading}
+{#if appState == appstate.NORMAL && !loading}
 	
 	<main
 		on:contextmenu|preventDefault={(e) => {}}
 		on:wheel={(e) => {
-			pan.zoom(e);
+			store_panning.handlers.zoom(e);
 		}}
 		on:pointerdown={(e) => {
 			pointerdown(e);
@@ -572,24 +511,25 @@ hexfiend red: #FF6666
 				<TerrainLayer
 					bind:this={comp_terrainLayer}
 					bind:data_terrain
-					bind:pan
 					{controls}
 					{L}
-					bind:tfield
 					{comp_coordsLayer}
 					{symbolTextureLookupTable}
 				/>
 
-				<PathLayer bind:this={comp_pathLayer} bind:paths={loadedSave.paths} bind:data_path {pan} {controls} {selectedTool} {tfield} />
+				<PathLayer 
+					bind:this={comp_pathLayer}
+					bind:paths={loadedSave.paths}
+					bind:data_path
+					{controls}
+					{selectedTool} />
 
 				<IconLayer
 					bind:this={comp_iconLayer}
 					bind:icons={loadedSave.icons}
 					bind:data_icon
 					{L}
-					{pan}
 					{selectedTool}
-					{tfield}
 					{controls}
 					{iconTextureLookupTable}
 				/>
@@ -597,20 +537,28 @@ hexfiend red: #FF6666
 				<!--
           Needs Optimization badly
         -->
-				<CoordsLayer bind:this={comp_coordsLayer} bind:data_coordinates tfield={loadedSave.TerrainField} />
+				<CoordsLayer
+					bind:this={comp_coordsLayer}
+					bind:data_coordinates
+				/>
 
-				<TextLayer bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text {pan} />
+				<TextLayer 
+					bind:this={comp_textLayer}
+					bind:texts={loadedSave.texts}
+					bind:data_text
+				/>
+
 			</Container>
 		</Pixi>
 	</main>
 
 	<!-- Terrain Buttons -->
 	{#if showTerrainGenerator}
-		<TerrainGenerator {loadedTilesets} {tfield} comp_terrainLayer={comp_terrainLayer} bind:showTerrainGenerator />
+		<TerrainGenerator {loadedTilesets} comp_terrainLayer={comp_terrainLayer} bind:showTerrainGenerator />
 	{:else if selectedTool == 'terrain'}
-		<TerrainPanel {loadedTilesets} {tfield} {app} {L} bind:data_terrain {symbolTextureLookupTable} />
+		<TerrainPanel {loadedTilesets} {app} {L} bind:data_terrain {symbolTextureLookupTable} />
 	{:else if selectedTool == 'icon'}
-		<IconPanel {L} {app} {loadedIconsets} bind:data_icon {iconTextureLookupTable} {tfield} />
+		<IconPanel {L} {app} {loadedIconsets} bind:data_icon {iconTextureLookupTable} />
 	{:else if selectedTool == 'path'}
 		<PathPanel bind:data_path {comp_pathLayer} bind:pathStyles={loadedSave.pathStyles} />
 	{:else if selectedTool == 'text'}
@@ -622,10 +570,6 @@ hexfiend red: #FF6666
 
 	<div id="tool-buttons">
 		<ToolButtons bind:selectedTool bind:hexOrientation={tfield.orientation} />
-
-		<!--
-    
-    -->
 	</div>
 
 	<div id="setting-buttons">
@@ -636,8 +580,10 @@ hexfiend red: #FF6666
 			on:click={() => {
 				showSavedMaps = true;
 			}}
-			title={'Maps'}><img src="assets/img/tools/maps.png" alt="Maps" /></button
-		>
+			title={'Maps'}>
+			<img src="assets/img/tools/maps.png" alt="Maps" />
+		</button>
+		
 		<button
 			on:click={() => {
 				showSettings = true;
@@ -652,16 +598,25 @@ hexfiend red: #FF6666
 
 	<MapSettings
 		{loadedSave}
-		bind:tfield
+		
 		bind:showSettings
 		bind:appState
 		bind:showTerrainGenerator
-		comp_terrainLayer={comp_terrainLayer}
+		bind:data_coordinates
+
+		{addTilesetTextures}
+		{addIconsetTextures}
+		bind:loadedTilesets
+		bind:loadedIconsets
+
+		{comp_terrainLayer}
 		{comp_coordsLayer}
 		{comp_iconLayer}
 		{comp_pathLayer}
 		{comp_textLayer}
-		bind:data_coordinates
+
+		{L}
+
 		renderAllHexes={() => {
 			comp_terrainLayer.renderAllHexes();
 		}}
@@ -673,22 +628,13 @@ hexfiend red: #FF6666
 		}}
 		{exportMap}
 		load={loadInit}
-		{L}
-		bind:loadedTilesets
-		bind:loadedIconsets
-		{addTilesetTextures}
-		{addIconsetTextures}
 	/>
 
 	<Controls {selectedTool} {data_terrain} {data_icon} {data_path} {data_text} />
 
-	{#if showLoader}
-		<Loader />
-	{/if}
-
-{:else if appState == 'tilesetCreator'}
+{:else if appState == appstate.TILESETCREATOR}
 	<TilesetCreator bind:appState />
-{:else if appState == 'iconsetCreator'}
+{:else if appState == appstate.ICONSETCREATOR}
 	<IconsetCreator bind:appState />
 {/if}
 
@@ -701,6 +647,7 @@ hexfiend red: #FF6666
 		width: 100%;
 		height: 100%;
 		overflow: hidden;
+		
 	}
 
 	:global(h2) {
@@ -735,8 +682,6 @@ hexfiend red: #FF6666
 		box-sizing: border-box;
 		padding: 0;
 	}
-
-	/* GLOBAL Checkbox */
 
 	/* Tools */
 

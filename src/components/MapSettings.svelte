@@ -16,6 +16,8 @@
 	import type { Tileset } from '../types/tilesets';
 	import type * as PIXI from 'pixi.js';
 
+	import * as store_tfield from '../stores/tfield';
+
 	export let loadedSave: save_data;
 	export let showSettings: boolean;
 	export let appState;
@@ -23,7 +25,11 @@
 
 	export let exportMap: Function;
 
-	export let tfield: terrain_field;
+	let tfield: terrain_field;
+	store_tfield.store.subscribe(newTField => {
+		tfield = newTField
+	})
+	
 	export let comp_terrainLayer: TerrainLayer;
 	export let renderAllHexes: Function;
 	export let renderGrid: Function;
@@ -284,7 +290,7 @@
 	<h2>Grid</h2>
 	<div class="settings-grid">
 		<label for="showGrid">Show Grid</label>
-		<Checkbox bind:checked={tfield.grid.shown} name={'showGrid'} />
+		<Checkbox bind:checked={tfield.grid.shown} id={'showGrid'} />
 		{#if tfield.grid.shown}
 			<label for="gridThickness">Grid Thickness</label>
 			<input
@@ -418,7 +424,7 @@
 		{/if}
 		
 		<label for="retainIcon" title="Icons will atempt to remain in their hex when transformations occur">Retain Icon Position</label>
-		<Checkbox bind:checked={retainIconPosition} name="retainIcon" />
+		<Checkbox bind:checked={retainIconPosition} id="retainIcon" />
 	
 	</div>
 
@@ -505,7 +511,7 @@
 	<p class="helperText">Coordinates can slow down map changes such as adding hexes or changing orientation.</p>
 	<div class="settings-grid">
 		<label for="showCoords">Show Coordinates</label>
-		<Checkbox bind:checked={data_coordinates.shown} name={'showCoords'} />
+		<Checkbox bind:checked={data_coordinates.shown} id={'showCoords'} />
 
 		{#if data_coordinates.shown}
 			<label for="coordsSystem"

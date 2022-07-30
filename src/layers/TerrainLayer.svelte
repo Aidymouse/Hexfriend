@@ -23,16 +23,28 @@
 	import { onMount } from 'svelte';
 	import { Container, Graphics } from 'svelte-pixi';
 
+	import * as store_tfield from '../stores/tfield';
+	import * as store_panning from '../stores/panning';
+	import type { pan_state } from 'src/types/panning';
+
 	let terrainGraphics = new PIXI.Graphics();
 	let symbolsContainer = new PIXI.Container();
 	let gridGraphics = new PIXI.Graphics();
 
 	let terrainSprites: { [key: hex_id]: PIXI.Sprite } = {};
 
-	export let pan;
+	let pan: pan_state;
+	store_panning.store.subscribe((newPan) => {
+		pan = newPan;
+	});
+	
 	export let controls;
 	export let L: PIXI.Loader;
-	export let tfield: terrain_field;
+
+	let tfield: terrain_field;
+	store_tfield.store.subscribe(newTField => {
+		tfield = newTField
+	})
 
 	export let comp_coordsLayer: CoordsLayer;
 
@@ -582,8 +594,8 @@
 		//data_terrain = data_terrain
 		// Needs checking if terrain matches what we're trying to place already
 		if (controls.mouseDown[0]) {
-			let x = pan.worldX;
-			let y = pan.worldY;
+			let x = store_panning.curWorldX();
+			let y = store_panning.curWorldY();
 			let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
 
 			let clickedId = genHexId(clickedCoords.q, clickedCoords.r, clickedCoords.s);
@@ -654,8 +666,8 @@
 
 	function eyedrop() {
 		if (controls.mouseDown[0]) {
-			let x = pan.worldX;
-			let y = pan.worldY;
+			let x = store_panning.curWorldX();
+			let y = store_panning.curWorldY();
 			let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
 
 			let clickedId = genHexId(clickedCoords.q, clickedCoords.r, clickedCoords.s);
@@ -672,7 +684,7 @@
 	}
 
 	export function eraseAtMouse() {
-		let clickedCoords = coords_worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
+		let clickedCoords = coords_worldToCube(store_panning.curWorldX(), store_panning.curWorldY(), tfield.orientation, tfield.hexWidth, tfield.hexHeight);
 
 		let clickedId = genHexId(clickedCoords.q, clickedCoords.r, clickedCoords.s);
 
@@ -685,8 +697,8 @@
 	}
 
 	function paintbucket() {
-		let x = pan.worldX;
-		let y = pan.worldY;
+		let x = store_panning.curWorldX();
+		let y = store_panning.curWorldY();
 		let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
 
 		let clickedId = genHexId_cordsObj(clickedCoords);
@@ -704,7 +716,7 @@
 	function erasePaintbucket() {
 		// Find all like hexes, much like a paintbucket, and perform a specific operation on them, passing in hex id as a parameter
 
-		let clickedId = genHexId_cordsObj(coords_worldToCube(pan.worldX, pan.worldY, tfield.orientation, tfield.hexWidth, tfield.hexHeight));
+		let clickedId = genHexId_cordsObj(coords_worldToCube(store_panning.curWorldX(), store_panning.curWorldY(), tfield.orientation, tfield.hexWidth, tfield.hexHeight));
 
 		if (!hexExists(clickedId)) return;
 		if (tfield.hexes[clickedId].tile == null) return;

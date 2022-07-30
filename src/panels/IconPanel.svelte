@@ -7,6 +7,8 @@
 	import * as PIXI from 'pixi.js';
 	import type { terrain_field } from 'src/types/terrain';
 
+	import * as store_tfield from '../stores/tfield';
+
 	export let loadedIconsets: Iconset[];
 	export let L: PIXI.Loader;
 	export let app: PIXI.Application;
@@ -15,7 +17,10 @@
 
 	export let iconTextureLookupTable;
 
-	export let tfield: terrain_field;
+	let tfield: terrain_field;
+	store_tfield.store.subscribe(newTField => {
+		tfield = newTField
+	})
 
 	let iconPreview = '';
 	$: {
@@ -100,11 +105,19 @@
 			/>
 		</div>
 
-		<ColorInputPixi bind:value={data_icon.color} w={25} h={25} label={'Icon Color'} id={'iconPanelColor'} />
+		<span class="icon-preview-control-row">
+			<ColorInputPixi bind:value={data_icon.color} w={25} h={25} id={'iconPanelColor'} />
+			<label for="iconPanelColor">Icon Color</label>
+		</span>
 
-		<Checkbox name={'cb_snapIcon'} label="Snap To Hex Center" bind:checked={data_icon.snapToHex} />
-
-		<input type="range" min={10} max={100} bind:value={data_icon.pHex} style="grid-column: 1/3; margin-bottom: 0;" />
+		<span class="icon-preview-control-row">
+			<Checkbox id={'cb_snapIcon'} bind:checked={data_icon.snapToHex} />
+			<label for="cb_snapIcon">Snap to Hex Center</label>
+		</span>
+		
+		<span class="icon-preview-control-row" style="grid-column: 1/3;" >
+			<input type="range" id="iconSize" min={10} max={100} bind:value={data_icon.pHex} style="margin-bottom: 0;" />
+		</span>
 
 		<button
 			id="eraser"
@@ -142,6 +155,12 @@
 </div>
 
 <style>
+	.icon-preview-control-row {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
 	.panel {
 		display: grid;
 		grid-template-columns: 1fr;

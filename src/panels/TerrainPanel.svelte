@@ -6,10 +6,16 @@
 	import type { Tile, Tileset } from '../types/tilesets';
 	import * as PIXI from 'pixi.js';
 
+	import * as store_tfield from '../stores/tfield';
+
 	export let loadedTilesets: Tileset[];
 	export let data_terrain: terrain_data;
 
-	export let tfield: terrain_field;
+	let tfield: terrain_field;
+	store_tfield.store.subscribe(newTField => {
+		tfield = newTField
+	})
+
 	export let app: PIXI.Application;
 	export let L: PIXI.Loader;
 

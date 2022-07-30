@@ -26,6 +26,6 @@
 		"gh-pages": "^4.0.0",
 		"pixi.js": "^5.3.12",
 		"prettier-plugin-svelte": "^2.7.0",
-		"svelte-pixi": "0.0.5"
+		"svelte-pixi": "^0.0.5"
 	}
 }
