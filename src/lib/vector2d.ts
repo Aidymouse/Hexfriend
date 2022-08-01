@@ -1,19 +1,20 @@
-export function Vector(x, y) {
-    this.x = x || 0;
-    this.y = y || 0;
-}
+export class Vector {
+    x: number;
+    y: number;    
 
-/* INSTANCE METHODS */
+    constructor(x: number, y: number) {
+        this.x = x || 0;
+        this.y = y || 0;
+    }
 
-// For angles: 0 radians = straight right
-
-Vector.prototype = {
-    negative: function () {
+    negate(): this {
         this.x = -this.x;
         this.y = -this.y;
         return this;
-    },
-    add: function (v) {
+    }
+
+
+    add(v: Vector) {
         if (v instanceof Vector) {
             this.x += v.x;
             this.y += v.y;
@@ -22,8 +23,9 @@ Vector.prototype = {
             this.y += v;
         }
         return this;
-    },
-    subtract: function (v) {
+    }
+
+    subtract(v: Vector | number) {
         if (v instanceof Vector) {
             this.x -= v.x;
             this.y -= v.y;
@@ -32,8 +34,9 @@ Vector.prototype = {
             this.y -= v;
         }
         return this;
-    },
-    multiply: function (v) {
+    }
+
+    multiply(v: Vector | number): this {
         if (v instanceof Vector) {
             this.x *= v.x;
             this.y *= v.y;
@@ -42,11 +45,14 @@ Vector.prototype = {
             this.y *= v;
         }
         return this;
-    },
-    divide: function (v) {
+    }
+
+    divide(v: Vector | number): this {
         if (v instanceof Vector) {
-            if (v.x != 0) this.x /= v.x;
-            if (v.y != 0) this.y /= v.y;
+            if (v.x != 0)
+                this.x /= v.x;
+            if (v.y != 0)
+                this.y /= v.y;
         } else {
             if (v != 0) {
                 this.x /= v;
@@ -54,63 +60,85 @@ Vector.prototype = {
             }
         }
         return this;
-    },
-    equals: function (v) {
+    }
+
+    equals(v: Vector): boolean {
         return this.x == v.x && this.y == v.y;
-    },
-    dot: function (v) {
+    }
+
+    dot(v: Vector): number {
         return this.x * v.x + this.y * v.y;
-    },
-    cross: function (v) {
-        return this.x * v.y - this.y * v.x
-    },
-    length: function () {
+    }
+
+    cross(v: Vector): number {
+        return this.x * v.y - this.y * v.x;
+    }
+
+    length(): number {
         return Math.sqrt(this.dot(this));
-    },
-    normalize: function () {
+    }
+
+    normalize(): this {
         return this.divide(this.length());
-    },
-    min: function () {
+    }
+
+    min(): number {
         return Math.min(this.x, this.y);
-    },
-    max: function () {
+    }
+
+    max(): number {
         return Math.max(this.x, this.y);
-    },
-    toAngles: function () {
+    }
+
+    toAngles(): number {
         return -Math.atan2(-this.y, this.x);
-    },
-    angleTo: function (a) {
-        return Math.acos(this.dot(a) / (this.length() * a.length()));
-    },
-    toArray: function (n) {
+    }
+
+    angleTo(v: Vector): number {
+        return Math.acos(this.dot(v) / (this.length() * v.length()));
+    }
+
+    toArray(n: number): number[] {
         return [this.x, this.y].slice(0, n || 2);
-    },
-    clone: function () {
+    }
+
+    clone(): Vector {
         return new Vector(this.x, this.y);
-    },
-    set: function (x, y) {
+    }
+
+    set(x: number, y: number): this {
         this.x = x; this.y = y;
         return this;
-    },
-    rotate: function (ang) {
-        //ang = -ang //* (Math.PI / 180);
+    }
+
+    rotate(ang: number): this {
         var cos = Math.cos(ang);
         var sin = Math.sin(ang);
 
-        let oldX = this.x
-        let oldY = this.y
+        let oldX = this.x;
+        let oldY = this.y;
 
-        this.x = oldX * cos + oldY * sin
-        this.y = -oldX * sin + oldY * cos
-
+        this.x = oldX * cos + oldY * sin;
+        this.y = -oldX * sin + oldY * cos;
 
         this.x = Math.round(1000 * this.x) / 1000;
         this.y = Math.round(1000 * this.y) / 1000;
 
         return this;
     }
-    
-};
+
+
+    static negative: (v: Vector) => Vector;
+    static add: (a: Vector, b: Vector | number) => Vector;
+    static subtract: (a: Vector, b: Vector | number) => Vector;
+    static multiply: (a: Vector, b: Vector | number) => Vector;
+    static divide: (a: Vector, b: Vector | number) => Vector;
+    static equals: (a: Vector, b: Vector) => boolean;
+    static dot: (a: Vector, b: Vector) => number;
+    static cross: (a: Vector, b: Vector) => number;
+    static normalize: (v: Vector) => Vector;
+}
+
 
 /* STATIC METHODS */
 Vector.negative = function (v) {
@@ -145,10 +173,6 @@ Vector.cross = function (a, b) {
 Vector.normalize = function (v) {
     return v.clone().normalize()
 };
-
-Vector.negative = function(v) {
-    return new Vector(-v.x, -v.y);
-}
 
 
 // TESTING

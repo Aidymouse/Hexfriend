@@ -148,33 +148,6 @@
 		//console.log(paths);
 	}
 
-	function getHitArea(path: path_layer_path): PIXI.Rectangle {
-		let leftMostX = Infinity;
-		let rightMostX = -Infinity;
-		let topMostY = Infinity;
-		let bottomMostY = -Infinity;
-
-		for (let pI = 0; pI < path.points.length; pI += 2) {
-			let curX = path.points[pI];
-			let curY = path.points[pI + 1];
-
-			if (curX < leftMostX) leftMostX = curX;
-			if (curX > rightMostX) rightMostX = curX;
-			topMostY = Math.min(topMostY, curY);
-			bottomMostY = Math.max(bottomMostY, curY);
-		}
-
-		let hitAreaMargin = 5;
-		let n = new PIXI.Rectangle(
-			leftMostX - hitAreaMargin,
-			topMostY - hitAreaMargin,
-			rightMostX - leftMostX + hitAreaMargin * 2,
-			bottomMostY - topMostY + hitAreaMargin * 2
-		);
-		//console.log(n);
-		return n;
-	}
-
 
 	function pathPointsToPoints(path: path_layer_path) {
 		let points = [];
@@ -185,15 +158,16 @@
 	}
 
 
-	function findHitBoxes(path: path_layer_path) {
-		if (path.points.length < 6) return
+	function findHitArea(path: path_layer_path) {
+		let boxWidth = 5 + path.style.width;
+		
+		if (path.points.length < 4) return new PIXI.Polygon([
+			path.points[0]-boxWidth, path.points[1]-boxWidth,
+			path.points[0]-boxWidth, path.points[1]+boxWidth,
+			path.points[0]+boxWidth, path.points[1]+boxWidth,
+			path.points[0]+boxWidth, path.points[1]-boxWidth,
+		])
 
-		let hitboxPolyPoints = [];
-		let stack = [];
-
-		let perpAngles = [];
-
-		let boxWidth = 10;
 
 		let pathPoints = pathPointsToPoints(path);
 
@@ -206,13 +180,7 @@
 
 		// Set up initial two prior points
 
-		let firstSegment = Vector.subtract(pathPoints[1], pathPoints[0]);
-
-		let firstSegPerpDir = new Vector(firstSegment.y, -firstSegment.x).normalize()
-
 		// Imagine we're facing the direction of the vector. Left is the point on our left, right is the point on our right
-		let priorPointLeft = Vector.subtract(pathPoints[0], Vector.multiply(firstSegPerpDir, boxWidth));
-		let priorPointRight = Vector.add(pathPoints[0], Vector.multiply(firstSegPerpDir, boxWidth));
 
 		let newPolyPoints = [];
 		let pointStack = [];
@@ -225,7 +193,6 @@
 		newPolyPoints.push(firstPointLeft)
 		pointStack.push(firstPointRight)
 
-		console.log(firstPointRight)
 
 		// Find points for corners
 		for (let pI = 1; pI < pathPoints.length-1; pI++) {
@@ -234,30 +201,51 @@
 			let p3 = pathPoints[pI+1]
 
 			let lineSeg1 = Vector.subtract(p2, p1)
-			let lineSeg2 = Vector.subtract(p3, p2)
+			let lineSeg2 = Vector.subtract(p2, p3)
 
-			let perpLine1Dir = new Vector(lineSeg1.y, -lineSeg1.x)
-			let perpLine2Dir = new Vector(lineSeg2.y, -lineSeg2.x)
+			let perpLine1Dir = new Vector(lineSeg1.y, -lineSeg1.x).normalize();
+			let perpLine2Dir = new Vector(lineSeg2.y, -lineSeg2.x).normalize();
 
 			let p1Left = Vector.add(p1, Vector.multiply(perpLine1Dir, boxWidth))
 			let p1Right = Vector.add(p1, Vector.multiply(perpLine1Dir, -boxWidth))
 
 			let p3Left = Vector.add(p3, Vector.multiply(perpLine2Dir, boxWidth))
 			let p3Right = Vector.add(p3, Vector.multiply(perpLine2Dir, -boxWidth))
-			
-			
-
 		
+
+
 			// Find intersection Point between left lines
+			let p1LeftLine = {start: p1Left, end: Vector.add(p1Left, Vector.multiply(lineSeg1, 5))}
+			let p3RightLine = {start: p3Right, end: Vector.add(p3Right, Vector.multiply(lineSeg2, 5))}
+			let newPointLeft = findIntersectionPoint(p1LeftLine, p3RightLine)
+
+			let p1RightLine = {start: p1Right, end: Vector.add(p1Right, Vector.multiply(lineSeg1, 5))}
+			let p3LeftLine = {start: p3Left, end: Vector.add(p3Left, Vector.multiply(lineSeg2, 5))}
+			let newPointRight = findIntersectionPoint(p1RightLine, p3LeftLine)
 			
-			let p1LeftLine = {start: p1Left, end: Vector.add(p1Left, lineSeg1)}
-			let p3LeftLine = {start: p3Left, end: Vector.multiply(5, Vector.add(p1Left, Vector.negative(lineSeg2)))}
-			let newPointLeft = findIntersectionPoint(p1LeftLine, p3LeftLine)
+			
+			/* 
+			
+			g.lineStyle(2, 0x0000ff);
+			g.moveTo(p1LeftLine.start.x, p1LeftLine.start.y)
+			g.lineTo(p1LeftLine.end.x, p1LeftLine.end.y)
+			
+			g.lineStyle(2, 0x00ff00);
+			g.moveTo(p3LeftLine.start.x, p3LeftLine.start.y)
+			g.lineTo(p3LeftLine.end.x, p3LeftLine.end.y)
+			
+			*/
 
-			let p1RightLine = {start: p1Right, end: Vector.add(p1Right, lineSeg1)}
-			let p3RightLine = {start: p3Right, end: Vector.multiply(5, Vector.add(p1Right, Vector.negative(lineSeg2)))}
-			let newPointRight = findIntersectionPoint(p1RightLine, p3RightLine)
 
+			/*
+			g.lineStyle(2, 0x000088);
+			g.moveTo(p1RightLine.start.x, p1RightLine.start.y)
+			g.lineTo(p1RightLine.end.x, p1RightLine.end.y)
+			
+			g.lineStyle(2, 0x008800);
+			g.moveTo(p3RightLine.start.x, p3RightLine.start.y)
+			g.lineTo(p3RightLine.end.x, p3RightLine.end.y)
+			*/
 
 			newPolyPoints.push(newPointLeft)
 			pointStack.push(newPointRight)
@@ -266,7 +254,17 @@
 
 		}
 		
-		newPolyPoints.push(pathPoints[pathPoints.length-1])
+		let lastPoint = pathPoints[pathPoints.length-1]
+		let secondLastPoint = pathPoints[pathPoints.length-2]
+
+		let lastSeg = Vector.subtract(lastPoint, secondLastPoint)
+		let perpLastSegDir = new Vector(lastSeg.y, -lastSeg.x).normalize()
+		let lastPointLeft = Vector.add(lastPoint, Vector.multiply(perpLastSegDir, boxWidth))
+		let lastPointRight = Vector.add(lastPoint, Vector.multiply(perpLastSegDir, -boxWidth))
+
+		newPolyPoints.push(lastPointLeft)
+		pointStack.push(lastPointRight)
+
 		while (pointStack.length > 0) {
 			newPolyPoints.push( pointStack.pop() )
 		}
@@ -276,9 +274,13 @@
 			if (point) newPolyParse.push(point.x, point.y)
 		})
 
-		console.log(newPolyPoints);
+		let poly = new PIXI.Polygon(newPolyParse);
+		/*
+		g.lineStyle(3, 0xff0000);
+		g.drawPolygon(poly)
+		*/
 
-		return new PIXI.Polygon(newPolyParse);
+		return poly;
 	}
 
 	function findIntersectionPoint(line1, line2) {
@@ -329,8 +331,8 @@
 
 {#each paths as path (path.id)}
 	<Container
+		hitArea={findHitArea(path)}
 		interactive={selectedTool == 'path' && !data_path.selectedPath}
-		hitArea={findHitBoxes(path)}
 		on:pointerover={() => {
 			hoveredPath = path;
 		}}
@@ -358,12 +360,9 @@
 						g.drawCircle(path.points[pI], path.points[pI + 1], 3);
 					}
 				}
-
-				if (path.points.length > 4) {
-					g.lineStyle(2, 0xff0000)
-					g.drawPolygon(findHitBoxes(path))
-				}
 			}}
 		/>
+
+
 	</Container>
 {/each}
