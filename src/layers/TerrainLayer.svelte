@@ -25,7 +25,8 @@
 
 	import * as store_tfield from '../stores/tfield';
 	import * as store_panning from '../stores/panning';
-	import type { pan_state } from 'src/types/panning';
+	import type { pan_state } from '../types/panning';
+	import type { shortcut_data } from '../types/inputs';
 
 	let terrainGraphics = new PIXI.Graphics();
 	let symbolsContainer = new PIXI.Container();
@@ -779,6 +780,8 @@
 		return visitedIDs;
 	}
 
+
+
 	export function pointerdown() {
 		if (data_terrain.usingEyedropper) {
 			eyedrop();
@@ -799,6 +802,38 @@
 			terrainSprites[hexId].destroy();
 			delete terrainSprites[hexId];
 		});
+	}
+
+	// KEYBOARD EVENTS
+	export function keydown(e: KeyboardEvent) {
+		switch (e.key) {
+			case ("Alt"): {
+				data_terrain.usingEyedropper = true
+				break;
+			}
+		}
+
+	}
+
+	export function keyup(e: KeyboardEvent) {
+		switch (e.key) {
+			case ("Alt"): {
+				data_terrain.usingEyedropper = false
+				break;
+			}
+		}
+	}
+
+	export function handleKeyboardShortcut(shortcutData: shortcut_data) {
+
+		switch (shortcutData.function) {
+			
+			case "toggleEraser":
+				data_terrain.usingEraser = !data_terrain.usingEraser
+				break;
+
+		}
+
 	}
 
 	onMount(() => {

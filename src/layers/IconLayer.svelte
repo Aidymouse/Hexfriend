@@ -10,6 +10,7 @@
 	import * as store_tfield from '../stores/tfield';
 	import * as store_panning from '../stores/panning';
 import type { pan_state } from 'src/types/panning';
+import type { shortcut_data } from 'src/types/inputs';
 	
 	export let icons: IconLayerIcon[] = [];
 
@@ -241,6 +242,24 @@ import type { pan_state } from 'src/types/panning';
 
 		oldHexWidth = tfield.hexWidth
 		oldHexHeight = tfield.hexHeight
+
+	}
+
+	export function handleKeyboardShortcut(shortcutData: shortcut_data) {
+
+		switch (shortcutData.function) {
+			
+			case "toggleSnap": {
+				data_icon.snapToHex = !data_icon.snapToHex
+				break; 
+			}
+
+			case "toggleEraser": {
+				data_icon.usingEraser = !data_icon.usingEraser
+				break;
+			}
+
+		}
 
 	}
 

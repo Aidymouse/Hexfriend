@@ -64,9 +64,13 @@ hexfiend red: #FF6666
 	import { tick } from 'svelte';
 	import { Container, Pixi } from 'svelte-pixi';
 	import type { pan_state } from './types/panning';
+	import type { input_state } from './types/inputs';
+
+	import { getKeyboardShortcut } from './lib/keyboardShortcuts'
 
 	import * as store_tfield from './stores/tfield';
 	import * as store_panning from './stores/panning';
+	import * as store_inputs from './stores/inputs';
 
 	/* STATE */
 
@@ -123,9 +127,11 @@ hexfiend red: #FF6666
 		pan = newPan;
 	})
 
-	let controls = {
-		mouseDown: [false, false, false, false, false],
-	};
+	let controls: input_state;
+	store_inputs.store.subscribe((newInputState) => {
+		controls = newInputState
+	});
+	
 
 	let selectedTool: tools = tools.TERRAIN;
 
@@ -305,6 +311,98 @@ hexfiend red: #FF6666
 
 	}
 
+	/* KEYBOARD EVENTS */
+	function keyDown(e: KeyboardEvent) {
+
+
+		// Generate key code
+		let keycode="";
+
+		
+
+		if (e.ctrlKey) keycode += "control+"
+		if (e.shiftKey) keycode += "shift+"
+		if (e.altKey) keycode += "alt+"
+		keycode += e.key.toLowerCase()
+
+		if (e.key == "Alt") keycode = "alt";
+		if (e.key == "Shift") keycode = "shift";
+		if (e.key == "Control") keycode = "control";
+
+		let shortcutData = getKeyboardShortcut(keycode);
+
+		//console.log(keycode);
+		if (shortcutData) {
+
+				switch (shortcutData.tool) {
+					case (null):
+						
+						switch (shortcutData.function) {
+							
+						
+						case "save":
+							saveToDexie();
+							break;
+
+						case "openSavedMaps":
+							showSavedMaps = true;
+							break;
+						
+						case "backToMainView":
+							showSavedMaps = false;
+							showSettings = false;
+							break;
+						
+
+
+					}
+
+					break;
+				
+				case (tools.TERRAIN):
+					comp_terrainLayer.handleKeyboardShortcut(shortcutData);
+					break;
+
+				case (tools.ICON):
+					comp_iconLayer.handleKeyboardShortcut(shortcutData);
+					break;
+
+				case (tools.PATH):
+					comp_pathLayer.handleKeyboardShortcut(shortcutData);
+					break;
+
+
+			}
+		}
+
+
+		// Some more active keyboard listeners require these methods to be called
+		switch (selectedTool) {
+			case (tools.TERRAIN): {
+
+				comp_terrainLayer.keydown(e);
+				break;
+
+			}
+		}
+
+
+	}
+
+	function keyUp(e: KeyboardEvent) {
+
+		switch (selectedTool) {
+			case (tools.TERRAIN): {
+				
+				comp_terrainLayer.keyup(e);
+				break;
+
+			}
+		}
+
+	}
+
+
 	function createNewMap() {
 		/* TODO: Save Data Checking */
 
@@ -482,8 +580,15 @@ hexfiend red: #FF6666
 	createNewMap();
 </script>
 
+<svelte:window
+	on:keydown|preventDefault={keyDown}
+	on:keyup|preventDefault={keyUp}
+/>
+
 {#if appState == appstate.NORMAL && !loading}
 	
+
+
 	<main
 		on:contextmenu|preventDefault={(e) => {}}
 		on:wheel={(e) => {
@@ -495,13 +600,17 @@ hexfiend red: #FF6666
 		on:pointermove={(e) => {
 			pointermove(e);
 		}}
+
 		on:pointerup={(e) => {
 			pointerup(e);
 		}}
 
 		on:pointerout={(e) => {
 			pointerOffLayers(e);
-		}}
+		}}		
+
+		on:keydown={keyDown}
+		on:keyup={keyUp}
 	>
 
 		

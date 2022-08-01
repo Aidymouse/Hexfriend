@@ -11,6 +11,7 @@
 	import * as store_panning from '../stores/panning';
 	import type { pan_state } from '../types/panning';
 	import { Vector } from '../lib/vector2d';
+	import type { shortcut_data } from 'src/types/inputs';
 	
 	export let controls;
 	let pan: pan_state;
@@ -180,7 +181,7 @@
 
 		// Set up initial two prior points
 
-		// Imagine we're facing the direction of the vector. Left is the point on our left, right is the point on our right
+		// Names need some cleaning up, but i'll handle that later. Use the draw functions to help!
 
 		let newPolyPoints = [];
 		let pointStack = [];
@@ -324,6 +325,16 @@
 
 		paths = paths;
 	}
+
+
+	export function handleKeyboardShortcut(shortcutData: shortcut_data) {
+		switch (shortcutData.function) {
+			case "toggleSnap":
+				data_path.snap = !data_path.snap
+				break;
+		}
+	}
+
 
 	const HOVEREDSELECTORSTYLE: PIXI.LineStyle = { width: 1, color: 0x555555 };
 	const SELECTEDSELECTORSTYLE: PIXI.LineStyle = { width: 2, color: 0x333333 };
