@@ -1,21 +1,24 @@
 <script lang="ts">
 	import { coords_cubeToWorld, coords_worldToCube, cube_round } from '../helpers/hexHelpers';
 	import type { path_data } from '../types/data';
-	import type { path } from '../types/path';
+	import type { path_layer_path } from '../types/path';
 	import type { terrain_field } from '../types/terrain';
 	import * as PIXI from 'pixi.js';
 	import { Container, Graphics } from 'svelte-pixi';
+	import type { tools } from 'src/types/toolData';
 
 	import * as store_tfield from '../stores/tfield';
 	import * as store_panning from '../stores/panning';
-	import type { pan_state } from 'src/types/panning';
+	import type { pan_state } from '../types/panning';
+	import { Vector } from '../lib/vector2d';
 	
 	export let controls;
 	let pan: pan_state;
 	store_panning.store.subscribe((newPan) => {
 		pan = newPan;
 	});
-	export let selectedTool;
+
+	export let selectedTool: tools;
 
 	let tfield: terrain_field;
 	store_tfield.store.subscribe(newTField => {
@@ -24,15 +27,15 @@
 	
 	export let data_path: path_data;
 
-	export let paths: path[] = [];
+	export let paths: path_layer_path[] = [];
 
-	let hoveredPath: path | null = null;
+	let hoveredPath: path_layer_path | null = null;
 
 	let pathId: number = 0;
 	paths.forEach((p) => (pathId = Math.max(pathId, p.id)));
 	pathId++;
 
-	function appendPoint(path: path, x: number, y: number) {
+	function appendPoint(path: path_layer_path, x: number, y: number) {
 		path.points = [...path.points, x, y];
 		paths = paths;
 	}
@@ -59,7 +62,7 @@
 		}
 	}
 
-	export function removeLastPoint(path: path) {
+	export function removeLastPoint(path: path_layer_path) {
 		path.points.pop();
 		path.points.pop();
 		paths = paths;
@@ -67,7 +70,7 @@
 		if (path.points.length == 0) deletePath(path);
 	}
 
-	export function deletePath(path: path) {
+	export function deletePath(path: path_layer_path) {
 		data_path.selectedPath = null;
 
 		let pathIndex = paths.indexOf(path);
@@ -138,14 +141,14 @@
 			pY = snapPoint.y;
 		}
 
-		paths.push({ id: pathId, style: { ...data_path.style }, points: [pX, pY] });
+		paths.push({ id: pathId, style: { ...data_path.style }, points: [pX, pY], hitboxes: [] });
 		paths = paths;
 		pathId++;
 		data_path.selectedPath = paths[paths.length - 1];
 		//console.log(paths);
 	}
 
-	function getHitArea(path: path): PIXI.Rectangle {
+	function getHitArea(path: path_layer_path): PIXI.Rectangle {
 		let leftMostX = Infinity;
 		let rightMostX = -Infinity;
 		let topMostY = Infinity;
@@ -172,6 +175,58 @@
 		return n;
 	}
 
+
+	function findHitBoxes(path: path_layer_path) {
+		if (path.points.length < 6) return
+
+		let hitboxPolyPoints = [];
+		let stack = [];
+
+		let boxWidth = 10;
+
+		// Add first point
+
+		for (let pI = 0; pI < path.points.length-4; pI += 2) {
+			// For every pair of paths, find a rectangle that fits around that line as the hit area
+			
+			
+
+			let p1 = new Vector(path.points[pI], path.points[pI+1])
+			let p2 = new Vector(path.points[pI+2], path.points[pI+3])
+			let p3 = new Vector(path.points[pI+4], path.points[pI+5])
+
+			let lineSeg1 = Vector.subtract(p2, p1);
+			let lineSeg2 = Vector.subtract(p3, p2);
+
+
+			// Find left and right lines of line 1
+			let perpLine1Dir = new Vector(lineSeg1.y, -lineSeg1.x).normalize()
+
+			// Minus to get left
+			let leftLineStart = new Vector(p1.x - boxWidth * perpLine1Dir.x, p1.y - boxWidth * perpLine1Dir.y)
+			let leftLineEnd = new Vector(p2.x - boxWidth * perpLine1Dir.x, p2.y - boxWidth * perpLine1Dir.y)
+
+			let leftLine = Vector.subtract(leftLineEnd, leftLineStart);
+
+			console.log(leftLine);
+
+
+
+
+			//hitboxPolyPoints.push(p1.x + boxWidth * perpDir.x)
+			//hitboxPolyPoints.push(p1.y + boxWidth * perpDir.y)
+
+			//stack.push(p1.y - boxWidth * perpDir.y)
+			//stack.push(p1.x - boxWidth * perpDir.x)
+
+
+		}
+
+		while (stack.length > 0) { hitboxPolyPoints.push( stack.pop() ) }
+
+		return new PIXI.Polygon([0, 0, 0, 10, 10, 10, 10, 0]);
+	}
+
 	export function moveAllPaths(xMod: number, yMod: number) {
 		paths.forEach((path) => {
 			for (let pI = 0; pI < path.points.length; pI += 2) {
@@ -190,7 +245,7 @@
 {#each paths as path (path.id)}
 	<Container
 		interactive={selectedTool == 'path' && !data_path.selectedPath}
-		hitArea={getHitArea(path)}
+		hitArea={findHitBoxes(path)}
 		on:pointerover={() => {
 			hoveredPath = path;
 		}}
@@ -217,6 +272,11 @@
 					for (let pI = 0; pI < path.points.length; pI += 2) {
 						g.drawCircle(path.points[pI], path.points[pI + 1], 3);
 					}
+				}
+
+				if (path.points.length > 4) {
+					g.lineStyle(2, 0xff0000)
+					g.drawPolygon(findHitBoxes(path))
 				}
 			}}
 		/>
