@@ -1,9 +1,11 @@
-export function Vector(x: number, y: number) {
+export function Vector(x, y) {
     this.x = x || 0;
     this.y = y || 0;
 }
 
 /* INSTANCE METHODS */
+
+// For angles: 0 radians = straight right
 
 Vector.prototype = {
     negative: function () {
@@ -91,12 +93,19 @@ Vector.prototype = {
         return this;
     },
     rotate: function (ang) {
-        ang = -ang //* (Math.PI / 180);
+        //ang = -ang //* (Math.PI / 180);
         var cos = Math.cos(ang);
         var sin = Math.sin(ang);
 
-        this.x = this.x * cos - this.y * sin;
-        this.y = (this.x * sin + this.y * cos);
+        let oldX = this.x
+        let oldY = this.y
+
+        this.x = oldX * cos + oldY * sin
+        this.y = -oldX * sin + oldY * cos
+
+
+        this.x = Math.round(1000 * this.x) / 1000;
+        this.y = Math.round(1000 * this.y) / 1000;
 
         return this;
     }
@@ -132,3 +141,14 @@ Vector.dot = function (a, b) {
 Vector.cross = function (a, b) {
     return a.x * b.y - a.y * b.x;
 };
+
+Vector.normalize = function (v) {
+    return v.clone().normalize()
+};
+
+Vector.negative = function(v) {
+    return new Vector(-v.x, -v.y);
+}
+
+
+// TESTING

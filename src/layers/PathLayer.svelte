@@ -176,56 +176,141 @@
 	}
 
 
+	function pathPointsToPoints(path: path_layer_path) {
+		let points = [];
+		for (let pI = 0; pI < path.points.length; pI += 2) {
+			points.push( new Vector(path.points[pI], path.points[pI+1]) );
+		}
+		return points;
+	}
+
+
 	function findHitBoxes(path: path_layer_path) {
 		if (path.points.length < 6) return
 
 		let hitboxPolyPoints = [];
 		let stack = [];
 
+		let perpAngles = [];
+
 		let boxWidth = 10;
+
+		let pathPoints = pathPointsToPoints(path);
 
 		// Add first point
 
-		for (let pI = 0; pI < path.points.length-4; pI += 2) {
-			// For every pair of paths, find a rectangle that fits around that line as the hit area
+		// 0 radians = straight right
+		// PI/2 radians = straight down
+		// PI radians = straight left
+		// -PI/2 radians = straight up
+
+		// Set up initial two prior points
+
+		let firstSegment = Vector.subtract(pathPoints[1], pathPoints[0]);
+
+		let firstSegPerpDir = new Vector(firstSegment.y, -firstSegment.x).normalize()
+
+		// Imagine we're facing the direction of the vector. Left is the point on our left, right is the point on our right
+		let priorPointLeft = Vector.subtract(pathPoints[0], Vector.multiply(firstSegPerpDir, boxWidth));
+		let priorPointRight = Vector.add(pathPoints[0], Vector.multiply(firstSegPerpDir, boxWidth));
+
+		let newPolyPoints = [];
+		let pointStack = [];
+
+		let firstSeg = Vector.subtract(pathPoints[1], pathPoints[0])
+		let perpFirstSegDir = new Vector(firstSeg.y, -firstSeg.x).normalize()
+		let firstPointLeft = Vector.add(pathPoints[0], Vector.multiply(perpFirstSegDir, boxWidth))
+		let firstPointRight = Vector.add(pathPoints[0], Vector.multiply(perpFirstSegDir, -boxWidth))
+
+		newPolyPoints.push(firstPointLeft)
+		pointStack.push(firstPointRight)
+
+		console.log(firstPointRight)
+
+		// Find points for corners
+		for (let pI = 1; pI < pathPoints.length-1; pI++) {
+			let p1 = pathPoints[pI-1]
+			let p2 = pathPoints[pI]
+			let p3 = pathPoints[pI+1]
+
+			let lineSeg1 = Vector.subtract(p2, p1)
+			let lineSeg2 = Vector.subtract(p3, p2)
+
+			let perpLine1Dir = new Vector(lineSeg1.y, -lineSeg1.x)
+			let perpLine2Dir = new Vector(lineSeg2.y, -lineSeg2.x)
+
+			let p1Left = Vector.add(p1, Vector.multiply(perpLine1Dir, boxWidth))
+			let p1Right = Vector.add(p1, Vector.multiply(perpLine1Dir, -boxWidth))
+
+			let p3Left = Vector.add(p3, Vector.multiply(perpLine2Dir, boxWidth))
+			let p3Right = Vector.add(p3, Vector.multiply(perpLine2Dir, -boxWidth))
 			
 			
 
-			let p1 = new Vector(path.points[pI], path.points[pI+1])
-			let p2 = new Vector(path.points[pI+2], path.points[pI+3])
-			let p3 = new Vector(path.points[pI+4], path.points[pI+5])
+		
+			// Find intersection Point between left lines
+			
+			let p1LeftLine = {start: p1Left, end: Vector.add(p1Left, lineSeg1)}
+			let p3LeftLine = {start: p3Left, end: Vector.multiply(5, Vector.add(p1Left, Vector.negative(lineSeg2)))}
+			let newPointLeft = findIntersectionPoint(p1LeftLine, p3LeftLine)
 
-			let lineSeg1 = Vector.subtract(p2, p1);
-			let lineSeg2 = Vector.subtract(p3, p2);
-
-
-			// Find left and right lines of line 1
-			let perpLine1Dir = new Vector(lineSeg1.y, -lineSeg1.x).normalize()
-
-			// Minus to get left
-			let leftLineStart = new Vector(p1.x - boxWidth * perpLine1Dir.x, p1.y - boxWidth * perpLine1Dir.y)
-			let leftLineEnd = new Vector(p2.x - boxWidth * perpLine1Dir.x, p2.y - boxWidth * perpLine1Dir.y)
-
-			let leftLine = Vector.subtract(leftLineEnd, leftLineStart);
-
-			console.log(leftLine);
+			let p1RightLine = {start: p1Right, end: Vector.add(p1Right, lineSeg1)}
+			let p3RightLine = {start: p3Right, end: Vector.multiply(5, Vector.add(p1Right, Vector.negative(lineSeg2)))}
+			let newPointRight = findIntersectionPoint(p1RightLine, p3RightLine)
 
 
+			newPolyPoints.push(newPointLeft)
+			pointStack.push(newPointRight)
 
-
-			//hitboxPolyPoints.push(p1.x + boxWidth * perpDir.x)
-			//hitboxPolyPoints.push(p1.y + boxWidth * perpDir.y)
-
-			//stack.push(p1.y - boxWidth * perpDir.y)
-			//stack.push(p1.x - boxWidth * perpDir.x)
-
+			
 
 		}
+		
+		newPolyPoints.push(pathPoints[pathPoints.length-1])
+		while (pointStack.length > 0) {
+			newPolyPoints.push( pointStack.pop() )
+		}
 
-		while (stack.length > 0) { hitboxPolyPoints.push( stack.pop() ) }
+		let newPolyParse = [];
+		newPolyPoints.forEach(point => {
+			if (point) newPolyParse.push(point.x, point.y)
+		})
 
-		return new PIXI.Polygon([0, 0, 0, 10, 10, 10, 10, 0]);
+		console.log(newPolyPoints);
+
+		return new PIXI.Polygon(newPolyParse);
 	}
+
+	function findIntersectionPoint(line1, line2) {
+		// Check if none of the lines are of length 0
+		if ((line1.start.x === line1.end.x && line1.start.y === line1.end.y) 
+		|| (line2.start.x === line2.end.x && line2.start.y === line2.end.y)) {
+			return false
+		}
+
+		let denominator = ((line2.end.y - line2.start.y) * (line1.end.x - line1.start.x) - (line2.end.x - line2.start.x) * (line1.end.y - line1.start.y))
+
+		// Lines are parallel
+		if (denominator === 0) {
+			return false
+		}
+
+		let ua = ((line2.end.x - line2.start.x) * (line1.start.y - line2.start.y) - (line2.end.y - line2.start.y) * (line1.start.x - line2.start.x)) / denominator
+		let ub = ((line1.end.x - line1.start.x) * (line1.start.y - line2.start.y) - (line1.end.y - line1.start.y) * (line1.start.x - line2.start.x)) / denominator
+
+		// is the intersection along the segments
+		if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
+			return false
+		}
+
+		// Return a object with the x and y coordinates of the intersection
+		let x = line1.start.x + ua * (line1.end.x - line1.start.x)
+		let y = line1.start.y + ua * (line1.end.y - line1.start.y)
+
+		return {x, y}
+
+	}
+	
 
 	export function moveAllPaths(xMod: number, yMod: number) {
 		paths.forEach((path) => {
