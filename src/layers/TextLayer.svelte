@@ -3,7 +3,9 @@
 	import * as PIXI from 'pixi.js';
 	import { Graphics, Text } from 'svelte-pixi';
 	import * as store_panning from '../stores/panning';
-	import type { pan_state } from 'src/types/panning';
+	import type { pan_state } from '../types/panning';
+	import type { shortcut_data } from '../types/inputs';
+	import type { text_layer_text } from '../types/text'
 	
 	let pan: pan_state;
 	store_panning.store.subscribe((newPan) => {
@@ -17,7 +19,7 @@
 	let dragX; // offset from the
 	let dragY;
 
-	export let texts = [
+	export let texts: text_layer_text[] = [
 		// {text: string, style: object }
 	];
 
@@ -75,7 +77,7 @@
 		data_text.selectedText = texts[texts.length - 1];
 	}
 
-	export function deleteText(text) {
+	export function deleteText(text: text_layer_text) {
 		if (text == data_text.selectedText) data_text.selectedText = null;
 		let i = texts.indexOf(text);
 		texts.splice(i, 1);
@@ -83,12 +85,12 @@
 	}
 
 	/* Hacky as fuck, but updating the text size alone doesnt do it... */
-	function getTextWidth(text): number {
+	function getTextWidth(text: text_layer_text): number {
 		let tm = PIXI.TextMetrics.measureText(text.text, new PIXI.TextStyle(text.style));
 		return tm.width;
 	}
 
-	function getTextHeight(text): number {
+	function getTextHeight(text: text_layer_text): number {
 		let tm = PIXI.TextMetrics.measureText(text.text, new PIXI.TextStyle(text.style));
 		return tm.height;
 	}
@@ -99,13 +101,33 @@
 		right: { x: 1, y: 0 },
 	};
 
-	export function moveAllTexts(xMod, yMod) {
+	export function moveAllTexts(xMod: number, yMod: number) {
 		texts.forEach((t) => {
 			t.x += xMod;
 			t.y += yMod;
 		});
 
 		texts = texts;
+	}
+
+	export function handleKeyboardShortcut(shortcutData: shortcut_data) {
+
+		switch (shortcutData.function) {
+
+			case "toggleItalics":
+				data_text.style.fontStyle = data_text.style.fontStyle == "italic" ? "normal" : "italic";
+				break;
+
+			case "toggleBold":
+				data_text.style.fontWeight = data_text.style.fontWeight == "bold" ? "normal" : "bold";
+				break;
+			
+			case "deleteText":
+				if (data_text.selectedText) deleteText(data_text.selectedText);
+				break;
+
+		}
+
 	}
 </script>
 

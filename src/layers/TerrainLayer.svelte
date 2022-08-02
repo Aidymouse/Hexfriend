@@ -811,6 +811,16 @@
 				data_terrain.usingEyedropper = true
 				break;
 			}
+
+			case ("Shift"): {
+				data_terrain.usingEraser = true
+				break;
+			}
+
+			case ("Control"): {
+				data_terrain.usingPaintbucket = true
+				break;
+			}
 		}
 
 	}
@@ -819,6 +829,16 @@
 		switch (e.key) {
 			case ("Alt"): {
 				data_terrain.usingEyedropper = false
+				break;
+			}
+
+			case ("Shift"): {
+				data_terrain.usingEraser = false
+				break;
+			}
+
+			case ("Control"): {
+				data_terrain.usingPaintbucket = false
 				break;
 			}
 		}
@@ -830,6 +850,10 @@
 			
 			case "toggleEraser":
 				data_terrain.usingEraser = !data_terrain.usingEraser
+				break;
+			
+			case "togglePaintbucket":
+				data_terrain.usingPaintbucket = !data_terrain.usingPaintbucket
 				break;
 
 		}

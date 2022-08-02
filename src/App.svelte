@@ -72,6 +72,8 @@ hexfiend red: #FF6666
 	import * as store_panning from './stores/panning';
 	import * as store_inputs from './stores/inputs';
 
+	import ShortcutList from './components/ShortcutList.svelte'
+
 	/* STATE */
 
 	let loadedSave: save_data = DEFAULTSAVEDATA;
@@ -88,6 +90,7 @@ hexfiend red: #FF6666
 	let showSettings = false;
 	let showTerrainGenerator = false;
 	let showLoader: boolean = false;
+	let showKeyboardShortcuts: boolean = false;
 
 	let offsetContainer = new PIXI.Container();
 
@@ -97,6 +100,8 @@ hexfiend red: #FF6666
 	let comp_pathLayer: PathLayer;
 	let comp_textLayer: TextLayer;
 	let comp_coordsLayer: CoordsLayer;
+
+	let comp_shortcutList: ShortcutList;
 
 	//offsetContainer.addChild(terrainGraphics);
 
@@ -313,12 +318,24 @@ hexfiend red: #FF6666
 
 	/* KEYBOARD EVENTS */
 	function keyDown(e: KeyboardEvent) {
+		
+		if (comp_shortcutList && e.key != "Escape" && !(e.key == "k" && e.ctrlKey)) {
+			e.preventDefault();
+			comp_shortcutList.keydown(e);
+			return;
+		}
 
+		if (data_text.editorRef) {
+			
+			if (e.ctrlKey) {
+				e.preventDefault();
+			}
+		}
+		
+		e.preventDefault();
 
 		// Generate key code
 		let keycode="";
-
-		
 
 		if (e.ctrlKey) keycode += "control+"
 		if (e.shiftKey) keycode += "shift+"
@@ -329,7 +346,7 @@ hexfiend red: #FF6666
 		if (e.key == "Shift") keycode = "shift";
 		if (e.key == "Control") keycode = "control";
 
-		let shortcutData = getKeyboardShortcut(keycode);
+		let shortcutData = getKeyboardShortcut(keycode, selectedTool);
 
 		//console.log(keycode);
 		if (shortcutData) {
@@ -344,14 +361,40 @@ hexfiend red: #FF6666
 							saveToDexie();
 							break;
 
-						case "openSavedMaps":
-							showSavedMaps = true;
+						case "toggleViewMaps":
+							showSavedMaps = !showSavedMaps;
 							break;
 						
+						case "toggleViewSettings":
+							showSettings = !showSettings;
+							break;
+
+						case "toggleShortcutList":
+							showKeyboardShortcuts = !showKeyboardShortcuts
+							break;
+
 						case "backToMainView":
 							showSavedMaps = false;
 							showSettings = false;
+							showKeyboardShortcuts = false;
 							break;
+
+							case "changeTool_terrain":
+							selectedTool = tools.TERRAIN
+							break
+						case "changeTool_icon":
+							selectedTool = tools.ICON
+							break
+						case "changeTool_path":
+							selectedTool = tools.PATH
+							break
+						case "changeTool_text":
+							selectedTool = tools.TEXT
+							break
+						case "changeTool_eraser":
+							selectedTool = tools.ERASER
+							break
+						
 						
 
 
@@ -370,6 +413,10 @@ hexfiend red: #FF6666
 				case (tools.PATH):
 					comp_pathLayer.handleKeyboardShortcut(shortcutData);
 					break;
+				
+				case (tools.TEXT):
+					comp_textLayer.handleKeyboardShortcut(shortcutData);
+					break;
 
 
 			}
@@ -385,21 +432,26 @@ hexfiend red: #FF6666
 
 			}
 		}
-
-
+		
+		
 	}
-
+	
 	function keyUp(e: KeyboardEvent) {
+		
+		if (comp_shortcutList) {
+			comp_shortcutList.keyup(e);
+		}
 
 		switch (selectedTool) {
 			case (tools.TERRAIN): {
 				
 				comp_terrainLayer.keyup(e);
 				break;
-
+				
 			}
 		}
-
+		
+		
 	}
 
 
@@ -581,7 +633,7 @@ hexfiend red: #FF6666
 </script>
 
 <svelte:window
-	on:keydown|preventDefault={keyDown}
+	on:keydown={keyDown}
 	on:keyup|preventDefault={keyUp}
 />
 
@@ -703,6 +755,10 @@ hexfiend red: #FF6666
 
 	{#if showSavedMaps}
 		<SavedMaps bind:showSavedMaps {createNewMap} load={loadInit} />
+	{/if}
+
+	{#if showKeyboardShortcuts}
+		<ShortcutList bind:this={comp_shortcutList} />
 	{/if}
 
 	<MapSettings

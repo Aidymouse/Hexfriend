@@ -119,6 +119,7 @@
 </script>
 
 <span>
+	
 	<div class="control">
 		<p>Right Mouse</p>
 		<p>Pan</p>
@@ -158,6 +159,11 @@
 			<p>Erase Terrain + Icons</p>
 		</div>
 	{/if}
+
+	<div class="control" style="margin-top: 4px;">
+		<p>Ctrl+K</p>
+		<p>View Keybinds</p>
+	</div>
 </span>
 
 <style>

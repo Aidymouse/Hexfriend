@@ -11,6 +11,9 @@ export interface input_state {
 }
 
 export interface shortcut_data {
-    function: string,
+    keycode: string
+    function: string
     tool?: tools
+    display: string
+    displayKeycode?: string
 }

@@ -13,7 +13,7 @@ export interface text_style {
 */
 
 /* HF stands for Hexfriend */
-export interface HF_text {
+export interface text_layer_text {
 	id: number;
 	text: string;
 	style: PIXI.Text['style'];
