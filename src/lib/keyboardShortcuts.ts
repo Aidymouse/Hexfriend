@@ -14,6 +14,7 @@ export let shortcuts: shortcut_data[] = [
     {keycode: "shift+s", function: "toggleViewSettings", tool: null, display: "Toggle Settings" },
     {keycode: "escape", function: "backToMainView", tool: null, display: "Back to Main View" },
     {keycode: "control+k", function: "toggleShortcutList", tool: null, display: "View Shortcut List" },
+    {keycode: "shift+k", function: "toggleControls", tool: null, display: "Toggle Controls" },
 
 
     {keycode: "1", function: "changeTool_terrain", tool: null, display: "Terrain Tool"},
@@ -31,17 +32,21 @@ export let shortcuts: shortcut_data[] = [
     {keycode: "alt", function: null, tool: tools.TERRAIN, display: "Eyedropper", displayKeycode: "alt (Hold)"},
 
     // ICONs
-    {keycode: "s", function: "toggleSnap", tool: tools.ICON, display: ""},
+    {keycode: "s", function: "toggleSnap", tool: tools.ICON, display: "Toggle Snapping"},
 
 
     // PATH
-    {keycode: "s", function: "toggleSnap", tool: tools.PATH, display: ""},
-    {keycode: "delete", function: "delete", tool: tools.PATH, display: ""},
+    {keycode: "s", function: "toggleSnap", tool: tools.PATH, display: "Toggle Snapping"},
+    {keycode: "delete", function: "deletePath", tool: tools.PATH, display: "Delete Selected Path"},
+    {keycode: "backspace", function: "deleteLastPoint", tool: tools.PATH, display: "Delete Latest Point"},
+    {keycode: "control+d", function: "deselect", tool: tools.PATH, display: "Deselect Path"},
+    
+    {keycode: "shift", function: null, tool: tools.PATH, display: "Ignore Paths", displayKeycode: "shift (Hold)"},
 
     // TEXT
-    {keycode: "control+b", function: "toggleBold", tool: tools.TEXT, display: ""},
-    {keycode: "control+i", function: "toggleItalics", tool: tools.TEXT, display: ""},
-    {keycode: "control+delete", function: "deleteText", tool: tools.TEXT, display: ""},
+    {keycode: "control+b", function: "toggleBold", tool: tools.TEXT, display: "Toggle Bold"},
+    {keycode: "control+i", function: "toggleItalics", tool: tools.TEXT, display: "Toggle Italics"},
+    {keycode: "control+delete", function: "deleteText", tool: tools.TEXT, display: "Delete Selected Text"},
 ]
 
 export function getKeyboardShortcut(keyCode: string, selectedTool: tools) {

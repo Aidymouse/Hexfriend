@@ -1,6 +1,6 @@
 import type { coord_system } from './coordinates';
-import type { path } from './path';
-import type { HF_text } from './text';
+import type { path_layer_path } from './path';
+import type { text_layer_text } from './text';
 import type { Tile } from './tilesets';
 import type * as PIXI from 'pixi.js';
 
@@ -30,13 +30,15 @@ export interface coordinates_data {
 
 export interface text_data {
 	style: PIXI.Text['style'];
-	selectedText?: HF_text;
+	selectedText?: text_layer_text;
 	editorRef: any;
 	usingTextTool: boolean;
 }
 
 export interface path_data {
-	selectedPath: path;
+	selectedPath?: path_layer_path;
+	hoveredPath?: path_layer_path;
+	dontSelectPaths: boolean
 	snap: boolean;
 	style: PIXI.LineStyle;
 }

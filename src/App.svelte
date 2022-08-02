@@ -91,6 +91,7 @@ hexfiend red: #FF6666
 	let showTerrainGenerator = false;
 	let showLoader: boolean = false;
 	let showKeyboardShortcuts: boolean = false;
+	let showControls: boolean = true;
 
 	let offsetContainer = new PIXI.Container();
 
@@ -165,7 +166,9 @@ hexfiend red: #FF6666
 
 	let data_path: path_data = {
 		style: { color: 0, width: 3, cap: PIXI.LINE_CAP.ROUND, join: PIXI.LINE_JOIN.ROUND },
+		hoveredPath: null,
 		selectedPath: null,
+		dontSelectPaths: null,
 		snap: false,
 	};
 
@@ -373,6 +376,10 @@ hexfiend red: #FF6666
 							showKeyboardShortcuts = !showKeyboardShortcuts
 							break;
 
+						case "toggleControls":
+							showControls = !showControls;
+							break;
+
 						case "backToMainView":
 							showSavedMaps = false;
 							showSettings = false;
@@ -431,6 +438,11 @@ hexfiend red: #FF6666
 				break;
 
 			}
+
+			case (tools.PATH): {
+				comp_pathLayer.keydown(e);
+				break;
+			}
 		}
 		
 		
@@ -448,6 +460,11 @@ hexfiend red: #FF6666
 				comp_terrainLayer.keyup(e);
 				break;
 				
+			}
+
+			case (tools.PATH): {
+				comp_pathLayer.keyup(e);
+				break;
 			}
 		}
 		
@@ -795,7 +812,9 @@ hexfiend red: #FF6666
 		load={loadInit}
 	/>
 
-	<Controls {selectedTool} {data_terrain} {data_icon} {data_path} {data_text} />
+	{#if showControls}
+		<Controls {selectedTool} {data_terrain} {data_icon} {data_path} {data_text} />
+	{/if}
 
 {:else if appState == appstate.TILESETCREATOR}
 	<TilesetCreator bind:appState />

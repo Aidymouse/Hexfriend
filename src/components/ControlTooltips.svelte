@@ -63,6 +63,8 @@
 
 		if (data_path.selectedPath) {
 			c_path.leftMouse = 'Place Point';
+		} else if (data_path.hoveredPath && !data_path.dontSelectPaths) {
+			c_path.leftMouse = 'Select Path';
 		}
 	}
 
@@ -83,6 +85,7 @@
 		if (data_text.selectedText) {
 			c_text.leftMouse = 'Deselect Text';
 		}
+
 	}
 
 	$: {

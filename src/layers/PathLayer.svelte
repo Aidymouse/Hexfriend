@@ -30,8 +30,6 @@
 
 	export let paths: path_layer_path[] = [];
 
-	let hoveredPath: path_layer_path | null = null;
-
 	let pathId: number = 0;
 	paths.forEach((p) => (pathId = Math.max(pathId, p.id)));
 	pathId++;
@@ -53,10 +51,10 @@
 				}
 
 				appendPoint(data_path.selectedPath, pX, pY);
-			} else if (hoveredPath) {
-				data_path.selectedPath = paths[paths.indexOf(hoveredPath)];
+			} else if (data_path.hoveredPath && !data_path.dontSelectPaths) {
+				data_path.selectedPath = paths[paths.indexOf(data_path.hoveredPath)];
 				data_path.style = { ...data_path.selectedPath.style };
-				hoveredPath = null;
+				data_path.hoveredPath = null;
 			} else {
 				addNewPath();
 			}
@@ -146,6 +144,7 @@
 		paths = paths;
 		pathId++;
 		data_path.selectedPath = paths[paths.length - 1];
+		data_path.hoveredPath = null;
 		//console.log(paths);
 	}
 
@@ -332,9 +331,40 @@
 			case "toggleSnap":
 				data_path.snap = !data_path.snap
 				break;
+			
+			case "deleteLastPoint":
+				if (data_path.selectedPath) {
+					removeLastPoint(data_path.selectedPath);
+				}
+				break;	
+			
+			case "deletePath":
+				if (data_path.selectedPath) {
+					deletePath(data_path.selectedPath);
+				}
+				break;
+			
+			case "deselect":
+				data_path.selectedPath = null;
+				break;
 		}
 	}
 
+	export function keydown(e: KeyboardEvent) {
+		switch (e.key) {
+			case "Shift":
+				data_path.dontSelectPaths = true;
+				break;
+		}
+	}
+
+	export function keyup(e: KeyboardEvent) {
+		switch (e.key) {
+			case "Shift":
+				data_path.dontSelectPaths = false;
+				break;
+		}
+	}
 
 	const HOVEREDSELECTORSTYLE: PIXI.LineStyle = { width: 1, color: 0x555555 };
 	const SELECTEDSELECTORSTYLE: PIXI.LineStyle = { width: 2, color: 0x333333 };
@@ -345,10 +375,10 @@
 		hitArea={findHitArea(path)}
 		interactive={selectedTool == 'path' && !data_path.selectedPath}
 		on:pointerover={() => {
-			hoveredPath = path;
+			data_path.hoveredPath = path;
 		}}
 		on:pointerout={() => {
-			hoveredPath = null;
+			data_path.hoveredPath = null;
 		}}
 	>
 		<Graphics
@@ -360,20 +390,38 @@
 					g.lineTo(path.points[pI], path.points[pI + 1]);
 				}
 
-				if (data_path.selectedPath == path) {
-					g.lineStyle(SELECTEDSELECTORSTYLE);
-					for (let pI = 0; pI < path.points.length; pI += 2) {
-						g.drawCircle(path.points[pI], path.points[pI + 1], 4);
-					}
-				} else if (hoveredPath == path) {
-					g.lineStyle(HOVEREDSELECTORSTYLE);
-					for (let pI = 0; pI < path.points.length; pI += 2) {
-						g.drawCircle(path.points[pI], path.points[pI + 1], 3);
-					}
-				}
+				
 			}}
 		/>
 
 
 	</Container>
 {/each}
+
+{#if data_path.selectedPath}
+	<Graphics
+			draw={(g) => {
+				g.clear();
+				g.lineStyle(SELECTEDSELECTORSTYLE);
+				for (let pI = 0; pI < data_path.selectedPath.points.length; pI += 2) {
+					g.drawCircle(data_path.selectedPath.points[pI], data_path.selectedPath.points[pI + 1], 4);
+				}
+				 
+			}}
+		/>
+{/if}
+
+
+{#if data_path.hoveredPath && !data_path.dontSelectPaths}
+	<Graphics
+			draw={(g) => {
+				g.clear();
+				g.lineStyle(HOVEREDSELECTORSTYLE);
+				for (let pI = 0; pI < data_path.hoveredPath.points.length; pI += 2) {
+					g.drawCircle(data_path.hoveredPath.points[pI], data_path.hoveredPath.points[pI + 1], 3);
+				}
+			}}	
+		/>
+{/if}
+
+
