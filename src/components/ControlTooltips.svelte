@@ -99,9 +99,9 @@
 	function setTooltips_eraser() {
 		c_eraser.leftMouse = 'Erase Terrain + Icons'
 
-		if (data_eraser.ignoreIcons && data_eraser.ignoreTerrain) c_eraser.leftMouse = "Do Nothing!";
-		else if (data_eraser.ignoreIcons) c_eraser.leftMouse = 'Erase Terrain';
-		else if (data_eraser.ignoreTerrain) c_eraser.leftMouse = 'Erase Icons';
+		if (data_eraser.ignoreIcons && data_eraser.ignoreTerrain) c_eraser.leftMouse = "Erase Nothing!";
+		else if (data_eraser.ignoreIcons) c_eraser.leftMouse = 'Erase Only Terrain';
+		else if (data_eraser.ignoreTerrain) c_eraser.leftMouse = 'Erase Only Icons';
 
 	}
 

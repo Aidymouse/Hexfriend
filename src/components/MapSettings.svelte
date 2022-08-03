@@ -22,7 +22,6 @@
 	export let showSettings: boolean;
 	export let appState;
 	export let showTerrainGenerator: boolean;
-	export let showControls: boolean;
 
 	export let exportMap: Function;
 

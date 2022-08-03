@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { coords_cubeToq, coords_cubeTor, coords_cubeToWorld, coords_qToCube, coords_rToCube, coords_worldToCube, hexOrientation } from '../helpers/hexHelpers';
-	import type { icon_data } from '../types/data';
+	import type { eraser_data, icon_data } from '../types/data';
 	import type { IconLayerIcon } from '../types/icon';
 	import type { terrain_field } from '../types/terrain';
 	import { tools } from '../types/toolData';
@@ -28,6 +28,7 @@ import type { shortcut_data } from 'src/types/inputs';
 	})
 
 	export let data_icon: icon_data;
+	export let data_eraser: eraser_data;
 	export let iconTextureLookupTable: { [key: string]: string };
 
 	let floatingIcon: IconLayerIcon | null = null;
@@ -289,7 +290,7 @@ import type { shortcut_data } from 'src/types/inputs';
 		tint={icon.color}
 		anchor={{ x: 0.5, y: 0.5 }}
 		scale={{ x: icon.scale, y: icon.scale }}
-		interactive={ (selectedTool == 'eraser' ) || (selectedTool == 'icon' && data_icon.usingEraser)}
+		interactive={ (selectedTool == 'eraser' && !data_eraser.ignoreIcons) || (selectedTool == 'icon' && data_icon.usingEraser)}
 		on:pointerdown={(e) => {
 			if (e.detail.data.button == 0) deleteIcon(icon);
 		}}

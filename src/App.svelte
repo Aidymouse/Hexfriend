@@ -268,7 +268,8 @@ hexfiend red: #FF6666
 					break;
 
 				case tools.ERASER:
-					if (!data_eraser.ignoreTerrain) comp_terrainLayer.eraseAtMouse();
+					console.log(data_eraser)
+					if (data_eraser.ignoreTerrain) { comp_terrainLayer.eraseAtMouse(); }
 					/* Icons are handled in the IconLayer */
 					break;
 			}
@@ -308,7 +309,9 @@ hexfiend red: #FF6666
 				break;
 
 			case tools.ERASER:
-				if (controls.mouseDown[0]) comp_terrainLayer.eraseAtMouse();
+				if (controls.mouseDown[0]) {
+					if (!data_eraser.ignoreTerrain) comp_terrainLayer.eraseAtMouse();
+				}
 				/* Icons are handled differently in the icon handler */
 				break;
 		}
@@ -324,24 +327,7 @@ hexfiend red: #FF6666
 
 	}
 
-	/* KEYBOARD EVENTS */
-	function keyDown(e: KeyboardEvent) {
-		
-		if (comp_shortcutList && e.key != "Escape" && !(e.key == "k" && e.ctrlKey)) {
-			e.preventDefault();
-			comp_shortcutList.keydown(e);
-			return;
-		}
-
-		if (data_text.editorRef) {
-			
-			if (e.ctrlKey) {
-				e.preventDefault();
-			}
-		}
-		
-		e.preventDefault();
-
+	function handleShortcuts(e: KeyboardEvent) {
 		// Generate key code
 		let keycode="";
 
@@ -433,6 +419,30 @@ hexfiend red: #FF6666
 
 			}
 		}
+	}
+
+	/* KEYBOARD EVENTS */
+	function keyDown(e: KeyboardEvent) {
+		
+		if (comp_shortcutList && e.key != "Escape" && !(e.key == "k" && e.ctrlKey)) {
+			e.preventDefault();
+			comp_shortcutList.keydown(e);
+			return;
+		}
+
+		// Conditions under which we don't want to prevent default
+		if (data_text.editorRef) {
+			
+			if (e.ctrlKey) {
+				e.preventDefault();
+			}
+
+		} else {
+
+			e.preventDefault();
+		}
+
+		handleShortcuts(e);
 
 
 		// Some more active keyboard listeners require these methods to be called
@@ -450,7 +460,6 @@ hexfiend red: #FF6666
 			}
 
 			case (tools.ERASER): {
-				console.log(e.key);
 				if (e.key == "Shift") data_eraser.ignoreIcons = true;
 				if (e.key == "Control") data_eraser.ignoreTerrain = true;
 				break;
@@ -724,6 +733,7 @@ hexfiend red: #FF6666
 					bind:this={comp_iconLayer}
 					bind:icons={loadedSave.icons}
 					bind:data_icon
+					{data_eraser}
 					{L}
 					{selectedTool}
 					{controls}

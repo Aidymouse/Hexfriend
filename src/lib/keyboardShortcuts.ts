@@ -23,6 +23,7 @@ export let shortcuts: shortcut_data[] = [
     {keycode: "4", function: "changeTool_text", tool: null, display: "Text Tool"},
     {keycode: "5", function: "changeTool_eraser", tool: null, display: "Eraser Tool"},
 
+    
     // TERRAIN
     {keycode: "e", function: "toggleEraser", tool: tools.TERRAIN, display: "Toggle Eraser"},
     {keycode: "p", function: "togglePaintbucket", tool: tools.TERRAIN, display: "Toggle Paintbucket"},
@@ -30,6 +31,7 @@ export let shortcuts: shortcut_data[] = [
     {keycode: "shift", function: null, tool: tools.TERRAIN, display: "Erase", displayKeycode: "shift (Hold)"},
     {keycode: "control", function: null, tool: tools.TERRAIN, display: "Paint Bucket", displayKeycode: "control (Hold)"},
     {keycode: "alt", function: null, tool: tools.TERRAIN, display: "Eyedropper", displayKeycode: "alt (Hold)"},
+
 
     // ICONs
     {keycode: "s", function: "toggleSnap", tool: tools.ICON, display: "Toggle Snapping"},
@@ -43,10 +45,16 @@ export let shortcuts: shortcut_data[] = [
     
     {keycode: "shift", function: null, tool: tools.PATH, display: "Ignore Paths", displayKeycode: "shift (Hold)"},
 
+
     // TEXT
     {keycode: "control+b", function: "toggleBold", tool: tools.TEXT, display: "Toggle Bold"},
     {keycode: "control+i", function: "toggleItalics", tool: tools.TEXT, display: "Toggle Italics"},
     {keycode: "control+delete", function: "deleteText", tool: tools.TEXT, display: "Delete Selected Text"},
+
+
+    // ERASER
+    {keycode: "shift", function: null, tool: tools.ERASER, display: "Only Erase Terrain", displayKeycode: "shift (Hold)"},
+    {keycode: "control", function: null, tool: tools.ERASER, display: "Only Erase Icons", displayKeycode: "control (Hold)"},
 ]
 
 export function getKeyboardShortcut(keyCode: string, selectedTool: tools) {
