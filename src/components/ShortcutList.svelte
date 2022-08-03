@@ -102,7 +102,7 @@
 	}
 
     .keycode {
-        font-family: 'Consolas';
+        font-family: monospace;
 		background-color: #222222;
 		color: #f2f2f2;
 		padding-left: 5px;

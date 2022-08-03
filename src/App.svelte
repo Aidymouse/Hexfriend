@@ -54,7 +54,7 @@ hexfiend red: #FF6666
 	import './styles/panels.css';
 	import './styles/scrollbar.css';
 	import { coord_system } from './types/coordinates';
-	import type { coordinates_data, icon_data, path_data, terrain_data, text_data, trace_data } from './types/data';
+	import type { coordinates_data, eraser_data, icon_data, path_data, terrain_data, text_data, trace_data } from './types/data';
 	import type { Iconset } from './types/icon';
 	import type { save_data } from './types/savedata';
 	import type { terrain_field } from './types/terrain';
@@ -198,6 +198,11 @@ hexfiend red: #FF6666
 		gap: 4,
 	};
 
+	let data_eraser: eraser_data = {
+		ignoreTerrain: false,
+		ignoreIcons: false
+	}
+
 	const L: PIXI.Loader = new PIXI.Loader();
 
 	// Never cleared, to stop duplicate textures being added
@@ -250,20 +255,20 @@ hexfiend red: #FF6666
 					comp_terrainLayer.pointerdown();
 					break;
 
-				case 'icon':
+				case tools.ICON:
 					comp_iconLayer.pointerdown();
 					break;
 
-				case 'path':
+				case tools.PATH:
 					comp_pathLayer.pointerdown();
 					break;
 
-				case 'text':
+				case tools.TEXT:
 					comp_textLayer.pointerdown();
 					break;
 
-				case 'eraser':
-					comp_terrainLayer.eraseAtMouse();
+				case tools.ERASER:
+					if (!data_eraser.ignoreTerrain) comp_terrainLayer.eraseAtMouse();
 					/* Icons are handled in the IconLayer */
 					break;
 			}
@@ -443,6 +448,13 @@ hexfiend red: #FF6666
 				comp_pathLayer.keydown(e);
 				break;
 			}
+
+			case (tools.ERASER): {
+				console.log(e.key);
+				if (e.key == "Shift") data_eraser.ignoreIcons = true;
+				if (e.key == "Control") data_eraser.ignoreTerrain = true;
+				break;
+			}
 		}
 		
 		
@@ -464,6 +476,12 @@ hexfiend red: #FF6666
 
 			case (tools.PATH): {
 				comp_pathLayer.keyup(e);
+				break;
+			}
+
+			case (tools.ERASER): {
+				if (e.key == "Shift") data_eraser.ignoreIcons = false;
+				if (e.key == "Control") data_eraser.ignoreTerrain = false;
 				break;
 			}
 		}
@@ -743,8 +761,6 @@ hexfiend red: #FF6666
 		<TextPanel bind:data_text {comp_textLayer} bind:textStyles={loadedSave.textStyles} />
 	{/if}
 
-	<!--
-      -->
 
 	<div id="tool-buttons">
 		<ToolButtons bind:selectedTool bind:hexOrientation={tfield.orientation} />
@@ -813,7 +829,7 @@ hexfiend red: #FF6666
 	/>
 
 	{#if showControls}
-		<Controls {selectedTool} {data_terrain} {data_icon} {data_path} {data_text} />
+		<Controls {selectedTool} {data_terrain} {data_icon} {data_path} {data_text} {data_eraser} />
 	{/if}
 
 {:else if appState == appstate.TILESETCREATOR}

@@ -289,7 +289,7 @@ import type { shortcut_data } from 'src/types/inputs';
 		tint={icon.color}
 		anchor={{ x: 0.5, y: 0.5 }}
 		scale={{ x: icon.scale, y: icon.scale }}
-		interactive={selectedTool == 'eraser' || (selectedTool == 'icon' && data_icon.usingEraser)}
+		interactive={ (selectedTool == 'eraser' ) || (selectedTool == 'icon' && data_icon.usingEraser)}
 		on:pointerdown={(e) => {
 			if (e.detail.data.button == 0) deleteIcon(icon);
 		}}

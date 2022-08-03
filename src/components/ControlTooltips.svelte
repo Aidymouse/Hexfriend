@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { icon_data, path_data, terrain_data, text_data } from '../types/data';
+	import type { eraser_data, icon_data, path_data, terrain_data, text_data } from '../types/data';
 	import { tools } from '../types/toolData';
 
 	export let selectedTool: tools;
@@ -8,6 +8,7 @@
 	export let data_icon: icon_data;
 	export let data_path: path_data;
 	export let data_text: text_data;
+	export let data_eraser: eraser_data;
 
 	/* Terrain */
 	interface terrain_controls {
@@ -88,11 +89,28 @@
 
 	}
 
+
+	let c_eraser = {
+		leftMouse: 'Erase Terrain + Icons'
+
+		
+	}
+
+	function setTooltips_eraser() {
+		c_eraser.leftMouse = 'Erase Terrain + Icons'
+
+		if (data_eraser.ignoreIcons && data_eraser.ignoreTerrain) c_eraser.leftMouse = "Do Nothing!";
+		else if (data_eraser.ignoreIcons) c_eraser.leftMouse = 'Erase Terrain';
+		else if (data_eraser.ignoreTerrain) c_eraser.leftMouse = 'Erase Icons';
+
+	}
+
 	$: {
 		data_terrain = data_terrain;
 		data_icon = data_icon;
 		data_path = data_path;
 		data_text = data_text;
+		data_eraser = data_eraser;
 		setTooltips();
 	}
 
@@ -116,6 +134,10 @@
 
 			case tools.TEXT:
 				setTooltips_text();
+				break;
+			
+			case tools.ERASER:
+				setTooltips_eraser();
 				break;
 		}
 	}
@@ -159,7 +181,7 @@
 	{:else if selectedTool == tools.ERASER}
 		<div class="control">
 			<p>Left Mouse</p>
-			<p>Erase Terrain + Icons</p>
+			<p>{c_eraser.leftMouse}</p>
 		</div>
 	{/if}
 
