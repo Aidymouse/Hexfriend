@@ -5,7 +5,6 @@ import { getHexPath } from '../helpers/hexHelpers';
 
     import { Graphics } from 'svelte-pixi';
     import * as store_tfield from '../stores/tfield';
-    import * as PIXI from 'pixi.js';
 
     
     let tfield: terrain_field;
@@ -16,8 +15,6 @@ import { getHexPath } from '../helpers/hexHelpers';
     let orientation: hex_orientation = hex_orientation.FLATTOP
 
     let diameterInHexes = 3
-
-    let style = new PIXI.LineStyle()
 
 </script>
 
@@ -32,10 +29,14 @@ import { getHexPath } from '../helpers/hexHelpers';
         let bigHeight = tfield.hexHeight * diameterInHexes
         let bigWidth = bigHeight * ratio
 
-        let bigHexPath = getHexPath( bigWidth, bigHeight, orientation, 0, 0 )
+        
+        g.lineStyle(tfield.grid.overlayStyle.width, tfield.grid.overlayStyle.color);
+        for (let i = 0; i<Math.round(tfield.rows/diameterInHexes); i++) {
+            let bigHexPath = getHexPath( bigWidth, bigHeight, orientation, 0, i*bigHeight )
 
-        g.lineStyle(2, 0xff0000);
-        g.drawPolygon(bigHexPath);
+            g.drawPolygon(bigHexPath);
+        }
+
 
     }} />
 

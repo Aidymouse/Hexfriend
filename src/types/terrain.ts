@@ -22,7 +22,7 @@ export interface terrain_field {
 	hexWidth: number;
 	hexHeight: number;
 
-	grid: { stroke: number; thickness: number; shown: boolean; overlay: boolean; overlayStyle?: PIXI.LineStyle };
+	grid: { stroke: number; thickness: number; shown: boolean; overlay: boolean; overlayStyle: {width: number, color: number} };
 
 	mapType: map_type;
 
