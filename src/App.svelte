@@ -268,8 +268,7 @@ hexfiend red: #FF6666
 					break;
 
 				case tools.ERASER:
-					console.log(data_eraser)
-					if (data_eraser.ignoreTerrain) { comp_terrainLayer.eraseAtMouse(); }
+					if (!data_eraser.ignoreTerrain) { comp_terrainLayer.eraseAtMouse(); }
 					/* Icons are handled in the IconLayer */
 					break;
 			}
