@@ -38,6 +38,7 @@ hexfiend red: #FF6666
 	import PathLayer from './layers/PathLayer.svelte';
 	import TerrainLayer from './layers/TerrainLayer.svelte';
 	import TextLayer from './layers/TextLayer.svelte';
+	import OverlayLayer from './layers/OverlayLayer.svelte';
 	import { db } from './lib/db';
 	// Data
 	import DEFAULTSAVEDATA from './lib/defaultSaveData';
@@ -712,6 +713,8 @@ hexfiend red: #FF6666
 
 		<Pixi {app}>
 			<Container instance={offsetContainer} x={pan.offsetX} y={pan.offsetY} scale={{ x: pan.zoomScale, y: pan.zoomScale }}>
+				
+
 				<TerrainLayer
 					bind:this={comp_terrainLayer}
 					bind:data_terrain
@@ -742,6 +745,9 @@ hexfiend red: #FF6666
 				<!--
           Needs Optimization badly
         -->
+				
+				<OverlayLayer />
+
 				<CoordsLayer
 					bind:this={comp_coordsLayer}
 					bind:data_coordinates
@@ -752,6 +758,8 @@ hexfiend red: #FF6666
 					bind:texts={loadedSave.texts}
 					bind:data_text
 				/>
+
+				
 
 			</Container>
 		</Pixi>

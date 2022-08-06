@@ -1,6 +1,12 @@
 import type { map_type } from './settings';
 import type { Tile } from './tilesets';
 import type { hex_id } from './toolData';
+import type * as PIXI from 'pixi.js'
+
+export enum hex_orientation {
+	FLATTOP = "flatTop",
+	POINTYTOP = "pointyTop"
+}
 
 // Hexes are the data that get drawn as terrain
 export interface TerrainHex {
@@ -16,7 +22,7 @@ export interface terrain_field {
 	hexWidth: number;
 	hexHeight: number;
 
-	grid: { stroke: number; thickness: number; shown: boolean };
+	grid: { stroke: number; thickness: number; shown: boolean; overlay: boolean; overlayStyle?: PIXI.LineStyle };
 
 	mapType: map_type;
 
@@ -28,7 +34,7 @@ export interface terrain_field {
 	columns: number;
 	raised: 'odd' | 'even';
 
-	orientation: 'flatTop' | 'pointyTop';
+	orientation: hex_orientation;
 	blankHexColor: number;
 
 	hexes: { [key: hex_id]: TerrainHex };

@@ -4,7 +4,7 @@ import type { coordinates_data } from '../types/data';
 import type { Iconset } from '../types/icon';
 import type { save_data } from '../types/savedata';
 import { map_type } from '../types/settings';
-import type { terrain_field } from '../types/terrain';
+import { hex_orientation, terrain_field } from '../types/terrain';
 import type { Tile, Tileset } from '../types/tilesets';
 import { DEFAULTICONSET } from './defaultIconset';
 import { DEFAULTTILESET } from './defaultTileset';
@@ -18,7 +18,7 @@ let DEFAULTSAVEDATA: save_data = {
 	TerrainField: {
 		hexWidth: 50,
 		hexHeight: 45,
-		orientation: 'flatTop',
+		orientation: hex_orientation.FLATTOP,
 
 		rows: 20,
 		columns: 20,
@@ -29,7 +29,7 @@ let DEFAULTSAVEDATA: save_data = {
 		mapType: map_type.SQUARE,
 		blankHexColor: 0xf2f2f2,
 
-		grid: { stroke: 0x333333, thickness: 2, shown: true },
+		grid: { stroke: 0x333333, thickness: 2, shown: true, overlay: false, overlayStyle: null },
 
 		hexes: {},
 	},

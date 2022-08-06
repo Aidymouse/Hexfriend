@@ -290,8 +290,16 @@
 	<h2>Grid</h2>
 	<div class="settings-grid">
 		<label for="showGrid">Show Grid</label>
-		<Checkbox bind:checked={tfield.grid.shown} id={'showGrid'} />
-		{#if tfield.grid.shown}
+		<Checkbox bind:checked={tfield.grid.shown} id={'showGrid'} 
+			on:change={()=>{
+				store_tfield.store.update(newtfield => {
+					newtfield.grid.shown = tfield.grid.shown;
+					return newtfield;
+					});
+				}}
+		/>
+		
+			{#if tfield.grid.shown}
 			<label for="gridThickness">Grid Thickness</label>
 			<input
 				id="gridThickness"
@@ -310,6 +318,19 @@
 				id={'gridColor'}
 			/>
 		{/if}
+
+		<label for="showOverlay">Overlay</label>
+		<Checkbox 
+			bind:checked={tfield.grid.overlay}
+			id="showOverlay"
+			on:change={() => {
+				store_tfield.store.update(newTfield => {
+					newTfield.grid.overlay = tfield.grid.overlay;
+					return newTfield;
+				})
+				
+			}}
+		/>
 	</div>
 
 	<h2>Hexes</h2>
