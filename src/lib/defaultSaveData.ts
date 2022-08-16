@@ -51,11 +51,11 @@ let DEFAULTSAVEDATA: save_data = {
 	texts: [],
 
 	pathStyles: [
-		{ display: 'River', style: { color: 10813439, width: 6, cap: 'round', join: 'round' } },
-		{ display: 'Path', style: { color: 16774327, width: 4, cap: 'round', join: 'bevel' } },
-		{ display: 'Trail', style: { color: 16367733, width: 3, cap: 'round', join: 'round' } },
-		{ display: 'Pass', style: { color: 12632256, width: 5, cap: 'round', join: 'miter' } },
-		{ display: 'Border', style: { color: 16711680, width: 5, cap: 'round', join: 'round' } },
+		{ display: 'River', style: { color: 10813439, width: 6, cap: 'round', join: 'round' }, id: 1 },
+		{ display: 'Path', style: { color: 16774327, width: 4, cap: 'round', join: 'round' }, id: 2 },
+		{ display: 'Trail', style: { color: 16367733, width: 3, cap: 'round', join: 'round' }, id: 3 },
+		{ display: 'Pass', style: { color: 12632256, width: 5, cap: 'round', join: 'round' }, id: 4 },
+		{ display: 'Border', style: { color: 16711680, width: 5, cap: 'round', join: 'round' }, id: 5 },
 	],
 
 	textStyles: [
