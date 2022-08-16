@@ -22,7 +22,14 @@ export interface terrain_field {
 	hexWidth: number;
 	hexHeight: number;
 
-	grid: { stroke: number; thickness: number; shown: boolean; overlay: boolean; overlayStyle: {width: number, color: number} };
+	grid: { stroke: number; thickness: number; shown: boolean; };
+
+	overlay: {
+		shown: boolean;
+		style: {width: number; color: number; };
+		offset: {x: number; y: number; };
+		diameterInHexes: number;
+	};
 
 	mapType: map_type;
 

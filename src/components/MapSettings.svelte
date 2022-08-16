@@ -237,6 +237,13 @@
 			load(saveData, null);
 		};
 	}
+
+	$: {
+		tfield = tfield
+		store_tfield.store.update(newTfield => {
+			return tfield
+		})
+	}
 </script>
 
 <button
@@ -319,20 +326,55 @@
 			/>
 		{/if}
 
-		<label for="showOverlay">Overlay</label>
+		<!-- PLACEHOLDER -->
+		<div style="height: 10px;"></div>
+		<div></div>
+
+		<!-- OVERLAY -->
+
+		<label for="showOverlay">Show Overlay</label>
 		<Checkbox 
-			bind:checked={tfield.grid.overlay}
+			bind:checked={tfield.overlay.shown}
 			id="showOverlay"
-			on:change={() => {
-				store_tfield.store.update(newTfield => {
-					newTfield.grid.overlay = tfield.grid.overlay;
-					return newTfield;
-				})
-				
-			}}
 		/>
+
+		{#if tfield.overlay.shown}
+
+			<label for="overlayDiameter">Overlay Size</label>
+			<input type="number" id="overlayDiameter" min={2} bind:value={tfield.overlay.diameterInHexes}>
+
+			<label for="overlayColor">Color</label>
+			<ColorInputPixi id={'overlayColor'} bind:value={tfield.overlay.style.color} />
+
+			<label for="overlayThickness">Thickness</label>
+			<input type="number" id={'overlayThickness'} bind:value={tfield.overlay.style.width} />
+
+			<label for="overlayOffsetX">Horizontal Offset</label>
+			<input type="number" 
+				bind:value={ tfield.overlay.offset.x }
+				min={0}
+				step={0.25}
+				max={5}
+			>
+
+			<label for="overlayOffsetY">Vertical Offset</label>
+			<input type="number" 
+				bind:value={ tfield.overlay.offset.y }
+				min={0}
+				step={0.25}
+				max={5}
+			>
+
+		{/if}
+
+		
+
+		
+
 	</div>
 
+
+	<!-- HEXES -->
 	<h2>Hexes</h2>
 	<div class="settings-grid">
 		<label for="blankHexColor">Blank Hex Color</label>

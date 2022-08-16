@@ -773,7 +773,7 @@ hexfiend red: #FF6666
 	{:else if selectedTool == 'icon'}
 		<IconPanel {L} {app} {loadedIconsets} bind:data_icon {iconTextureLookupTable} />
 	{:else if selectedTool == 'path'}
-		<PathPanel bind:data_path {comp_pathLayer} bind:pathStyles={loadedSave.pathStyles} {app} />
+		<PathPanel bind:data_path {comp_pathLayer} bind:pathStyles={loadedSave.pathStyles} />
 	{:else if selectedTool == 'text'}
 		<TextPanel bind:data_text {comp_textLayer} bind:textStyles={loadedSave.textStyles} />
 	{/if}
