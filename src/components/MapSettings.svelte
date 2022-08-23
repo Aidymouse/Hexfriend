@@ -307,7 +307,8 @@ import TerrainLayer from '../layers/TerrainLayer.svelte';
 	<h2>Grid</h2>
 	<div class="settings-grid">
 		<label for="showGrid">Show Grid</label>
-		<Checkbox bind:checked={tfield.grid.shown} id={'showGrid'} />
+		<!-- Weird bug where the grid wont render if you turn it off then resize the hex flower map ?? -->
+		<Checkbox bind:checked={tfield.grid.shown} id={'showGrid'} on:change={ comp_terrainLayer.renderGrid } />
 		{#if tfield.grid.shown}
 			<label for="gridThickness">Grid Thickness</label>
 			<input
@@ -452,6 +453,19 @@ import TerrainLayer from '../layers/TerrainLayer.svelte';
 
 
 	<h2>Map Dimensions</h2>
+
+	<div class="settings-grid">
+		<label for="mapShape">Map Shape</label>
+		
+		<select bind:value={tfield.mapShape} on:change={() => {/* TODO */}}>
+			
+			<option value={map_shape.SQUARE}>Square</option>
+			<option value={map_shape.FLOWER}>Hex Flower</option>
+
+		</select>
+		
+	</div>
+
 
 	{#if tfield.mapShape == map_shape.SQUARE}
 
