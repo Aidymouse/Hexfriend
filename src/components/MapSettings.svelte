@@ -5,18 +5,19 @@
 	import type CoordsLayer from '../layers/CoordsLayer.svelte';
 	import type IconLayer from '../layers/IconLayer.svelte';
 	import type PathLayer from '../layers/PathLayer.svelte';
-	import type TerrainLayer from '../layers/TerrainLayer.svelte';
+	import TerrainLayer from '../layers/TerrainLayer.svelte';
 	import type TextLayer from '../layers/TextLayer.svelte';
 	import { coord_system } from '../types/coordinates';
 	import type { coordinates_data, terrain_data, trace_data } from '../types/data';
 	import type { Iconset } from '../types/icon';
 	import type { save_data } from '../types/savedata';
-	import { map_type } from '../types/settings';
+	import { map_shape } from '../types/settings';
 	import type { terrain_field } from '../types/terrain';
 	import type { Tileset } from '../types/tilesets';
 	import type * as PIXI from 'pixi.js';
 
 	import * as store_tfield from '../stores/tfield';
+import TerrainLayer from '../layers/TerrainLayer.svelte';
 
 	export let loadedSave: save_data;
 	export let showSettings: boolean;
@@ -29,6 +30,8 @@
 	store_tfield.store.subscribe(newTField => {
 		tfield = newTField
 	})
+
+	$: store_tfield.store.update(() => { return tfield })
 	
 	export let comp_terrainLayer: TerrainLayer;
 	export let renderAllHexes: Function;
@@ -133,7 +136,7 @@
 		};
 	}
 
-	function expandMapDimension(direction, amount) {
+	function square_expandMapDimension(direction, amount) {
 		comp_terrainLayer.square_expandMapDimension(direction, amount);
 
 		let xMod = 0;
@@ -174,7 +177,7 @@
 		comp_textLayer.moveAllTexts(xMod, yMod);
 	}
 
-	function reduceMapDimension(direction, amount) {
+	function square_reduceMapDimension(direction, amount) {
 		if (direction == 'left' || direction == 'right') {
 			if (tfield.columns <= amount) amount = tfield.columns - 1;
 			if (amount == 0) return;
@@ -223,6 +226,17 @@
 		comp_iconLayer.moveAllIcons(xMod, yMod);
 		comp_pathLayer.moveAllPaths(xMod, yMod);
 		comp_textLayer.moveAllTexts(xMod, yMod);
+	}
+
+	function flower_expandHexesOut(amount) {
+
+		comp_terrainLayer.flower_expandHexesOut(amount)
+	}
+
+	function flower_reduceHexesOut(amount) {
+		comp_terrainLayer.flower_reduceHexesOut(amount)
+		
+
 	}
 
 	let mapImportFiles: FileList;
@@ -287,6 +301,9 @@
 		</button>
 	</span>
 
+
+
+	<!-- GRID -->
 	<h2>Grid</h2>
 	<div class="settings-grid">
 		<label for="showGrid">Show Grid</label>
@@ -312,6 +329,9 @@
 		{/if}
 	</div>
 
+
+
+	<!-- HEXES -->
 	<h2>Hexes</h2>
 	<div class="settings-grid">
 		<label for="blankHexColor">Blank Hex Color</label>
@@ -386,14 +406,14 @@
 		
 
 		<!--
-        <label for="mapType">Map Type</label>
-        <select id="mapType" bind:value={tfield.mapType}>
-            <option value={map_type.SQUARE}>Square</option>
-            <option value={map_type.RADIAL}>Radial</option>
+        <label for="mapShape">Map Type</label>
+        <select id="mapShape" bind:value={tfield.mapShape}>
+            <option value={map_shape.SQUARE}>Square</option>
+            <option value={map_shape.RADIAL}>Radial</option>
         </select>
         -->
 
-		{#if tfield.mapType == map_type.SQUARE}
+		{#if tfield.mapShape == map_shape.SQUARE}
 			{#if tfield.orientation == 'flatTop'}
 				<p>Raised Column</p>
 				<div style={'height: 100%; display: flex; align-items: center;'}>
@@ -421,6 +441,7 @@
 					/>
 				</div>
 			{/if}
+
 		{/if}
 		
 		<label for="retainIcon" title="Icons will atempt to remain in their hex when transformations occur">Retain Icon Position</label>
@@ -431,81 +452,98 @@
 
 
 	<h2>Map Dimensions</h2>
-	<section id="map-dimensions-container">
-		<div id="map-dimensions">
-			{#if addOrRemoveMapDimensions == 'add'}
-				<button
-					style="grid-area: left;"
-					on:click={() => {
-						expandMapDimension('left', 1);
-					}}>Add<br />Left</button
-				>
-				<button
-					style="grid-area: top;"
-					on:click={() => {
-						expandMapDimension('top', 1);
-					}}>Add<br />Top</button
-				>
-				<button
-					style="grid-area: bottom;"
-					on:click={() => {
-						expandMapDimension('bottom', 1);
-					}}>Add<br />Bottom</button
-				>
-				<button
-					style="grid-area: right;"
-					on:click={() => {
-						expandMapDimension('right', 1);
-					}}>Add<br />Right</button
-				>
-				<button
-					style="grid-area: center;"
-					on:click={() => {
-						addOrRemoveMapDimensions = 'remove';
-					}}
-				>
-					<img src={`/assets/img/tools/addHex_${tfield.orientation == 'flatTop' ? 'ft' : 'pt'}.png`} alt={'Add Hex'} title={'Add Hex'} />
-				</button>
-			{:else}
-				<button
-					style="grid-area: left;"
-					on:click={() => {
-						reduceMapDimension('left', 1);
-					}}>Remove<br />Left</button
-				>
-				<button
-					style="grid-area: top;"
-					on:click={() => {
-						reduceMapDimension('top', 1);
-					}}>Remove<br />Top</button
-				>
-				<button
-					style="grid-area: bottom;"
-					on:click={() => {
-						reduceMapDimension('bottom', 1);
-					}}>Remove<br />Bottom</button
-				>
-				<button
-					style="grid-area: right;"
-					on:click={() => {
-						reduceMapDimension('right', 1);
-					}}>Remove<br />Right</button
-				>
-				<button
-					style="grid-area: center;"
-					on:click={() => {
-						addOrRemoveMapDimensions = 'add';
-					}}
-				>
-					<img
-						src={`/assets/img/tools/removeHex_${tfield.orientation == 'flatTop' ? 'ft' : 'pt'}.png`}
-						alt={'Remove Hex'}
-						title={'Remove Hex'}
-					/>
-				</button>
-			{/if}
-		</div>
-	</section>
+
+	{#if tfield.mapShape == map_shape.SQUARE}
+
+		<section id="map-dimensions-container">
+			<div id="map-dimensions">
+				{#if addOrRemoveMapDimensions == 'add'}
+					<button
+						style="grid-area: left;"
+						on:click={() => {
+							square_expandMapDimension('left', 1);
+						}}>Add<br />Left</button
+					>
+					<button
+						style="grid-area: top;"
+						on:click={() => {
+							square_expandMapDimension('top', 1);
+						}}>Add<br />Top</button
+					>
+					<button
+						style="grid-area: bottom;"
+						on:click={() => {
+							square_expandMapDimension('bottom', 1);
+						}}>Add<br />Bottom</button
+					>
+					<button
+						style="grid-area: right;"
+						on:click={() => {
+							square_expandMapDimension('right', 1);
+						}}>Add<br />Right</button
+					>
+					<button
+						style="grid-area: center;"
+						on:click={() => {
+							addOrRemoveMapDimensions = 'remove';
+						}}
+					>
+						<img src={`/assets/img/tools/addHex_${tfield.orientation == 'flatTop' ? 'ft' : 'pt'}.png`} alt={'Add Hex'} title={'Add Hex'} />
+					</button>
+				{:else}
+					<button
+						style="grid-area: left;"
+						on:click={() => {
+							square_reduceMapDimension('left', 1);
+						}}>Remove<br />Left</button
+					>
+					<button
+						style="grid-area: top;"
+						on:click={() => {
+							square_reduceMapDimension('top', 1);
+						}}>Remove<br />Top</button
+					>
+					<button
+						style="grid-area: bottom;"
+						on:click={() => {
+							square_reduceMapDimension('bottom', 1);
+						}}>Remove<br />Bottom</button
+					>
+					<button
+						style="grid-area: right;"
+						on:click={() => {
+							square_reduceMapDimension('right', 1);
+						}}>Remove<br />Right</button
+					>
+					<button
+						style="grid-area: center;"
+						on:click={() => {
+							addOrRemoveMapDimensions = 'add';
+						}}
+					>
+						<img
+							src={`/assets/img/tools/removeHex_${tfield.orientation == 'flatTop' ? 'ft' : 'pt'}.png`}
+							alt={'Remove Hex'}
+							title={'Remove Hex'}
+						/>
+					</button>
+				{/if}
+			</div>
+		</section>
+
+	{:else if tfield.mapShape == map_shape.FLOWER}
+		<section id="flower-dimensions-container">
+
+			<p>Hexes out from center</p>
+			<div id="flower-dimensions-controls-grid">
+				<button on:click={()=>{ flower_reduceHexesOut(1) }}>-</button>
+				<div id="counter-container">{tfield.hexesOut}</div>
+				<button on:click={()=>{ flower_expandHexesOut(1) }}>+</button>
+			</div>
+
+		</section>
+
+	{/if}
 
 	<h2 style="margin-bottom: 0px;">Coordinates</h2>
 	<p class="helperText">Coordinates can slow down map changes such as adding hexes or changing orientation.</p>
@@ -665,6 +703,37 @@
 	a:visited {
 		color: #8cc63f;
 	}
+
+
+
+	#flower-dimensions-controls-grid {
+		display: grid;
+		grid-template-columns: 60px 1fr 60px;
+		width: 100%;
+	}
+
+	#flower-dimensions-container p {
+		margin-bottom: 10px;
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		
+
+	}
+
+	#flower-dimensions-controls-grid button {
+		height: 60px;
+	}
+
+	#flower-dimensions-controls-grid #counter-container {
+		width: 100%;
+		height: 60px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		font-size: 20px;
+	}
+
 
 	#export-map-select {
 		border: solid 1px #777777;

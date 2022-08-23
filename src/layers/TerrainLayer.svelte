@@ -5,15 +5,17 @@
 		coords_qToCube,
 		coords_rToCube,
 		coords_worldToCube,
+		genCoordsObj,
 		genHexId,
-		genHexId_cordsObj,
+		genHexId_coordsObj,
 		getHexPath,
 		getNeighbours,
+		getRing
 	} from '../helpers/hexHelpers';
 	//import { collapseWaveGen } from '../lib/terrainGenerator';
 	import type { cube_coords } from '../types/coordinates';
 	import type { terrain_data } from '../types/data';
-	import { map_type } from '../types/settings';
+	import { map_shape } from '../types/settings';
 	import type { TerrainHex, terrain_field } from '../types/terrain';
 	import type { Tile } from '../types/tilesets';
 	import type { TileSymbol } from '../types/tilesets';
@@ -65,51 +67,51 @@
 			for (let col = 1; col < tfield.columns; col += 2) {
 				// Create hex at bottom of column
 				let newHexCoords: cube_coords = coords_qToCube('odd', col, tfield.rows - 1);
-				let newId: hex_id = genHexId_cordsObj(newHexCoords);
+				let newId: hex_id = genHexId_coordsObj(newHexCoords);
 				tfield.hexes[newId] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, tile: null };
 				comp_coordsLayer.generateNewCoord(newId);
 
 				// Move all hexes one down
 				for (let row = tfield.rows - 1; row >= 0; row--) {
 					let destinationCoords = coords_qToCube('odd', col, row);
-					let destinationHex = tfield.hexes[genHexId_cordsObj(destinationCoords)];
+					let destinationHex = tfield.hexes[genHexId_coordsObj(destinationCoords)];
 
 					let sourceId = coords_qToCube('odd', col, row - 1);
-					let sourceHex = tfield.hexes[genHexId_cordsObj(sourceId)];
+					let sourceHex = tfield.hexes[genHexId_coordsObj(sourceId)];
 
 					copyHex(sourceHex, destinationHex);
-					comp_coordsLayer.updateCoordText(genHexId_cordsObj(destinationCoords));
+					comp_coordsLayer.updateCoordText(genHexId_coordsObj(destinationCoords));
 				}
 
 				let oldHexCoords = coords_qToCube('even', col, 0);
-				eraseHex(genHexId_cordsObj(oldHexCoords));
-				delete tfield.hexes[genHexId_cordsObj(oldHexCoords)];
-				comp_coordsLayer.eliminateCoord(genHexId_cordsObj(oldHexCoords));
+				eraseHex(genHexId_coordsObj(oldHexCoords));
+				delete tfield.hexes[genHexId_coordsObj(oldHexCoords)];
+				comp_coordsLayer.eliminateCoord(genHexId_coordsObj(oldHexCoords));
 			}
 		} else if (tfield.raised == 'even') {
 			for (let col = 1; col < tfield.columns; col += 2) {
 				// Create hex at top of column
 				let newHexCoords = coords_qToCube('even', col, 0);
-				let newId = genHexId_cordsObj(newHexCoords);
+				let newId = genHexId_coordsObj(newHexCoords);
 				tfield.hexes[newId] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, tile: null };
 				comp_coordsLayer.generateNewCoord(newId);
 
 				// Move all hexes one up
 				for (let row = 0; row < tfield.rows; row++) {
 					let destinationCoords = coords_qToCube('even', col, row);
-					let destinationHex = tfield.hexes[genHexId_cordsObj(destinationCoords)];
+					let destinationHex = tfield.hexes[genHexId_coordsObj(destinationCoords)];
 
 					let sourceId = coords_qToCube('even', col, row + 1);
-					let sourceHex = tfield.hexes[genHexId_cordsObj(sourceId)];
+					let sourceHex = tfield.hexes[genHexId_coordsObj(sourceId)];
 
 					copyHex(sourceHex, destinationHex);
-					comp_coordsLayer.updateCoordText(genHexId_cordsObj(destinationCoords));
+					comp_coordsLayer.updateCoordText(genHexId_coordsObj(destinationCoords));
 				}
 
 				let oldHexCoords = coords_qToCube('odd', col, tfield.rows - 1);
-				eraseHex(genHexId_cordsObj(oldHexCoords));
-				delete tfield.hexes[genHexId_cordsObj(oldHexCoords)];
-				comp_coordsLayer.eliminateCoord(genHexId_cordsObj(oldHexCoords));
+				eraseHex(genHexId_coordsObj(oldHexCoords));
+				delete tfield.hexes[genHexId_coordsObj(oldHexCoords)];
+				comp_coordsLayer.eliminateCoord(genHexId_coordsObj(oldHexCoords));
 			}
 		}
 
@@ -121,51 +123,51 @@
 			for (let row = 1; row < tfield.rows; row += 2) {
 				// Create hex at right of row
 				let newHexCoords = coords_rToCube('odd', tfield.columns - 1, row);
-				let newId = genHexId_cordsObj(newHexCoords);
+				let newId = genHexId_coordsObj(newHexCoords);
 				tfield.hexes[newId] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, tile: null };
 				comp_coordsLayer.generateNewCoord(newId);
 
 				// Move all hexes one right
 				for (let col = tfield.columns - 1; col >= 0; col--) {
 					let destinationCoords = coords_rToCube('odd', col, row);
-					let destinationHex = tfield.hexes[genHexId_cordsObj(destinationCoords)];
+					let destinationHex = tfield.hexes[genHexId_coordsObj(destinationCoords)];
 
 					let sourceId = coords_rToCube('odd', col - 1, row);
-					let sourceHex = tfield.hexes[genHexId_cordsObj(sourceId)];
+					let sourceHex = tfield.hexes[genHexId_coordsObj(sourceId)];
 
 					copyHex(sourceHex, destinationHex);
-					comp_coordsLayer.updateCoordText(genHexId_cordsObj(destinationCoords));
+					comp_coordsLayer.updateCoordText(genHexId_coordsObj(destinationCoords));
 				}
 
 				let oldHexCoords = coords_rToCube('even', 0, row);
-				eraseHex(genHexId_cordsObj(oldHexCoords));
-				delete tfield.hexes[genHexId_cordsObj(oldHexCoords)];
-				comp_coordsLayer.eliminateCoord(genHexId_cordsObj(oldHexCoords));
+				eraseHex(genHexId_coordsObj(oldHexCoords));
+				delete tfield.hexes[genHexId_coordsObj(oldHexCoords)];
+				comp_coordsLayer.eliminateCoord(genHexId_coordsObj(oldHexCoords));
 			}
 		} else if (tfield.raised == 'even') {
 			for (let row = 1; row < tfield.rows; row += 2) {
 				// Create hex at top of column
 				let newHexCoords = coords_rToCube('even', 0, row);
-				let newId = genHexId_cordsObj(newHexCoords);
+				let newId = genHexId_coordsObj(newHexCoords);
 				tfield.hexes[newId] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, tile: null };
 				comp_coordsLayer.generateNewCoord(newId);
 
 				// Move all hexes one up
 				for (let col = 0; col < tfield.columns; col++) {
 					let destinationCoords = coords_rToCube('even', col, row);
-					let destinationHex = tfield.hexes[genHexId_cordsObj(destinationCoords)];
+					let destinationHex = tfield.hexes[genHexId_coordsObj(destinationCoords)];
 
 					let sourceId = coords_rToCube('even', col + 1, row);
-					let sourceHex = tfield.hexes[genHexId_cordsObj(sourceId)];
+					let sourceHex = tfield.hexes[genHexId_coordsObj(sourceId)];
 
 					copyHex(sourceHex, destinationHex);
-					comp_coordsLayer.updateCoordText(genHexId_cordsObj(destinationCoords));
+					comp_coordsLayer.updateCoordText(genHexId_coordsObj(destinationCoords));
 				}
 
 				let oldHexCoords = coords_rToCube('odd', tfield.columns - 1, row);
-				eraseHex(genHexId_cordsObj(oldHexCoords));
-				delete tfield.hexes[genHexId_cordsObj(oldHexCoords)];
-				comp_coordsLayer.eliminateCoord(genHexId_cordsObj(oldHexCoords));
+				eraseHex(genHexId_coordsObj(oldHexCoords));
+				delete tfield.hexes[genHexId_coordsObj(oldHexCoords)];
+				comp_coordsLayer.eliminateCoord(genHexId_coordsObj(oldHexCoords));
 			}
 		}
 
@@ -182,11 +184,11 @@
 
 				let sourceHexCoords =
 					tfield.orientation == 'flatTop' ? coords_rToCube(tfield.raised, col, row) : coords_qToCube(tfield.raised, col, row);
-				let sourceHex: TerrainHex = tfield.hexes[genHexId_cordsObj(sourceHexCoords)];
+				let sourceHex: TerrainHex = tfield.hexes[genHexId_coordsObj(sourceHexCoords)];
 
 				let newHex = { ...sourceHex, q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s };
 
-				newHexes[genHexId_cordsObj(newHexCoords)] = newHex;
+				newHexes[genHexId_coordsObj(newHexCoords)] = newHex;
 			}
 		}
 
@@ -255,8 +257,8 @@
 						? coords_qToCube(tfield.raised, tfield.columns, row)
 						: coords_rToCube(tfield.raised, tfield.columns, row);
 
-				tfield.hexes[genHexId_cordsObj(newHexCoords)] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, tile: null };
-				comp_coordsLayer.generateNewCoord(genHexId_cordsObj(newHexCoords));
+				tfield.hexes[genHexId_coordsObj(newHexCoords)] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, tile: null };
+				comp_coordsLayer.generateNewCoord(genHexId_coordsObj(newHexCoords));
 			}
 
 			tfield.columns += 1;
@@ -268,7 +270,7 @@
 			for (let row = 0; row < tfield.rows; row++) {
 				let destinationCoords =
 					tfield.orientation == 'flatTop' ? coords_qToCube(tfield.raised, col, row) : coords_rToCube(tfield.raised, col, row);
-				let destinationHex = tfield.hexes[genHexId_cordsObj(destinationCoords)];
+				let destinationHex = tfield.hexes[genHexId_coordsObj(destinationCoords)];
 
 				let sourceColumn = col - amount;
 
@@ -276,7 +278,7 @@
 					tfield.orientation == 'flatTop'
 						? coords_qToCube(tfield.raised, sourceColumn, row)
 						: coords_rToCube(tfield.raised, sourceColumn, row);
-				let sourceHex = tfield.hexes[genHexId_cordsObj(sourceCoords)];
+				let sourceHex = tfield.hexes[genHexId_coordsObj(sourceCoords)];
 
 				copyHex(sourceHex, destinationHex);
 
@@ -295,8 +297,8 @@
 						? coords_qToCube(tfield.raised, col, tfield.rows + row)
 						: coords_rToCube(tfield.raised, col, tfield.rows + row);
 
-				tfield.hexes[genHexId_cordsObj(newHexCoords)] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, tile: null };
-				comp_coordsLayer.generateNewCoord(genHexId_cordsObj(newHexCoords));
+				tfield.hexes[genHexId_coordsObj(newHexCoords)] = { q: newHexCoords.q, r: newHexCoords.r, s: newHexCoords.s, tile: null };
+				comp_coordsLayer.generateNewCoord(genHexId_coordsObj(newHexCoords));
 			}
 		}
 		tfield.rows += amount;
@@ -307,13 +309,13 @@
 			for (let row = tfield.rows - 1; row >= amount; row--) {
 				let destinationCoords =
 					tfield.orientation == 'flatTop' ? coords_qToCube(tfield.raised, col, row) : coords_rToCube(tfield.raised, col, row);
-				let destinationHex = tfield.hexes[genHexId_cordsObj(destinationCoords)];
+				let destinationHex = tfield.hexes[genHexId_coordsObj(destinationCoords)];
 
 				let sourceRow = row - amount;
 
 				let sourceCoords =
 					tfield.orientation == 'flatTop' ? coords_qToCube(tfield.raised, col, sourceRow) : coords_rToCube(tfield.raised, col, sourceRow);
-				let sourceHex = tfield.hexes[genHexId_cordsObj(sourceCoords)];
+				let sourceHex = tfield.hexes[genHexId_coordsObj(sourceCoords)];
 
 				copyHex(sourceHex, destinationHex);
 
@@ -394,7 +396,7 @@
 					tfield.orientation == 'flatTop'
 						? coords_qToCube(tfield.raised, tfield.columns - 1, row)
 						: coords_rToCube(tfield.raised, tfield.columns - 1, row);
-				eliminateHex(genHexId_cordsObj(fatedHexCoords));
+				eliminateHex(genHexId_coordsObj(fatedHexCoords));
 			}
 
 			tfield.columns -= 1;
@@ -406,7 +408,7 @@
 			for (let row = 0; row < tfield.rows; row++) {
 				let destinationCoords =
 					tfield.orientation == 'flatTop' ? coords_qToCube(tfield.raised, col, row) : coords_rToCube(tfield.raised, col, row);
-				let destinationHex = tfield.hexes[genHexId_cordsObj(destinationCoords)];
+				let destinationHex = tfield.hexes[genHexId_coordsObj(destinationCoords)];
 
 				let sourceColumn = col + amount;
 
@@ -414,7 +416,7 @@
 					tfield.orientation == 'flatTop'
 						? coords_qToCube(tfield.raised, sourceColumn, row)
 						: coords_rToCube(tfield.raised, sourceColumn, row);
-				let sourceHex = tfield.hexes[genHexId_cordsObj(sourceCoords)];
+				let sourceHex = tfield.hexes[genHexId_coordsObj(sourceCoords)];
 
 				copyHex(sourceHex, destinationHex);
 
@@ -433,7 +435,7 @@
 						? coords_qToCube(tfield.raised, col, tfield.rows - 1 - row)
 						: coords_rToCube(tfield.raised, col, tfield.rows - 1 - row);
 
-				eliminateHex(genHexId_cordsObj(newHexCoords));
+				eliminateHex(genHexId_coordsObj(newHexCoords));
 			}
 		}
 		tfield.rows -= amount;
@@ -444,13 +446,13 @@
 			for (let row = 0; row <= tfield.rows - 1 - amount; row++) {
 				let destinationCoords =
 					tfield.orientation == 'flatTop' ? coords_qToCube(tfield.raised, col, row) : coords_rToCube(tfield.raised, col, row);
-				let destinationHex = tfield.hexes[genHexId_cordsObj(destinationCoords)];
+				let destinationHex = tfield.hexes[genHexId_coordsObj(destinationCoords)];
 
 				let sourceRow = row + amount;
 
 				let sourceCoords =
 					tfield.orientation == 'flatTop' ? coords_qToCube(tfield.raised, col, sourceRow) : coords_rToCube(tfield.raised, col, sourceRow);
-				let sourceHex = tfield.hexes[genHexId_cordsObj(sourceCoords)];
+				let sourceHex = tfield.hexes[genHexId_coordsObj(sourceCoords)];
 
 				copyHex(sourceHex, destinationHex);
 
@@ -461,14 +463,90 @@
 		}
 	}
 
+
+
+	/* FLOWER SHAPED MAPS */
+	export function flower_expandHexesOut(amount: number) {
+
+		for (let curRing = 0; curRing < amount; curRing++) {
+			tfield.hexesOut += 1
+			
+			let idsToAdd = getRing("0:0:0", tfield.hexesOut)
+	
+			idsToAdd.forEach(hexId => {
+	
+				createBlankHex( genCoordsObj(hexId) )
+				renderHex(hexId);
+	
+			})
+		}
+
+		renderGrid();
+		comp_coordsLayer.populateBlankHexes();
+		
+		store_tfield.store.update(() => {
+			return tfield;
+		})
+	}
+	
+	export function flower_reduceHexesOut(amount) {
+		if (tfield.hexesOut == 0) return;
+		
+		for (let curRing = 0; curRing < amount; curRing++) {
+			
+			let idsToAdd = getRing("0:0:0", tfield.hexesOut)
+			
+			idsToAdd.forEach(hexId => {
+				
+				eliminateHex( hexId )
+				
+			})
+			
+			tfield.hexesOut -= 1
+		}
+		
+		renderAllHexes();
+		renderGrid();
+		comp_coordsLayer.cullUnusedCoordinates();
+
+		store_tfield.store.update(() => {
+			return tfield;
+		})
+	}
+
+
+
 	/* FUNCTIONS THAT APPLY TO ALL MAP TYPES */
+	function createBlankHex(coords: cube_coords) {
+
+		tfield.hexes[genHexId_coordsObj(coords)] = {q: coords.q, r: coords.r, s: coords.s, tile: null}
+
+	}
+
 	export function changeOrientation() {
-		if (tfield.mapType == map_type.SQUARE) square_changeOrientation();
-		//else if (tfield.mapType == map_type.RADIAL) radial_changeOrientation()
+
+		switch (tfield.mapShape) {
+			case map_shape.SQUARE:
+				square_changeOrientation();
+				break;
+
+			case map_shape.FLOWER:
+				renderAllHexes();
+				// Perhaps... a flower orientation change algorithm that finds the closest hex in screen space after transformation and maps shit like that
+				// Might cause hex overlaps though... preventable?
+				break;
+		}
 
 		comp_coordsLayer.cullUnusedCoordinates();
 	}
 
+	export function changeMapShape(newMapShape: map_shape) {
+
+	}
+
+
+
+	/* RENDER FUNCTIONS */
 	function findSymbolScale(symbol: TileSymbol) {
 		if (tfield.hexWidth < tfield.hexHeight) {
 			let s = (tfield.hexWidth * symbol.pHex) / 100 / symbol.texWidth;
@@ -485,7 +563,6 @@
 		}
 	}
 
-	/* RENDER FUNCTIONS */
 	export function renderGrid() {
 		gridGraphics.clear();
 		if (!tfield.grid.shown) return;
@@ -702,7 +779,7 @@
 		let y = store_panning.curWorldY();
 		let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
 
-		let clickedId = genHexId_cordsObj(clickedCoords);
+		let clickedId = genHexId_coordsObj(clickedCoords);
 		if (!hexExists(clickedId)) return;
 		if (hexMatchesData(clickedId)) return;
 
@@ -717,7 +794,7 @@
 	function erasePaintbucket() {
 		// Find all like hexes, much like a paintbucket, and perform a specific operation on them, passing in hex id as a parameter
 
-		let clickedId = genHexId_cordsObj(coords_worldToCube(store_panning.curWorldX(), store_panning.curWorldY(), tfield.orientation, tfield.hexWidth, tfield.hexHeight));
+		let clickedId = genHexId_coordsObj(coords_worldToCube(store_panning.curWorldX(), store_panning.curWorldY(), tfield.orientation, tfield.hexWidth, tfield.hexHeight));
 
 		if (!hexExists(clickedId)) return;
 		if (tfield.hexes[clickedId].tile == null) return;
