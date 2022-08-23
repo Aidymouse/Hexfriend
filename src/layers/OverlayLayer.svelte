@@ -22,6 +22,7 @@
     
     let orientation: hex_orientation = hex_orientation.FLATTOP
 
+
 </script>
 
 {#if tfield.overlay.shown}
@@ -30,10 +31,27 @@
 
         g.clear()
 
-        let ratio = tfield.hexWidth / tfield.hexHeight
+        let ratio;
+        let bigHeight;
+        let bigWidth;
+        let horizonalSpan;
+        let verticalSpan;
 
-        let bigHeight = tfield.hexHeight * tfield.overlay.diameterInHexes
-        let bigWidth = bigHeight * ratio
+        if (tfield.orientation == hex_orientation.FLATTOP) {
+            ratio = tfield.hexWidth / tfield.hexHeight
+
+            bigHeight = tfield.hexHeight * tfield.overlay.diameterInHexes
+            bigWidth = bigHeight * ratio
+        
+            
+        } else {
+            ratio = tfield.hexHeight / tfield.hexWidth
+            bigWidth = tfield.hexWidth * tfield.overlay.diameterInHexes
+            bigHeight = bigWidth * ratio
+
+        }
+
+
 
         let bigRows = Math.round(tfield.rows/tfield.overlay.diameterInHexes)
         
@@ -49,10 +67,21 @@
         for (let bigRow = 0; bigRow < bigRows; bigRow++) {
             for (let bigCol = 0; bigCol < bigCols; bigCol++){
 
-                let bigHexX = bigCol*bigWidth*0.75+zeroOffsetX
-                let bigHexY = bigRow*bigHeight - (bigCol%2==1 ? bigHeight/2 : 0) + zeroOffsetY
+                let bigHexX, bigHexY;
 
-                let bigHexPath = getHexPath( bigWidth, bigHeight, orientation, bigHexX, bigHexY )
+                if (tfield.orientation == hex_orientation.FLATTOP) {
+                    bigHexX = bigCol*bigWidth*0.75+zeroOffsetX
+                    bigHexY = bigRow*bigHeight - (bigCol%2==1 ? bigHeight/2 : 0) + zeroOffsetY
+
+                } else {
+
+                    bigHexX = bigCol*bigWidth - (bigRow%2==1 ? bigWidth/2 : 0) + zeroOffsetX
+                    bigHexY = bigRow*bigHeight*0.75 + zeroOffsetY
+
+                }
+
+
+                let bigHexPath = getHexPath( bigWidth, bigHeight, tfield.orientation, bigHexX, bigHexY )
                 g.drawPolygon(bigHexPath);
 
             }

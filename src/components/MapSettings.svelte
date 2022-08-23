@@ -11,7 +11,7 @@
 	import type { coordinates_data, terrain_data, trace_data } from '../types/data';
 	import type { Iconset } from '../types/icon';
 	import type { save_data } from '../types/savedata';
-	import { map_type } from '../types/settings';
+	import { map_shape } from '../types/settings';
 	import type { terrain_field } from '../types/terrain';
 	import type { Tileset } from '../types/tilesets';
 	import type * as PIXI from 'pixi.js';
@@ -29,6 +29,8 @@
 	store_tfield.store.subscribe(newTField => {
 		tfield = newTField
 	})
+
+	$: store_tfield.store.update(() => {return tfield})
 	
 	export let comp_terrainLayer: TerrainLayer;
 	export let renderAllHexes: Function;
@@ -297,14 +299,7 @@
 	<h2>Grid</h2>
 	<div class="settings-grid">
 		<label for="showGrid">Show Grid</label>
-		<Checkbox bind:checked={tfield.grid.shown} id={'showGrid'} 
-			on:change={()=>{
-				store_tfield.store.update(newtfield => {
-					newtfield.grid.shown = tfield.grid.shown;
-					return newtfield;
-					});
-				}}
-		/>
+		<Checkbox bind:checked={tfield.grid.shown} id={'showGrid'} />
 		
 			{#if tfield.grid.shown}
 			<label for="gridThickness">Grid Thickness</label>
@@ -326,12 +321,13 @@
 			/>
 		{/if}
 
-		<!-- PLACEHOLDER -->
+		<!-- PLACEHOLDER to give distance between the overlay and grid options -->
 		<div style="height: 10px;"></div>
 		<div></div>
 
-		<!-- OVERLAY -->
 
+
+		<!-- OVERLAY -->
 		<label for="showOverlay">Show Overlay</label>
 		<Checkbox 
 			bind:checked={tfield.overlay.shown}
@@ -346,7 +342,7 @@
 			<label for="overlayColor">Color</label>
 			<ColorInputPixi id={'overlayColor'} bind:value={tfield.overlay.style.color} />
 
-			<label for="overlayThickness">Thickness</label>
+			<label for="overlayThickness">Outline Thickness</label>
 			<input type="number" id={'overlayThickness'} bind:value={tfield.overlay.style.width} />
 
 			<label for="overlayOffsetX">Horizontal Offset</label>
@@ -449,14 +445,14 @@
 		
 
 		<!--
-        <label for="mapType">Map Type</label>
-        <select id="mapType" bind:value={tfield.mapType}>
-            <option value={map_type.SQUARE}>Square</option>
-            <option value={map_type.RADIAL}>Radial</option>
+        <label for="shape">Map Type</label>
+        <select id="shape" bind:value={tfield.shape}>
+            <option value={map_shape.SQUARE}>Square</option>
+            <option value={map_shape.RADIAL}>Radial</option>
         </select>
         -->
 
-		{#if tfield.mapType == map_type.SQUARE}
+		{#if tfield.shape == map_shape.SQUARE}
 			{#if tfield.orientation == 'flatTop'}
 				<p>Raised Column</p>
 				<div style={'height: 100%; display: flex; align-items: center;'}>

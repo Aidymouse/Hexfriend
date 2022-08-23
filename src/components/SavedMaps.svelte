@@ -55,7 +55,7 @@
 						deleteMap(save.id);
 					}}
 				>
-					<img src="/assets/img/tools/trash.png" />
+					<img src="/assets/img/tools/trash.png" alt={"Delete"}/>
 				</button>
 			</div>
 		{/each}
@@ -66,7 +66,7 @@
 				showSavedMaps = false;
 			}}
 		>
-			<img src="/assets/img/tools/close.png" />
+			<img src="/assets/img/tools/close.png" alt={"Close Screen"} />
 		</button>
 	</div>
 </div>

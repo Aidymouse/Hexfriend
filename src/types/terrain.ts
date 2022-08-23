@@ -1,4 +1,4 @@
-import type { map_type } from './settings';
+import type { map_shape } from './settings';
 import type { Tile } from './tilesets';
 import type { hex_id } from './toolData';
 import type * as PIXI from 'pixi.js'
@@ -31,7 +31,7 @@ export interface terrain_field {
 		diameterInHexes: number;
 	};
 
-	mapType: map_type;
+	shape: map_shape;
 
 	/* Radial Maps */
 	hexesOut: number;

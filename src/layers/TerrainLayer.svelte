@@ -13,7 +13,7 @@
 	//import { collapseWaveGen } from '../lib/terrainGenerator';
 	import type { cube_coords } from '../types/coordinates';
 	import type { terrain_data } from '../types/data';
-	import { map_type } from '../types/settings';
+	import { map_shape } from '../types/settings';
 	import type { TerrainHex, terrain_field } from '../types/terrain';
 	import type { Tile } from '../types/tilesets';
 	import type { TileSymbol } from '../types/tilesets';
@@ -56,6 +56,8 @@
 	export function copyHex(from: TerrainHex, to: TerrainHex) {
 		to.tile = from.tile ? { ...from.tile, symbol: from.tile.symbol ? { ...from.tile.symbol } : null } : null;
 	}
+
+
 
 	/* SQUARE SHAPED MAPS */
 	export function square_updateRaisedColumn() {
@@ -244,6 +246,10 @@
 				break;
 		}
 
+		store_panning.store.update(() => {
+			return pan
+		})
+
 		renderAllHexes();
 	}
 
@@ -384,6 +390,10 @@
 				break;
 		}
 
+		store_panning.store.update(() => {
+			return pan
+		})
+
 		renderAllHexes();
 	}
 
@@ -461,10 +471,12 @@
 		}
 	}
 
+
+
 	/* FUNCTIONS THAT APPLY TO ALL MAP TYPES */
 	export function changeOrientation() {
-		if (tfield.mapType == map_type.SQUARE) square_changeOrientation();
-		//else if (tfield.mapType == map_type.RADIAL) radial_changeOrientation()
+		if (tfield.shape == map_shape.SQUARE) square_changeOrientation();
+		//else if (tfield.shape == map_shape.RADIAL) radial_changeOrientation()
 
 		comp_coordsLayer.cullUnusedCoordinates();
 	}
