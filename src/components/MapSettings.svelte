@@ -714,7 +714,7 @@ import TerrainLayer from '../layers/TerrainLayer.svelte';
 
 	<h2>About</h2>
 	<p class="helperText">
-		Hexfriend version 1.1.2 – "Wake up, Hexfriend!"
+		Hexfriend version 1.2.1 – "Pretty Flowers"
 		<br />
 		By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
 	</p>
