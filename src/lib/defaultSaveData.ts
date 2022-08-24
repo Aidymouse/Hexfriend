@@ -4,7 +4,7 @@ import type { coordinates_data } from '../types/data';
 import type { Iconset } from '../types/icon';
 import type { save_data } from '../types/savedata';
 import { map_shape } from '../types/settings';
-import { hex_orientation, terrain_field } from '../types/terrain';
+import { hex_orientation, hex_raised, terrain_field } from '../types/terrain';
 import type { Tile, Tileset } from '../types/tilesets';
 import { DEFAULTICONSET } from './defaultIconset';
 import { DEFAULTTILESET } from './defaultTileset';
@@ -22,7 +22,7 @@ let DEFAULTSAVEDATA: save_data = {
 
 		rows: 20,
 		columns: 20,
-		raised: 'even', // Which row / column should be higher / indented. This is implemented with an invisible hex. It's all quite messy.
+		raised: hex_raised.EVEN, // Which row / column should be higher / indented. This is implemented with an invisible hex. It's all quite messy.
 
 		hexesOut: 10,
 
@@ -31,7 +31,7 @@ let DEFAULTSAVEDATA: save_data = {
 
 		grid: { stroke: 0x333333, thickness: 2, shown: true},
 
-		overlay: { shown: false, style: {width: 3, color: 0x333333 }, offset: {x: 0, y: 1}, diameterInHexes: 3 },
+		overlay: { shown: false, style: {width: 3, color: 0x333333 }, offset: {x: 0, y: 1}, diameterInHexes: 3, raised: hex_raised.EVEN, encompassEdges: false },
 
 		hexes: {},
 	},

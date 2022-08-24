@@ -12,7 +12,8 @@
 	import type { Iconset } from '../types/icon';
 	import type { save_data } from '../types/savedata';
 	import { map_shape } from '../types/settings';
-	import type { terrain_field } from '../types/terrain';
+	import { hex_orientation, terrain_field } from '../types/terrain';
+	import {hex_raised} from '../types/terrain';
 	import type { Tileset } from '../types/tilesets';
 	import type * as PIXI from 'pixi.js';
 
@@ -328,7 +329,7 @@
 
 
 		<!-- OVERLAY -->
-		<label for="showOverlay">Show Overlay</label>
+		<label for="showOverlay">Big Hex Overlay</label>
 		<Checkbox 
 			bind:checked={tfield.overlay.shown}
 			id="showOverlay"
@@ -345,21 +346,32 @@
 			<label for="overlayThickness">Outline Thickness</label>
 			<input type="number" id={'overlayThickness'} bind:value={tfield.overlay.style.width} />
 
-			<label for="overlayOffsetX">Horizontal Offset</label>
+			<label for="overlayOffsetX" title="Measured in Hex Widths">Horizontal Offset</label>
 			<input type="number" 
 				bind:value={ tfield.overlay.offset.x }
 				min={0}
 				step={0.25}
-				max={5}
 			>
 
-			<label for="overlayOffsetY">Vertical Offset</label>
+			<label for="overlayOffsetY" title="Measured in Hex Heights">Vertical Offset</label>
 			<input type="number" 
 				bind:value={ tfield.overlay.offset.y }
 				min={0}
 				step={0.25}
-				max={5}
 			>
+
+			<label for="overlayEncompass">Encompass Map Edges</label>
+			<Checkbox bind:checked={tfield.overlay.encompassEdges}
+			id="overlayEncompass" />
+
+			<p> { tfield.orientation == hex_orientation.FLATTOP ? "Overlay Raised Column" : 'Overlay Indented Row' } </p>
+			<div style={'height: 100%; display: flex; align-items: center;'}>
+			<SelectGrid
+				values={['even', 'odd']}
+				filenamePrefix={tfield.orientation == hex_orientation.FLATTOP ? 'overlayraisedcolumn' : 'overlayindentedrow'}
+				bind:value={tfield.overlay.raised}
+			/>
+			</div>
 
 		{/if}
 

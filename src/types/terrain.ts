@@ -8,6 +8,11 @@ export enum hex_orientation {
 	POINTYTOP = "pointyTop"
 }
 
+export enum hex_raised {
+	EVEN = "even",
+	ODD = "odd"
+}
+
 // Hexes are the data that get drawn as terrain
 export interface TerrainHex {
 	// If no tile, the hex is blank
@@ -29,6 +34,8 @@ export interface terrain_field {
 		style: {width: number; color: number; };
 		offset: {x: number; y: number; };
 		diameterInHexes: number;
+		raised: hex_raised;
+		encompassEdges: boolean;
 	};
 
 	shape: map_shape;
@@ -39,7 +46,7 @@ export interface terrain_field {
 	/* All has to do with square maps */
 	rows: number;
 	columns: number;
-	raised: 'odd' | 'even';
+	raised: hex_raised;
 
 	orientation: hex_orientation;
 	blankHexColor: number;

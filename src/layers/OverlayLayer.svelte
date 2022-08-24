@@ -1,7 +1,7 @@
 <script lang="ts">
     import { getHexPath } from '../helpers/hexHelpers';
 
-    import { hex_orientation, terrain_field } from '../types/terrain';
+    import { hex_orientation, hex_raised, terrain_field } from '../types/terrain';
 
     import { Graphics } from 'svelte-pixi';
     import * as store_tfield from '../stores/tfield';
@@ -18,9 +18,6 @@
     store_panning.store.subscribe(newPanning => {
         panning = newPanning
     })
-    
-    
-    let orientation: hex_orientation = hex_orientation.FLATTOP
 
 
 </script>
@@ -34,8 +31,6 @@
         let ratio;
         let bigHeight;
         let bigWidth;
-        let horizonalSpan;
-        let verticalSpan;
 
         if (tfield.orientation == hex_orientation.FLATTOP) {
             ratio = tfield.hexWidth / tfield.hexHeight
@@ -51,12 +46,13 @@
 
         }
 
-
-
         let bigRows = Math.round(tfield.rows/tfield.overlay.diameterInHexes)
         
-        let horizontalSpan = bigWidth / tfield.hexWidth
-        let bigCols = Math.round( tfield.columns / horizontalSpan )
+        let span = bigWidth / tfield.hexWidth
+        let bigCols = Math.round( tfield.columns / span )
+
+        if (bigRows < 1) bigRows = 1;
+        if (bigCols < 1) bigCols = 1;
 
         let zeroOffsetX = tfield.overlay.offset.x * tfield.hexWidth //+ store_panning.curWorldX()
         let zeroOffsetY = tfield.overlay.offset.y * tfield.hexHeight //+ store_panning.curWorldY()
@@ -64,18 +60,22 @@
 
         g.lineStyle(tfield.overlay.style.width, tfield.overlay.style.color);
 
-        for (let bigRow = 0; bigRow < bigRows; bigRow++) {
-            for (let bigCol = 0; bigCol < bigCols; bigCol++){
+        let encompassMod = tfield.overlay.encompassEdges ? 1 : 0
+
+        for (let bigRow = 0 - encompassMod; bigRow < bigRows + encompassMod; bigRow++) {
+            for (let bigCol = 0 - encompassMod; bigCol < bigCols + encompassMod; bigCol++){
 
                 let bigHexX, bigHexY;
+                let raisedMod = tfield.overlay.raised == hex_raised.EVEN ? -1 : 1
 
                 if (tfield.orientation == hex_orientation.FLATTOP) {
+                    
                     bigHexX = bigCol*bigWidth*0.75+zeroOffsetX
-                    bigHexY = bigRow*bigHeight - (bigCol%2==1 ? bigHeight/2 : 0) + zeroOffsetY
-
+                    bigHexY = bigRow*bigHeight + ((Math.abs(bigCol%2)==1 ? bigHeight/2 : 0) * raisedMod) + zeroOffsetY
+                    
                 } else {
 
-                    bigHexX = bigCol*bigWidth - (bigRow%2==1 ? bigWidth/2 : 0) + zeroOffsetX
+                    bigHexX = bigCol*bigWidth + ((Math.abs(bigRow%2)==1 ? bigWidth/2 : 0) * raisedMod) + zeroOffsetX
                     bigHexY = bigRow*bigHeight*0.75 + zeroOffsetY
 
                 }
