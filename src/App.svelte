@@ -423,7 +423,13 @@ hexfiend red: #FF6666
 
 	/* KEYBOARD EVENTS */
 	function keyDown(e: KeyboardEvent) {
-		
+
+		// Prevent keyboard shortcuts
+		if (e.target.type == "number" || e.target.type == "textarea") {
+			return;
+		}
+
+
 		if (comp_shortcutList && e.key != "Escape" && !(e.key == "k" && e.ctrlKey)) {
 			e.preventDefault();
 			comp_shortcutList.keydown(e);

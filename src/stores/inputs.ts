@@ -1,7 +1,5 @@
 import { get, writable } from 'svelte/store';
 
-let input;
-
 export let store = writable({
 
     mouseDown: [false, false, false, false, false],
@@ -10,6 +8,8 @@ export let store = writable({
         shift: false,
         control: false,
         alt: false
-    }
+    },
+
+    editableHasFocus: false
 
 });
