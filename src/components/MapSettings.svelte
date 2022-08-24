@@ -5,7 +5,7 @@
 	import type CoordsLayer from '../layers/CoordsLayer.svelte';
 	import type IconLayer from '../layers/IconLayer.svelte';
 	import type PathLayer from '../layers/PathLayer.svelte';
-	import TerrainLayer from '../layers/TerrainLayer.svelte';
+	import type TerrainLayer from '../layers/TerrainLayer.svelte';
 	import type TextLayer from '../layers/TextLayer.svelte';
 	import { coord_system } from '../types/coordinates';
 	import type { coordinates_data, terrain_data, trace_data } from '../types/data';
@@ -18,8 +18,7 @@
 	import type * as PIXI from 'pixi.js';
 
 	import * as store_tfield from '../stores/tfield';
-import TerrainLayer from '../layers/TerrainLayer.svelte';
-
+	
 	export let loadedSave: save_data;
 	export let showSettings: boolean;
 	export let appState;

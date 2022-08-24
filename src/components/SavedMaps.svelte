@@ -67,7 +67,7 @@
 				>
 					<img src="/assets/img/tools/trash.png" alt={"Delete"}/>
 				</button>
-			</div>
+			
 		{/each}
 
 		{:else}
