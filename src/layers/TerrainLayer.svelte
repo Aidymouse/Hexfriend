@@ -516,7 +516,7 @@
 
 
 
-	/* FUNCTIONS THAT APPLY TO ALL MAP TYPES */
+	/* TRANSFORMATIONS THAT APPLY TO ALL MAP TYPES */
 	function createBlankHex(coords: cube_coords) {
 
 		tfield.hexes[genHexId_coordsObj(coords)] = {q: coords.q, r: coords.r, s: coords.s, tile: null}
@@ -542,8 +542,71 @@
 
 	export function changeMapShape(newMapShape: map_shape) {
 
+		switch (newMapShape) {
+			case map_shape.SQUARE:
+				square_generateBlankMap()
+				break;
+			
+			case map_shape.FLOWER:
+				flower_generateBlankMap();
+				break;
+		}
+
 	}
 
+
+
+	function square_generateBlankMap() {
+
+		eliminateAllHexes()
+		
+		
+		for (let col = 0; col < tfield.columns; col++) {
+			for (let row = 0; row < tfield.rows; row++) {
+				let cubeCoords = coords_qToCube(tfield.raised, col, row);
+
+				createBlankHex( cubeCoords );
+			}
+		}
+
+		comp_coordsLayer.cullUnusedCoordinates();
+		comp_coordsLayer.populateBlankHexes();
+		comp_coordsLayer.updateAllCoordPositions();
+
+		renderAllHexes()
+		renderGrid()
+
+	}
+
+	function flower_generateBlankMap() {
+
+		eliminateAllHexes();
+
+		for (let q = -tfield.hexesOut; q <= tfield.hexesOut; q++) {
+			for (let r = -tfield.hexesOut; r <= tfield.hexesOut; r++) {
+
+				if (q + r <= tfield.hexesOut && q+r >= -tfield.hexesOut) {
+			
+					createBlankHex( {q: q, r: r, s: -q-r} );
+
+				}
+			}
+		}
+
+		comp_coordsLayer.cullUnusedCoordinates();
+		comp_coordsLayer.populateBlankHexes();
+		comp_coordsLayer.updateAllCoordPositions();
+
+		renderAllHexes();
+		renderGrid();
+
+	}
+
+	function eliminateAllHexes() {
+		Object.keys(tfield.hexes).forEach( (hexId: hex_id) => {
+			eliminateHex(hexId);
+		})
+	}
 
 
 	/* RENDER FUNCTIONS */
@@ -688,7 +751,13 @@
 		paintFromTile(hexId, data_terrain.tile);
 	}
 
-	/* TESTS */
+	/* CHECKS */
+	export function areAllHexesBlank(): boolean {
+
+		return null == Object.entries(tfield.hexes).find( ([id, hex]) => hex.tile != null );
+
+	}
+
 	function hexExists(hexId: hex_id): boolean {
 		return tfield.hexes[hexId] != undefined;
 	}

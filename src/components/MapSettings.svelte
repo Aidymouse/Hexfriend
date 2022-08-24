@@ -239,6 +239,24 @@ import TerrainLayer from '../layers/TerrainLayer.svelte';
 
 	}
 
+	function changeMapShape() {
+
+		if (comp_terrainLayer.areAllHexesBlank()) {
+
+			comp_terrainLayer.changeMapShape( tfield.mapShape )
+			
+		} else {
+			
+			let changeConfirm = confirm("Are you sure? Changing shape will erase all hexes.")
+			
+			if (changeConfirm) {
+				comp_terrainLayer.changeMapShape( tfield.mapShape )
+			} 
+
+		}
+
+	}
+
 	let mapImportFiles: FileList;
 	function importMap() {
 		if (!mapImportFiles[0]) return;
@@ -300,8 +318,6 @@ import TerrainLayer from '../layers/TerrainLayer.svelte';
 			/>
 		</button>
 	</span>
-
-
 
 	<!-- GRID -->
 	<h2>Grid</h2>
@@ -452,12 +468,13 @@ import TerrainLayer from '../layers/TerrainLayer.svelte';
 
 
 
+	<!-- DIMENSIONS AND SHAPE -->
 	<h2>Map Dimensions</h2>
 
-	<div class="settings-grid">
+	<div class="settings-grid" style="margin-bottom: 5px;">
 		<label for="mapShape">Map Shape</label>
 		
-		<select bind:value={tfield.mapShape} on:change={() => {/* TODO */}}>
+		<select bind:value={tfield.mapShape} on:change={() => { changeMapShape() }}>
 			
 			<option value={map_shape.SQUARE}>Square</option>
 			<option value={map_shape.FLOWER}>Hex Flower</option>
