@@ -426,7 +426,7 @@ import { map_shape } from './types/settings';
 	function keyDown(e: KeyboardEvent) {
 
 		// Prevent keyboard shortcuts
-		if (e.target.type == "number" || e.target.type == "textarea") {
+		if (e.target.type == "number" || e.target.type == "textarea" || e.target.type == "text") {
 			return;
 		}
 
