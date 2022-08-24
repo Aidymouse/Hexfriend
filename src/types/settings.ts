@@ -1,4 +1,4 @@
-export enum map_type {
+export enum map_shape {
 	SQUARE = 'square',
-	RADIAL = 'radial',
+	FLOWER = 'flower',
 }

@@ -1,16 +1,18 @@
 <script lang="ts">
-	import { coords_cubeToq, coords_cubeTor, coords_cubeToWorld, coords_qToCube, coords_rToCube, coords_worldToCube, hexOrientation } from '../helpers/hexHelpers';
 	import type { eraser_data, icon_data } from '../types/data';
 	import type { IconLayerIcon } from '../types/icon';
 	import type { terrain_field } from '../types/terrain';
 	import { tools } from '../types/toolData';
 	import type * as PIXI from 'pixi.js';
+	import type { pan_state } from '../types/panning';
+	import type { shortcut_data } from '../types/inputs';
+	import { map_shape } from '../types/settings';
+	
+	import { coords_cubeToq, coords_cubeTor, coords_cubeToWorld, coords_qToCube, coords_rToCube, coords_worldToCube, hexOrientation } from '../helpers/hexHelpers';
 	import { Container, Sprite } from 'svelte-pixi';
-
+	
 	import * as store_tfield from '../stores/tfield';
 	import * as store_panning from '../stores/panning';
-import type { pan_state } from 'src/types/panning';
-import type { shortcut_data } from 'src/types/inputs';
 	
 	export let icons: IconLayerIcon[] = [];
 
@@ -199,6 +201,18 @@ import type { shortcut_data } from 'src/types/inputs';
 	}
 
 	export function retainIconPositionOnOrientationChange(newOrientation: hexOrientation) {
+		switch (tfield.mapShape) {
+			case map_shape.SQUARE:
+				square_retainIconPositionOnOrientationChange(newOrientation)
+				break;
+
+			case map_shape.FLOWER:
+				flower_retainIconPositionOnOrientationChange(newOrientation)
+				break;
+		}
+	}
+
+	function square_retainIconPositionOnOrientationChange(newOrientation: hexOrientation) {
 		// Only really works on square maps afaik
 		// Because it relies on row/col coords
 
@@ -244,6 +258,10 @@ import type { shortcut_data } from 'src/types/inputs';
 		oldHexWidth = tfield.hexWidth
 		oldHexHeight = tfield.hexHeight
 
+	}
+
+	function flower_retainIconPositionOnOrientationChange(newOrientation: hexOrientation) {
+		// Find the current 
 	}
 
 	export function handleKeyboardShortcut(shortcutData: shortcut_data) {

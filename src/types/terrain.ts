@@ -1,4 +1,4 @@
-import type { map_type } from './settings';
+import type { map_shape } from './settings';
 import type { Tile } from './tilesets';
 import type { hex_id } from './toolData';
 
@@ -18,7 +18,7 @@ export interface terrain_field {
 
 	grid: { stroke: number; thickness: number; shown: boolean };
 
-	mapType: map_type;
+	mapShape: map_shape;
 
 	/* Radial Maps */
 	hexesOut: number;

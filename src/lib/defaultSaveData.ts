@@ -3,13 +3,13 @@ import { coord_system } from '../types/coordinates';
 import type { coordinates_data } from '../types/data';
 import type { Iconset } from '../types/icon';
 import type { save_data } from '../types/savedata';
-import { map_type } from '../types/settings';
+import { map_shape } from '../types/settings';
 import type { terrain_field } from '../types/terrain';
 import type { Tile, Tileset } from '../types/tilesets';
 import { DEFAULTICONSET } from './defaultIconset';
 import { DEFAULTTILESET } from './defaultTileset';
 
-const CURRENTSAVEVERSION = 1;
+const CURRENTSAVEVERSION = 2;
 
 let DEFAULTSAVEDATA: save_data = {
 	saveVersion: CURRENTSAVEVERSION,
@@ -24,9 +24,9 @@ let DEFAULTSAVEDATA: save_data = {
 		columns: 20,
 		raised: 'even', // Which row / column should be higher / indented. This is implemented with an invisible hex. It's all quite messy.
 
-		hexesOut: 10,
+		hexesOut: 7,
 
-		mapType: map_type.SQUARE,
+		mapShape: map_shape.FLOWER,
 		blankHexColor: 0xf2f2f2,
 
 		grid: { stroke: 0x333333, thickness: 2, shown: true },
@@ -162,6 +162,23 @@ let DEFAULTSAVEDATA: save_data = {
 
 //console.log(JSON.stringify(DEFAULTSAVEDATA.tilesets['default']))
 
+
+// FOr testing, generate a flower shaped map
+let hexesOut = 7;
+
+for (let q = -hexesOut; q <= hexesOut; q++) {
+	for (let r = -hexesOut; r <= hexesOut; r++) {
+
+		if (q + r <= hexesOut && q+r >= -hexesOut) {
+			let s = -q-r
+	
+			DEFAULTSAVEDATA.TerrainField.hexes[genHexId(q, r, s)] = { q: q, r: r, s: s, tile: null };
+		}
+	}
+}
+
+/*
+
 for (let col = 0; col < DEFAULTSAVEDATA.TerrainField.columns; col++) {
 	for (let row = 0; row < DEFAULTSAVEDATA.TerrainField.rows; row++) {
 		let cubeCoords = coords_qToCube('even', col, row);
@@ -173,4 +190,5 @@ for (let col = 0; col < DEFAULTSAVEDATA.TerrainField.columns; col++) {
 	}
 }
 
+*/
 export default DEFAULTSAVEDATA;
