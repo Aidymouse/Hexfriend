@@ -567,8 +567,6 @@ import { map_shape } from './types/settings';
 		data_path.selectedPath = null;
 		data_text.selectedText = null;
 
-		//await tick()
-
 		// await tick() // The terrain field needs time to hook onto
 		//comp_terrainLayer.renderAllHexes()
 	}
@@ -651,6 +649,9 @@ import { map_shape } from './types/settings';
 			
 			comp_terrainLayer.clearTerrainSprites();
 			comp_terrainLayer.renderAllHexes();
+
+			// Jolt all the layers that respond to the data into place. Without this the text, icons and paths kinda get stuck. It's odd. Warrants further investigation.
+			loadedSave = loadedSave;
 		});
 
 		/* Set up tools - would be nice to remember tool settings but this works regardless of loaded tileset */
