@@ -25,29 +25,39 @@
 
 <div id="maps-container">
 	<div id="maps">
-		<div
-			class="map-save"
-			id="new-map-button"
-			on:click={() => {
-				createNewMap();
-				showSavedMaps = false;
-			}}
-		>
-			+
-		</div>
+		{#if $saves}
+			<div
+				class="map-save"
+				id="new-map-button"
+				on:click={() => {
+					createNewMap();
+					showSavedMaps = false;
+				}}
+			>
+				+
+			</div>
 
-		{#each $saves || [] as save (save.id)}
-			<div class="map-save">
-				<div
-					on:click={() => {
-						clickedMap(save.id);
-					}}
-				>
-					<div class="image-container">
-						<img src={save.previewBase64} alt={'Map Preview'} />
+			{#each $saves as save (save.id)}
+				<div class="map-save">
+					<div
+						on:click={() => {
+							clickedMap(save.id);
+						}}
+					>
+						<div class="image-container">
+							<img src={save.previewBase64} alt={'Map Preview'} />
+						</div>
+
+						<p>{save.mapTitle}</p>
 					</div>
-
-					<p>{save.mapTitle}</p>
+					<button
+						class="delete-button"
+						on:click={() => {
+							deleteMap(save.id);
+						}}
+					>
+						<img src="/assets/img/tools/trash.png" />
+					</button>
 				</div>
 				<button
 					class="delete-button"
@@ -59,6 +69,10 @@
 				</button>
 			</div>
 		{/each}
+
+		{:else}
+				<p>Loading...</p>
+		{/if}
 
 		<button
 			id="close-button"

@@ -24,9 +24,9 @@ let DEFAULTSAVEDATA: save_data = {
 		columns: 20,
 		raised: hex_raised.EVEN, // Which row / column should be higher / indented. This is implemented with an invisible hex. It's all quite messy.
 
-		hexesOut: 10,
+		hexesOut: 7,
 
-		shape: map_shape.SQUARE,
+		mapShape: map_shape.FLOWER,
 		blankHexColor: 0xf2f2f2,
 
 		grid: { stroke: 0x333333, thickness: 2, shown: true},
@@ -53,11 +53,11 @@ let DEFAULTSAVEDATA: save_data = {
 	texts: [],
 
 	pathStyles: [
-		{ display: 'River', style: { color: 10813439, width: 6, cap: 'round', join: 'round' } },
-		{ display: 'Path', style: { color: 16774327, width: 4, cap: 'round', join: 'bevel' } },
-		{ display: 'Trail', style: { color: 16367733, width: 3, cap: 'round', join: 'round' } },
-		{ display: 'Pass', style: { color: 12632256, width: 5, cap: 'round', join: 'miter' } },
-		{ display: 'Border', style: { color: 16711680, width: 5, cap: 'round', join: 'round' } },
+		{ display: 'River', style: { color: 10813439, width: 6, cap: 'round', join: 'round' }, id: 1 },
+		{ display: 'Path', style: { color: 16774327, width: 4, cap: 'round', join: 'round' }, id: 2 },
+		{ display: 'Trail', style: { color: 16367733, width: 3, cap: 'round', join: 'round' }, id: 3 },
+		{ display: 'Pass', style: { color: 12632256, width: 5, cap: 'round', join: 'round' }, id: 4 },
+		{ display: 'Border', style: { color: 16711680, width: 5, cap: 'round', join: 'round' }, id: 5 },
 	],
 
 	textStyles: [
@@ -164,6 +164,23 @@ let DEFAULTSAVEDATA: save_data = {
 
 //console.log(JSON.stringify(DEFAULTSAVEDATA.tilesets['default']))
 
+
+// FOr testing, generate a flower shaped map
+let hexesOut = 7;
+
+for (let q = -hexesOut; q <= hexesOut; q++) {
+	for (let r = -hexesOut; r <= hexesOut; r++) {
+
+		if (q + r <= hexesOut && q+r >= -hexesOut) {
+			let s = -q-r
+	
+			DEFAULTSAVEDATA.TerrainField.hexes[genHexId(q, r, s)] = { q: q, r: r, s: s, tile: null };
+		}
+	}
+}
+
+/*
+
 for (let col = 0; col < DEFAULTSAVEDATA.TerrainField.columns; col++) {
 	for (let row = 0; row < DEFAULTSAVEDATA.TerrainField.rows; row++) {
 		let cubeCoords = coords_qToCube('even', col, row);
@@ -175,4 +192,5 @@ for (let col = 0; col < DEFAULTSAVEDATA.TerrainField.columns; col++) {
 	}
 }
 
+*/
 export default DEFAULTSAVEDATA;

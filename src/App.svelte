@@ -74,6 +74,7 @@ hexfiend red: #FF6666
 	import * as store_inputs from './stores/inputs';
 
 	import ShortcutList from './components/ShortcutList.svelte'
+import { map_shape } from './types/settings';
 
 	/* STATE */
 
@@ -608,25 +609,35 @@ hexfiend red: #FF6666
 			let tf = loadedSave.TerrainField;
 
 			//pan.zoomScale = 1
+			
+			
 			store_panning.store.update(pan => {
+				
+				if (tf.mapShape == map_shape.SQUARE) {
+					if (tf.orientation == 'flatTop') {
+						let mapWidth = tf.columns * tf.hexWidth * 0.75 + tf.hexWidth * 0.25;
+						let mapHeight = (tf.rows - 1) * tf.hexHeight - tf.hexHeight * 0.5;
+		
+						pan.offsetX = window.innerWidth / 2 - (mapWidth / 2) * pan.zoomScale;
+						pan.offsetY = window.innerHeight / 2 - (mapHeight / 2) * pan.zoomScale;
+					} else {
+						let mapHeight = tf.rows * tf.hexHeight * 0.75 + tf.hexHeight * 0.25;
+						let mapWidth = (tf.columns - 1) * tf.hexWidth - tf.hexWidth * 0.5;
+		
+						pan.offsetX = window.innerWidth / 2 - (mapWidth / 2) * pan.zoomScale;
+						pan.offsetY = window.innerHeight / 2 - (mapHeight / 2) * pan.zoomScale;
+					}
 
-				if (tf.orientation == 'flatTop') {
-					let mapWidth = tf.columns * tf.hexWidth * 0.75 + tf.hexWidth * 0.25;
-					let mapHeight = (tf.rows - 1) * tf.hexHeight - tf.hexHeight * 0.5;
-	
-					pan.offsetX = window.innerWidth / 2 - (mapWidth / 2) * pan.zoomScale;
-					pan.offsetY = window.innerHeight / 2 - (mapHeight / 2) * pan.zoomScale;
 				} else {
-					let mapHeight = tf.rows * tf.hexHeight * 0.75 + tf.hexHeight * 0.25;
-					let mapWidth = (tf.columns - 1) * tf.hexWidth - tf.hexWidth * 0.5;
-	
-					pan.offsetX = window.innerWidth / 2 - (mapWidth / 2) * pan.zoomScale;
-					pan.offsetY = window.innerHeight / 2 - (mapHeight / 2) * pan.zoomScale;
-				}
 
+					pan.offsetX = window.innerWidth / 2;
+					pan.offsetY = window.innerHeight / 2;
+
+				}
 				return pan;
 				
 			})
+
 
 			loading = false;
 			await tick();

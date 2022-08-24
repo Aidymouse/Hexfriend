@@ -6,6 +6,7 @@
 	import type { path_data } from '../types/data';
 	import type { listed_path_style } from '../types/path';
 	import * as PIXI from 'pixi.js';
+import { prevent_default } from 'svelte/internal';
 
 	export let data_path: path_data;
 	export let comp_pathLayer: PathLayer;
@@ -20,21 +21,37 @@
 
 	export let pathStyles: listed_path_style[];
 
+	
+	let pathID = 0;
+	pathStyles.forEach(pathStyle => {
+		pathID = Math.max(pathID, pathStyle.id+1)
+	})
+
 	function styleMatchesData(pathStyle: PIXI.LineStyle) {
 		if (pathStyle.color != data_path.style.color) return false;
 		if (pathStyle.width != data_path.style.width) return false;
 		if (pathStyle.cap != data_path.style.cap) return false;
 		if (pathStyle.join != data_path.style.join) return false;
-
+		
 		return true;
 	}
+
 
 	function newPathStyle() {
 		let name = prompt('What would you like to name your path style?');
 		if (name == null) return;
 
-		pathStyles = [...pathStyles, { display: name, style: { ...data_path.style } }];
+		pathStyles = [...pathStyles, { display: name, style: { ...data_path.style }, id: pathID }];
+		pathID += 1
 	}
+
+
+	let editingPathStyle = null;
+
+	let menuX = 0;
+	let menuY = 0;
+
+
 </script>
 
 <div class="panel">
@@ -97,15 +114,30 @@
 		</div>
 	{/if}
 
+	
 	<div id="path-styles" style={data_path.selectedPath ? 'padding-top: 0px;' : ''}>
+
+		<div id="path-style-controls-menu" style={`top: ${menuY}px; left: ${menuX}px`}>
+			<button>Delete</button>
+			<button>Edit</button>
+		</div>
+
 		<div style="display: flex; gap: 5px; flex-wrap: wrap">
-			{#each pathStyles as pb}
+			{#each pathStyles as pb (pb.id)}
 				<button
 					on:click={() => {
 						data_path.style = { ...pb.style };
 					}}
-					class:selected={styleMatchesData(pb.style)}>{pb.display}</button
+					class:selected={styleMatchesData(pb.style)}
+					on:contextmenu={(e) => {
+						console.log(e);
+						menuX = e.clientX;
+						menuY = e.clientY;
+						e.preventDefault()
+					}}	
 				>
+					{pb.display}
+				</button>
 			{/each}
 			<button
 				class="green-button"
@@ -127,6 +159,10 @@
 	}
 	div {
 		color: white;
+	}
+
+	#path-style-controls-menu {
+		position: fixed;
 	}
 
 	.control-label {

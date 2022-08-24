@@ -29,6 +29,7 @@ export interface terrain_field {
 
 	grid: { stroke: number; thickness: number; shown: boolean; };
 
+	mapShape: map_shape;
 	overlay: {
 		shown: boolean;
 		style: {width: number; color: number; };
