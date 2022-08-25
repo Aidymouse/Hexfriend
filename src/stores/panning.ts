@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
-import type { terrain_field } from 'src/types/terrain';
+import type { terrain_field } from '../types/terrain';
+import { map_shape } from '../types/settings';
 import { get, writable } from 'svelte/store';
 
 import * as store_tfield from './tfield';
@@ -92,9 +93,21 @@ export const handlers = {
                 pan.zoomScale /= zoomFactor;
             }
         
+            // Control max zoom with different map shapes
+            let calcColumns
+            let calcRows
+
+            if (tfield.mapShape == map_shape.SQUARE) {
+                calcColumns = tfield.columns;
+                calcRows = tfield.rows;
+            } else if (tfield.mapShape == map_shape.FLOWER) {
+                calcColumns = tfield.hexesOut*2
+                calcRows = tfield.hexesOut*2
+            }
+
             // controls how far you can zoom out (smaller number is farther out)
             let minZoom = (window.innerWidth + window.innerHeight) / 2;
-            minZoom /= ((tfield.hexWidth + tfield.hexHeight) / 2) * ((tfield.columns + tfield.rows) / 2) * 2;
+            minZoom /= ((tfield.hexWidth + tfield.hexHeight) / 2) * ((calcColumns + calcRows) / 2) * 2;
             if (pan.zoomScale < minZoom) {
                 pan.zoomScale = minZoom;
             }

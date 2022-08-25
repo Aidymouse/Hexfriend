@@ -241,6 +241,8 @@
 
 	function changeMapShape() {
 
+		// TODO: Update zoom when map shape is changed
+
 		if (comp_terrainLayer.areAllHexesBlank()) {
 
 			comp_terrainLayer.changeMapShape( tfield.mapShape )
