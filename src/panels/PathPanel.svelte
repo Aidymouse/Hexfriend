@@ -91,6 +91,14 @@
 		data_path.selectedPath = null;
 	}
 
+	function duplicateStyle() {
+		let contextPathStyle: listed_path_style = pathStyles.find(ps => ps.id == data_path.contextPathId) 
+
+		pathID += 1
+		pathStyles = [...pathStyles, { display: contextPathStyle.display, style: { ...contextPathStyle.style }, id: pathID }];
+	
+		data_path.contextPathId = null
+	}
 
 </script>
 
@@ -198,6 +206,7 @@
 <div id="path-style-context-menu" class={"context-menu"} class:visible={data_path.contextPathId!=null} style={`top: ${menuY}px; left: ${menuX}px`}>
 	<button on:click={updateStyleToMatch} title={"Update this path style to match what is currently set above."}>Update Style</button>
 	<button on:click={renameStyle}>Rename</button>
+	<button on:click={duplicateStyle}>Duplicate</button>
 	<button on:click={deletePathStyle}>Delete</button>
 </div>
 

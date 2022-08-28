@@ -31,8 +31,14 @@
 	export let paths: path_layer_path[] = [];
 
 	let pathId: number = 0;
-	paths.forEach((p) => (pathId = Math.max(pathId, p.id)));
-	pathId++;
+
+	function updatePathId() {
+		paths.forEach((p) => (pathId = Math.max(pathId, p.id)));
+		pathId++;
+	}
+
+	updatePathId()
+
 
 	function appendPoint(path: path_layer_path, x: number, y: number) {
 		path.points = [...path.points, x, y];

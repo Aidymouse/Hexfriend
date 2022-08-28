@@ -78,16 +78,22 @@ import { map_shape } from './types/settings';
 
 	/* STATE */
 
-	let loadedSave: save_data = DEFAULTSAVEDATA;
-	let loadedId: number | null = null;
-
-	enum appstate {
-		NORMAL = 'normal',
-		TILESETCREATOR = 'tilesetCreator',
-		ICONSETCREATOR = 'iconsetCreator'
+	let dataToLoad = {
+		data: DEFAULTSAVEDATA,
+		id: null
 	}
 
-	let appState: appstate = appstate.NORMAL;
+	let loadedSave: save_data = null;
+	let loadedId: number | null = null;
+
+	enum app_state {
+		NORMAL = 'normal',
+		TILESETCREATOR = 'tilesetCreator',
+		ICONSETCREATOR = 'iconsetCreator',
+		LOADINGMAP = "loadingMap"
+	}
+
+	let appState: app_state = app_state.LOADINGMAP;
 
 	let showSettings = false;
 	let showTerrainGenerator = false;
@@ -572,7 +578,11 @@ import { map_shape } from './types/settings';
 		console.log(`Loaded ${id}`);
 		loading = true;
 
-		loadSave(data, id);
+		dataToLoad = {data: data, id: id}
+		appState = app_state.LOADINGMAP
+
+
+		//loadSave(data, id);
 		//await loadSave(data, id)
 
 		data_path.selectedPath = null;
@@ -648,21 +658,21 @@ import { map_shape } from './types/settings';
 			})
 
 
-			loading = false;
 			await tick();
 
 			// Final Layer Setup
-			comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
+			//comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
 
-			comp_coordsLayer.cullUnusedCoordinates();
-			comp_coordsLayer.updateAllCoordPositions();
-			comp_coordsLayer.populateBlankHexes();
+			//comp_coordsLayer.cullUnusedCoordinates();
+			//comp_coordsLayer.updateAllCoordPositions();
+			//comp_coordsLayer.populateBlankHexes();
 			
-			comp_terrainLayer.clearTerrainSprites();
-			comp_terrainLayer.renderAllHexes();
+			//comp_terrainLayer.clearTerrainSprites();
+			//comp_terrainLayer.renderAllHexes();
 
 			// Jolt all the layers that respond to the data into place. Without this the text, icons and paths kinda get stuck. It's odd. Warrants further investigation.
 			loadedSave = loadedSave;
+			appState = app_state.NORMAL;
 		});
 
 		/* Set up tools - would be nice to remember tool settings but this works regardless of loaded tileset */
@@ -702,7 +712,7 @@ import { map_shape } from './types/settings';
 		});
 	}
 
-	createNewMap();
+	//createNewMap();
 </script>
 
 <svelte:window
@@ -710,7 +720,7 @@ import { map_shape } from './types/settings';
 	on:keyup|preventDefault={keyUp}
 />
 
-{#if appState == appstate.NORMAL && !loading}
+{#if appState == app_state.NORMAL}
 	
 
 
@@ -878,10 +888,17 @@ import { map_shape } from './types/settings';
 		<Controls {selectedTool} {data_terrain} {data_icon} {data_path} {data_text} {data_eraser} />
 	{/if}
 
-{:else if appState == appstate.TILESETCREATOR}
+{:else if appState == app_state.TILESETCREATOR}
 	<TilesetCreator bind:appState />
-{:else if appState == appstate.ICONSETCREATOR}
+{:else if appState == app_state.ICONSETCREATOR}
 	<IconsetCreator bind:appState />
+
+{:else if appState == app_state.LOADINGMAP}
+
+		<img src="../public/assets/img/site/hexfriend.png" on:load={ () => { console.log("Loading save now"); loadSave( dataToLoad.data, dataToLoad.id ) } }/>
+
+
+
 {/if}
 
 <style>
