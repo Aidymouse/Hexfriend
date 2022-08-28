@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { db } from '../lib/db';
 	import { liveQuery } from 'dexie';
+	import { LATESTSAVEDATAVERSION } from '../types/savedata'
 	
+	import {convertSaveDataToLatest} from '../lib/saveDataConverter'
+
 	import { download } from '../lib/download2';
 
 	let saves = liveQuery(() => db.mapSaves.toArray());
 
-	const LATESTMAPSAVEVERSION = 2;
 
 	export let showSavedMaps: boolean;
 	export let load: Function;
@@ -17,6 +19,10 @@
 		let mapString = (await db.mapStrings.get(id)).mapString;
 
 		let mapData = JSON.parse(mapString);
+		if ((await db.mapSaves.get(id)).saveVersion != LATESTSAVEDATAVERSION) {
+			mapData = convertSaveDataToLatest(mapData)
+		}
+
 		load(mapData, id);
 		showSavedMaps = false;
 	}
@@ -53,7 +59,7 @@
 			</div>
 
 			{#each $saves as save (save.id)}
-				<div class="map-save" class:error={save.saveVersion != LATESTMAPSAVEVERSION}>
+				<div class="map-save" class:error={save.saveVersion != LATESTSAVEDATAVERSION}>
 					<div
 						on:click={() => {
 							clickedMap(save.id);
@@ -65,6 +71,13 @@
 
 						<p>{save.mapTitle}</p>
 					</div>
+
+					{#if save.saveVersion != LATESTSAVEDATAVERSION}
+					<div class="error-notification" title={"This save data is on an old version. It may fail to load."}>
+						!
+					</div>
+					{/if}
+
 					<button
 						class="delete-button"
 						on:click={() => {
@@ -81,7 +94,7 @@
 							exportAsHexfriend(save.id);
 						}}
 					>
-						E
+						Export
 					</button>
 				</div>
 			
@@ -119,9 +132,26 @@
 		height: 100%;
 	}
 
-	#map-save.error {
-		border: solid 3px red;
+	.map-save.error {
+		border: solid 1px red;
 	}
+
+	.map-save .error-notification {
+		position: absolute;
+		top: 10px;
+		left: 10px;
+		color: red;
+		width: 25px;
+		height: 25px;
+		border: solid 1px red;
+		border-radius: 4px;
+		background-color: rgba(255, 102, 102, 0.5);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+	}
+
 
 	#new-map-button {
 		border: solid 1px grey;
@@ -133,6 +163,11 @@
 		font-size: 48pt;
 		margin: 0;
 		padding: 0;
+	}
+
+	#new-map-button:hover {
+		margin-top: -5px;
+		margin-left: -5px;
 	}
 
 	#close-button {
@@ -232,6 +267,9 @@
 		border: solid 1px #8cc63f;
 		outline: #8cc63f solid 1px;
 		transition-duration: 0.2s;
+		margin-left: -5px;
+		margin-top: -5px;
+		box-shadow: 5px 5px 15px #000000 ;
 	}
 
 	.image-container {

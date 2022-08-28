@@ -541,6 +541,7 @@ import { map_shape } from './types/settings';
 			const id = await db.mapSaves.update(loadedId, {
 				mapTitle: loadedSave.title,
 				previewBase64: p,
+				saveVersion: loadedSave.saveVersion
 			});
 
 			await db.mapStrings.update(loadedId, {

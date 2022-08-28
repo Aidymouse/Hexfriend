@@ -8,11 +8,10 @@ import { hex_orientation, hex_raised, terrain_field } from '../types/terrain';
 import type { Tile, Tileset } from '../types/tilesets';
 import { DEFAULTICONSET } from './defaultIconset';
 import { DEFAULTTILESET } from './defaultTileset';
-
-const CURRENTSAVEVERSION = 2;
+import {LATESTSAVEDATAVERSION} from '../types/savedata'
 
 let DEFAULTSAVEDATA: save_data = {
-	saveVersion: CURRENTSAVEVERSION,
+	saveVersion: LATESTSAVEDATAVERSION,
 	title: '',
 
 	TerrainField: {
@@ -25,8 +24,8 @@ let DEFAULTSAVEDATA: save_data = {
 		raised: hex_raised.EVEN, // Which row / column should be higher / indented. This is implemented with an invisible hex. It's all quite messy.
 
 		hexesOut: 7,
-
 		mapShape: map_shape.FLOWER,
+		
 		blankHexColor: 0xf2f2f2,
 
 		grid: { stroke: 0x333333, thickness: 2, shown: true},

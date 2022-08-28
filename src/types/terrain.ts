@@ -39,8 +39,6 @@ export interface terrain_field {
 		encompassEdges: boolean;
 	};
 
-	shape: map_shape;
-
 	/* Radial Maps */
 	hexesOut: number;
 
