@@ -16,16 +16,7 @@
 	export let selectedTool: string;
 	export let hexOrientation: 'flatTop' | 'pointyTop';
 
-	export let data_path: path_data
-
-	function changeTool(newTool: tools) {
-
-		// Anything we need to make sure is reset on toolchagne
-		data_path.contextPathId = null
-
-		selectedTool = newTool
-
-	}
+	export let changeTool: Function
 
 </script>
 

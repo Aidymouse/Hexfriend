@@ -156,3 +156,25 @@ input[type='range']::-moz-range-thumb {
 	background: #8cc63f;
 	cursor: pointer;
 }
+
+
+
+/* Custom Context Menus */
+.context-menu {
+	width: 150px;
+	display: flex;
+	flex-direction: column;
+	border: solid 1px grey;
+	gap: 10px;
+	background-color: grey;
+	border-radius: 4px;
+}
+
+.context-menu button {
+	width: 100%;
+	height: 30px;
+	border-radius: 0;
+	border: none;
+	text-align: left;
+	padding-left: 10px;
+}

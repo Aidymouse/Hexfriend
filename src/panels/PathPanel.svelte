@@ -38,7 +38,7 @@
 	}
 
 	function newPathStyle() {
-		let name = prompt('What would you like to name your path style?');
+		let name = prompt('What would you like to name this path style?');
 		if (name == null) return;
 
 		pathStyles = [...pathStyles, { display: name, style: { ...data_path.style }, id: pathID }];
@@ -57,19 +57,33 @@
 		styleToEdit.style = {...data_path.style}
 		//styleToEdit = styleToEdit
 		pathStyles = pathStyles
-
+		
 		data_path.contextPathId = null
 		
 	}
 	
 	function deletePathStyle() {
 		if (!data_path.contextPathId) return;
+		if (!confirm("Are you sure you would like to delete this path style?")) return;
 		
 		pathStyles = pathStyles.filter(ps => ps.id != data_path.contextPathId)
-
+		
 		data_path.contextPathId = null
 	}
+	
+	function renameStyle() {
+		if (!data_path.contextPathId) return;
+		
+		let styleToEdit: listed_path_style = pathStyles.find(ps => ps.id == data_path.contextPathId)
+		data_path.contextPathId = null
 
+		let styleName = prompt("What would you like this path style to be called?")
+		if (!styleName) return
+		
+		styleToEdit.display = styleName
+		pathStyles = pathStyles
+
+	}
 
 	// Path Controls
 	function deselectPath() {
@@ -145,9 +159,7 @@
 
 	
 	<!-- PATH STYLES -->
-	<div id="path-styles" style={data_path.selectedPath ? 'padding-top: 0px;' : ''}>
-
-		
+	<div id="path-styles" style={data_path.selectedPath ? 'padding-top: 0px;' : ''}>		
 
 		<!-- Path Style Listing -->
 		<div style="display: flex; gap: 5px; flex-wrap: wrap">
@@ -184,7 +196,8 @@
 
 <!-- Path Style Context Menu -->
 <div id="path-style-context-menu" class={"context-menu"} class:visible={data_path.contextPathId!=null} style={`top: ${menuY}px; left: ${menuX}px`}>
-	<button on:click={updateStyleToMatch}>Update Style to Match</button>
+	<button on:click={updateStyleToMatch} title={"Update this path style to match what is currently set above."}>Update Style</button>
+	<button on:click={renameStyle}>Rename</button>
 	<button on:click={deletePathStyle}>Delete</button>
 </div>
 
@@ -205,25 +218,6 @@
 
 	#path-style-context-menu.visible {
 		display: block;
-	}
-
-	.context-menu {
-		width: 150px;
-		display: flex;
-		flex-direction: column;
-		border: solid 1px grey;
-		gap: 10px;
-		background-color: grey;
-		border-radius: 4px;
-	}
-
-	.context-menu button {
-		width: 100%;
-		height: 30px;
-		border-radius: 0;
-		border: none;
-		text-align: left;
-		padding-left: 10px;
 	}
 
 	.control-label {

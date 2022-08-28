@@ -245,6 +245,13 @@ import { map_shape } from './types/settings';
 	}
 
 	/* TOOL METHODS */
+	function changeTool(newTool: tools) {
+		
+		// A list of stuff that needs to happen every tool change
+		data_path.contextPathId = null
+
+		selectedTool = newTool
+	}
 
 	/* ALL PURPOSE POINTER METHODS */
 	function pointerdown(e: PointerEvent) {
@@ -377,22 +384,23 @@ import { map_shape } from './types/settings';
 							showSavedMaps = false;
 							showSettings = false;
 							showKeyboardShortcuts = false;
+							data_path.contextPathId = null;
 							break;
 
-							case "changeTool_terrain":
-							selectedTool = tools.TERRAIN
+						case "changeTool_terrain":
+							changeTool(tools.TERRAIN)
 							break
 						case "changeTool_icon":
-							selectedTool = tools.ICON
+							changeTool(tools.ICON)
 							break
 						case "changeTool_path":
-							selectedTool = tools.PATH
+							changeTool(tools.PATH)
 							break
 						case "changeTool_text":
-							selectedTool = tools.TEXT
+							changeTool(tools.TEXT)
 							break
 						case "changeTool_eraser":
-							selectedTool = tools.ERASER
+							changeTool(tools.ERASER)
 							break
 						
 						
@@ -800,7 +808,7 @@ import { map_shape } from './types/settings';
 
 
 	<div id="tool-buttons">
-		<ToolButtons bind:selectedTool bind:hexOrientation={tfield.orientation} bind:data_path />
+		<ToolButtons bind:selectedTool bind:hexOrientation={tfield.orientation} changeTool={changeTool} />
 	</div>
 
 	<div id="setting-buttons">
