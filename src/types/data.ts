@@ -41,6 +41,7 @@ export interface path_data {
 	dontSelectPaths: boolean
 	snap: boolean;
 	style: PIXI.LineStyle;
+	contextPathId?: number;
 }
 
 export interface trace_data {

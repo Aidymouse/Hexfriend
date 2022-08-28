@@ -40,6 +40,8 @@
 	}
 
 	export function pointerdown() {
+		data_path.contextPathId = null;
+
 		if (controls.mouseDown[0]) {
 			if (data_path.selectedPath) {
 				let pX = store_panning.curWorldX();
@@ -51,10 +53,12 @@
 				}
 
 				appendPoint(data_path.selectedPath, pX, pY);
+
 			} else if (data_path.hoveredPath && !data_path.dontSelectPaths) {
 				data_path.selectedPath = paths[paths.indexOf(data_path.hoveredPath)];
 				data_path.style = { ...data_path.selectedPath.style };
 				data_path.hoveredPath = null;
+
 			} else {
 				addNewPath();
 			}

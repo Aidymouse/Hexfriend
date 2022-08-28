@@ -172,6 +172,7 @@ import { map_shape } from './types/settings';
 		selectedPath: null,
 		dontSelectPaths: null,
 		snap: false,
+		contextPathId: null
 	};
 
 	let data_text: text_data = {
@@ -543,6 +544,7 @@ import { map_shape } from './types/settings';
 			const id = await db.mapSaves.add({
 				mapTitle: loadedSave.title,
 				previewBase64: p,
+				saveVersion: loadedSave.saveVersion
 			});
 
 			await db.mapStrings.add({
@@ -798,7 +800,7 @@ import { map_shape } from './types/settings';
 
 
 	<div id="tool-buttons">
-		<ToolButtons bind:selectedTool bind:hexOrientation={tfield.orientation} />
+		<ToolButtons bind:selectedTool bind:hexOrientation={tfield.orientation} bind:data_path />
 	</div>
 
 	<div id="setting-buttons">

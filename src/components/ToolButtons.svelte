@@ -1,14 +1,32 @@
 <script lang="ts">
+	import type { path_data } from "../types/data";
+	import { tools } from "../types/toolData";
+
+
+	
+
 	let buttons = [
-		{ display: 'Terrain', toolCode: 'terrain' },
-		{ display: 'Icon', toolCode: 'icon' },
-		{ display: 'Path', toolCode: 'path' },
-		{ display: 'Text', toolCode: 'text' },
-		{ display: 'Eraser', toolCode: 'eraser' },
+		{ display: 'Terrain', toolCode: tools.TERRAIN },
+		{ display: 'Icon', toolCode: tools.ICON },
+		{ display: 'Path', toolCode: tools.PATH },
+		{ display: 'Text', toolCode: tools.TEXT },
+		{ display: 'Eraser', toolCode: tools.ERASER },
 	];
 
 	export let selectedTool: string;
 	export let hexOrientation: 'flatTop' | 'pointyTop';
+
+	export let data_path: path_data
+
+	function changeTool(newTool: tools) {
+
+		// Anything we need to make sure is reset on toolchagne
+		data_path.contextPathId = null
+
+		selectedTool = newTool
+
+	}
+
 </script>
 
 <main>
@@ -16,7 +34,7 @@
 		<button
 			class={selectedTool == b.toolCode ? 'selected' : ''}
 			on:click={(e) => {
-				selectedTool = b.toolCode;
+				changeTool(b.toolCode);
 			}}
 			title={`${b.display} Tool`}
 		>

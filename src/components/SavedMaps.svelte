@@ -1,8 +1,12 @@
 <script lang="ts">
 	import { db } from '../lib/db';
 	import { liveQuery } from 'dexie';
+	
+	import { download } from '../lib/download2';
 
 	let saves = liveQuery(() => db.mapSaves.toArray());
+
+	const LATESTMAPSAVEVERSION = 2;
 
 	export let showSavedMaps: boolean;
 	export let load: Function;
@@ -18,8 +22,19 @@
 	}
 
 	function deleteMap(id: number) {
+
+		if (!confirm("Are you sure you want to delete?")) return;
+
 		db.mapSaves.delete(id);
 		db.mapStrings.delete(id);
+	}
+
+	async function exportAsHexfriend(id: number) {
+
+		let mapData = JSON.parse((await db.mapStrings.get(id)).mapString)
+
+		download(JSON.stringify(mapData), `${mapData.title ? mapData.title : 'Untitled Hexfriend'}.hexfriend`, "appliation/json");
+				
 	}
 </script>
 
@@ -38,7 +53,7 @@
 			</div>
 
 			{#each $saves as save (save.id)}
-				<div class="map-save">
+				<div class="map-save" class:error={save.saveVersion != LATESTMAPSAVEVERSION}>
 					<div
 						on:click={() => {
 							clickedMap(save.id);
@@ -56,19 +71,21 @@
 							deleteMap(save.id);
 						}}
 					>
-						<img src="/assets/img/tools/trash.png" />
+						<img src="/assets/img/tools/trash.png" alt={"Delete Map"} />
+					</button>
+
+					<button
+						class="delete-button"
+						style="margin-right: 40px;"
+						on:click={() => {
+							exportAsHexfriend(save.id);
+						}}
+					>
+						E
 					</button>
 				</div>
-				<button
-					class="delete-button"
-					on:click={() => {
-						deleteMap(save.id);
-					}}
-				>
-					<img src="/assets/img/tools/trash.png" alt={"Delete"}/>
-				</button>
 			
-		{/each}
+			{/each}
 
 		{:else}
 				<p>Loading...</p>
@@ -100,6 +117,10 @@
 	div {
 		width: 100%;
 		height: 100%;
+	}
+
+	#map-save.error {
+		border: solid 3px red;
 	}
 
 	#new-map-button {
@@ -193,8 +214,13 @@
 		transition-duration: 0.2s;
 	}
 
+	
+	
 	.delete-button img {
 		width: 70%;
+	}
+	
+	.export-button {
 	}
 
 	.map-save:hover .delete-button {

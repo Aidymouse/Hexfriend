@@ -6,11 +6,12 @@
 	import type { path_data } from '../types/data';
 	import type { listed_path_style } from '../types/path';
 	import * as PIXI from 'pixi.js';
-import { prevent_default } from 'svelte/internal';
 
 	export let data_path: path_data;
 	export let comp_pathLayer: PathLayer;
 
+
+	/* Path Style Management */
 	$: {
 		if (data_path.selectedPath) {
 			data_path.selectedPath.style = { ...data_path.style };
@@ -36,7 +37,6 @@ import { prevent_default } from 'svelte/internal';
 		return true;
 	}
 
-
 	function newPathStyle() {
 		let name = prompt('What would you like to name your path style?');
 		if (name == null) return;
@@ -45,16 +45,44 @@ import { prevent_default } from 'svelte/internal';
 		pathID += 1
 	}
 
-
-	let editingPathStyle = null;
-
 	let menuX = 0;
 	let menuY = 0;
+
+	function updateStyleToMatch() {
+
+		if (!data_path.contextPathId) return;
+		
+		let styleToEdit: listed_path_style = pathStyles.find(ps => ps.id == data_path.contextPathId)
+		
+		styleToEdit.style = {...data_path.style}
+		//styleToEdit = styleToEdit
+		pathStyles = pathStyles
+
+		data_path.contextPathId = null
+		
+	}
+	
+	function deletePathStyle() {
+		if (!data_path.contextPathId) return;
+		
+		pathStyles = pathStyles.filter(ps => ps.id != data_path.contextPathId)
+
+		data_path.contextPathId = null
+	}
+
+
+	// Path Controls
+	function deselectPath() {
+		if (data_path.selectedPath.points.length == 2) comp_pathLayer.deletePath(data_path.selectedPath);
+		data_path.selectedPath = null;
+	}
 
 
 </script>
 
-<div class="panel">
+
+
+<div class="panel" on:pointerdown={() => { if (data_path.contextPathId) data_path.contextPathId = null }}>
 	<div id="controls">
 		<label for="pathColor">Color</label>
 		<ColorInputPixi bind:value={data_path.style.color} id={'pathColor'} />
@@ -97,7 +125,7 @@ import { prevent_default } from 'svelte/internal';
 		<div id="selected-path-controls">
 			<button
 				on:click={() => {
-					data_path.selectedPath = null;
+					deselectPath()
 				}}>Deselect Current Path</button
 			>
 			<button
@@ -114,14 +142,14 @@ import { prevent_default } from 'svelte/internal';
 		</div>
 	{/if}
 
+
 	
+	<!-- PATH STYLES -->
 	<div id="path-styles" style={data_path.selectedPath ? 'padding-top: 0px;' : ''}>
 
-		<div id="path-style-controls-menu" style={`top: ${menuY}px; left: ${menuX}px`}>
-			<button>Delete</button>
-			<button>Edit</button>
-		</div>
+		
 
+		<!-- Path Style Listing -->
 		<div style="display: flex; gap: 5px; flex-wrap: wrap">
 			{#each pathStyles as pb (pb.id)}
 				<button
@@ -134,6 +162,7 @@ import { prevent_default } from 'svelte/internal';
 						menuX = e.clientX;
 						menuY = e.clientY;
 						e.preventDefault()
+						data_path.contextPathId = pb.id
 					}}	
 				>
 					{pb.display}
@@ -153,6 +182,12 @@ import { prevent_default } from 'svelte/internal';
 	</div>
 </div>
 
+<!-- Path Style Context Menu -->
+<div id="path-style-context-menu" class={"context-menu"} class:visible={data_path.contextPathId!=null} style={`top: ${menuY}px; left: ${menuX}px`}>
+	<button on:click={updateStyleToMatch}>Update Style to Match</button>
+	<button on:click={deletePathStyle}>Delete</button>
+</div>
+
 <style>
 	span {
 		display: flex;
@@ -161,8 +196,34 @@ import { prevent_default } from 'svelte/internal';
 		color: white;
 	}
 
-	#path-style-controls-menu {
+	
+
+	#path-style-context-menu {
 		position: fixed;
+		display: none;
+	}
+
+	#path-style-context-menu.visible {
+		display: block;
+	}
+
+	.context-menu {
+		width: 150px;
+		display: flex;
+		flex-direction: column;
+		border: solid 1px grey;
+		gap: 10px;
+		background-color: grey;
+		border-radius: 4px;
+	}
+
+	.context-menu button {
+		width: 100%;
+		height: 30px;
+		border-radius: 0;
+		border: none;
+		text-align: left;
+		padding-left: 10px;
 	}
 
 	.control-label {

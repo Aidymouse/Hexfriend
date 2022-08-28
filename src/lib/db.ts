@@ -1,9 +1,10 @@
 import Dexie, { Table } from 'dexie';
 
-export interface MapSave {
+export interface MapSaveInfo {
 	id?: number;
 	mapTitle: string;
 	previewBase64: string;
+	saveVersion: number;
 }
 
 export interface MapString {
@@ -12,15 +13,15 @@ export interface MapString {
 }
 
 export class MapDexie extends Dexie {
-	mapSaves!: Table<MapSave>;
+	mapSaves!: Table<MapSaveInfo>;
 	mapStrings!: Table<MapString>;
 
 	constructor() {
 		super('mapsdb');
-		this.version(4).stores({
+		this.version(5).stores({
 			/* I kinda dont know what im doing. These database IDs have to line up! 
             In theory they always should, but I'm sure dexie has a better way of sharing IDs between tables */
-			mapSaves: '++id, mapTitle, previewBase64',
+			mapSaves: '++id, mapTitle, previewBase64, saveVersion',
 			mapStrings: '++id, mapString',
 		});
 	}
