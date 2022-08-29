@@ -24,4 +24,5 @@ export interface text_layer_text {
 export interface listed_text_style {
 	display: string;
 	style: PIXI.Text['style'];
+	id: number;
 }

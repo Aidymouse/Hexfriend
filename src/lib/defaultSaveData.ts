@@ -73,6 +73,7 @@ let DEFAULTSAVEDATA: save_data = {
 				fontStyle: 'normal',
 				fontWeight: 'normal',
 			},
+			id: 0
 		},
 		{
 			display: 'Barony',
@@ -87,6 +88,7 @@ let DEFAULTSAVEDATA: save_data = {
 				fontStyle: 'normal',
 				fontWeight: 'normal',
 			},
+			id: 1
 		},
 		{
 			display: 'City',
@@ -101,6 +103,7 @@ let DEFAULTSAVEDATA: save_data = {
 				fontStyle: 'normal',
 				fontWeight: 'normal',
 			},
+			id: 2
 		},
 		{
 			display: 'Town',
@@ -115,6 +118,7 @@ let DEFAULTSAVEDATA: save_data = {
 				fontStyle: 'normal',
 				fontWeight: 'normal',
 			},
+			id: 3
 		},
 		{
 			display: 'Village',
@@ -129,6 +133,7 @@ let DEFAULTSAVEDATA: save_data = {
 				fontStyle: 'normal',
 				fontWeight: 'normal',
 			},
+			id: 4
 		},
 		{
 			display: 'River',
@@ -143,6 +148,7 @@ let DEFAULTSAVEDATA: save_data = {
 				fontStyle: 'italic',
 				fontWeight: 'normal',
 			},
+			id: 5
 		},
 		{
 			display: 'Dungeon',
@@ -157,6 +163,7 @@ let DEFAULTSAVEDATA: save_data = {
 				fontStyle: 'normal',
 				fontWeight: 'bold',
 			},
+			id: 6
 		},
 	],
 };

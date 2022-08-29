@@ -33,6 +33,8 @@
 	}
 
 	export function pointerdown() {
+		data_text.contextStyleId = null;
+		
 		if (data_text.selectedText && hoveredText) {
 			selectText();
 			setTimeout(() => {

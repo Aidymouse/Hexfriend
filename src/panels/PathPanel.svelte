@@ -50,7 +50,7 @@
 
 	function updateStyleToMatch() {
 
-		if (!data_path.contextPathId) return;
+		if (data_path.contextPathId == null) return;
 		
 		let styleToEdit: listed_path_style = pathStyles.find(ps => ps.id == data_path.contextPathId)
 		
@@ -63,7 +63,7 @@
 	}
 	
 	function deletePathStyle() {
-		if (!data_path.contextPathId) return;
+		if (data_path.contextPathId == null) return;
 		if (!confirm("Are you sure you would like to delete this path style?")) return;
 		
 		pathStyles = pathStyles.filter(ps => ps.id != data_path.contextPathId)
@@ -72,7 +72,7 @@
 	}
 	
 	function renameStyle() {
-		if (!data_path.contextPathId) return;
+		if (data_path.contextPathId == null) return;
 		
 		let styleToEdit: listed_path_style = pathStyles.find(ps => ps.id == data_path.contextPathId)
 		data_path.contextPathId = null
@@ -178,10 +178,9 @@
 					}}
 					class:selected={styleMatchesData(pb.style)}
 					on:contextmenu={(e) => {
-						console.log(e);
+						e.preventDefault()
 						menuX = e.clientX;
 						menuY = e.clientY;
-						e.preventDefault()
 						data_path.contextPathId = pb.id
 					}}	
 				>
@@ -203,12 +202,14 @@
 </div>
 
 <!-- Path Style Context Menu -->
-<div id="path-style-context-menu" class={"context-menu"} class:visible={data_path.contextPathId!=null} style={`top: ${menuY}px; left: ${menuX}px`}>
-	<button on:click={updateStyleToMatch} title={"Update this path style to match what is currently set above."}>Update Style</button>
-	<button on:click={renameStyle}>Rename</button>
-	<button on:click={duplicateStyle}>Duplicate</button>
-	<button on:click={deletePathStyle}>Delete</button>
-</div>
+{#if data_path.contextPathId!=null}
+	<div class={"context-menu"} style={`top: ${menuY}px; left: ${menuX}px`}>
+		<button on:click={updateStyleToMatch} title={"Update this path style to match what is currently set above."}>Update Style</button>
+		<button on:click={renameStyle}>Rename</button>
+		<button on:click={duplicateStyle}>Duplicate</button>
+		<button on:click={deletePathStyle}>Delete</button>
+	</div>
+{/if}
 
 <style>
 	span {
@@ -216,17 +217,6 @@
 	}
 	div {
 		color: white;
-	}
-
-	
-
-	#path-style-context-menu {
-		position: fixed;
-		display: none;
-	}
-
-	#path-style-context-menu.visible {
-		display: block;
 	}
 
 	.control-label {

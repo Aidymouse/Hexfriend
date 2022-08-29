@@ -74,7 +74,9 @@ hexfiend red: #FF6666
 	import * as store_inputs from './stores/inputs';
 
 	import ShortcutList from './components/ShortcutList.svelte'
-import { map_shape } from './types/settings';
+	import { map_shape } from './types/settings';
+	import { LATESTSAVEDATAVERSION } from './types/savedata'
+	import { convertSaveDataToLatest } from './lib/saveDataConverter'
 
 	/* STATE */
 
@@ -127,6 +129,8 @@ import { map_shape } from './types/settings';
 	let showSavedMaps = false;
 
 	let loading = true;
+	let saving = false;
+	let successfullySaved;
 
 	let loadedTilesets: Tileset[];
 	let loadedIconsets: Iconset[];
@@ -196,6 +200,7 @@ import { map_shape } from './types/settings';
 		selectedText: null,
 		editorRef: null,
 		usingTextTool: false,
+		contextStyleId: null
 	};
 	$: data_text.usingTextTool = selectedTool == tools.TEXT;
 
@@ -255,6 +260,7 @@ import { map_shape } from './types/settings';
 		
 		// A list of stuff that needs to happen every tool change
 		data_path.contextPathId = null
+		data_text.contextStyleId = null
 
 		selectedTool = newTool
 	}
@@ -367,7 +373,7 @@ import { map_shape } from './types/settings';
 							
 						
 						case "save":
-							saveToDexie();
+							saveInit();
 							break;
 
 						case "toggleViewMaps":
@@ -391,6 +397,7 @@ import { map_shape } from './types/settings';
 							showSettings = false;
 							showKeyboardShortcuts = false;
 							data_path.contextPathId = null;
+							data_text.contextStyleId = null;
 							break;
 
 						case "changeTool_terrain":
@@ -527,30 +534,55 @@ import { map_shape } from './types/settings';
 		loadInit(JSON.parse(JSON.stringify(DEFAULTSAVEDATA)), null);
 	}
 
-	async function saveToDexie() {
+	async function saveInit() {
+		// = asyncExtract(app, offsetContainer)
 		if (loadedSave.title == '') {
 			let t = prompt('Map Title:');
 			if (t != null) {
 				loadedSave.title = t;
 			} else {
 				alert('Cancelled save');
+				saving = false;
 				return;
 			}
 		}
+		//console.log("What")
+		saving = true;
+	}
+
+	async function asyncExtract(app, container): Promise<string> {
+		await null;
+		return new Promise(r => r(app.renderer.plugins.extract.base64(container)));
+
+	}
+
+	async function saveToDexie() {
+
 
 		console.log(loadedSave);
 
 		let c = JSON.stringify(loadedSave);
-		let p = app.renderer.plugins.extract.base64(offsetContainer);
+
+		let p
+
+		let p1 = asyncExtract(app, offsetContainer).catch(error => {
+			console.log("Oh no")
+			
+			p = ""
+		}).then(r => p = r)
+
+		await p1;
+
+
 
 		if (loadedId) {
-			const id = await db.mapSaves.update(loadedId, {
+			db.mapSaves.update(loadedId, {
 				mapTitle: loadedSave.title,
 				previewBase64: p,
 				saveVersion: loadedSave.saveVersion
 			});
 
-			await db.mapStrings.update(loadedId, {
+			db.mapStrings.update(loadedId, {
 				mapString: c,
 			});
 
@@ -570,13 +602,17 @@ import { map_shape } from './types/settings';
 			loadedId = Number(id);
 		}
 
-		alert('Saved');
+		saving = false
+
 	}
 
 	function loadInit(data: save_data, id: number | null) {
 		// Clean up
 		console.log(`Loaded ${id}`);
 		loading = true;
+
+		// Deal with outdated save data
+		if (data.saveVersion < LATESTSAVEDATAVERSION) data = convertSaveDataToLatest(data);
 
 		dataToLoad = {data: data, id: id}
 		appState = app_state.LOADINGMAP
@@ -658,7 +694,9 @@ import { map_shape } from './types/settings';
 			})
 
 
-			await tick();
+			appState = app_state.NORMAL;
+			//loading = true;
+			//await tick();
 
 			// Final Layer Setup
 			//comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
@@ -672,7 +710,7 @@ import { map_shape } from './types/settings';
 
 			// Jolt all the layers that respond to the data into place. Without this the text, icons and paths kinda get stuck. It's odd. Warrants further investigation.
 			loadedSave = loadedSave;
-			appState = app_state.NORMAL;
+			loading = false;
 		});
 
 		/* Set up tools - would be nice to remember tool settings but this works regardless of loaded tileset */
@@ -721,8 +759,17 @@ import { map_shape } from './types/settings';
 />
 
 {#if appState == app_state.NORMAL}
-	
 
+
+	{#if saving}
+		<div id="save-indicator">
+			<img 
+				src="../public/assets/img/site/hexfriend.png" 
+				on:load={() => { setTimeout(() => {saveToDexie()}, 30) }}
+				alt={"Saving..."}>
+				<p>Saving...</p>
+		</div>
+	{/if}
 
 	<main
 		on:contextmenu|preventDefault={(e) => {}}
@@ -824,7 +871,7 @@ import { map_shape } from './types/settings';
 
 	<div id="setting-buttons">
 		<div id="save-buttons">
-			<button on:click={saveToDexie} title={'Save'}> <img src="assets/img/tools/save.png" alt="Save" /> </button>
+			<button on:click={saveInit} title={'Save'}> <img src="assets/img/tools/save.png" alt="Save" /> </button>
 		</div>
 		<button
 			on:click={() => {
@@ -895,8 +942,12 @@ import { map_shape } from './types/settings';
 
 {:else if appState == app_state.LOADINGMAP}
 
-		<img src="../public/assets/img/site/hexfriend.png" on:load={ () => { console.log("Loading save now"); loadSave( dataToLoad.data, dataToLoad.id ) } }/>
-
+	<div id="loading-screen">
+		<img 
+		src="../public/assets/img/site/hexfriend.png" 
+		alt={"Loading"} 
+		on:load={ () => { setTimeout( () => {loadSave( dataToLoad.data, dataToLoad.id )}, 30 ) } }/>
+	</div>
 
 
 {/if}
@@ -910,6 +961,8 @@ import { map_shape } from './types/settings';
 		width: 100%;
 		height: 100%;
 		overflow: hidden;
+
+		--hexfriend-green: #8cc63f;
 		
 	}
 
@@ -933,6 +986,56 @@ import { map_shape } from './types/settings';
 	:global(#app) {
 		height: 100%;
 		width: 100%;
+	}
+
+	#loading-screen {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	#loading-screen img {
+		width: 50px;
+		height: 50px;
+		animation-name: spin;
+		animation-duration: 2s;
+		animation-iteration-count: infinite;
+		animation-timing-function: linear;
+	}
+
+	#save-indicator {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: rgba(0, 0, 0, 0.5);
+		position: fixed;
+		top: 0;
+		left: 0;
+		flex-direction: column;
+	}
+
+	@keyframes spin {
+		0% { rotate: 0deg; }
+		100% { rotate: 360deg; }
+	}
+
+	#save-indicator img {
+		width: 50px;
+		height: 50px;
+		animation-name: spin;
+		animation-duration: 2s;
+		animation-iteration-count: infinite;
+		animation-timing-function: linear;
+	}
+
+	#save-indicator p {
+		color: var(--hexfriend-green);
+		font-size: 20pt;
+		margin: 0;
 	}
 
 	main {

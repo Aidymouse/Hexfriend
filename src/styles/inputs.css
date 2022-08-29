@@ -165,9 +165,9 @@ input[type='range']::-moz-range-thumb {
 	display: flex;
 	flex-direction: column;
 	border: solid 1px grey;
-	gap: 10px;
 	background-color: grey;
 	border-radius: 4px;
+	position: fixed;
 }
 
 .context-menu button {

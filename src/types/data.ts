@@ -33,6 +33,7 @@ export interface text_data {
 	selectedText?: text_layer_text;
 	editorRef: any;
 	usingTextTool: boolean;
+	contextStyleId?: number;
 }
 
 export interface path_data {

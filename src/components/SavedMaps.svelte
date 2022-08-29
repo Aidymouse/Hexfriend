@@ -16,6 +16,8 @@
 	export let createNewMap: Function;
 
 	async function clickedMap(id: number) {
+		showSavedMaps = false;
+		
 		let mapString = (await db.mapStrings.get(id)).mapString;
 
 		let mapData = JSON.parse(mapString);
@@ -24,7 +26,6 @@
 		}
 
 		load(mapData, id);
-		showSavedMaps = false;
 	}
 
 	function deleteMap(id: number) {
@@ -89,12 +90,13 @@
 
 					<button
 						class="delete-button"
-						style="margin-right: 40px;"
+						style="margin-right: 35px;"
 						on:click={() => {
 							exportAsHexfriend(save.id);
 						}}
+						title={"Quick Export"}
 					>
-						Export
+						<img src="/assets/img/ui/quick export.png" alt={"Export"} />
 					</button>
 				</div>
 			
