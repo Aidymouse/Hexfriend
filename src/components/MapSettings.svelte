@@ -781,7 +781,7 @@
 
 	<h2>About</h2>
 	<p class="helperText">
-		Hexfriend version 1.2.1 – "Pretty Flowers"
+		Hexfriend version 1.2.2 – "Pretty Flowers, Rolling Hexfriend"
 		<br />
 		By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
 	</p>

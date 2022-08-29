@@ -750,7 +750,7 @@ hexfiend red: #FF6666
 		});
 	}
 
-	//createNewMap();
+	createNewMap();
 </script>
 
 <svelte:window
@@ -764,7 +764,7 @@ hexfiend red: #FF6666
 	{#if saving}
 		<div id="save-indicator">
 			<img 
-				src="../public/assets/img/site/hexfriend.png" 
+				src="../assets/img/site/hexfriend.png" 
 				on:load={() => { setTimeout(() => {saveToDexie()}, 30) }}
 				alt={"Saving..."}>
 				<p>Saving...</p>
@@ -944,7 +944,7 @@ hexfiend red: #FF6666
 
 	<div id="loading-screen">
 		<img 
-		src="../public/assets/img/site/hexfriend.png" 
+		src="../assets/img/site/hexfriend.png" 
 		alt={"Loading"} 
 		on:load={ () => { setTimeout( () => {loadSave( dataToLoad.data, dataToLoad.id )}, 30 ) } }/>
 	</div>
