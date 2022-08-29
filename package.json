@@ -21,6 +21,7 @@
 		"vite": "^2.8.0"
 	},
 	"dependencies": {
+		"@pixi/assets": "^6.5.2",
 		"@trivago/prettier-plugin-sort-imports": "^3.3.0",
 		"dexie": "^3.2.1",
 		"gh-pages": "^4.0.0",

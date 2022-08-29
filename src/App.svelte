@@ -95,7 +95,7 @@ hexfiend red: #FF6666
 		LOADINGMAP = "loadingMap"
 	}
 
-	let appState: app_state = app_state.LOADINGMAP;
+	let appState: app_state = app_state.ICONSETCREATOR;
 
 	let showSettings = false;
 	let showTerrainGenerator = false;
@@ -444,6 +444,8 @@ hexfiend red: #FF6666
 	/* KEYBOARD EVENTS */
 	function keyDown(e: KeyboardEvent) {
 
+		if (appState != app_state.NORMAL) return;
+
 		// Prevent keyboard shortcuts
 		if (e.target.type == "number" || e.target.type == "textarea" || e.target.type == "text") {
 			return;
@@ -496,6 +498,7 @@ hexfiend red: #FF6666
 	}
 	
 	function keyUp(e: KeyboardEvent) {
+		if (appState != app_state.NORMAL) return;
 		
 		if (comp_shortcutList) {
 			comp_shortcutList.keyup(e);
@@ -713,6 +716,10 @@ hexfiend red: #FF6666
 		//loadedId = id
 	}
 
+	function tilesetToAssetManifest(tileset: Tileset) {
+		
+	}
+
 	function addTilesetTextures(tileset: Tileset, loader: PIXI.Loader) {
 		tileset.tiles.forEach(async (tile) => {
 			//console.log(tile.symbol.texId)
@@ -744,7 +751,7 @@ hexfiend red: #FF6666
 		});
 	}
 
-	createNewMap();
+	//createNewMap();
 </script>
 
 <svelte:window

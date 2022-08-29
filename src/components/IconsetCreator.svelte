@@ -7,6 +7,7 @@
 	import * as PIXI from 'pixi.js';
 	import { tick } from 'svelte';
 	import { Graphics, Pixi, Sprite } from 'svelte-pixi';
+	import * as PIXI_Assets from '@pixi/assets'
 
 	let app = new PIXI.Application({
 		width: 300,
@@ -36,6 +37,7 @@
 	let previewContainer = new PIXI.Container();
 	previewContainer.addChild(previewSprite);
 
+
 	function findID(baseId: string): string {
 		let counter = 0;
 		let proposedId = `${IDify(workingIconset.name)}_${baseId}${counter == 0 ? '' : counter}`;
@@ -48,11 +50,19 @@
 		return proposedId;
 	}
 
+	let loadedTextures = {}; // Tex ID -> texture
+	let iconTextureLookupTable = {}; // Tex ID -> Tex ID in loaded textures table
+
 	function IDify(name: string): string {
 		return name.toLowerCase().replace(' ', '-');
 	}
 
 	let newIconFiles: FileList;
+
+	async function createIcon( base64 ) {
+
+	}
+
 	function newIcon() {
 		//console.log(newIconFiles)
 
@@ -61,31 +71,41 @@
 
 			r.readAsDataURL(file);
 			r.onload = async (eb) => {
-				l.reset();
 
-				l.add('s', eb.target.result);
+				// Check: has texture already been loaded?
 
-				l.load(() => {
-					let iconName = file.name.split('.')[0];
+				let iconName = file.name.split('.')[0]
+				let texId = findID(IDify(iconName));
 
-					let newIcon: Icon = {
-						display: iconName,
-						texId: findID(IDify(iconName)),
-						id: findID(IDify(iconName)),
-						color: 0xffffff,
-						pHex: 80,
-						base64: eb.target.result,
-						preview: eb.target.result,
-						texWidth: l.resources['s'].texture.width,
-						texHeight: l.resources['s'].texture.height,
-					};
+				let newTexture;
+				if (PIXI_Assets.Cache.has(r.result as string)) {
+					newTexture = PIXI_Assets.Cache.get(r.result as string)
+					iconTextureLookupTable[texId] = newTexture.textureCacheIds[1]
 
-					workingIconset.icons[workingIconset.icons.length] = newIcon;
+				} else {					
+					PIXI_Assets.Assets.add(texId, r.result as string)
+					loadedTextures[texId] = await PIXI_Assets.Assets.load(texId)
+					newTexture = loadedTextures[texId]
+					iconTextureLookupTable[texId] = texId
+				}
 
-					texId++;
 
-					selectedIcon = workingIconset.icons[workingIconset.icons.length - 1];
-				});
+				
+				let newIcon: Icon = {
+					display: iconName,
+					texId: findID(IDify(iconName)),
+					id: findID(IDify(iconName)),
+					color: 0xffffff,
+					pHex: 80,
+					base64: r.result as string,
+					preview: r.result as string,
+					texWidth: newTexture.width,
+					texHeight: newTexture.height
+				}
+
+				texId++;
+				workingIconset.icons = [...workingIconset.icons, newIcon];
+
 			};
 		});
 	}
@@ -264,7 +284,7 @@
 				/>
 
 				<Sprite
-					texture={PIXI.Texture.from(selectedIcon.base64)}
+					texture={loadedTextures[iconTextureLookupTable[selectedIcon.texId]]}
 					x={150}
 					y={150}
 					anchor={{ x: 0.5, y: 0.5 }}
