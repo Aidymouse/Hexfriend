@@ -7,13 +7,13 @@
 	import * as PIXI from 'pixi.js';
 	import { tick } from 'svelte';
 	import { Graphics, Pixi, Sprite } from 'svelte-pixi';
-
+	
 	let app = new PIXI.Application({
-		width: 300,
 		height: 300,
+		width: 300,
 		backgroundAlpha: 0,
-		transparent: true,
 	});
+
 
 	export let appState;
 
@@ -130,7 +130,7 @@
 					texWidth: loader.resources.s.texture.width,
 					texHeight: loader.resources.s.texture.height,
 					pHex: 80,
-					base64: eb.target.result,
+					base64: r.result as string,
 				};
 			});
 		};
@@ -161,7 +161,7 @@
 	function exportTileset() {
 		workingTileset.id = IDify(workingTileset.name);
 
-		download(JSON.stringify(workingTileset), workingTileset.name + '.hfts');
+		download(JSON.stringify(workingTileset), workingTileset.name + '.hfts', "application/json");
 	}
 
 	let importFiles = [];
@@ -182,10 +182,11 @@
 			/* Load textures */
 
 			workingTileset = { ...setToImport };
+			selectedTile = null;
+			
 			await tick();
 			//workingTileset.tiles = workingTileset.tiles;
 
-			selectedTile = null;
 		};
 	}
 </script>
@@ -252,27 +253,29 @@
 
 	{#if selectedTile}
 		<div id="tile-preview">
-			<Pixi {app}>
-				<Graphics
-					draw={(g) => {
-						g.clear();
-						g.beginFill(selectedTile.bgColor);
-						g.drawPolygon(getHexPathRadius(150, orientation, 150, 150));
-						g.endFill();
-					}}
-				/>
-
-				{#if selectedTile.symbol}
-					<Sprite
-						texture={PIXI.Texture.from(selectedTile.symbol.base64)}
-						x={150}
-						y={150}
-						anchor={{ x: 0.5, y: 0.5 }}
-						tint={selectedTile.symbol.color}
-						scale={getSymbolScale(selectedTile.symbol)}
+			<div id="pixi-container" style="height: 300px; width: 300px;">
+				<Pixi {app}>
+					<Graphics
+						draw={(g) => {
+							g.clear();
+							g.beginFill(selectedTile.bgColor);
+							g.drawPolygon(getHexPathRadius(150, orientation, 150, 150));
+							g.endFill();
+						}}
 					/>
-				{/if}
-			</Pixi>
+
+					{#if selectedTile.symbol}
+						<Sprite
+							texture={PIXI.Texture.from(selectedTile.symbol.base64)}
+							x={150}
+							y={150}
+							anchor={{ x: 0.5, y: 0.5 }}
+							tint={selectedTile.symbol.color}
+							scale={getSymbolScale(selectedTile.symbol)}
+						/>
+					{/if}
+				</Pixi>
+			</div>
 
 			<input
 				type="text"

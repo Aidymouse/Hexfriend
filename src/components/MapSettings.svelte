@@ -700,7 +700,7 @@
 	<h2>Tilesets</h2>
 	<div id="tilesets">
 		{#each loadedTilesets as tileset (tileset.id)}
-			<div class="loaded-tileset">
+			<div class="loaded-tileset" on:click={()=>{console.log(tileset)}}>
 				{tileset.name}
 
 				{#if tileset.id != 'default'}
@@ -736,7 +736,7 @@
 	<h2>Icon Sets</h2>
 	<div id="iconsets">
 		{#each loadedIconsets as iconset (iconset.id)}
-			<div class="loaded-tileset">
+			<div class="loaded-tileset" on:click={()=>{console.log(iconset)}}>
 				{iconset.name}
 
 				{#if iconset.id != 'default'}
@@ -795,11 +795,11 @@
 
 <style>
 	a {
-		color: #8cc63f;
+		color: var(--hexfriend-green);
 	}
 
 	a:visited {
-		color: #8cc63f;
+		color: var(--hexfriend-green);
 	}
 
 

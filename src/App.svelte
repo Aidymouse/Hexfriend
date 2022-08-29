@@ -115,7 +115,7 @@ hexfiend red: #FF6666
 	let comp_shortcutList: ShortcutList;
 
 	//offsetContainer.addChild(terrainGraphics);
-
+	
 	/* APPLICATION */
 	let app = new PIXI.Application({
 		backgroundAlpha: 0,
@@ -124,13 +124,10 @@ hexfiend red: #FF6666
 		resizeTo: window,
 	});
 
-	PIXI.settings.RESOLUTION = 4
 
 	let showSavedMaps = false;
 
-	let loading = true;
 	let saving = false;
-	let successfullySaved;
 
 	let loadedTilesets: Tileset[];
 	let loadedIconsets: Iconset[];
@@ -609,7 +606,6 @@ hexfiend red: #FF6666
 	function loadInit(data: save_data, id: number | null) {
 		// Clean up
 		console.log(`Loaded ${id}`);
-		loading = true;
 
 		// Deal with outdated save data
 		if (data.saveVersion < LATESTSAVEDATAVERSION) data = convertSaveDataToLatest(data);
@@ -695,7 +691,6 @@ hexfiend red: #FF6666
 
 
 			appState = app_state.NORMAL;
-			//loading = true;
 			//await tick();
 
 			// Final Layer Setup
@@ -710,7 +705,6 @@ hexfiend red: #FF6666
 
 			// Jolt all the layers that respond to the data into place. Without this the text, icons and paths kinda get stuck. It's odd. Warrants further investigation.
 			loadedSave = loadedSave;
-			loading = false;
 		});
 
 		/* Set up tools - would be nice to remember tool settings but this works regardless of loaded tileset */
