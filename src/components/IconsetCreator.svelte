@@ -203,6 +203,45 @@
 			selectedIcon = null;
 		};
 	}
+
+
+	/* DRAG FUNCTIONS */
+	let dragIcon: Icon;
+	let phantomIconButtonId;
+
+	function dragButton(e: DragEvent, icon: Icon) {
+		//console.log(icon);
+
+		phantomIconButtonId = icon.id
+
+		e.dataTransfer.setData("text/json", JSON.stringify(icon));
+	}
+
+
+	function dropButton(e: DragEvent) {
+		phantomIconButtonId = null;
+	}
+
+	function draggedOverButton(e: DragEvent, icon: Icon) {
+
+		if (icon.id == phantomIconButtonId) return;
+		
+		let draggedOverIndex = workingIconset.icons.indexOf(icon)
+		workingIconset.icons = workingIconset.icons.filter(i => i.id != phantomIconButtonId)
+		
+		// If phantom is on the left, switch them. Otherwise, proceed as normal
+		if (draggedOverIndex != 0 && workingIconset.icons[draggedOverIndex-1].id == phantomIconButtonId) {
+			workingIconset.icons.splice(draggedOverIndex+1, 0, JSON.parse(e.dataTransfer.getData("text/json")))
+
+		} else {
+			workingIconset.icons.splice(draggedOverIndex, 0, JSON.parse(e.dataTransfer.getData("text/json")))
+		}
+		
+		workingIconset = workingIconset
+
+
+	}
+
 </script>
 
 <main>
@@ -242,18 +281,33 @@
 			</div>
 		</div>
 
-		<div id="icon-buttons">
+		<div id="icon-buttons"
+			on:dragover={( e )=>{ e.preventDefault() }}
+			on:dragenter={( e )=>{ e.preventDefault() }}
+
+			on:drop={dropButton}
+		>
 			{#each workingIconset.icons as icon (icon.id)}
+
+
 				<button
 					class="icon-button"
 					class:selected={selectedIcon == icon}
+					style={ icon.id == phantomIconButtonId ? "opacity: 0" : "" }
 					on:click={() => {
 						selectedIcon = icon;
 					}}
+					draggable={true}
+
+					on:dragstart={(e) => { dragButton(e, icon) } }
+					on:dragenter={ (e) => { draggedOverButton(e, icon) } }
+					
 					title={icon.display}
 				>
-					<img src={icon.preview} alt="Button for {icon.display}" />
+					<img src={icon.preview} draggable="false" alt="Button for {icon.display}" />
 				</button>
+
+				
 			{/each}
 
 			<button class="icon-button file-input-button">
