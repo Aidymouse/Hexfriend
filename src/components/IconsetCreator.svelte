@@ -4,10 +4,10 @@
 	import { download } from '../lib/download2';
 	import type { Icon, Iconset } from '../types/icon';
 	import ColorInputPixi from './ColorInputPixi.svelte';
+	import * as PIXI_Assets from '@pixi/assets';
 	import * as PIXI from 'pixi.js';
 	import { tick } from 'svelte';
 	import { Graphics, Pixi, Sprite } from 'svelte-pixi';
-	import * as PIXI_Assets from '@pixi/assets'
 
 	let app = new PIXI.Application({
 		width: 300,
@@ -37,7 +37,6 @@
 	let previewContainer = new PIXI.Container();
 	previewContainer.addChild(previewSprite);
 
-
 	function findID(baseId: string): string {
 		let counter = 0;
 		let proposedId = `${IDify(workingIconset.name)}_${baseId}${counter == 0 ? '' : counter}`;
@@ -59,9 +58,7 @@
 
 	let newIconFiles: FileList;
 
-	async function createIcon( base64 ) {
-
-	}
+	async function createIcon(base64) {}
 
 	function newIcon() {
 		//console.log(newIconFiles)
@@ -71,26 +68,22 @@
 
 			r.readAsDataURL(file);
 			r.onload = async (eb) => {
-
 				// Check: has texture already been loaded?
 
-				let iconName = file.name.split('.')[0]
+				let iconName = file.name.split('.')[0];
 				let texId = findID(IDify(iconName));
 
 				let newTexture;
 				if (PIXI_Assets.Cache.has(r.result as string)) {
-					newTexture = PIXI_Assets.Cache.get(r.result as string)
-					iconTextureLookupTable[texId] = newTexture.textureCacheIds[1]
-
-				} else {					
-					PIXI_Assets.Assets.add(texId, r.result as string)
-					loadedTextures[texId] = await PIXI_Assets.Assets.load(texId)
-					newTexture = loadedTextures[texId]
-					iconTextureLookupTable[texId] = texId
+					newTexture = PIXI_Assets.Cache.get(r.result as string);
+					iconTextureLookupTable[texId] = newTexture.textureCacheIds[1];
+				} else {
+					PIXI_Assets.Assets.add(texId, r.result as string);
+					loadedTextures[texId] = await PIXI_Assets.Assets.load(texId);
+					newTexture = loadedTextures[texId];
+					iconTextureLookupTable[texId] = texId;
 				}
 
-
-				
 				let newIcon: Icon = {
 					display: iconName,
 					texId: findID(IDify(iconName)),
@@ -100,12 +93,11 @@
 					base64: r.result as string,
 					preview: r.result as string,
 					texWidth: newTexture.width,
-					texHeight: newTexture.height
-				}
+					texHeight: newTexture.height,
+				};
 
 				texId++;
 				workingIconset.icons = [...workingIconset.icons, newIcon];
-
 			};
 		});
 	}
@@ -204,7 +196,6 @@
 		};
 	}
 
-
 	/* DRAG FUNCTIONS */
 	let dragIcon: Icon;
 	let phantomIconButtonId;
@@ -212,36 +203,30 @@
 	function dragButton(e: DragEvent, icon: Icon) {
 		//console.log(icon);
 
-		phantomIconButtonId = icon.id
+		phantomIconButtonId = icon.id;
 
-		e.dataTransfer.setData("text/json", JSON.stringify(icon));
+		e.dataTransfer.setData('text/json', JSON.stringify(icon));
 	}
-
 
 	function dropButton(e: DragEvent) {
 		phantomIconButtonId = null;
 	}
 
 	function draggedOverButton(e: DragEvent, icon: Icon) {
-
 		if (icon.id == phantomIconButtonId) return;
-		
-		let draggedOverIndex = workingIconset.icons.indexOf(icon)
-		workingIconset.icons = workingIconset.icons.filter(i => i.id != phantomIconButtonId)
-		
+
+		let draggedOverIndex = workingIconset.icons.indexOf(icon);
+		workingIconset.icons = workingIconset.icons.filter((i) => i.id != phantomIconButtonId);
+
 		// If phantom is on the left, switch them. Otherwise, proceed as normal
-		if (draggedOverIndex != 0 && workingIconset.icons[draggedOverIndex-1].id == phantomIconButtonId) {
-			workingIconset.icons.splice(draggedOverIndex+1, 0, JSON.parse(e.dataTransfer.getData("text/json")))
-
+		if (draggedOverIndex != 0 && workingIconset.icons[draggedOverIndex - 1].id == phantomIconButtonId) {
+			workingIconset.icons.splice(draggedOverIndex + 1, 0, JSON.parse(e.dataTransfer.getData('text/json')));
 		} else {
-			workingIconset.icons.splice(draggedOverIndex, 0, JSON.parse(e.dataTransfer.getData("text/json")))
+			workingIconset.icons.splice(draggedOverIndex, 0, JSON.parse(e.dataTransfer.getData('text/json')));
 		}
-		
-		workingIconset = workingIconset
 
-
+		workingIconset = workingIconset;
 	}
-
 </script>
 
 <main>
@@ -281,33 +266,35 @@
 			</div>
 		</div>
 
-		<div id="icon-buttons"
-			on:dragover={( e )=>{ e.preventDefault() }}
-			on:dragenter={( e )=>{ e.preventDefault() }}
-
+		<div
+			id="icon-buttons"
+			on:dragover={(e) => {
+				e.preventDefault();
+			}}
+			on:dragenter={(e) => {
+				e.preventDefault();
+			}}
 			on:drop={dropButton}
 		>
 			{#each workingIconset.icons as icon (icon.id)}
-
-
 				<button
 					class="icon-button"
 					class:selected={selectedIcon == icon}
-					style={ icon.id == phantomIconButtonId ? "opacity: 0" : "" }
+					style={icon.id == phantomIconButtonId ? 'opacity: 0' : ''}
 					on:click={() => {
 						selectedIcon = icon;
 					}}
 					draggable={true}
-
-					on:dragstart={(e) => { dragButton(e, icon) } }
-					on:dragenter={ (e) => { draggedOverButton(e, icon) } }
-					
+					on:dragstart={(e) => {
+						dragButton(e, icon);
+					}}
+					on:dragenter={(e) => {
+						draggedOverButton(e, icon);
+					}}
 					title={icon.display}
 				>
 					<img src={icon.preview} draggable="false" alt="Button for {icon.display}" />
 				</button>
-
-				
 			{/each}
 
 			<button class="icon-button file-input-button">

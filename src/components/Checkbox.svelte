@@ -1,20 +1,24 @@
 <script lang="ts">
 	import { checkboxBase64 } from '../types/data';
-	import {createEventDispatcher} from 'svelte';
+	import { createEventDispatcher } from 'svelte';
 
 	export let checked: boolean;
 
 	export let id: string = null;
 
 	const disaptch = createEventDispatcher();
-
 </script>
 
 <span>
 	<div class="cb" class:checked>
-		<input id={id} type="checkbox" bind:checked on:change={ () => {
-			disaptch('change')
-		} } />
+		<input
+			{id}
+			type="checkbox"
+			bind:checked
+			on:change={() => {
+				disaptch('change');
+			}}
+		/>
 		{#if checked}
 			<img src={checkboxBase64} alt="check" />
 		{/if}

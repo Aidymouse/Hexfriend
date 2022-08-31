@@ -6,7 +6,7 @@
 	import type { text_data } from '../types/data';
 	import type { listed_text_style } from '../types/text';
 	import type * as PIXI from 'pixi.js';
-import { text } from 'svelte/internal';
+	import { text } from 'svelte/internal';
 
 	export let data_text: text_data;
 	export let comp_textLayer: TextLayer;
@@ -22,9 +22,9 @@ import { text } from 'svelte/internal';
 
 	export let textStyles: listed_text_style[];
 	let styleId = 0;
-	textStyles.forEach(ts => {
-		styleId = Math.max(ts.id, styleId)
-	})
+	textStyles.forEach((ts) => {
+		styleId = Math.max(ts.id, styleId);
+	});
 
 	function selectedMatches(style: listed_text_style): boolean {
 		return JSON.stringify(style) == JSON.stringify(data_text.style);
@@ -46,54 +46,59 @@ import { text } from 'svelte/internal';
 		let name = prompt('What would you like to name this text style?');
 		if (name == null) return;
 
+		styleId += 1;
 		textStyles = [...textStyles, { display: name, style: { ...data_text.style }, id: styleId }];
 	}
 
 	let menuX = 0;
 	let menuY = 0;
 
-	function updateStyle(){
-		if ( data_text.contextStyleId == null) return;
-
-		let styleToUpdate = textStyles.find(ts => ts.id == data_text.contextStyleId)
-		styleToUpdate.style = {...data_text.style}
-
-		textStyles = textStyles
-		data_text.contextStyleId = null
-	}
-
-	function renameStyle(){
+	function updateStyle() {
 		if (data_text.contextStyleId == null) return;
-		
-		let styleToEdit: listed_text_style = textStyles.find(ps => ps.id == data_text.contextStyleId)
-		data_text.contextStyleId = null
 
-		let styleName = prompt("What would you like this text style to be called?")
-		if (!styleName) return
-		
-		styleToEdit.display = styleName
-		textStyles = textStyles
+		let styleToUpdate = textStyles.find((ts) => ts.id == data_text.contextStyleId);
+		styleToUpdate.style = { ...data_text.style };
+
+		textStyles = textStyles;
+		data_text.contextStyleId = null;
 	}
-	
-	function duplicateStyle(){
-		if (data_text.contextStyleId == null) return
 
-		let styleToDupe = textStyles.find(ts => ts.id == data_text.contextStyleId)
-		styleId+=1
-		textStyles = [...textStyles, {display: styleToDupe.display, style: {...styleToDupe.style}, id: styleId}]
+	function renameStyle() {
+		if (data_text.contextStyleId == null) return;
+
+		let styleToEdit: listed_text_style = textStyles.find((ps) => ps.id == data_text.contextStyleId);
+		data_text.contextStyleId = null;
+
+		let styleName = prompt('What would you like this text style to be called?');
+		if (!styleName) return;
+
+		styleToEdit.display = styleName;
+		textStyles = textStyles;
+	}
+
+	function duplicateStyle() {
+		if (data_text.contextStyleId == null) return;
+
+		let styleToDupe = textStyles.find((ts) => ts.id == data_text.contextStyleId);
+		styleId += 1;
+		textStyles = [...textStyles, { display: styleToDupe.display, style: { ...styleToDupe.style }, id: styleId }];
 
 		data_text.contextStyleId = null;
 	}
 
-	function deleteStyle(){
-		if (!confirm("Are you sure you would like to delete this text style?")) return;
-		textStyles = textStyles.filter(ts => ts.id != data_text.contextStyleId)
+	function deleteStyle() {
+		if (!confirm('Are you sure you would like to delete this text style?')) return;
+		textStyles = textStyles.filter((ts) => ts.id != data_text.contextStyleId);
 		data_text.contextStyleId = null;
 	}
-	
 </script>
 
-<div class="panel" on:pointerdown={() => { if (data_text.contextStyleId) data_text.contextStyleId = null }}>
+<div
+	class="panel"
+	on:pointerdown={() => {
+		if (data_text.contextStyleId) data_text.contextStyleId = null;
+	}}
+>
 	<div id="controls">
 		<label for="textFill">Color</label>
 		<ColorInput bind:value={data_text.style.fill} name="textFill" />
@@ -155,7 +160,6 @@ import { text } from 'svelte/internal';
 		</div>
 	{/if}
 
-
 	<!-- TEXT STYLES -->
 	<div id="text-styles" style={data_text.selectedText ? 'padding-top: 0px' : ''}>
 		<div style="display: flex; gap: 5px; flex-wrap: wrap">
@@ -164,14 +168,12 @@ import { text } from 'svelte/internal';
 					on:click={() => {
 						changeTextStyle(ts.style);
 					}}
-
 					on:contextmenu={(e) => {
-						e.preventDefault()
-						menuX = e.clientX
-						menuY = e.clientY
-						data_text.contextStyleId = ts.id
+						e.preventDefault();
+						menuX = e.clientX;
+						menuY = e.clientY;
+						data_text.contextStyleId = ts.id;
 					}}
-
 					class:selected={selectedMatches(ts.style)}>{ts.display}</button
 				>
 			{/each}
@@ -190,14 +192,12 @@ import { text } from 'svelte/internal';
 </div>
 
 {#if data_text.contextStyleId != null}
-
-	<div class={"context-menu"} style={`top: ${menuY}px; left: ${menuX}px`}>
-		<button on:click={updateStyle} title={"Update this path style to match what is currently set above."}>Update Style</button>
-		<button on:click={renameStyle} >Rename</button>
-		<button on:click={duplicateStyle} >Duplicate</button>
-		<button on:click={deleteStyle} >Delete</button>
+	<div class={'context-menu'} style={`top: ${menuY}px; left: ${menuX}px`}>
+		<button on:click={updateStyle} title={'Update this path style to match what is currently set above.'}>Update Style</button>
+		<button on:click={renameStyle}>Rename</button>
+		<button on:click={duplicateStyle}>Duplicate</button>
+		<button on:click={deleteStyle}>Delete</button>
 	</div>
-
 {/if}
 
 <style>

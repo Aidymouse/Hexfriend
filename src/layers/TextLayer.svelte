@@ -1,12 +1,12 @@
 <script lang="ts">
+	import * as store_panning from '../stores/panning';
 	import type { text_data } from '../types/data';
+	import type { shortcut_data } from '../types/inputs';
+	import type { pan_state } from '../types/panning';
+	import type { text_layer_text } from '../types/text';
 	import * as PIXI from 'pixi.js';
 	import { Graphics, Text } from 'svelte-pixi';
-	import * as store_panning from '../stores/panning';
-	import type { pan_state } from '../types/panning';
-	import type { shortcut_data } from '../types/inputs';
-	import type { text_layer_text } from '../types/text'
-	
+
 	let pan: pan_state;
 	store_panning.store.subscribe((newPan) => {
 		pan = newPan;
@@ -34,7 +34,7 @@
 
 	export function pointerdown() {
 		data_text.contextStyleId = null;
-		
+
 		if (data_text.selectedText && hoveredText) {
 			selectText();
 			setTimeout(() => {
@@ -113,23 +113,19 @@
 	}
 
 	export function handleKeyboardShortcut(shortcutData: shortcut_data) {
-
 		switch (shortcutData.function) {
-
-			case "toggleItalics":
-				data_text.style.fontStyle = data_text.style.fontStyle == "italic" ? "normal" : "italic";
+			case 'toggleItalics':
+				data_text.style.fontStyle = data_text.style.fontStyle == 'italic' ? 'normal' : 'italic';
 				break;
 
-			case "toggleBold":
-				data_text.style.fontWeight = data_text.style.fontWeight == "bold" ? "normal" : "bold";
+			case 'toggleBold':
+				data_text.style.fontWeight = data_text.style.fontWeight == 'bold' ? 'normal' : 'bold';
 				break;
-			
-			case "deleteText":
+
+			case 'deleteText':
 				if (data_text.selectedText) deleteText(data_text.selectedText);
 				break;
-
 		}
-
 	}
 </script>
 

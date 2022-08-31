@@ -10,11 +10,15 @@
 		genHexId_coordsObj,
 		getHexPath,
 		getNeighbours,
-		getRing
+		getRing,
 	} from '../helpers/hexHelpers';
+	import * as store_panning from '../stores/panning';
+	import * as store_tfield from '../stores/tfield';
 	//import { collapseWaveGen } from '../lib/terrainGenerator';
 	import type { cube_coords } from '../types/coordinates';
 	import type { terrain_data } from '../types/data';
+	import type { shortcut_data } from '../types/inputs';
+	import type { pan_state } from '../types/panning';
 	import { map_shape } from '../types/settings';
 	import type { TerrainHex, terrain_field } from '../types/terrain';
 	import type { Tile } from '../types/tilesets';
@@ -24,11 +28,6 @@
 	import * as PIXI from 'pixi.js';
 	import { onMount } from 'svelte';
 	import { Container, Graphics } from 'svelte-pixi';
-
-	import * as store_tfield from '../stores/tfield';
-	import * as store_panning from '../stores/panning';
-	import type { pan_state } from '../types/panning';
-	import type { shortcut_data } from '../types/inputs';
 
 	let terrainGraphics = new PIXI.Graphics();
 	let symbolsContainer = new PIXI.Container();
@@ -40,14 +39,14 @@
 	store_panning.store.subscribe((newPan) => {
 		pan = newPan;
 	});
-	
+
 	export let controls;
 	export let L: PIXI.Loader;
 
 	let tfield: terrain_field;
-	store_tfield.store.subscribe(newTField => {
-		tfield = newTField
-	})
+	store_tfield.store.subscribe((newTField) => {
+		tfield = newTField;
+	});
 
 	export let comp_coordsLayer: CoordsLayer;
 
@@ -58,8 +57,6 @@
 	export function copyHex(from: TerrainHex, to: TerrainHex) {
 		to.tile = from.tile ? { ...from.tile, symbol: from.tile.symbol ? { ...from.tile.symbol } : null } : null;
 	}
-
-
 
 	/* SQUARE SHAPED MAPS */
 	export function square_updateRaisedColumn() {
@@ -249,8 +246,8 @@
 		}
 
 		store_panning.store.update(() => {
-			return pan
-		})
+			return pan;
+		});
 
 		renderAllHexes();
 	}
@@ -393,8 +390,8 @@
 		}
 
 		store_panning.store.update(() => {
-			return pan
-		})
+			return pan;
+		});
 
 		renderAllHexes();
 	}
@@ -473,68 +470,55 @@
 		}
 	}
 
-
-
 	/* FLOWER SHAPED MAPS */
 	export function flower_expandHexesOut(amount: number) {
-
 		for (let curRing = 0; curRing < amount; curRing++) {
-			tfield.hexesOut += 1
-			
-			let idsToAdd = getRing("0:0:0", tfield.hexesOut)
-	
-			idsToAdd.forEach(hexId => {
-	
-				createBlankHex( genCoordsObj(hexId) )
+			tfield.hexesOut += 1;
+
+			let idsToAdd = getRing('0:0:0', tfield.hexesOut);
+
+			idsToAdd.forEach((hexId) => {
+				createBlankHex(genCoordsObj(hexId));
 				renderHex(hexId);
-	
-			})
+			});
 		}
 
 		renderGrid();
 		comp_coordsLayer.populateBlankHexes();
-		
+
 		store_tfield.store.update(() => {
 			return tfield;
-		})
+		});
 	}
-	
+
 	export function flower_reduceHexesOut(amount) {
 		if (tfield.hexesOut == 0) return;
-		
+
 		for (let curRing = 0; curRing < amount; curRing++) {
-			
-			let idsToAdd = getRing("0:0:0", tfield.hexesOut)
-			
-			idsToAdd.forEach(hexId => {
-				
-				eliminateHex( hexId )
-				
-			})
-			
-			tfield.hexesOut -= 1
+			let idsToAdd = getRing('0:0:0', tfield.hexesOut);
+
+			idsToAdd.forEach((hexId) => {
+				eliminateHex(hexId);
+			});
+
+			tfield.hexesOut -= 1;
 		}
-		
+
 		renderAllHexes();
 		renderGrid();
 		comp_coordsLayer.cullUnusedCoordinates();
 
 		store_tfield.store.update(() => {
 			return tfield;
-		})
+		});
 	}
-
-
 
 	/* TRANSFORMATIONS THAT APPLY TO ALL MAP TYPES */
 	function createBlankHex(coords: cube_coords) {
-
-		tfield.hexes[genHexId_coordsObj(coords)] = {q: coords.q, r: coords.r, s: coords.s, tile: null}
-
+		tfield.hexes[genHexId_coordsObj(coords)] = { q: coords.q, r: coords.r, s: coords.s, tile: null };
 	}
 
 	export function changeOrientation() {
-
 		switch (tfield.mapShape) {
 			case map_shape.SQUARE:
 				square_changeOrientation();
@@ -551,31 +535,25 @@
 	}
 
 	export function changeMapShape(newMapShape: map_shape) {
-
 		switch (newMapShape) {
 			case map_shape.SQUARE:
-				square_generateBlankMap()
+				square_generateBlankMap();
 				break;
-			
+
 			case map_shape.FLOWER:
 				flower_generateBlankMap();
 				break;
 		}
-
 	}
 
-
-
 	function square_generateBlankMap() {
+		eliminateAllHexes();
 
-		eliminateAllHexes()
-		
-		
 		for (let col = 0; col < tfield.columns; col++) {
 			for (let row = 0; row < tfield.rows; row++) {
 				let cubeCoords = coords_qToCube(tfield.raised, col, row);
 
-				createBlankHex( cubeCoords );
+				createBlankHex(cubeCoords);
 			}
 		}
 
@@ -583,22 +561,17 @@
 		comp_coordsLayer.populateBlankHexes();
 		comp_coordsLayer.updateAllCoordPositions();
 
-		renderAllHexes()
-		renderGrid()
-
+		renderAllHexes();
+		renderGrid();
 	}
 
 	function flower_generateBlankMap() {
-
 		eliminateAllHexes();
 
 		for (let q = -tfield.hexesOut; q <= tfield.hexesOut; q++) {
 			for (let r = -tfield.hexesOut; r <= tfield.hexesOut; r++) {
-
-				if (q + r <= tfield.hexesOut && q+r >= -tfield.hexesOut) {
-			
-					createBlankHex( {q: q, r: r, s: -q-r} );
-
+				if (q + r <= tfield.hexesOut && q + r >= -tfield.hexesOut) {
+					createBlankHex({ q: q, r: r, s: -q - r });
 				}
 			}
 		}
@@ -609,15 +582,13 @@
 
 		renderAllHexes();
 		renderGrid();
-
 	}
 
 	function eliminateAllHexes() {
-		Object.keys(tfield.hexes).forEach( (hexId: hex_id) => {
+		Object.keys(tfield.hexes).forEach((hexId: hex_id) => {
 			eliminateHex(hexId);
-		})
+		});
 	}
-
 
 	/* RENDER FUNCTIONS */
 	function findSymbolScale(symbol: TileSymbol) {
@@ -763,9 +734,7 @@
 
 	/* CHECKS */
 	export function areAllHexesBlank(): boolean {
-
-		return null == Object.entries(tfield.hexes).find( ([id, hex]) => hex.tile != null );
-
+		return null == Object.entries(tfield.hexes).find(([id, hex]) => hex.tile != null);
 	}
 
 	function hexExists(hexId: hex_id): boolean {
@@ -841,7 +810,13 @@
 	}
 
 	export function eraseAtMouse() {
-		let clickedCoords = coords_worldToCube(store_panning.curWorldX(), store_panning.curWorldY(), tfield.orientation, tfield.hexWidth, tfield.hexHeight);
+		let clickedCoords = coords_worldToCube(
+			store_panning.curWorldX(),
+			store_panning.curWorldY(),
+			tfield.orientation,
+			tfield.hexWidth,
+			tfield.hexHeight
+		);
 
 		let clickedId = genHexId(clickedCoords.q, clickedCoords.r, clickedCoords.s);
 
@@ -873,7 +848,9 @@
 	function erasePaintbucket() {
 		// Find all like hexes, much like a paintbucket, and perform a specific operation on them, passing in hex id as a parameter
 
-		let clickedId = genHexId_coordsObj(coords_worldToCube(store_panning.curWorldX(), store_panning.curWorldY(), tfield.orientation, tfield.hexWidth, tfield.hexHeight));
+		let clickedId = genHexId_coordsObj(
+			coords_worldToCube(store_panning.curWorldX(), store_panning.curWorldY(), tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+		);
 
 		if (!hexExists(clickedId)) return;
 		if (tfield.hexes[clickedId].tile == null) return;
@@ -936,8 +913,6 @@
 		return visitedIDs;
 	}
 
-
-
 	export function pointerdown() {
 		if (data_terrain.usingEyedropper) {
 			eyedrop();
@@ -963,57 +938,52 @@
 	// KEYBOARD EVENTS
 	export function keydown(e: KeyboardEvent) {
 		switch (e.key) {
-			case ("Alt"): {
-				data_terrain.usingEyedropper = true
+			case 'Alt': {
+				data_terrain.usingEyedropper = true;
 				break;
 			}
 
-			case ("Shift"): {
-				data_terrain.usingEraser = true
+			case 'Shift': {
+				data_terrain.usingEraser = true;
 				break;
 			}
 
-			case ("Control"): {
-				data_terrain.usingPaintbucket = true
+			case 'Control': {
+				data_terrain.usingPaintbucket = true;
 				break;
 			}
 		}
-
 	}
 
 	export function keyup(e: KeyboardEvent) {
 		switch (e.key) {
-			case ("Alt"): {
-				data_terrain.usingEyedropper = false
+			case 'Alt': {
+				data_terrain.usingEyedropper = false;
 				break;
 			}
 
-			case ("Shift"): {
-				data_terrain.usingEraser = false
+			case 'Shift': {
+				data_terrain.usingEraser = false;
 				break;
 			}
 
-			case ("Control"): {
-				data_terrain.usingPaintbucket = false
+			case 'Control': {
+				data_terrain.usingPaintbucket = false;
 				break;
 			}
 		}
 	}
 
 	export function handleKeyboardShortcut(shortcutData: shortcut_data) {
-
 		switch (shortcutData.function) {
-			
-			case "toggleEraser":
-				data_terrain.usingEraser = !data_terrain.usingEraser
-				break;
-			
-			case "togglePaintbucket":
-				data_terrain.usingPaintbucket = !data_terrain.usingPaintbucket
+			case 'toggleEraser':
+				data_terrain.usingEraser = !data_terrain.usingEraser;
 				break;
 
+			case 'togglePaintbucket':
+				data_terrain.usingPaintbucket = !data_terrain.usingPaintbucket;
+				break;
 		}
-
 	}
 
 	onMount(() => {

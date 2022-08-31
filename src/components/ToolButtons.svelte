@@ -1,9 +1,6 @@
 <script lang="ts">
-	import type { path_data } from "../types/data";
-	import { tools } from "../types/toolData";
-
-
-	
+	import type { path_data } from '../types/data';
+	import { tools } from '../types/toolData';
 
 	let buttons = [
 		{ display: 'Terrain', toolCode: tools.TERRAIN },
@@ -16,8 +13,7 @@
 	export let selectedTool: string;
 	export let hexOrientation: 'flatTop' | 'pointyTop';
 
-	export let changeTool: Function
-
+	export let changeTool: Function;
 </script>
 
 <main>

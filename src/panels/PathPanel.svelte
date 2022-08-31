@@ -10,7 +10,6 @@
 	export let data_path: path_data;
 	export let comp_pathLayer: PathLayer;
 
-
 	/* Path Style Management */
 	$: {
 		if (data_path.selectedPath) {
@@ -22,18 +21,17 @@
 
 	export let pathStyles: listed_path_style[];
 
-	
 	let pathID = 0;
-	pathStyles.forEach(pathStyle => {
-		pathID = Math.max(pathID, pathStyle.id+1)
-	})
+	pathStyles.forEach((pathStyle) => {
+		pathID = Math.max(pathID, pathStyle.id + 1);
+	});
 
 	function styleMatchesData(pathStyle: PIXI.LineStyle) {
 		if (pathStyle.color != data_path.style.color) return false;
 		if (pathStyle.width != data_path.style.width) return false;
 		if (pathStyle.cap != data_path.style.cap) return false;
 		if (pathStyle.join != data_path.style.join) return false;
-		
+
 		return true;
 	}
 
@@ -42,47 +40,44 @@
 		if (name == null) return;
 
 		pathStyles = [...pathStyles, { display: name, style: { ...data_path.style }, id: pathID }];
-		pathID += 1
+		pathID += 1;
 	}
 
 	let menuX = 0;
 	let menuY = 0;
 
 	function updateStyleToMatch() {
-
 		if (data_path.contextPathId == null) return;
-		
-		let styleToEdit: listed_path_style = pathStyles.find(ps => ps.id == data_path.contextPathId)
-		
-		styleToEdit.style = {...data_path.style}
+
+		let styleToEdit: listed_path_style = pathStyles.find((ps) => ps.id == data_path.contextPathId);
+
+		styleToEdit.style = { ...data_path.style };
 		//styleToEdit = styleToEdit
-		pathStyles = pathStyles
-		
-		data_path.contextPathId = null
-		
+		pathStyles = pathStyles;
+
+		data_path.contextPathId = null;
 	}
-	
+
 	function deletePathStyle() {
 		if (data_path.contextPathId == null) return;
-		if (!confirm("Are you sure you would like to delete this path style?")) return;
-		
-		pathStyles = pathStyles.filter(ps => ps.id != data_path.contextPathId)
-		
-		data_path.contextPathId = null
+		if (!confirm('Are you sure you would like to delete this path style?')) return;
+
+		pathStyles = pathStyles.filter((ps) => ps.id != data_path.contextPathId);
+
+		data_path.contextPathId = null;
 	}
-	
+
 	function renameStyle() {
 		if (data_path.contextPathId == null) return;
-		
-		let styleToEdit: listed_path_style = pathStyles.find(ps => ps.id == data_path.contextPathId)
-		data_path.contextPathId = null
 
-		let styleName = prompt("What would you like this path style to be called?")
-		if (!styleName) return
-		
-		styleToEdit.display = styleName
-		pathStyles = pathStyles
+		let styleToEdit: listed_path_style = pathStyles.find((ps) => ps.id == data_path.contextPathId);
+		data_path.contextPathId = null;
 
+		let styleName = prompt('What would you like this path style to be called?');
+		if (!styleName) return;
+
+		styleToEdit.display = styleName;
+		pathStyles = pathStyles;
 	}
 
 	// Path Controls
@@ -92,19 +87,21 @@
 	}
 
 	function duplicateStyle() {
-		let contextPathStyle: listed_path_style = pathStyles.find(ps => ps.id == data_path.contextPathId) 
+		let contextPathStyle: listed_path_style = pathStyles.find((ps) => ps.id == data_path.contextPathId);
 
-		pathID += 1
+		pathID += 1;
 		pathStyles = [...pathStyles, { display: contextPathStyle.display, style: { ...contextPathStyle.style }, id: pathID }];
-	
-		data_path.contextPathId = null
-	}
 
+		data_path.contextPathId = null;
+	}
 </script>
 
-
-
-<div class="panel" on:pointerdown={() => { if (data_path.contextPathId) data_path.contextPathId = null }}>
+<div
+	class="panel"
+	on:pointerdown={() => {
+		if (data_path.contextPathId) data_path.contextPathId = null;
+	}}
+>
 	<div id="controls">
 		<label for="pathColor">Color</label>
 		<ColorInputPixi bind:value={data_path.style.color} id={'pathColor'} />
@@ -147,7 +144,7 @@
 		<div id="selected-path-controls">
 			<button
 				on:click={() => {
-					deselectPath()
+					deselectPath();
 				}}>Deselect Current Path</button
 			>
 			<button
@@ -164,11 +161,8 @@
 		</div>
 	{/if}
 
-
-	
 	<!-- PATH STYLES -->
-	<div id="path-styles" style={data_path.selectedPath ? 'padding-top: 0px;' : ''}>		
-
+	<div id="path-styles" style={data_path.selectedPath ? 'padding-top: 0px;' : ''}>
 		<!-- Path Style Listing -->
 		<div style="display: flex; gap: 5px; flex-wrap: wrap">
 			{#each pathStyles as pb (pb.id)}
@@ -178,11 +172,11 @@
 					}}
 					class:selected={styleMatchesData(pb.style)}
 					on:contextmenu={(e) => {
-						e.preventDefault()
+						e.preventDefault();
 						menuX = e.clientX;
 						menuY = e.clientY;
-						data_path.contextPathId = pb.id
-					}}	
+						data_path.contextPathId = pb.id;
+					}}
 				>
 					{pb.display}
 				</button>
@@ -202,9 +196,9 @@
 </div>
 
 <!-- Path Style Context Menu -->
-{#if data_path.contextPathId!=null}
-	<div class={"context-menu"} style={`top: ${menuY}px; left: ${menuX}px`}>
-		<button on:click={updateStyleToMatch} title={"Update this path style to match what is currently set above."}>Update Style</button>
+{#if data_path.contextPathId != null}
+	<div class={'context-menu'} style={`top: ${menuY}px; left: ${menuX}px`}>
+		<button on:click={updateStyleToMatch} title={'Update this path style to match what is currently set above.'}>Update Style</button>
 		<button on:click={renameStyle}>Rename</button>
 		<button on:click={duplicateStyle}>Duplicate</button>
 		<button on:click={deletePathStyle}>Delete</button>

@@ -2,24 +2,24 @@
 
 /* width */
 ::-webkit-scrollbar {
-    width: 8px;
+	width: 8px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-    display: none;
-    opacity: 0;
+	display: none;
+	opacity: 0;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background: #f2f2f2;
-    opacity: 0;
-    border-radius: 4px;
-    width: 8px;
+	background: #f2f2f2;
+	opacity: 0;
+	border-radius: 4px;
+	width: 8px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-    opacity: 1;
+	opacity: 1;
 }

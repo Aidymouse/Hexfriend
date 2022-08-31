@@ -157,8 +157,6 @@ input[type='range']::-moz-range-thumb {
 	cursor: pointer;
 }
 
-
-
 /* Custom Context Menus */
 .context-menu {
 	width: 150px;

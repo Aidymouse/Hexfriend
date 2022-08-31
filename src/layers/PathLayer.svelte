@@ -1,18 +1,17 @@
 <script lang="ts">
 	import { coords_cubeToWorld, coords_worldToCube, cube_round } from '../helpers/hexHelpers';
+	import { Vector } from '../lib/vector2d';
+	import * as store_panning from '../stores/panning';
+	import * as store_tfield from '../stores/tfield';
 	import type { path_data } from '../types/data';
+	import type { pan_state } from '../types/panning';
 	import type { path_layer_path } from '../types/path';
 	import type { terrain_field } from '../types/terrain';
 	import * as PIXI from 'pixi.js';
-	import { Container, Graphics } from 'svelte-pixi';
-	import type { tools } from 'src/types/toolData';
-
-	import * as store_tfield from '../stores/tfield';
-	import * as store_panning from '../stores/panning';
-	import type { pan_state } from '../types/panning';
-	import { Vector } from '../lib/vector2d';
 	import type { shortcut_data } from 'src/types/inputs';
-	
+	import type { tools } from 'src/types/toolData';
+	import { Container, Graphics } from 'svelte-pixi';
+
 	export let controls;
 	let pan: pan_state;
 	store_panning.store.subscribe((newPan) => {
@@ -22,10 +21,10 @@
 	export let selectedTool: tools;
 
 	let tfield: terrain_field;
-	store_tfield.store.subscribe(newTField => {
-		tfield = newTField
-	})
-	
+	store_tfield.store.subscribe((newTField) => {
+		tfield = newTField;
+	});
+
 	export let data_path: path_data;
 
 	export let paths: path_layer_path[] = [];
@@ -37,8 +36,7 @@
 		pathId++;
 	}
 
-	updatePathId()
-
+	updatePathId();
 
 	function appendPoint(path: path_layer_path, x: number, y: number) {
 		path.points = [...path.points, x, y];
@@ -59,12 +57,10 @@
 				}
 
 				appendPoint(data_path.selectedPath, pX, pY);
-
 			} else if (data_path.hoveredPath && !data_path.dontSelectPaths) {
 				data_path.selectedPath = paths[paths.indexOf(data_path.hoveredPath)];
 				data_path.style = { ...data_path.selectedPath.style };
 				data_path.hoveredPath = null;
-
 			} else {
 				addNewPath();
 			}
@@ -92,7 +88,13 @@
 		let hW = tfield.hexWidth;
 		let hH = tfield.hexHeight;
 
-		let clickedCoords = coords_worldToCube(store_panning.curWorldX(), store_panning.curWorldY(), tfield.orientation, tfield.hexWidth, tfield.hexHeight);
+		let clickedCoords = coords_worldToCube(
+			store_panning.curWorldX(),
+			store_panning.curWorldY(),
+			tfield.orientation,
+			tfield.hexWidth,
+			tfield.hexHeight
+		);
 		let centerCoords = coords_cubeToWorld(
 			clickedCoords.q,
 			clickedCoords.r,
@@ -158,26 +160,28 @@
 		//console.log(paths);
 	}
 
-
 	function pathPointsToPoints(path: path_layer_path) {
 		let points = [];
 		for (let pI = 0; pI < path.points.length; pI += 2) {
-			points.push( new Vector(path.points[pI], path.points[pI+1]) );
+			points.push(new Vector(path.points[pI], path.points[pI + 1]));
 		}
 		return points;
 	}
 
-
 	function findHitArea(path: path_layer_path) {
 		let boxWidth = 5 + path.style.width;
-		
-		if (path.points.length < 4) return new PIXI.Polygon([
-			path.points[0]-boxWidth, path.points[1]-boxWidth,
-			path.points[0]-boxWidth, path.points[1]+boxWidth,
-			path.points[0]+boxWidth, path.points[1]+boxWidth,
-			path.points[0]+boxWidth, path.points[1]-boxWidth,
-		])
 
+		if (path.points.length < 4)
+			return new PIXI.Polygon([
+				path.points[0] - boxWidth,
+				path.points[1] - boxWidth,
+				path.points[0] - boxWidth,
+				path.points[1] + boxWidth,
+				path.points[0] + boxWidth,
+				path.points[1] + boxWidth,
+				path.points[0] + boxWidth,
+				path.points[1] - boxWidth,
+			]);
 
 		let pathPoints = pathPointsToPoints(path);
 
@@ -195,45 +199,41 @@
 		let newPolyPoints = [];
 		let pointStack = [];
 
-		let firstSeg = Vector.subtract(pathPoints[1], pathPoints[0])
-		let perpFirstSegDir = new Vector(firstSeg.y, -firstSeg.x).normalize()
-		let firstPointLeft = Vector.add(pathPoints[0], Vector.multiply(perpFirstSegDir, boxWidth))
-		let firstPointRight = Vector.add(pathPoints[0], Vector.multiply(perpFirstSegDir, -boxWidth))
+		let firstSeg = Vector.subtract(pathPoints[1], pathPoints[0]);
+		let perpFirstSegDir = new Vector(firstSeg.y, -firstSeg.x).normalize();
+		let firstPointLeft = Vector.add(pathPoints[0], Vector.multiply(perpFirstSegDir, boxWidth));
+		let firstPointRight = Vector.add(pathPoints[0], Vector.multiply(perpFirstSegDir, -boxWidth));
 
-		newPolyPoints.push(firstPointLeft)
-		pointStack.push(firstPointRight)
-
+		newPolyPoints.push(firstPointLeft);
+		pointStack.push(firstPointRight);
 
 		// Find points for corners
-		for (let pI = 1; pI < pathPoints.length-1; pI++) {
-			let p1 = pathPoints[pI-1]
-			let p2 = pathPoints[pI]
-			let p3 = pathPoints[pI+1]
+		for (let pI = 1; pI < pathPoints.length - 1; pI++) {
+			let p1 = pathPoints[pI - 1];
+			let p2 = pathPoints[pI];
+			let p3 = pathPoints[pI + 1];
 
-			let lineSeg1 = Vector.subtract(p2, p1)
-			let lineSeg2 = Vector.subtract(p2, p3)
+			let lineSeg1 = Vector.subtract(p2, p1);
+			let lineSeg2 = Vector.subtract(p2, p3);
 
 			let perpLine1Dir = new Vector(lineSeg1.y, -lineSeg1.x).normalize();
 			let perpLine2Dir = new Vector(lineSeg2.y, -lineSeg2.x).normalize();
 
-			let p1Left = Vector.add(p1, Vector.multiply(perpLine1Dir, boxWidth))
-			let p1Right = Vector.add(p1, Vector.multiply(perpLine1Dir, -boxWidth))
+			let p1Left = Vector.add(p1, Vector.multiply(perpLine1Dir, boxWidth));
+			let p1Right = Vector.add(p1, Vector.multiply(perpLine1Dir, -boxWidth));
 
-			let p3Left = Vector.add(p3, Vector.multiply(perpLine2Dir, boxWidth))
-			let p3Right = Vector.add(p3, Vector.multiply(perpLine2Dir, -boxWidth))
-		
-
+			let p3Left = Vector.add(p3, Vector.multiply(perpLine2Dir, boxWidth));
+			let p3Right = Vector.add(p3, Vector.multiply(perpLine2Dir, -boxWidth));
 
 			// Find intersection Point between left lines
-			let p1LeftLine = {start: p1Left, end: Vector.add(p1Left, Vector.multiply(lineSeg1, 5))}
-			let p3RightLine = {start: p3Right, end: Vector.add(p3Right, Vector.multiply(lineSeg2, 5))}
-			let newPointLeft = findIntersectionPoint(p1LeftLine, p3RightLine)
+			let p1LeftLine = { start: p1Left, end: Vector.add(p1Left, Vector.multiply(lineSeg1, 5)) };
+			let p3RightLine = { start: p3Right, end: Vector.add(p3Right, Vector.multiply(lineSeg2, 5)) };
+			let newPointLeft = findIntersectionPoint(p1LeftLine, p3RightLine);
 
-			let p1RightLine = {start: p1Right, end: Vector.add(p1Right, Vector.multiply(lineSeg1, 5))}
-			let p3LeftLine = {start: p3Left, end: Vector.add(p3Left, Vector.multiply(lineSeg2, 5))}
-			let newPointRight = findIntersectionPoint(p1RightLine, p3LeftLine)
-			
-			
+			let p1RightLine = { start: p1Right, end: Vector.add(p1Right, Vector.multiply(lineSeg1, 5)) };
+			let p3LeftLine = { start: p3Left, end: Vector.add(p3Left, Vector.multiply(lineSeg2, 5)) };
+			let newPointRight = findIntersectionPoint(p1RightLine, p3LeftLine);
+
 			/* 
 			
 			g.lineStyle(2, 0x0000ff);
@@ -246,7 +246,6 @@
 			
 			*/
 
-
 			/*
 			g.lineStyle(2, 0x000088);
 			g.moveTo(p1RightLine.start.x, p1RightLine.start.y)
@@ -257,32 +256,29 @@
 			g.lineTo(p3RightLine.end.x, p3RightLine.end.y)
 			*/
 
-			newPolyPoints.push(newPointLeft)
-			pointStack.push(newPointRight)
-
-			
-
+			newPolyPoints.push(newPointLeft);
+			pointStack.push(newPointRight);
 		}
-		
-		let lastPoint = pathPoints[pathPoints.length-1]
-		let secondLastPoint = pathPoints[pathPoints.length-2]
 
-		let lastSeg = Vector.subtract(lastPoint, secondLastPoint)
-		let perpLastSegDir = new Vector(lastSeg.y, -lastSeg.x).normalize()
-		let lastPointLeft = Vector.add(lastPoint, Vector.multiply(perpLastSegDir, boxWidth))
-		let lastPointRight = Vector.add(lastPoint, Vector.multiply(perpLastSegDir, -boxWidth))
+		let lastPoint = pathPoints[pathPoints.length - 1];
+		let secondLastPoint = pathPoints[pathPoints.length - 2];
 
-		newPolyPoints.push(lastPointLeft)
-		pointStack.push(lastPointRight)
+		let lastSeg = Vector.subtract(lastPoint, secondLastPoint);
+		let perpLastSegDir = new Vector(lastSeg.y, -lastSeg.x).normalize();
+		let lastPointLeft = Vector.add(lastPoint, Vector.multiply(perpLastSegDir, boxWidth));
+		let lastPointRight = Vector.add(lastPoint, Vector.multiply(perpLastSegDir, -boxWidth));
+
+		newPolyPoints.push(lastPointLeft);
+		pointStack.push(lastPointRight);
 
 		while (pointStack.length > 0) {
-			newPolyPoints.push( pointStack.pop() )
+			newPolyPoints.push(pointStack.pop());
 		}
 
 		let newPolyParse = [];
-		newPolyPoints.forEach(point => {
-			if (point) newPolyParse.push(point.x, point.y)
-		})
+		newPolyPoints.forEach((point) => {
+			if (point) newPolyParse.push(point.x, point.y);
+		});
 
 		let poly = new PIXI.Polygon(newPolyParse);
 		/*
@@ -295,34 +291,36 @@
 
 	function findIntersectionPoint(line1, line2) {
 		// Check if none of the lines are of length 0
-		if ((line1.start.x === line1.end.x && line1.start.y === line1.end.y) 
-		|| (line2.start.x === line2.end.x && line2.start.y === line2.end.y)) {
-			return false
+		if ((line1.start.x === line1.end.x && line1.start.y === line1.end.y) || (line2.start.x === line2.end.x && line2.start.y === line2.end.y)) {
+			return false;
 		}
 
-		let denominator = ((line2.end.y - line2.start.y) * (line1.end.x - line1.start.x) - (line2.end.x - line2.start.x) * (line1.end.y - line1.start.y))
+		let denominator =
+			(line2.end.y - line2.start.y) * (line1.end.x - line1.start.x) - (line2.end.x - line2.start.x) * (line1.end.y - line1.start.y);
 
 		// Lines are parallel
 		if (denominator === 0) {
-			return false
+			return false;
 		}
 
-		let ua = ((line2.end.x - line2.start.x) * (line1.start.y - line2.start.y) - (line2.end.y - line2.start.y) * (line1.start.x - line2.start.x)) / denominator
-		let ub = ((line1.end.x - line1.start.x) * (line1.start.y - line2.start.y) - (line1.end.y - line1.start.y) * (line1.start.x - line2.start.x)) / denominator
+		let ua =
+			((line2.end.x - line2.start.x) * (line1.start.y - line2.start.y) - (line2.end.y - line2.start.y) * (line1.start.x - line2.start.x)) /
+			denominator;
+		let ub =
+			((line1.end.x - line1.start.x) * (line1.start.y - line2.start.y) - (line1.end.y - line1.start.y) * (line1.start.x - line2.start.x)) /
+			denominator;
 
 		// is the intersection along the segments
 		if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
-			return false
+			return false;
 		}
 
 		// Return a object with the x and y coordinates of the intersection
-		let x = line1.start.x + ua * (line1.end.x - line1.start.x)
-		let y = line1.start.y + ua * (line1.end.y - line1.start.y)
+		let x = line1.start.x + ua * (line1.end.x - line1.start.x);
+		let y = line1.start.y + ua * (line1.end.y - line1.start.y);
 
-		return {x, y}
-
+		return { x, y };
 	}
-	
 
 	export function moveAllPaths(xMod: number, yMod: number) {
 		paths.forEach((path) => {
@@ -335,26 +333,25 @@
 		paths = paths;
 	}
 
-
 	export function handleKeyboardShortcut(shortcutData: shortcut_data) {
 		switch (shortcutData.function) {
-			case "toggleSnap":
-				data_path.snap = !data_path.snap
+			case 'toggleSnap':
+				data_path.snap = !data_path.snap;
 				break;
-			
-			case "deleteLastPoint":
+
+			case 'deleteLastPoint':
 				if (data_path.selectedPath) {
 					removeLastPoint(data_path.selectedPath);
 				}
-				break;	
-			
-			case "deletePath":
+				break;
+
+			case 'deletePath':
 				if (data_path.selectedPath) {
 					deletePath(data_path.selectedPath);
 				}
 				break;
-			
-			case "deselect":
+
+			case 'deselect':
 				data_path.selectedPath = null;
 				break;
 		}
@@ -362,7 +359,7 @@
 
 	export function keydown(e: KeyboardEvent) {
 		switch (e.key) {
-			case "Shift":
+			case 'Shift':
 				data_path.dontSelectPaths = true;
 				break;
 		}
@@ -370,7 +367,7 @@
 
 	export function keyup(e: KeyboardEvent) {
 		switch (e.key) {
-			case "Shift":
+			case 'Shift':
 				data_path.dontSelectPaths = false;
 				break;
 		}
@@ -399,39 +396,31 @@
 				for (let pI = 0; pI < path.points.length; pI += 2) {
 					g.lineTo(path.points[pI], path.points[pI + 1]);
 				}
-
-				
 			}}
 		/>
-
-
 	</Container>
 {/each}
 
 {#if data_path.selectedPath}
 	<Graphics
-			draw={(g) => {
-				g.clear();
-				g.lineStyle(SELECTEDSELECTORSTYLE);
-				for (let pI = 0; pI < data_path.selectedPath.points.length; pI += 2) {
-					g.drawCircle(data_path.selectedPath.points[pI], data_path.selectedPath.points[pI + 1], 4);
-				}
-				 
-			}}
-		/>
+		draw={(g) => {
+			g.clear();
+			g.lineStyle(SELECTEDSELECTORSTYLE);
+			for (let pI = 0; pI < data_path.selectedPath.points.length; pI += 2) {
+				g.drawCircle(data_path.selectedPath.points[pI], data_path.selectedPath.points[pI + 1], 4);
+			}
+		}}
+	/>
 {/if}
-
 
 {#if data_path.hoveredPath && !data_path.dontSelectPaths}
 	<Graphics
-			draw={(g) => {
-				g.clear();
-				g.lineStyle(HOVEREDSELECTORSTYLE);
-				for (let pI = 0; pI < data_path.hoveredPath.points.length; pI += 2) {
-					g.drawCircle(data_path.hoveredPath.points[pI], data_path.hoveredPath.points[pI + 1], 3);
-				}
-			}}	
-		/>
+		draw={(g) => {
+			g.clear();
+			g.lineStyle(HOVEREDSELECTORSTYLE);
+			for (let pI = 0; pI < data_path.hoveredPath.points.length; pI += 2) {
+				g.drawCircle(data_path.hoveredPath.points[pI], data_path.hoveredPath.points[pI + 1], 3);
+			}
+		}}
+	/>
 {/if}
-
-

@@ -1,14 +1,11 @@
 <script lang="ts">
 	import { db } from '../lib/db';
-	import { liveQuery } from 'dexie';
-	import { LATESTSAVEDATAVERSION } from '../types/savedata'
-	
-	import {convertSaveDataToLatest} from '../lib/saveDataConverter'
-
 	import { download } from '../lib/download2';
+	import { convertSaveDataToLatest } from '../lib/saveDataConverter';
+	import { LATESTSAVEDATAVERSION } from '../types/savedata';
+	import { liveQuery } from 'dexie';
 
 	let saves = liveQuery(() => db.mapSaves.toArray());
-
 
 	export let showSavedMaps: boolean;
 	export let load: Function;
@@ -17,31 +14,28 @@
 
 	async function clickedMap(id: number) {
 		showSavedMaps = false;
-		
+
 		let mapString = (await db.mapStrings.get(id)).mapString;
 
 		let mapData = JSON.parse(mapString);
 		if ((await db.mapSaves.get(id)).saveVersion != LATESTSAVEDATAVERSION) {
-			mapData = convertSaveDataToLatest(mapData)
+			mapData = convertSaveDataToLatest(mapData);
 		}
 
 		load(mapData, id);
 	}
 
 	function deleteMap(id: number) {
-
-		if (!confirm("Are you sure you want to delete?")) return;
+		if (!confirm('Are you sure you want to delete?')) return;
 
 		db.mapSaves.delete(id);
 		db.mapStrings.delete(id);
 	}
 
 	async function exportAsHexfriend(id: number) {
+		let mapData = JSON.parse((await db.mapStrings.get(id)).mapString);
 
-		let mapData = JSON.parse((await db.mapStrings.get(id)).mapString)
-
-		download(JSON.stringify(mapData), `${mapData.title ? mapData.title : 'Untitled Hexfriend'}.hexfriend`, "appliation/json");
-				
+		download(JSON.stringify(mapData), `${mapData.title ? mapData.title : 'Untitled Hexfriend'}.hexfriend`, 'appliation/json');
 	}
 </script>
 
@@ -74,9 +68,7 @@
 					</div>
 
 					{#if save.saveVersion != LATESTSAVEDATAVERSION}
-					<div class="error-notification" title={"This save data is on an old version. It may fail to load."}>
-						!
-					</div>
+						<div class="error-notification" title={'This save data is on an old version. It may fail to load.'}>!</div>
 					{/if}
 
 					<button
@@ -85,7 +77,7 @@
 							deleteMap(save.id);
 						}}
 					>
-						<img src="/assets/img/tools/trash.png" alt={"Delete Map"} />
+						<img src="/assets/img/tools/trash.png" alt={'Delete Map'} />
 					</button>
 
 					<button
@@ -94,16 +86,14 @@
 						on:click={() => {
 							exportAsHexfriend(save.id);
 						}}
-						title={"Quick Export"}
+						title={'Quick Export'}
 					>
-						<img src="/assets/img/ui/quick export.png" alt={"Export"} />
+						<img src="/assets/img/ui/quick export.png" alt={'Export'} />
 					</button>
 				</div>
-			
 			{/each}
-
 		{:else}
-				<p>Loading...</p>
+			<p>Loading...</p>
 		{/if}
 
 		<button
@@ -112,7 +102,7 @@
 				showSavedMaps = false;
 			}}
 		>
-			<img src="/assets/img/tools/close.png" alt={"Close Screen"} />
+			<img src="/assets/img/tools/close.png" alt={'Close Screen'} />
 		</button>
 	</div>
 </div>
@@ -151,9 +141,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-
 	}
-
 
 	#new-map-button {
 		border: solid 1px grey;
@@ -251,12 +239,10 @@
 		transition-duration: 0.2s;
 	}
 
-	
-	
 	.delete-button img {
 		width: 70%;
 	}
-	
+
 	.export-button {
 	}
 
@@ -271,7 +257,7 @@
 		transition-duration: 0.2s;
 		margin-left: -5px;
 		margin-top: -5px;
-		box-shadow: 5px 5px 15px #000000 ;
+		box-shadow: 5px 5px 15px #000000;
 	}
 
 	.image-container {

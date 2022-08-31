@@ -9,7 +9,7 @@ ghpages.publish(
 			name: 'Aidymouse', // update to use your name
 			email: 'aidan@thewizardscat.co.nz', // Update to use your email
 		},
-		message: "GH Pages Script"
+		message: 'GH Pages Script',
 	},
 	() => {
 		console.log('Deploy Complete!');

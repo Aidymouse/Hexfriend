@@ -2,6 +2,7 @@
 	// Small random bug that i'll come investigate later: if you change orientation, then raised col/indented row, then change orientation again, hex at (col.row) (1.0) or (1.1) will be duplicated??
 	import { coords_cubeToWorld, genHexId } from '../helpers/hexHelpers';
 	import { coords_cubeToq, coords_cubeTor } from '../helpers/hexHelpers';
+	import * as store_tfield from '../stores/tfield';
 	import { coord_system } from '../types/coordinates';
 	import type { coordinates_data } from '../types/data';
 	import type { TerrainHex, terrain_field } from '../types/terrain';
@@ -9,8 +10,6 @@
 	import * as PIXI from 'pixi.js';
 	import { onMount } from 'svelte';
 	import { Container, Text } from 'svelte-pixi';
-
-	import * as store_tfield from '../stores/tfield'
 
 	interface coordText {
 		pixiText: PIXI.Text;
@@ -28,10 +27,10 @@
 	let cont_textContainer = new PIXI.Container();
 
 	let tfield: terrain_field;
-	store_tfield.store.subscribe(newTField => {
-		tfield = newTField
-	})
-	
+	store_tfield.store.subscribe((newTField) => {
+		tfield = newTField;
+	});
+
 	export let data_coordinates: coordinates_data;
 
 	function breakDownHexID(hexId: hex_id) {
@@ -119,7 +118,7 @@
 
 				return {
 					parts: [idParts.col, idParts.row],
-					text: `${parts[0] < 10 ? 0 : ""}${parts[0]}${data_coordinates.seperator}${parts[1] < 10 ? 0 : ""}${parts[1]}`,
+					text: `${parts[0] < 10 ? 0 : ''}${parts[0]}${data_coordinates.seperator}${parts[1] < 10 ? 0 : ''}${parts[1]}`,
 				};
 			}
 

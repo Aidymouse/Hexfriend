@@ -3,12 +3,12 @@ import { coord_system } from '../types/coordinates';
 import type { coordinates_data } from '../types/data';
 import type { Iconset } from '../types/icon';
 import type { save_data } from '../types/savedata';
+import { LATESTSAVEDATAVERSION } from '../types/savedata';
 import { map_shape } from '../types/settings';
 import { hex_orientation, hex_raised, terrain_field } from '../types/terrain';
 import type { Tile, Tileset } from '../types/tilesets';
 import { DEFAULTICONSET } from './defaultIconset';
 import { DEFAULTTILESET } from './defaultTileset';
-import {LATESTSAVEDATAVERSION} from '../types/savedata'
 
 let DEFAULTSAVEDATA: save_data = {
 	saveVersion: LATESTSAVEDATAVERSION,
@@ -25,12 +25,19 @@ let DEFAULTSAVEDATA: save_data = {
 
 		hexesOut: 7,
 		mapShape: map_shape.FLOWER,
-		
+
 		blankHexColor: 0xf2f2f2,
 
-		grid: { stroke: 0x333333, thickness: 2, shown: true},
+		grid: { stroke: 0x333333, thickness: 2, shown: true },
 
-		overlay: { shown: false, style: {width: 3, color: 0x333333 }, offset: {x: 0, y: 1}, diameterInHexes: 3, raised: hex_raised.EVEN, encompassEdges: false },
+		overlay: {
+			shown: false,
+			style: { width: 3, color: 0x333333 },
+			offset: { x: 0, y: 1 },
+			diameterInHexes: 3,
+			raised: hex_raised.EVEN,
+			encompassEdges: false,
+		},
 
 		hexes: {},
 	},
@@ -73,7 +80,7 @@ let DEFAULTSAVEDATA: save_data = {
 				fontStyle: 'normal',
 				fontWeight: 'normal',
 			},
-			id: 0
+			id: 0,
 		},
 		{
 			display: 'Barony',
@@ -88,7 +95,7 @@ let DEFAULTSAVEDATA: save_data = {
 				fontStyle: 'normal',
 				fontWeight: 'normal',
 			},
-			id: 1
+			id: 1,
 		},
 		{
 			display: 'City',
@@ -103,7 +110,7 @@ let DEFAULTSAVEDATA: save_data = {
 				fontStyle: 'normal',
 				fontWeight: 'normal',
 			},
-			id: 2
+			id: 2,
 		},
 		{
 			display: 'Town',
@@ -118,7 +125,7 @@ let DEFAULTSAVEDATA: save_data = {
 				fontStyle: 'normal',
 				fontWeight: 'normal',
 			},
-			id: 3
+			id: 3,
 		},
 		{
 			display: 'Village',
@@ -133,7 +140,7 @@ let DEFAULTSAVEDATA: save_data = {
 				fontStyle: 'normal',
 				fontWeight: 'normal',
 			},
-			id: 4
+			id: 4,
 		},
 		{
 			display: 'River',
@@ -148,7 +155,7 @@ let DEFAULTSAVEDATA: save_data = {
 				fontStyle: 'italic',
 				fontWeight: 'normal',
 			},
-			id: 5
+			id: 5,
 		},
 		{
 			display: 'Dungeon',
@@ -163,23 +170,21 @@ let DEFAULTSAVEDATA: save_data = {
 				fontStyle: 'normal',
 				fontWeight: 'bold',
 			},
-			id: 6
+			id: 6,
 		},
 	],
 };
 
 //console.log(JSON.stringify(DEFAULTSAVEDATA.tilesets['default']))
 
-
 // FOr testing, generate a flower shaped map
 let hexesOut = 7;
 
 for (let q = -hexesOut; q <= hexesOut; q++) {
 	for (let r = -hexesOut; r <= hexesOut; r++) {
+		if (q + r <= hexesOut && q + r >= -hexesOut) {
+			let s = -q - r;
 
-		if (q + r <= hexesOut && q+r >= -hexesOut) {
-			let s = -q-r
-	
 			DEFAULTSAVEDATA.TerrainField.hexes[genHexId(q, r, s)] = { q: q, r: r, s: s, tile: null };
 		}
 	}

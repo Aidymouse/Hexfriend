@@ -39,7 +39,7 @@ export interface text_data {
 export interface path_data {
 	selectedPath?: path_layer_path;
 	hoveredPath?: path_layer_path;
-	dontSelectPaths: boolean
+	dontSelectPaths: boolean;
 	snap: boolean;
 	style: PIXI.LineStyle;
 	contextPathId?: number;

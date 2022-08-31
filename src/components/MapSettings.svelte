@@ -7,18 +7,17 @@
 	import type PathLayer from '../layers/PathLayer.svelte';
 	import type TerrainLayer from '../layers/TerrainLayer.svelte';
 	import type TextLayer from '../layers/TextLayer.svelte';
+	import * as store_tfield from '../stores/tfield';
 	import { coord_system } from '../types/coordinates';
 	import type { coordinates_data, terrain_data, trace_data } from '../types/data';
 	import type { Iconset } from '../types/icon';
 	import type { save_data } from '../types/savedata';
 	import { map_shape } from '../types/settings';
 	import { hex_orientation, terrain_field } from '../types/terrain';
-	import {hex_raised} from '../types/terrain';
+	import { hex_raised } from '../types/terrain';
 	import type { Tileset } from '../types/tilesets';
 	import type * as PIXI from 'pixi.js';
 
-	import * as store_tfield from '../stores/tfield';
-	
 	export let loadedSave: save_data;
 	export let showSettings: boolean;
 	export let appState;
@@ -27,12 +26,14 @@
 	export let exportMap: Function;
 
 	let tfield: terrain_field;
-	store_tfield.store.subscribe(newTField => {
-		tfield = newTField
-	})
+	store_tfield.store.subscribe((newTField) => {
+		tfield = newTField;
+	});
 
-	$: store_tfield.store.update(() => {return tfield})
-	
+	$: store_tfield.store.update(() => {
+		return tfield;
+	});
+
 	export let comp_terrainLayer: TerrainLayer;
 	export let renderAllHexes: Function;
 	export let renderGrid: Function;
@@ -56,7 +57,7 @@
 
 	export let load: Function;
 
-	let retainIconPosition: boolean = true
+	let retainIconPosition: boolean = true;
 
 	let exportType: 'Export As...' | 'image/png' | 'application/json' = 'Export As...';
 
@@ -229,34 +230,25 @@
 	}
 
 	function flower_expandHexesOut(amount) {
-
-		comp_terrainLayer.flower_expandHexesOut(amount)
+		comp_terrainLayer.flower_expandHexesOut(amount);
 	}
 
 	function flower_reduceHexesOut(amount) {
-		comp_terrainLayer.flower_reduceHexesOut(amount)
-		
-
+		comp_terrainLayer.flower_reduceHexesOut(amount);
 	}
 
 	function changeMapShape() {
-
 		// TODO: Update zoom when map shape is changed
 
 		if (comp_terrainLayer.areAllHexesBlank()) {
-
-			comp_terrainLayer.changeMapShape( tfield.mapShape )
-			
+			comp_terrainLayer.changeMapShape(tfield.mapShape);
 		} else {
-			
-			let changeConfirm = confirm("Are you sure? Changing shape will erase all hexes.")
-			
+			let changeConfirm = confirm('Are you sure? Changing shape will erase all hexes.');
+
 			if (changeConfirm) {
-				comp_terrainLayer.changeMapShape( tfield.mapShape )
-			} 
-
+				comp_terrainLayer.changeMapShape(tfield.mapShape);
+			}
 		}
-
 	}
 
 	let mapImportFiles: FileList;
@@ -273,10 +265,10 @@
 	}
 
 	$: {
-		tfield = tfield
-		store_tfield.store.update(newTfield => {
-			return tfield
-		})
+		tfield = tfield;
+		store_tfield.store.update((newTfield) => {
+			return tfield;
+		});
 	}
 </script>
 
@@ -333,7 +325,7 @@
 	<div class="settings-grid">
 		<label for="showGrid">Show Grid</label>
 		<!-- Weird bug where the grid wont render if you turn it off then resize the hex flower map ?? -->
-		<Checkbox bind:checked={tfield.grid.shown} id={'showGrid'} on:change={ comp_terrainLayer.renderGrid } />
+		<Checkbox bind:checked={tfield.grid.shown} id={'showGrid'} on:change={comp_terrainLayer.renderGrid} />
 		{#if tfield.grid.shown}
 			<label for="gridThickness">Grid Thickness</label>
 			<input
@@ -355,22 +347,16 @@
 		{/if}
 
 		<!-- PLACEHOLDER to give distance between the overlay and grid options -->
-		<div style="height: 10px;"></div>
-		<div></div>
-
-
+		<div style="height: 10px;" />
+		<div />
 
 		<!-- OVERLAY -->
 		<label for="showOverlay">Big Hex Overlay</label>
-		<Checkbox 
-			bind:checked={tfield.overlay.shown}
-			id="showOverlay"
-		/>
+		<Checkbox bind:checked={tfield.overlay.shown} id="showOverlay" />
 
 		{#if tfield.overlay.shown}
-
 			<label for="overlayDiameter">Overlay Size</label>
-			<input type="number" id="overlayDiameter" min={2} bind:value={tfield.overlay.diameterInHexes}>
+			<input type="number" id="overlayDiameter" min={2} bind:value={tfield.overlay.diameterInHexes} />
 
 			<label for="overlayColor">Color</label>
 			<ColorInputPixi id={'overlayColor'} bind:value={tfield.overlay.style.color} />
@@ -379,41 +365,24 @@
 			<input type="number" id={'overlayThickness'} bind:value={tfield.overlay.style.width} />
 
 			<label for="overlayOffsetX" title="Measured in Hex Widths">Horizontal Offset</label>
-			<input type="number" 
-				bind:value={ tfield.overlay.offset.x }
-				min={0}
-				step={0.25}
-			>
+			<input type="number" bind:value={tfield.overlay.offset.x} min={0} step={0.25} />
 
 			<label for="overlayOffsetY" title="Measured in Hex Heights">Vertical Offset</label>
-			<input type="number" 
-				bind:value={ tfield.overlay.offset.y }
-				min={0}
-				step={0.25}
-			>
+			<input type="number" bind:value={tfield.overlay.offset.y} min={0} step={0.25} />
 
 			<label for="overlayEncompass">Encompass Map Edges</label>
-			<Checkbox bind:checked={tfield.overlay.encompassEdges}
-			id="overlayEncompass" />
+			<Checkbox bind:checked={tfield.overlay.encompassEdges} id="overlayEncompass" />
 
-			<p> { tfield.orientation == hex_orientation.FLATTOP ? "Overlay Raised Column" : 'Overlay Indented Row' } </p>
+			<p>{tfield.orientation == hex_orientation.FLATTOP ? 'Overlay Raised Column' : 'Overlay Indented Row'}</p>
 			<div style={'height: 100%; display: flex; align-items: center;'}>
-			<SelectGrid
-				values={['even', 'odd']}
-				filenamePrefix={tfield.orientation == hex_orientation.FLATTOP ? 'overlayraisedcolumn' : 'overlayindentedrow'}
-				bind:value={tfield.overlay.raised}
-			/>
+				<SelectGrid
+					values={['even', 'odd']}
+					filenamePrefix={tfield.orientation == hex_orientation.FLATTOP ? 'overlayraisedcolumn' : 'overlayindentedrow'}
+					bind:value={tfield.overlay.raised}
+				/>
 			</div>
-
 		{/if}
-
-		
-
-		
-
 	</div>
-
-
 
 	<!-- HEXES -->
 	<h2>Hexes</h2>
@@ -458,16 +427,14 @@
 			id="hexWidth"
 			type="number"
 			bind:value={tfield.hexWidth}
-			
 			on:focus={() => {
-				comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight)
+				comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
 			}}
-
 			on:change={() => {
 				redrawEntireMap();
 				comp_coordsLayer.updateAllCoordPositions();
-				if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize(tfield.hexWidth, tfield.hexHeight)
-				comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight)
+				if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize(tfield.hexWidth, tfield.hexHeight);
+				comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
 			}}
 		/>
 
@@ -477,17 +444,15 @@
 			type="number"
 			bind:value={tfield.hexHeight}
 			on:focus={() => {
-				comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight)
+				comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
 			}}
 			on:change={() => {
 				redrawEntireMap();
 				comp_coordsLayer.updateAllCoordPositions();
-				if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize(tfield.hexWidth, tfield.hexHeight)
-				comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight)
+				if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize(tfield.hexWidth, tfield.hexHeight);
+				comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
 			}}
 		/>
-
-		
 
 		<!--
         <label for="mapShape">Map Type</label>
@@ -525,34 +490,30 @@
 					/>
 				</div>
 			{/if}
-
 		{/if}
-		
+
 		<label for="retainIcon" title="Icons will atempt to remain in their hex when transformations occur">Retain Icon Position</label>
 		<Checkbox bind:checked={retainIconPosition} id="retainIcon" />
-	
 	</div>
-
-
 
 	<!-- DIMENSIONS AND SHAPE -->
 	<h2>Map Dimensions</h2>
 
 	<div class="settings-grid" style="margin-bottom: 5px;">
 		<label for="mapShape">Map Shape</label>
-		
-		<select bind:value={tfield.mapShape} on:change={() => { changeMapShape() }}>
-			
+
+		<select
+			bind:value={tfield.mapShape}
+			on:change={() => {
+				changeMapShape();
+			}}
+		>
 			<option value={map_shape.SQUARE}>Square</option>
 			<option value={map_shape.FLOWER}>Hex Flower</option>
-
 		</select>
-		
 	</div>
 
-
 	{#if tfield.mapShape == map_shape.SQUARE}
-
 		<section id="map-dimensions-container">
 			<div id="map-dimensions">
 				{#if addOrRemoveMapDimensions == 'add'}
@@ -586,7 +547,11 @@
 							addOrRemoveMapDimensions = 'remove';
 						}}
 					>
-						<img src={`/assets/img/tools/addHex_${tfield.orientation == 'flatTop' ? 'ft' : 'pt'}.png`} alt={'Add Hex'} title={'Add Hex'} />
+						<img
+							src={`/assets/img/tools/addHex_${tfield.orientation == 'flatTop' ? 'ft' : 'pt'}.png`}
+							alt={'Add Hex'}
+							title={'Add Hex'}
+						/>
 					</button>
 				{:else}
 					<button
@@ -628,19 +593,23 @@
 				{/if}
 			</div>
 		</section>
-
 	{:else if tfield.mapShape == map_shape.FLOWER}
 		<section id="flower-dimensions-container">
-
 			<p>Hexes out from center</p>
 			<div id="flower-dimensions-controls-grid">
-				<button on:click={()=>{ flower_reduceHexesOut(1) }}>-</button>
+				<button
+					on:click={() => {
+						flower_reduceHexesOut(1);
+					}}>-</button
+				>
 				<div id="counter-container">{tfield.hexesOut}</div>
-				<button on:click={()=>{ flower_expandHexesOut(1) }}>+</button>
+				<button
+					on:click={() => {
+						flower_expandHexesOut(1);
+					}}>+</button
+				>
 			</div>
-
 		</section>
-
 	{/if}
 
 	<h2 style="margin-bottom: 0px;">Coordinates</h2>
@@ -700,7 +669,12 @@
 	<h2>Tilesets</h2>
 	<div id="tilesets">
 		{#each loadedTilesets as tileset (tileset.id)}
-			<div class="loaded-tileset" on:click={()=>{console.log(tileset)}}>
+			<div
+				class="loaded-tileset"
+				on:click={() => {
+					console.log(tileset);
+				}}
+			>
 				{tileset.name}
 
 				{#if tileset.id != 'default'}
@@ -736,7 +710,12 @@
 	<h2>Icon Sets</h2>
 	<div id="iconsets">
 		{#each loadedIconsets as iconset (iconset.id)}
-			<div class="loaded-tileset" on:click={()=>{console.log(iconset)}}>
+			<div
+				class="loaded-tileset"
+				on:click={() => {
+					console.log(iconset);
+				}}
+			>
 				{iconset.name}
 
 				{#if iconset.id != 'default'}
@@ -781,7 +760,7 @@
 
 	<h2>About</h2>
 	<p class="helperText">
-		Hexfriend version 1.2.2 – "Pretty Flowers, Rolling Hexfriend"
+		Hexfriend version 1.2.3 – "Pretty Flowers, Rolling Hexfriend"
 		<br />
 		By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
 	</p>
@@ -802,8 +781,6 @@
 		color: var(--hexfriend-green);
 	}
 
-
-
 	#flower-dimensions-controls-grid {
 		display: grid;
 		grid-template-columns: 60px 1fr 60px;
@@ -815,8 +792,6 @@
 		width: 100%;
 		display: flex;
 		justify-content: center;
-		
-
 	}
 
 	#flower-dimensions-controls-grid button {
@@ -831,7 +806,6 @@
 		align-items: center;
 		font-size: 20px;
 	}
-
 
 	#export-map-select {
 		border: solid 1px #777777;

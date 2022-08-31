@@ -86,23 +86,18 @@
 		if (data_text.selectedText) {
 			c_text.leftMouse = 'Deselect Text';
 		}
-
 	}
-
 
 	let c_eraser = {
-		leftMouse: 'Erase Terrain + Icons'
-
-		
-	}
+		leftMouse: 'Erase Terrain + Icons',
+	};
 
 	function setTooltips_eraser() {
-		c_eraser.leftMouse = 'Erase Terrain + Icons'
+		c_eraser.leftMouse = 'Erase Terrain + Icons';
 
-		if (data_eraser.ignoreIcons && data_eraser.ignoreTerrain) c_eraser.leftMouse = "Erase Nothing!";
+		if (data_eraser.ignoreIcons && data_eraser.ignoreTerrain) c_eraser.leftMouse = 'Erase Nothing!';
 		else if (data_eraser.ignoreIcons) c_eraser.leftMouse = 'Erase Only Terrain';
 		else if (data_eraser.ignoreTerrain) c_eraser.leftMouse = 'Erase Only Icons';
-
 	}
 
 	$: {
@@ -135,7 +130,7 @@
 			case tools.TEXT:
 				setTooltips_text();
 				break;
-			
+
 			case tools.ERASER:
 				setTooltips_eraser();
 				break;
@@ -144,7 +139,6 @@
 </script>
 
 <span>
-	
 	<div class="control">
 		<p>Right Mouse</p>
 		<p>Pan</p>

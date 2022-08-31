@@ -8,7 +8,7 @@ export interface path_layer_path {
 }
 
 export interface listed_path_style {
-	id: number
+	id: number;
 	display: string;
 	style: PIXI.LineStyle;
 }

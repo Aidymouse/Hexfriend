@@ -7,13 +7,13 @@ export type hexOrientation = 'flatTop' | 'pointyTop';
 type cubeCoords = { q: number; r: number; s: number };
 
 const hexDirVectors: cube_coords[] = [
-	{q: 1, r: 0, s: -1},
-	{q: 1, r: -1, s: 0},
-	{q: 0, r: -1, s: 1},
-	{q: -1, r: 0, s: 1},
-	{q: -1, r: 1, s: 0},
-	{q: 0, r: 1, s: -1},
-]
+	{ q: 1, r: 0, s: -1 },
+	{ q: 1, r: -1, s: 0 },
+	{ q: 0, r: -1, s: 1 },
+	{ q: -1, r: 0, s: 1 },
+	{ q: -1, r: 1, s: 0 },
+	{ q: 0, r: 1, s: -1 },
+];
 
 export function getHexPath(
 	width: number,
@@ -55,8 +55,6 @@ export function getHexPath(
 	}
 }
 
-
-
 export function getHexPathRadius(radius: number, orientation: hexOrientation = 'flatTop', centerX: number = 0, centerY: number = 0): number[] {
 	let w: number, h: number;
 	if (orientation == 'pointyTop') {
@@ -81,46 +79,40 @@ export function genHexId_coordsObj(coords: cubeCoords): hex_id {
 }
 
 export function genCoordsObj(hexId: hex_id): cube_coords {
-	let idParts = hexId.split(":")
+	let idParts = hexId.split(':');
 
 	return {
 		q: parseInt(idParts[0]),
 		r: parseInt(idParts[1]),
-		s: parseInt(idParts[2])
-	}
+		s: parseInt(idParts[2]),
+	};
 }
 
 /* NEIGHBOURS */
 export function getRing(centerId: hex_id, radius: number): hex_id[] {
+	let firstHexCoords = cube_add(genCoordsObj(centerId), cube_scale(hexDirVectors[4], radius));
 
-	let firstHexCoords = cube_add(genCoordsObj(centerId), cube_scale(hexDirVectors[4], radius))
+	let curHexCoords = firstHexCoords;
 
+	let ringHexIds = [];
 
-	let curHexCoords = firstHexCoords
-	
-	let ringHexIds = []
-	
-	for (let i=0; i<6; i++){
-		let currentHexDir = hexDirVectors[i]
-		for (let j=0; j<radius; j++) {
-			
-				ringHexIds.push( genHexId_coordsObj(curHexCoords) )
-				curHexCoords = cube_add(curHexCoords, currentHexDir)
-
+	for (let i = 0; i < 6; i++) {
+		let currentHexDir = hexDirVectors[i];
+		for (let j = 0; j < radius; j++) {
+			ringHexIds.push(genHexId_coordsObj(curHexCoords));
+			curHexCoords = cube_add(curHexCoords, currentHexDir);
 		}
 	}
 
-	return ringHexIds
-
-
+	return ringHexIds;
 }
 
 function cube_scale(coords: cube_coords, scale: number): cube_coords {
-	return { q: coords.q * scale, r: coords.r * scale, s: coords.s * scale}
+	return { q: coords.q * scale, r: coords.r * scale, s: coords.s * scale };
 }
 
-function cube_add( c1: cube_coords, c2: cube_coords ): cube_coords {
-	return { q: c1.q + c2.q, r: c1.r + c2.r, s: c1.s + c2.s }
+function cube_add(c1: cube_coords, c2: cube_coords): cube_coords {
+	return { q: c1.q + c2.q, r: c1.r + c2.r, s: c1.s + c2.s };
 }
 
 export function getNeighbours(q: number, r: number, s: number): string[] {

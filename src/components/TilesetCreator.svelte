@@ -3,17 +3,16 @@
 	import type { hexOrientation } from '../helpers/hexHelpers';
 	import { getHexPathRadius } from '../helpers/hexHelpers';
 	import { download } from '../lib/download2';
-	import type { Tile, Tileset, TileSymbol } from '../types/tilesets';
+	import type { Tile, TileSymbol, Tileset } from '../types/tilesets';
 	import * as PIXI from 'pixi.js';
 	import { tick } from 'svelte';
 	import { Graphics, Pixi, Sprite } from 'svelte-pixi';
-	
+
 	let app = new PIXI.Application({
 		height: 300,
 		width: 300,
 		backgroundAlpha: 0,
 	});
-
 
 	export let appState;
 
@@ -161,7 +160,7 @@
 	function exportTileset() {
 		workingTileset.id = IDify(workingTileset.name);
 
-		download(JSON.stringify(workingTileset), workingTileset.name + '.hfts', "application/json");
+		download(JSON.stringify(workingTileset), workingTileset.name + '.hfts', 'application/json');
 	}
 
 	let importFiles = [];
@@ -183,10 +182,9 @@
 
 			workingTileset = { ...setToImport };
 			selectedTile = null;
-			
+
 			await tick();
 			//workingTileset.tiles = workingTileset.tiles;
-
 		};
 	}
 </script>

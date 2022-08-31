@@ -1,6 +1,5 @@
-import { writable } from 'svelte/store';
-
 import type { terrain_field } from 'src/types/terrain';
+import { writable } from 'svelte/store';
 
 let tfield: terrain_field;
 

@@ -1,16 +1,15 @@
 <script lang="ts">
 	import { genHexId, getNeighbours } from '../helpers/hexHelpers';
 	import { download } from '../lib/download2';
+	import * as store_tfield from '../stores/tfield';
 	import type { TerrainHex, terrain_field } from '../types/terrain';
 	import type { Tile, Tileset } from '../types/tilesets';
 
-	import * as store_tfield from '../stores/tfield';
-
 	export let loadedTilesets: Tileset[];
 	let tfield: terrain_field;
-	store_tfield.store.subscribe(newTField => {
-		tfield = newTField
-	})
+	store_tfield.store.subscribe((newTField) => {
+		tfield = newTField;
+	});
 	export let comp_terrainLayer;
 	export let showTerrainGenerator: boolean;
 
@@ -226,8 +225,6 @@
 
 		genFunction = genFunction;
 	}
-
-	
 </script>
 
 <main>
