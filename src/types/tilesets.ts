@@ -2,7 +2,7 @@
 interface Tile {
 	display: string;
 	bgColor: number;
-	id: tile_id; // ID doubles up as symbol id, but only us it as such if there is a symbol!
+	id: tile_id; // ID doubles up as symbol id, but only use it as such if there is a symbol!
 	symbol: TileSymbol | null;
 	preview: string;
 }

@@ -1,7 +1,7 @@
 import type { TerrainHex } from '../types/terrain';
 import type { hex_id } from '../types/toolData';
 import { hex2rgb } from '@pixi/utils';
-import type { cube_coords } from 'src/types/coordinates';
+import type { cube_coords } from '../types/coordinates';
 
 export type hexOrientation = 'flatTop' | 'pointyTop';
 type cubeCoords = { q: number; r: number; s: number };
@@ -76,6 +76,12 @@ export function genHexId_coordsObj(coords: cubeCoords): hex_id {
 	let r = coords.r;
 	let s = coords.s;
 	return `${q}:${r}:${s}`;
+}
+
+export function genHexId_tfieldHex(hex: TerrainHex) {
+
+	return genHexId(hex.q, hex.r, hex.s)
+
 }
 
 export function genCoordsObj(hexId: hex_id): cube_coords {

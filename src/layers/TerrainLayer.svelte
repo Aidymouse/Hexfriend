@@ -737,7 +737,7 @@
 		return null == Object.entries(tfield.hexes).find(([id, hex]) => hex.tile != null);
 	}
 
-	function hexExists(hexId: hex_id): boolean {
+	export function hexExists(hexId: hex_id): boolean {
 		return tfield.hexes[hexId] != undefined;
 	}
 

@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { genHexId, getNeighbours } from '../helpers/hexHelpers';
+import type { hex_id } from 'src/types/toolData';
+
+	import { genHexId, genHexId_tfieldHex, getNeighbours } from '../helpers/hexHelpers';
 	import { download } from '../lib/download2';
 	import * as store_tfield from '../stores/tfield';
 	import type { TerrainHex, terrain_field } from '../types/terrain';
@@ -19,6 +21,13 @@
 
 	let slowAnimation = false;
 
+	interface rule {
+		id: string
+		weight: number
+	}
+
+	type genFunction = {[key: hex_id]: rule[]}
+
 	let genFunction = {};
 	// Populate the gen function
 	loadedTilesets.forEach((tileset: Tileset) => {
@@ -29,8 +38,8 @@
 
 	function rand(min: number, max: number): number {
 		min = Math.ceil(min);
-		max = Math.floor(max);
-		return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
+		max = Math.floor(max)+1;
+		return Math.floor(Math.random() * (max - min) + min); //The maximum is now inclusive and the minimum is inclusive
 	}
 
 	function validateRuleset(rules) {
@@ -60,6 +69,10 @@
 
 		//console.log("Something fucked up!")
 		return '!!BLANK!!';
+	}
+
+	function findDomain(hexID) {
+		// The domain of a given hex is the hex ID's 
 	}
 
 	function collapseWaveGen(hexes, rules) {
@@ -160,7 +173,69 @@
 		return tileset.tiles.find((tile: Tile) => tile.id == tileId);
 	}
 
+	function standardGen(hexes, rules: genFunction) {
+
+		let visitedIds = [];
+		let seenIds = [ genHexId_tfieldHex(hexes["0:0:0"]) ]
+		// Color first hex (plains as default)
+		comp_terrainLayer.paintFromTile("0:0:0", getTileFromId("default_plains"))
+
+
+
+		while (seenIds.length > 0) {
+			let curId = seenIds.pop();
+			let curHex = hexes[curId];
+
+			// Find sum of weights of all hexes in this hexes domain
+			let curDomain = rules[curHex.tile.id]
+			let totalWeight = 0;
+			curDomain.forEach(rule => {
+				totalWeight += rule.weight
+			});
+
+			// Color each neighbour, mark as seen (if not already seen or visited), then mark self as visited
+			let neighbourIds = getNeighbours(curHex.q, curHex.r, curHex.s)
+			neighbourIds.forEach( (nId: hex_id) => {
+
+				if (!comp_terrainLayer.hexExists(nId)) return;
+
+				if (visitedIds.find(i => nId == i) != null) return;
+				if (seenIds.find(i => nId == i) != null) return;
+
+				let r = rand(0, totalWeight)
+				console.log(r);
+				let total = 0;
+
+				for (let i=0; i<curDomain.length; i++) {
+					let rule = curDomain[i]
+					if (r <= rule.weight + total) {
+
+						comp_terrainLayer.paintFromTile(nId, getTileFromId(rule.id))
+						break
+
+					} else {
+
+						total += rule.weight
+					}
+				}
+
+				seenIds.push(nId);
+
+			});
+
+			visitedIds.push(curId);
+
+		}
+			
+
+	}
+
 	function generate() {
+		standardGen(tfield.hexes, genFunction)
+		//comp_terrainLayer.renderAllHexes()
+	}
+
+	function generate2() {
 		let g = collapseWaveGen(tfield.hexes, genFunction);
 		let generatedTerrain = g.gen;
 		let o = g.order;
@@ -198,7 +273,7 @@
 
 		let r = new FileReader();
 		r.onload = (eb) => {
-			genFunction = { ...JSON.parse(eb.target.result.toString()) };
+			genFunction = { ...JSON.parse(r.result as string) };
 		};
 
 		r.readAsText(importFiles[0]);
