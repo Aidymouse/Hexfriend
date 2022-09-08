@@ -31,6 +31,7 @@ export let shortcuts: shortcut_data[] = [
 
 	// ICONs
 	{ keycode: 's', function: 'toggleSnap', tool: tools.ICON, display: 'Toggle Snapping' },
+	{ keycode: 'control', function: 'toggleDragMode', tool: tools.ICON, display: 'Drag Icon', displayKeycode: 'control (Hold)' },
 
 	// PATH
 	{ keycode: 's', function: 'toggleSnap', tool: tools.PATH, display: 'Toggle Snapping' },

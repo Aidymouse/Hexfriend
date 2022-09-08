@@ -20,7 +20,7 @@
 	import type { shortcut_data } from '../types/inputs';
 	import type { pan_state } from '../types/panning';
 	import { map_shape } from '../types/settings';
-	import type { TerrainHex, terrain_field } from '../types/terrain';
+	import { hex_raised, TerrainHex, terrain_field } from '../types/terrain';
 	import type { Tile } from '../types/tilesets';
 	import type { TileSymbol } from '../types/tilesets';
 	import type { hex_id } from '../types/toolData';
@@ -212,7 +212,7 @@
 					pan.offsetX -= tfield.hexWidth * 0.75 * pan.zoomScale * amount;
 
 					if (amount % 2 == 1) {
-						tfield.raised = tfield.raised == 'odd' ? 'even' : 'odd';
+						tfield.raised = tfield.raised == hex_raised.ODD ? hex_raised.EVEN : hex_raised.ODD;
 						square_updateRaisedColumn();
 						pan.offsetY += tfield.hexHeight * 0.5 * (tfield.raised == 'odd' ? -1 : 1) * pan.zoomScale;
 					}
@@ -236,7 +236,7 @@
 					pan.offsetY -= tfield.hexHeight * 0.75 * pan.zoomScale * amount;
 
 					if (amount % 2 == 1) {
-						tfield.raised = tfield.raised == 'odd' ? 'even' : 'odd';
+						tfield.raised = tfield.raised == hex_raised.ODD ? hex_raised.EVEN : hex_raised.ODD;
 						square_changeIndentedRow();
 						pan.offsetX += tfield.hexWidth * 0.5 * (tfield.raised == 'odd' ? -1 : 1) * pan.zoomScale;
 					}
@@ -348,7 +348,7 @@
 
 				if (tfield.orientation == 'flatTop') {
 					if (amount % 2 == 1) {
-						tfield.raised = tfield.raised == 'odd' ? 'even' : 'odd';
+						tfield.raised = tfield.raised == hex_raised.ODD ? hex_raised.EVEN : hex_raised.ODD;
 						square_updateRaisedColumn();
 					}
 

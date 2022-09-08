@@ -18,6 +18,7 @@ export interface icon_data {
 	pHex: number;
 	snapToHex: boolean;
 	usingEraser: boolean;
+	dragMode: boolean;
 }
 
 export interface coordinates_data {

@@ -165,6 +165,7 @@ hexfiend red: #FF6666
 		pHex: 80,
 		snapToHex: true,
 		usingEraser: false,
+		dragMode: false
 	};
 
 	let data_path: path_data = {
@@ -456,6 +457,11 @@ hexfiend red: #FF6666
 				break;
 			}
 
+			case tools.ICON: {
+				comp_iconLayer.keydown(e);
+				break;
+			}
+
 			case tools.PATH: {
 				comp_pathLayer.keydown(e);
 				break;
@@ -479,6 +485,11 @@ hexfiend red: #FF6666
 		switch (selectedTool) {
 			case tools.TERRAIN: {
 				comp_terrainLayer.keyup(e);
+				break;
+			}
+
+			case tools.ICON: {
+				comp_iconLayer.keyup(e);
 				break;
 			}
 

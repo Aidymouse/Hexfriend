@@ -128,6 +128,17 @@
 		>
 			<img src="/assets/img/tools/eraser.png" alt={'Eyedropper'} />
 		</button>
+
+		<button
+			id="dragmode"
+			title={'Drag Mode'}
+			on:click={() => {
+				data_icon.dragMode = !data_icon.dragMode;
+			}}
+			class:selected={data_icon.dragMode}
+		>
+			<img src="/assets/img/tools/dragmode.png" alt={'Drag'} />
+		</button>
 	</div>
 
 	<div id="buttons" class="scroll-container">
@@ -251,5 +262,14 @@
 		width: 100%;
 		height: 100%;
 		margin: 0;
+	}
+
+	#dragmode {
+		position: absolute;
+		top: 10px;
+		right: 45px;
+		width: 25px;
+		height: 25px;
+		padding: 2px;
 	}
 </style>

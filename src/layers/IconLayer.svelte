@@ -19,6 +19,8 @@
 	import { tools } from '../types/toolData';
 	import type * as PIXI from 'pixi.js';
 	import { Container, Sprite } from 'svelte-pixi';
+import type { Point } from 'pixi.js';
+
 
 	export let icons: IconLayerIcon[] = [];
 
@@ -28,6 +30,8 @@
 		pan = newPan;
 	});
 	export let selectedTool: tools;
+
+
 	export let controls;
 
 	let tfield: terrain_field;
@@ -40,6 +44,7 @@
 	export let iconTextureLookupTable: { [key: string]: string };
 
 	let floatingIcon: IconLayerIcon | null = null;
+	let draggedIcon: IconLayerIcon | null = null;
 
 	let iconId: number = 0;
 	icons.forEach((i) => (iconId = Math.max(iconId, i.id)));
@@ -51,6 +56,15 @@
 		iconId++;
 
 		if (floatingIcon) floatingIcon.scale = getIconScale();
+	}
+
+	let areIconsInteractive = false
+	$: {
+		selectedTool = selectedTool
+		data_eraser = data_eraser
+		data_icon = data_icon
+
+		areIconsInteractive = (selectedTool == 'eraser' && !data_eraser.ignoreIcons) || (selectedTool == 'icon' && data_icon.usingEraser)
 	}
 
 	function getIconScale() {
@@ -109,12 +123,14 @@
 
 	export function pointerdown() {
 		if (data_icon.usingEraser) return;
+		if (data_icon.dragMode) return;
 
 		newIcon();
 		//createFloatingIcon();
 	}
 
 	export function pointerup() {
+		draggedIcon = null;
 		if (data_icon.usingEraser) return;
 
 		//newIcon();
@@ -123,13 +139,17 @@
 
 	export function pointermove() {
 		if (floatingIcon) updateFloatingIcon();
+		if (draggedIcon) updateDraggedIcon();
+
 		cursorOnLayer = true;
+
 	}
 
 	let cursorOnLayer: boolean = false;
 	export function pointerout(e: PointerEvent) {
 		cursorOnLayer = false;
 	}
+
 
 	// Floating icons have a few bugs / polish requried:
 	// - Icon appears weirdly when icon layer is switched too, will need to update when layer is switched to
@@ -328,8 +348,88 @@
 				data_icon.usingEraser = !data_icon.usingEraser;
 				break;
 			}
+
+			// Drag mode handled by key up and key down
 		}
 	}
+
+	export function keyup(e: KeyboardEvent) {
+		switch (e.key) {
+			case 'Shift': 
+				data_icon.usingEraser = false;
+				break;
+
+			case 'Control':
+				data_icon.dragMode = false;
+				break;
+
+		}
+	}
+
+	export function keydown(e: KeyboardEvent) {
+		switch (e.key) {
+			case "Shift": 
+				data_icon.usingEraser = true;
+				break;
+
+			case 'Control':
+				data_icon.dragMode = true;
+				break;
+
+
+		}
+	}
+
+	function shouldEraseIcons(): boolean {
+		return (selectedTool == 'eraser' && !data_eraser.ignoreIcons) || data_icon.usingEraser
+	}
+
+	let dragOffsetX = 0;
+	let dragOffsetY = 0;
+	function icon_pointerdown(e: PointerEvent, icon: IconLayerIcon) {
+		if (shouldEraseIcons()) {
+			deleteIcon(icon)
+		} else if ( data_icon.dragMode && draggedIcon == null ) {
+			draggedIcon = icon
+			dragOffsetX = store_panning.curWorldX() - icon.x
+			dragOffsetY = store_panning.curWorldY() - icon.y
+		}
+	}
+
+	function icon_pointerover(e: CustomEvent<PointerEvent>, icon: IconLayerIcon) {
+
+		if (controls.mouseDown[0] && shouldEraseIcons()) deleteIcon(icon)
+	}
+
+	function updateDraggedIcon() {
+		if (data_icon.snapToHex) {
+			let mouseHexCoords = coords_worldToCube(
+				store_panning.curWorldX(),
+				store_panning.curWorldY(),
+				tfield.orientation,
+				tfield.hexWidth,
+				tfield.hexHeight
+			);
+			let iconCoords = coords_cubeToWorld(
+				mouseHexCoords.q,
+				mouseHexCoords.r,
+				mouseHexCoords.s,
+				tfield.orientation,
+				tfield.hexWidth,
+				tfield.hexHeight
+			);
+
+			draggedIcon.x = iconCoords.x;
+			draggedIcon.y = iconCoords.y;
+		} else {
+			draggedIcon.x = store_panning.curWorldX() - dragOffsetX
+			draggedIcon.y = store_panning.curWorldY() - dragOffsetY
+		}
+
+		icons = icons
+
+	}
+	
 
 	createFloatingIcon();
 </script>
@@ -343,7 +443,7 @@
 		anchor={{ x: 0.5, y: 0.5 }}
 		scale={{ x: floatingIcon.scale, y: floatingIcon.scale }}
 		alpha={0.5}
-		visible={!data_icon.usingEraser && selectedTool == tools.ICON && cursorOnLayer}
+		visible={!data_icon.usingEraser && selectedTool == tools.ICON && cursorOnLayer && !data_icon.dragMode && draggedIcon == null}
 	/>
 {/if}
 
@@ -355,12 +455,13 @@
 		tint={icon.color}
 		anchor={{ x: 0.5, y: 0.5 }}
 		scale={{ x: icon.scale, y: icon.scale }}
-		interactive={(selectedTool == 'eraser' && !data_eraser.ignoreIcons) || (selectedTool == 'icon' && data_icon.usingEraser)}
+		interactive={ true }
 		on:pointerdown={(e) => {
-			if (e.detail.data.button == 0) deleteIcon(icon);
+			icon_pointerdown(e, icon);
 		}}
 		on:pointerover={(e) => {
-			if (controls.mouseDown[0]) deleteIcon(icon);
+			icon_pointerover(e, icon);
 		}}
+		
 	/>
 {/each}
