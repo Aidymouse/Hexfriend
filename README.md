@@ -20,6 +20,17 @@ The software is free to use, copy, share, steal, whatever! Check the license fil
 Hexfriend is never finished! Here's a list of stuff to do:
 
 -   Undo
--   Hex Flower shaped maps
--   Keyboard Shortcuts
+-   Uploading a background image
+-   Some fun easter eggs
 -   More to come!
+
+### Feature List
+A list of neat things Hexfriend can do!
+
+-   Create square or flower shaped maps
+-   Easily add and remove new hexes to the edge of the map
+-   Overlay larger hexes for multi-scale maps
+-   Create, add and remove custom tiles and icons
+-   Export maps as images and proprietary hexfriend format (it's JSON) for sharing across computers 
+-   Save maps in browser
+-   Create and edit path and text styles
