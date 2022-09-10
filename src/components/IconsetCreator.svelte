@@ -30,7 +30,7 @@
 	let selectedIcon: Icon | null = null;
 
 	const l: PIXI.Loader = new PIXI.Loader();
-	let texId = 0;
+	let texId: number = 0;
 
 	let previewSprite = new PIXI.Sprite();
 	//let previewGraphics = new PIXI.Graphics()
@@ -60,6 +60,20 @@
 
 	async function createIcon(base64) {}
 
+	async function loadTexture(texId, result) {
+		let newTexture;
+		if (PIXI_Assets.Cache.has(result as string)) {
+			newTexture = PIXI_Assets.Cache.get(result as string);
+			iconTextureLookupTable[texId] = newTexture.textureCacheIds[1];
+		} else {
+			PIXI_Assets.Assets.add(texId, result as string);
+			loadedTextures[texId] = await PIXI_Assets.Assets.load(texId);
+			newTexture = loadedTextures[texId];
+			iconTextureLookupTable[texId] = texId;
+		}
+		return newTexture
+	}
+
 	function newIcon() {
 		//console.log(newIconFiles)
 
@@ -73,16 +87,7 @@
 				let iconName = file.name.split('.')[0];
 				let texId = findID(IDify(iconName));
 
-				let newTexture;
-				if (PIXI_Assets.Cache.has(r.result as string)) {
-					newTexture = PIXI_Assets.Cache.get(r.result as string);
-					iconTextureLookupTable[texId] = newTexture.textureCacheIds[1];
-				} else {
-					PIXI_Assets.Assets.add(texId, r.result as string);
-					loadedTextures[texId] = await PIXI_Assets.Assets.load(texId);
-					newTexture = loadedTextures[texId];
-					iconTextureLookupTable[texId] = texId;
-				}
+				let newTexture = loadTexture(texId, r.result);
 
 				let newIcon: Icon = {
 					display: iconName,
@@ -96,7 +101,6 @@
 					texHeight: newTexture.height,
 				};
 
-				texId++;
 				workingIconset.icons = [...workingIconset.icons, newIcon];
 			};
 		});
@@ -187,6 +191,10 @@
 			//console.log(setToImport)
 
 			/* Load textures */
+
+			setToImport.icons.forEach( (icon: Icon) => {
+				loadTexture(icon.texId, icon.base64)
+			})
 
 			workingIconset = { ...setToImport };
 			await tick();
