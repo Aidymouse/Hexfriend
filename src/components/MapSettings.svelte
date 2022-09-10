@@ -108,6 +108,12 @@
 		//data_terrain.tile = {...loadedTilesets[0].tiles[0]}
 
 		loadedTilesets = loadedTilesets.filter((ts: Tileset) => ts.id != setId);
+		loadedSave.tilesets = loadedTilesets
+	}
+
+	function removeIconset(setId: string) {
+		loadedIconsets = loadedIconsets.filter((is: Iconset) => is.id != setId);
+		loadedSave.iconsets = loadedIconsets
 	}
 
 	let iconsetFiles: FileList;
@@ -719,7 +725,9 @@
 				{iconset.name}
 
 				{#if iconset.id != 'default'}
-					<button> <img src="/assets/img/tools/trash.png" alt={'Trash'} title={'Remove Iconset'} /> </button>
+					<button on:click={() => {
+							removeIconset(iconset.id);
+						}}> <img src="/assets/img/tools/trash.png" alt={'Trash'} title={'Remove Iconset'} /> </button>
 				{/if}
 			</div>
 		{/each}
@@ -760,7 +768,7 @@
 
 	<h2>About</h2>
 	<p class="helperText">
-		Hexfriend version 1.2.3 – "Pretty Flowers, Rolling Hexfriend"
+		Hexfriend version 1.3.0 – "You're all grown up, Hexfriend!"
 		<br />
 		By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
 	</p>

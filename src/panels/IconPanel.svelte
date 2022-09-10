@@ -137,7 +137,7 @@
 			}}
 			class:selected={data_icon.dragMode}
 		>
-			<img src="/assets/img/tools/dragmode.png" alt={'Drag'} />
+			<img src="/assets/img/tools/drag.png" alt={'Drag'} />
 		</button>
 	</div>
 
