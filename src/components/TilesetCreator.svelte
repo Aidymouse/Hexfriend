@@ -187,6 +187,38 @@
 			//workingTileset.tiles = workingTileset.tiles;
 		};
 	}
+
+
+	// Dragging Code
+	let phantomTileButtonId;
+
+	function dragButton(e: DragEvent, tile: Tile) {
+		//console.log(icon);
+
+		phantomTileButtonId = tile.id;
+
+		e.dataTransfer.setData('text/json', JSON.stringify(tile));
+	}
+
+	function dropButton(e: DragEvent) {
+		phantomTileButtonId = null;
+	}
+
+	function draggedOverButton(e: DragEvent, tile: Tile) {
+		if (tile.id == phantomTileButtonId) return;
+
+		let draggedOverIndex = workingTileset.tiles.indexOf(tile);
+		workingTileset.tiles = workingTileset.tiles.filter((i) => i.id != phantomTileButtonId);
+
+		// If phantom is on the left, switch them. Otherwise, proceed as normal
+		if (draggedOverIndex != 0 && workingTileset.tiles[draggedOverIndex - 1].id == phantomTileButtonId) {
+			workingTileset.tiles.splice(draggedOverIndex + 1, 0, JSON.parse(e.dataTransfer.getData('text/json')));
+		} else {
+			workingTileset.tiles.splice(draggedOverIndex, 0, JSON.parse(e.dataTransfer.getData('text/json')));
+		}
+
+		workingTileset = workingTileset;
+	}
 </script>
 
 <main>
@@ -226,13 +258,29 @@
 			</div>
 		</div>
 
-		<div id="tile-buttons">
+		<div id="tile-buttons"
+			on:dragover={(e) => {
+				e.preventDefault();
+			}}
+			on:dragenter={(e) => {
+				e.preventDefault();
+			}}
+			on:drop={dropButton}
+		>
 			{#each workingTileset.tiles as tile (tile.id)}
 				<button
 					class="tile-button"
 					class:selected={selectedTile == tile}
+					style={tile.id == phantomTileButtonId ? 'opacity: 0' : ''}
 					on:click={() => {
 						selectedTile = tile;
+					}}
+					draggable={true}
+					on:dragstart={(e) => {
+						dragButton(e, tile);
+					}}
+					on:dragenter={(e) => {
+						draggedOverButton(e, tile);
 					}}
 					title={tile.display}
 				>

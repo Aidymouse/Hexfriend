@@ -62,6 +62,7 @@
 
 	async function loadTexture(texId, result) {
 		let newTexture;
+		// Check: has the goysloppigus texture already been loaded?
 		if (PIXI_Assets.Cache.has(result as string)) {
 			newTexture = PIXI_Assets.Cache.get(result as string);
 			iconTextureLookupTable[texId] = newTexture.textureCacheIds[1];
@@ -82,7 +83,6 @@
 
 			r.readAsDataURL(file);
 			r.onload = async (eb) => {
-				// Check: has texture already been loaded?
 
 				let iconName = file.name.split('.')[0];
 				let texId = findID(IDify(iconName));
