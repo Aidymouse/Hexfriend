@@ -59,11 +59,19 @@
 			},
 
 			{
-				display: "Drag Mode",
+				display: "Drag Icons",
 				action: function() { data_icon.dragMode = !data_icon.dragMode },
 				image: "/assets/img/tools/drag.png",
 				obj: data_icon,
 				field: "dragMode"
+			},
+
+			{
+				display: "Snap Icon",
+				action: function() { data_icon.snapToHex = !data_icon.snapToHex },
+				image: "",
+				obj: data_icon,
+				field: "snapToHex"
 			}
 		] },
 
@@ -105,7 +113,6 @@
 			</button>
 
 			<!-- Mini Buttons -->
-			
 			{#if selectedTool == b.toolCode}
 			<div class="mini-button-container">
 				{#each b.miniButtons as mb}
@@ -116,7 +123,7 @@
 							title={mb.display}
 						>
 
-							<img src={mb.image} alt={mb.display}>
+							<img draggable={false} src={mb.image} alt={mb.display}>
 
 						</button>
 					{/each}
@@ -161,20 +168,33 @@
 		position: relative;
 	}
 
+	/* MINI BUTTONS */
 	.mini-button-container {
 		position: absolute;
 		left: 100%;
 		margin-left: 10px;
 		top: 0;
 
+		background-color: #555555;
+
 		display: flex;
 		flex-direction: column;
-		gap: 10px;
+		gap: 1px;
+		border: solid 1px #555555;
+		border-radius: 3px;
 	}
 
 	.mini-button {
 		width: 35px;
 		height: 35px;
+
+		border: none;
+		border-radius: 0px;
+	}
+
+	.mini-button.selected {
+		outline: none;
+		background-color: var(--hexfriend-green);
 	}
 
 	.mini-button img {

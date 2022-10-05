@@ -109,10 +109,12 @@
 			<label for="iconPanelColor">Icon Color</label>
 		</span>
 
+		<!--
 		<span class="icon-preview-control-row">
 			<Checkbox id={'cb_snapIcon'} bind:checked={data_icon.snapToHex} />
 			<label for="cb_snapIcon">Snap to Hex Center</label>
 		</span>
+		-->
 
 		<span class="icon-preview-control-row" style="grid-column: 1/3;">
 			<input type="range" id="iconSize" min={10} max={100} bind:value={data_icon.pHex} style="margin-bottom: 0;" />
