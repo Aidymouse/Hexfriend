@@ -131,15 +131,15 @@
 <style>
 	main {
 		display: grid;
-		grid-template-columns: 3.2em;
-		grid-template-rows: 3.2em;
-		grid-auto-rows: 3.2em;
-		gap: 0.7em;
+		grid-template-columns: 50px;
+		grid-template-rows: 50px;
+		grid-auto-rows: 50px;
+		gap: 10px;
 	}
 
 	main button {
-		width: 100%;
-		height: 100%;
+		width: 50px;
+		height: 50px;
 	}
 
 	button {
@@ -156,25 +156,25 @@
 	}
 
 	.tool-button-container {
-		width: 100%;
-		height: 100%;
+		width: 50px;
+		height: 50px;
 		position: relative;
 	}
 
 	.mini-button-container {
 		position: absolute;
 		left: 100%;
-		margin-left: 0.7em;
+		margin-left: 10px;
 		top: 0;
 
 		display: flex;
 		flex-direction: column;
-		gap: 0.7em;
+		gap: 10px;
 	}
 
 	.mini-button {
-		width: 2.8em;
-		height: 2.8em;
+		width: 35px;
+		height: 35px;
 	}
 
 	.mini-button img {

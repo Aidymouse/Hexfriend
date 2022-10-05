@@ -205,27 +205,6 @@
 		margin: 0;
 	}
 
-	.small-panel-button {
-		position: absolute;
-		width: 25px;
-		height: 25px;
-		margin: 0;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		padding: 0;
-	}
-
-	.small-panel-button img {
-		width: 90%;
-		height: auto;
-	}
-
-	#snap {
-		top: 10px;
-		right: 10px;
-	}
-
 	#controls {
 		padding: 10px;
 		display: grid;
