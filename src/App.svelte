@@ -800,7 +800,14 @@ hexfiend red: #FF6666
 	{/if}
 
 	<div id="tool-buttons">
-		<ToolButtons bind:selectedTool bind:hexOrientation={tfield.orientation} {changeTool} />
+		<ToolButtons
+			bind:selectedTool
+			bind:hexOrientation={tfield.orientation}
+			{changeTool}
+			bind:data_terrain	
+			bind:data_icon	
+			bind:data_path	
+		/>
 	</div>
 
 	<div id="setting-buttons">

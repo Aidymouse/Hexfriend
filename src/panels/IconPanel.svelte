@@ -118,27 +118,6 @@
 			<input type="range" id="iconSize" min={10} max={100} bind:value={data_icon.pHex} style="margin-bottom: 0;" />
 		</span>
 
-		<button
-			id="eraser"
-			title={'Icon Eraser'}
-			on:click={() => {
-				data_icon.usingEraser = !data_icon.usingEraser;
-			}}
-			class:selected={data_icon.usingEraser}
-		>
-			<img src="/assets/img/tools/eraser.png" alt={'Eyedropper'} />
-		</button>
-
-		<button
-			id="dragmode"
-			title={'Drag Mode'}
-			on:click={() => {
-				data_icon.dragMode = !data_icon.dragMode;
-			}}
-			class:selected={data_icon.dragMode}
-		>
-			<img src="/assets/img/tools/drag.png" alt={'Drag'} />
-		</button>
 	</div>
 
 	<div id="buttons" class="scroll-container">

@@ -138,39 +138,6 @@
 			<ColorInputPixi bind:value={data_terrain.tile.symbol.color} id={'symbolColor'} label={'Symbol Color'} />
 		{/if}
 
-		<button
-			id="eyedropper"
-			class="small-panel-button"
-			title={'Hex Eyedropper'}
-			on:click={() => {
-				data_terrain.usingEyedropper = !data_terrain.usingEyedropper;
-			}}
-			class:selected={data_terrain.usingEyedropper}
-		>
-			<img src="/assets/img/tools/eyedropper.png" alt={'Eyedropper'} />
-		</button>
-		<button
-			id="paintbucket"
-			class="small-panel-button"
-			title={'Hex Paintbucket'}
-			on:click={() => {
-				data_terrain.usingPaintbucket = !data_terrain.usingPaintbucket;
-			}}
-			class:selected={data_terrain.usingPaintbucket}
-		>
-			<img src="/assets/img/tools/paintbucket.png" alt={'Paint Bucket'} />
-		</button>
-		<button
-			id="eraser"
-			class="small-panel-button"
-			title={'Hex Eraser'}
-			on:click={() => {
-				data_terrain.usingEraser = !data_terrain.usingEraser;
-			}}
-			class:selected={data_terrain.usingEraser}
-		>
-			<img src="/assets/img/tools/eraser.png" alt={'Eraser'} />
-		</button>
 	</div>
 
 	<div id="buttons" class="scroll-container">

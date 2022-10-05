@@ -107,19 +107,7 @@
 		<ColorInputPixi bind:value={data_path.style.color} id={'pathColor'} />
 
 		<label for="pathThickness">Thickness</label>
-		<input id="pathThickness" type="number" bind:value={data_path.style.width} />
-
-		<button
-			id="snap"
-			class="small-panel-button"
-			title={'Snap'}
-			on:click={() => {
-				data_path.snap = !data_path.snap;
-			}}
-			class:selected={data_path.snap}
-		>
-			<img src="/assets/img/tools/snap.png" alt={'Snap'} />
-		</button>
+		<input id="pathThickness" type="number" min={1} bind:value={data_path.style.width} />
 
 		<p class="control-label">Line Cap</p>
 		<span>
