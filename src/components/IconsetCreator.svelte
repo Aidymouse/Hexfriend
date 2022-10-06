@@ -29,7 +29,7 @@
 
 	let selectedIcon: Icon | null = null;
 
-	const l: PIXI.Loader = new PIXI.Loader();
+	//const l: PIXI.Loader = new PIXI.Loader();
 	let texId: number = 0;
 
 	let previewSprite = new PIXI.Sprite();
@@ -322,7 +322,7 @@
 
 	{#if selectedIcon}
 		<div id="icon-preview">
-			<Pixi {app}>
+			<Application {app}>
 				<Graphics
 					draw={(g) => {
 						g.clear();
@@ -340,7 +340,7 @@
 					tint={selectedIcon.color}
 					scale={getIconScale(selectedIcon)}
 				/>
-			</Pixi>
+				</Application>
 
 			<input
 				type="text"

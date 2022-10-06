@@ -300,7 +300,7 @@
 	{#if selectedTile}
 		<div id="tile-preview">
 			<div id="pixi-container" style="height: 300px; width: 300px;">
-				<Pixi {app}>
+				<Application {app}>
 					<Graphics
 						draw={(g) => {
 							g.clear();
@@ -320,7 +320,7 @@
 							scale={getSymbolScale(selectedTile.symbol)}
 						/>
 					{/if}
-				</Pixi>
+					</Application>
 			</div>
 
 			<input
