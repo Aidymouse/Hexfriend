@@ -22,11 +22,13 @@
 	},
 	"dependencies": {
 		"@pixi/assets": "^6.5.2",
+		"@pixi/basis": "^6.5.5",
 		"@trivago/prettier-plugin-sort-imports": "^3.3.0",
 		"dexie": "^3.2.1",
 		"gh-pages": "^4.0.0",
 		"pixi.js": "^6.5.2",
 		"prettier-plugin-svelte": "^2.7.0",
-		"svelte-pixi": "^0.0.5"
+		"svelte-pixi": "^0.1.3",
+		"yarn": "^1.22.19"
 	}
 }

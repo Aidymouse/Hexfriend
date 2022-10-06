@@ -6,7 +6,7 @@
 	import type { Tile, TileSymbol, Tileset } from '../types/tilesets';
 	import * as PIXI from 'pixi.js';
 	import { tick } from 'svelte';
-	import { Graphics, Pixi, Sprite } from 'svelte-pixi';
+	import { Graphics, Application, Sprite } from 'svelte-pixi';
 
 	let app = new PIXI.Application({
 		height: 300,

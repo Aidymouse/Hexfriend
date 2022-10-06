@@ -7,7 +7,7 @@
 	import * as PIXI_Assets from '@pixi/assets';
 	import * as PIXI from 'pixi.js';
 	import { tick } from 'svelte';
-	import { Graphics, Pixi, Sprite } from 'svelte-pixi';
+	import { Graphics, Application, Sprite } from 'svelte-pixi';
 
 	let app = new PIXI.Application({
 		width: 300,

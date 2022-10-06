@@ -72,7 +72,7 @@ hexfiend red: #FF6666
 	import { tools } from './types/toolData';
 	import * as PIXI from 'pixi.js';
 	import { tick } from 'svelte';
-	import { Container, Pixi } from 'svelte-pixi';
+	import { Container, Application } from 'svelte-pixi';
 
 	/* STATE */
 
@@ -756,7 +756,7 @@ hexfiend red: #FF6666
 		on:keydown={keyDown}
 		on:keyup={keyUp}
 	>
-		<Pixi {app}>
+		<Application {app} >
 			<Container instance={offsetContainer} x={pan.offsetX} y={pan.offsetY} scale={{ x: pan.zoomScale, y: pan.zoomScale }}>
 				<TerrainLayer bind:this={comp_terrainLayer} bind:data_terrain {controls} {L} {comp_coordsLayer} {symbolTextureLookupTable} />
 
@@ -783,7 +783,7 @@ hexfiend red: #FF6666
 
 				<TextLayer bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text />
 			</Container>
-		</Pixi>
+		</Application>
 	</main>
 
 	<!-- Terrain Buttons -->
