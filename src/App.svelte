@@ -756,7 +756,7 @@ hexfiend red: #FF6666
 		on:keydown={keyDown}
 		on:keyup={keyUp}
 	>
-		<Application {app} >
+		<Application instance={app} resizeTo={window} render={"demand"} >
 			<Container instance={offsetContainer} x={pan.offsetX} y={pan.offsetY} scale={{ x: pan.zoomScale, y: pan.zoomScale }}>
 				<TerrainLayer bind:this={comp_terrainLayer} bind:data_terrain {controls} {L} {comp_coordsLayer} {symbolTextureLookupTable} />
 
