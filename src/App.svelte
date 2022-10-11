@@ -72,7 +72,9 @@ hexfiend red: #FF6666
 	import { tools } from './types/toolData';
 	import * as PIXI from 'pixi.js';
 	import { tick } from 'svelte';
-	import { Container, Pixi } from 'svelte-pixi';
+	import { Container, Application } from 'svelte-pixi';
+
+	import * as PIXI_Assets from '@pixi/assets';
 
 	/* STATE */
 
@@ -213,6 +215,8 @@ hexfiend red: #FF6666
 
 	// Never cleared, to stop duplicate textures being added
 	// Theoretically a memory leak... but bounded by how many unique tiles can be loaded. Shouldn't be a problem?
+	let loaded_symbol_textures = {}
+
 	let symbolTextureLookupTable: { [key: string]: string } = {
 		// tile id: id of tile who's texture we use
 	};
@@ -682,7 +686,22 @@ hexfiend red: #FF6666
 		//loadedId = id
 	}
 
-	function tilesetToAssetManifest(tileset: Tileset) {}
+	// TEXTURES //
+	async function loadSymbolTexture(texture_id, base64) {
+		let new_texture;
+
+		if (PIXI_Assets.Cache.has(base64 as string)) {
+			new_texture = PIXI_Assets.Cache.has(base64 as string);
+			symbolTextureLookupTable[texture_id] = new_texture.textureCacheIds[1]
+		} else {
+			PIXI_Assets.Assets.add(texture_id, base64 as string)
+			loaded_symbol_textures[texture_id] = await PIXI_Assets.Assets.load(texture_id)
+			new_texture = loaded_symbol_textures[texture_id]
+			symbolTextureLookupTable[texture_id] = texture_id
+
+		}
+		return new_texture
+	}
 
 	function addTilesetTextures(tileset: Tileset, loader: PIXI.Loader) {
 		tileset.tiles.forEach(async (tile) => {
@@ -690,13 +709,7 @@ hexfiend red: #FF6666
 
 			if (!tile.symbol) return;
 
-			let entry = Object.entries(L.resources).find(([id, r]) => r.url == tile.symbol.base64);
-			if (entry) {
-				// Texture already exists! Add this tile's ID to the lookup table
-				symbolTextureLookupTable[tile.id] = entry[0];
-			} else {
-				loader.add(tile.id, tile.symbol.base64);
-			}
+			loadSymbolTexture(tile.id, tile.symbol.base64)
 		});
 	}
 
@@ -756,9 +769,9 @@ hexfiend red: #FF6666
 		on:keydown={keyDown}
 		on:keyup={keyUp}
 	>
-		<Pixi {app}>
+		<Application instance={app} resizeTo={window} >
 			<Container instance={offsetContainer} x={pan.offsetX} y={pan.offsetY} scale={{ x: pan.zoomScale, y: pan.zoomScale }}>
-				<TerrainLayer bind:this={comp_terrainLayer} bind:data_terrain {controls} {L} {comp_coordsLayer} {symbolTextureLookupTable} />
+				<TerrainLayer bind:this={comp_terrainLayer} bind:data_terrain {controls} {L} {comp_coordsLayer} {symbolTextureLookupTable} {loaded_symbol_textures} />
 
 				<PathLayer bind:this={comp_pathLayer} bind:paths={loadedSave.paths} bind:data_path {controls} {selectedTool} />
 
@@ -783,14 +796,14 @@ hexfiend red: #FF6666
 
 				<TextLayer bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text />
 			</Container>
-		</Pixi>
+		</Application>
 	</main>
 
 	<!-- Terrain Buttons -->
 	{#if showTerrainGenerator}
 		<TerrainGenerator {loadedTilesets} {comp_terrainLayer} bind:showTerrainGenerator />
 	{:else if selectedTool == 'terrain'}
-		<TerrainPanel {loadedTilesets} {app} {L} bind:data_terrain {symbolTextureLookupTable} />
+		<TerrainPanel {loadedTilesets} {app} {L} bind:data_terrain {symbolTextureLookupTable} {loaded_symbol_textures} />
 	{:else if selectedTool == 'icon'}
 		<IconPanel {L} {app} {loadedIconsets} bind:data_icon {iconTextureLookupTable} />
 	{:else if selectedTool == 'path'}

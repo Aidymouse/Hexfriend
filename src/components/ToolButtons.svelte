@@ -24,7 +24,7 @@
 				{
 					display: "Hex Eraser",
 					action: function() { data_terrain.usingEraser = !data_terrain.usingEraser },
-					image: "/assets/img/tools/eraser.png",
+					image: "/assets/img/tools/mini_eraser.png",
 					obj: data_terrain,
 					field: "usingEraser"
 				},
@@ -53,7 +53,7 @@
 			{
 				display: "Icon Eraser",
 				action: function() { data_icon.usingEraser = !data_icon.usingEraser },
-				image: "/assets/img/tools/eraser.png",
+				image: "/assets/img/tools/mini_eraser.png",
 				obj: data_icon,
 				field: "usingEraser"
 			},
@@ -69,7 +69,7 @@
 			{
 				display: "Snap Icon",
 				action: function() { data_icon.snapToHex = !data_icon.snapToHex },
-				image: "",
+				image: "/assets/img/tools/snap_icon.png",
 				obj: data_icon,
 				field: "snapToHex"
 			}
@@ -77,9 +77,9 @@
 
 		{ display: 'Path', toolCode: tools.PATH, miniButtons: [
 			{
-				display: "Snap Point",
+				display: "Snap Path Point",
 				action: function() { data_path.snap = !data_path.snap },
-				image: "/assets/img/tools/snap.png",
+				image: "/assets/img/tools/snap_path.png",
 				obj: data_path,
 				field: "snap"
 			}
@@ -113,7 +113,7 @@
 			</button>
 
 			<!-- Mini Buttons -->
-			{#if selectedTool == b.toolCode}
+			{#if selectedTool == b.toolCode && b.miniButtons.length > 0}
 			<div class="mini-button-container">
 				{#each b.miniButtons as mb}
 						<button 
@@ -124,6 +124,7 @@
 						>
 
 							<img draggable={false} src={mb.image} alt={mb.display}>
+							<img draggable={false} class="selected-img" src={mb.image.replace(".png", "_white.png")} alt={mb.display}>
 
 						</button>
 					{/each}
@@ -194,9 +195,21 @@
 
 	.mini-button.selected {
 		outline: none;
-		background-color: var(--hexfriend-green);
+		background-color: #8cc63f;
 	}
 
+	.mini-button.selected img {
+		display: none;
+	}
+
+	.mini-button .selected-img {
+		display: none;
+	}
+
+	.mini-button.selected .selected-img {
+		display: block !important;
+	}
+	
 	.mini-button img {
 		width: 100%;
 		height: 100%;
