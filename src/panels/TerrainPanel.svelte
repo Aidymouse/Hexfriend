@@ -17,7 +17,6 @@
 	});
 
 	export let app: PIXI.Application;
-	export let L: PIXI.Loader;
 
 	export let symbolTextureLookupTable: { [key: string]: string };
 

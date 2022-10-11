@@ -771,7 +771,7 @@ hexfiend red: #FF6666
 	>
 		<Application instance={app} resizeTo={window} >
 			<Container instance={offsetContainer} x={pan.offsetX} y={pan.offsetY} scale={{ x: pan.zoomScale, y: pan.zoomScale }}>
-				<TerrainLayer bind:this={comp_terrainLayer} bind:data_terrain {controls} {L} {comp_coordsLayer} {symbolTextureLookupTable} {loaded_symbol_textures} />
+				<TerrainLayer bind:this={comp_terrainLayer} bind:data_terrain {controls} {comp_coordsLayer} {symbolTextureLookupTable} {loaded_symbol_textures} />
 
 				<PathLayer bind:this={comp_pathLayer} bind:paths={loadedSave.paths} bind:data_path {controls} {selectedTool} />
 
@@ -803,7 +803,7 @@ hexfiend red: #FF6666
 	{#if showTerrainGenerator}
 		<TerrainGenerator {loadedTilesets} {comp_terrainLayer} bind:showTerrainGenerator />
 	{:else if selectedTool == 'terrain'}
-		<TerrainPanel {loadedTilesets} {app} {L} bind:data_terrain {symbolTextureLookupTable} {loaded_symbol_textures} />
+		<TerrainPanel {loadedTilesets} {app} bind:data_terrain {symbolTextureLookupTable} {loaded_symbol_textures} />
 	{:else if selectedTool == 'icon'}
 		<IconPanel {L} {app} {loadedIconsets} bind:data_icon {iconTextureLookupTable} />
 	{:else if selectedTool == 'path'}

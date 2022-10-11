@@ -41,7 +41,6 @@
 	});
 
 	export let controls;
-	export let L: PIXI.Loader;
 	export let loaded_symbol_textures;
 
 	let tfield: terrain_field;
