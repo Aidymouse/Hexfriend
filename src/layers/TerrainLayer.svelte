@@ -42,6 +42,7 @@
 
 	export let controls;
 	export let L: PIXI.Loader;
+	export let loaded_symbol_textures;
 
 	let tfield: terrain_field;
 	store_tfield.store.subscribe((newTField) => {
@@ -673,7 +674,7 @@
 			// Re-use the sprite that already exists
 			let ns = terrainSprites[hexId];
 
-			ns.texture = L.resources[getSymbolTextureId(hex.tile.id)].texture;
+			ns.texture = get_symbol_texture(hex.tile.id);
 			ns.scale = findSymbolScale(hex.tile.symbol);
 			ns.tint = hex.tile.symbol.color;
 			ns.position.set(hexWorldCoords.x, hexWorldCoords.y); // Position is updated even though it's usually the same, but if hex has been resized since last draw the symbol position will be different
@@ -684,7 +685,7 @@
 			let hc = hexWorldCoords;
 			ns.position.set(hc.x, hc.y);
 
-			ns.texture = L.resources[getSymbolTextureId(hex.tile.id)].texture;
+			ns.texture = get_symbol_texture(hex.tile.id);
 			ns.tint = hex.tile.symbol.color;
 			ns.scale = findSymbolScale(hex.tile.symbol);
 
@@ -693,13 +694,9 @@
 		}
 	}
 
-	function getSymbolTextureId(tileId: string): string {
+	function get_symbol_texture(tileId: string): string {
 		// If tileId appears as a key in the lookup table, use the lookup table version instead
-		if (Object.keys(symbolTextureLookupTable).find((k) => k == tileId)) {
-			return symbolTextureLookupTable[tileId];
-		}
-
-		return tileId;
+		return loaded_symbol_textures[ symbolTextureLookupTable[tileId] ]
 	}
 
 	/* PAINT */
@@ -764,7 +761,7 @@
 
 		if (tile1.symbol && tile2.symbol) {
 			if (tile1.symbol.color != tile2.symbol.color) return false;
-			if (getSymbolTextureId(tile1.id) != getSymbolTextureId(tile2.id)) return false;
+			if (get_symbol_texture(tile1.id) != get_symbol_texture(tile2.id)) return false;
 		}
 
 		return true;

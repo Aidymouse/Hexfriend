@@ -9,6 +9,7 @@
 
 	export let loadedTilesets: Tileset[];
 	export let data_terrain: terrain_data;
+	export let loaded_symbol_textures;
 
 	let tfield: terrain_field;
 	store_tfield.store.subscribe((newTField) => {
@@ -42,13 +43,10 @@
 		data_terrain.usingEraser = false;
 	}
 
-	function getSymbolTextureId(tileId: string) {
+	function get_symbol_texture(tileId: string) {
 		// If tileId appears in the lookup table, use the lookup table version instead
-		if (Object.keys(symbolTextureLookupTable).find((k) => k == tileId)) {
-			return symbolTextureLookupTable[tileId];
-		}
+		return loaded_symbol_textures[ symbolTextureLookupTable[tileId] ]
 
-		return tileId;
 	}
 
 	function findSymbolScale(symbol, hexWidth: number, hexHeight: number) {
@@ -83,7 +81,7 @@
 		g.endFill();
 
 		if (data_terrain.tile && data_terrain.tile.symbol) {
-			s.texture = L.resources[getSymbolTextureId(data_terrain.tile.id)].texture;
+			s.texture = get_symbol_texture(data_terrain.tile.id);
 			s.tint = data_terrain.tile.symbol.color;
 			s.scale = findSymbolScale(data_terrain.tile.symbol, hexWidth, hexHeight);
 			s.anchor.set(0.5);
@@ -114,7 +112,7 @@
 
 		if (tile1.symbol && tile2.symbol) {
 			if (tile1.symbol.color != tile2.symbol.color) return false;
-			if (getSymbolTextureId(tile1.id) != getSymbolTextureId(tile2.id)) return false;
+			if (get_symbol_texture(tile1.id) != get_symbol_texture(tile2.id)) return false;
 		}
 
 		return true;

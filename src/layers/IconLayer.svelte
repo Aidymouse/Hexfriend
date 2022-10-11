@@ -19,7 +19,6 @@
 	import { tools } from '../types/toolData';
 	import type * as PIXI from 'pixi.js';
 	import { Container, Sprite } from 'svelte-pixi';
-import type { Point } from 'pixi.js';
 
 
 	export let icons: IconLayerIcon[] = [];
@@ -434,6 +433,7 @@ import type { Point } from 'pixi.js';
 	createFloatingIcon();
 </script>
 
+
 {#if floatingIcon}
 	<Sprite
 		texture={L.resources[getIconTextureId(data_icon.texId)].texture}
@@ -442,7 +442,7 @@ import type { Point } from 'pixi.js';
 		tint={data_icon.color}
 		anchor={{ x: 0.5, y: 0.5 }}
 		scale={{ x: floatingIcon.scale, y: floatingIcon.scale }}
-		alpha={0.5}
+		
 		visible={!data_icon.usingEraser && selectedTool == tools.ICON && cursorOnLayer && !data_icon.dragMode && draggedIcon == null}
 	/>
 {/if}
