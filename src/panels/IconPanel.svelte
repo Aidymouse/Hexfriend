@@ -8,8 +8,9 @@
 	import * as PIXI from 'pixi.js';
 	import type { terrain_field } from 'src/types/terrain';
 
+	import { get_icon_texture, icon_texture_lookup_table } from '../lib/texture_loader';
+
 	export let loadedIconsets: Iconset[];
-	export let L: PIXI.Loader;
 	export let app: PIXI.Application;
 
 	export let data_icon: icon_data;
@@ -43,9 +44,9 @@
 	function getIconScale(hexWidth: number, hexHeight: number): number {
 		let scale: number;
 		if (hexWidth < hexHeight) {
-			scale = (hexWidth * (data_icon.pHex / 100)) / L.resources[getIconTextureId(data_icon.texId)].texture.width;
+			scale = (hexWidth * (data_icon.pHex / 100)) / get_icon_texture(data_icon.texId).width;
 		} else {
-			scale = (hexHeight * (data_icon.pHex / 100)) / L.resources[getIconTextureId(data_icon.texId)].texture.height;
+			scale = (hexHeight * (data_icon.pHex / 100)) / get_icon_texture(data_icon.texId).height;
 		}
 
 		return scale;
@@ -66,7 +67,7 @@
 		g.drawPolygon(path);
 		g.endFill();
 
-		s.texture = L.resources[getIconTextureId(iconData.texId)].texture;
+		s.texture = get_icon_texture(data_icon.texId);
 		s.tint = iconData.color;
 		s.anchor.set(0.5, 0.5);
 		s.scale.set(getIconScale(hW, hH));
@@ -78,17 +79,11 @@
 
 	function iconMatchesData(icon: Icon): boolean {
 		if (data_icon.color != icon.color) return false;
-		if (getIconTextureId(data_icon.texId) != getIconTextureId(icon.texId)) return false;
+		if (icon_texture_lookup_table[data_icon.texId] != icon_texture_lookup_table[icon.texId]) return false;
 		return true;
 	}
 
-	function getIconTextureId(id: string): string {
-		if (Object.keys(iconTextureLookupTable).find((k) => k == id)) {
-			return iconTextureLookupTable[id];
-		}
 
-		return id;
-	}
 </script>
 
 <div class="panel">

@@ -212,7 +212,7 @@ hexfiend red: #FF6666
 		ignoreIcons: false,
 	};
 
-	let L = new PIXI.Loader()
+	//let L = new PIXI.Loader()
 
 	// Never cleared, to stop duplicate textures being added
 	// Theoretically a memory leak... but bounded by how many unique tiles can be loaded. Shouldn't be a problem?
@@ -596,81 +596,80 @@ hexfiend red: #FF6666
 		//comp_terrainLayer.renderAllHexes()
 	}
 
-	function loadSave(data: save_data, id: number | null) {
+	async function loadSave(data: save_data, id: number | null) {
 		loadedTilesets = data.tilesets;
 		loadedIconsets = data.iconsets;
 
-		store_tfield.store.set(data.TerrainField);
-		//tfield = data.TerrainField;
-
-		data_coordinates = data.coords;
-
 		// Load Textures
-		loadedTilesets.forEach((tileset) => {
+		for (const tileset of loadedTilesets) {
 			texture_loader.load_tileset_textures(tileset);
-		});
+		}
 
 		// Load Icons
 		loadedIconsets.forEach((iconset: Iconset) => {
 			texture_loader.load_iconset_textures(iconset);
 		});
 
-		//L.onComplete.add( );
+		store_tfield.store.set(data.TerrainField);
+		//tfield = data.TerrainField;
 
-		L.load(async () => {
-			loadedSave = data;
-			loadedId = id;
+		data_coordinates = data.coords;
 
-			let firstTile = loadedTilesets[0].tiles[0];
-			data_terrain.tile = { ...firstTile, symbol: firstTile.symbol ? { ...firstTile.symbol } : null };
+		//console.log(PIXI_Assets.Assets)
 
-			let firstIcon = loadedIconsets[0].icons[0];
-			data_icon.color = firstIcon.color;
-			data_icon.texId = firstIcon.texId;
+		loadedSave = data;
+		loadedId = id;
 
-			// Center the map
-			let tf = loadedSave.TerrainField;
+		let firstTile = loadedTilesets[0].tiles[0];
+		data_terrain.tile = { ...firstTile, symbol: firstTile.symbol ? { ...firstTile.symbol } : null };
 
-			//pan.zoomScale = 1
+		let firstIcon = loadedIconsets[0].icons[0];
+		data_icon.color = firstIcon.color;
+		data_icon.texId = firstIcon.texId;
 
-			store_panning.store.update((pan) => {
-				if (tf.mapShape == map_shape.SQUARE) {
-					if (tf.orientation == 'flatTop') {
-						let mapWidth = tf.columns * tf.hexWidth * 0.75 + tf.hexWidth * 0.25;
-						let mapHeight = (tf.rows - 1) * tf.hexHeight - tf.hexHeight * 0.5;
+		// Center the map
+		let tf = loadedSave.TerrainField;
 
-						pan.offsetX = window.innerWidth / 2 - (mapWidth / 2) * pan.zoomScale;
-						pan.offsetY = window.innerHeight / 2 - (mapHeight / 2) * pan.zoomScale;
-					} else {
-						let mapHeight = tf.rows * tf.hexHeight * 0.75 + tf.hexHeight * 0.25;
-						let mapWidth = (tf.columns - 1) * tf.hexWidth - tf.hexWidth * 0.5;
+		//pan.zoomScale = 1
 
-						pan.offsetX = window.innerWidth / 2 - (mapWidth / 2) * pan.zoomScale;
-						pan.offsetY = window.innerHeight / 2 - (mapHeight / 2) * pan.zoomScale;
-					}
+		store_panning.store.update((pan) => {
+			if (tf.mapShape == map_shape.SQUARE) {
+				if (tf.orientation == 'flatTop') {
+					let mapWidth = tf.columns * tf.hexWidth * 0.75 + tf.hexWidth * 0.25;
+					let mapHeight = (tf.rows - 1) * tf.hexHeight - tf.hexHeight * 0.5;
+
+					pan.offsetX = window.innerWidth / 2 - (mapWidth / 2) * pan.zoomScale;
+					pan.offsetY = window.innerHeight / 2 - (mapHeight / 2) * pan.zoomScale;
 				} else {
-					pan.offsetX = window.innerWidth / 2;
-					pan.offsetY = window.innerHeight / 2;
+					let mapHeight = tf.rows * tf.hexHeight * 0.75 + tf.hexHeight * 0.25;
+					let mapWidth = (tf.columns - 1) * tf.hexWidth - tf.hexWidth * 0.5;
+
+					pan.offsetX = window.innerWidth / 2 - (mapWidth / 2) * pan.zoomScale;
+					pan.offsetY = window.innerHeight / 2 - (mapHeight / 2) * pan.zoomScale;
 				}
-				return pan;
-			});
-
-			appState = app_state.NORMAL;
-			//await tick();
-
-			// Final Layer Setup
-			//comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
-
-			//comp_coordsLayer.cullUnusedCoordinates();
-			//comp_coordsLayer.updateAllCoordPositions();
-			//comp_coordsLayer.populateBlankHexes();
-
-			//comp_terrainLayer.clearTerrainSprites();
-			//comp_terrainLayer.renderAllHexes();
-
-			// Jolt all the layers that respond to the data into place. Without this the text, icons and paths kinda get stuck. It's odd. Warrants further investigation.
-			loadedSave = loadedSave;
+			} else {
+				pan.offsetX = window.innerWidth / 2;
+				pan.offsetY = window.innerHeight / 2;
+			}
+			return pan;
 		});
+
+		appState = app_state.NORMAL;
+		//await tick();
+
+		// Final Layer Setup
+		//comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
+
+		//comp_coordsLayer.cullUnusedCoordinates();
+		//comp_coordsLayer.updateAllCoordPositions();
+		//comp_coordsLayer.populateBlankHexes();
+
+		//comp_terrainLayer.clearTerrainSprites();
+		//comp_terrainLayer.renderAllHexes();
+
+		// Jolt all the layers that respond to the data into place. Without this the text, icons and paths kinda get stuck. It's odd. Warrants further investigation.
+		loadedSave = loadedSave;
+		
 
 		/* Set up tools - would be nice to remember tool settings but this works regardless of loaded tileset */
 
@@ -753,7 +752,7 @@ hexfiend red: #FF6666
 	{:else if selectedTool == 'terrain'}
 		<TerrainPanel {loadedTilesets} {app} bind:data_terrain />
 	{:else if selectedTool == 'icon'}
-		<IconPanel {L} {app} {loadedIconsets} bind:data_icon />
+		<IconPanel {app} {loadedIconsets} bind:data_icon />
 	{:else if selectedTool == 'path'}
 		<PathPanel bind:data_path {comp_pathLayer} bind:pathStyles={loadedSave.pathStyles} />
 	{:else if selectedTool == 'text'}
@@ -841,7 +840,7 @@ hexfiend red: #FF6666
 			on:load={() => {
 				setTimeout(() => {
 					loadSave(dataToLoad.data, dataToLoad.id);
-				}, 30);
+				}, 100);
 			}}
 		/>
 	</div>

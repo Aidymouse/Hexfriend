@@ -19,6 +19,7 @@
 	import { tools } from '../types/toolData';
 	import type * as PIXI from 'pixi.js';
 	import { Container, Sprite } from 'svelte-pixi';
+
 	import { get_icon_texture } from '../lib/texture_loader'
 
 
@@ -67,11 +68,17 @@
 	}
 
 	function getIconScale() {
+		
+		let icon_texture = get_icon_texture(data_icon.texId)
+		
+		let icon_texture_width = 100
+		let icon_texture_height = 100
+
 		let scale: number;
 		if (tfield.hexWidth < tfield.hexHeight) {
-			scale = (tfield.hexWidth * (data_icon.pHex / 100)) / get_icon_texture(data_icon.texId).width;
+			scale = (tfield.hexWidth * (data_icon.pHex / 100)) / icon_texture_width;
 		} else {
-			scale = (tfield.hexHeight * (data_icon.pHex / 100)) / get_icon_texture(data_icon.texId).height;
+			scale = (tfield.hexHeight * (data_icon.pHex / 100)) / icon_texture_height;
 		}
 
 		return scale;
@@ -426,6 +433,8 @@
 </script>
 
 
+<!--
+
 {#if floatingIcon}
 	<Sprite
 		texture={get_icon_texture(floatingIcon.texId)}
@@ -438,6 +447,7 @@
 		visible={!data_icon.usingEraser && selectedTool == tools.ICON && cursorOnLayer && !data_icon.dragMode && draggedIcon == null}
 	/>
 {/if}
+-->
 
 {#each icons as icon (icon.id)}
 	<Sprite
