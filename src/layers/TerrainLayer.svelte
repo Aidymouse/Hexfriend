@@ -35,13 +35,14 @@
 
 	let terrainSprites: { [key: hex_id]: PIXI.Sprite } = {};
 
+	import { get_symbol_texture } from '../lib/texture_loader';
+
 	let pan: pan_state;
 	store_panning.store.subscribe((newPan) => {
 		pan = newPan;
 	});
 
 	export let controls;
-	export let loaded_symbol_textures;
 
 	let tfield: terrain_field;
 	store_tfield.store.subscribe((newTField) => {
@@ -51,8 +52,6 @@
 	export let comp_coordsLayer: CoordsLayer;
 
 	export let data_terrain: terrain_data;
-
-	export let symbolTextureLookupTable;
 
 	export function copyHex(from: TerrainHex, to: TerrainHex) {
 		to.tile = from.tile ? { ...from.tile, symbol: from.tile.symbol ? { ...from.tile.symbol } : null } : null;
@@ -691,11 +690,6 @@
 			symbolsContainer.addChild(ns);
 			terrainSprites[hexId] = ns;
 		}
-	}
-
-	function get_symbol_texture(tileId: string): string {
-		// If tileId appears as a key in the lookup table, use the lookup table version instead
-		return loaded_symbol_textures[ symbolTextureLookupTable[tileId] ]
 	}
 
 	/* PAINT */

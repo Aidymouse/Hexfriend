@@ -14,8 +14,6 @@
 
 	export let data_icon: icon_data;
 
-	export let iconTextureLookupTable;
-
 	let tfield: terrain_field;
 	store_tfield.store.subscribe((newTField) => {
 		tfield = newTField;

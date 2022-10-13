@@ -7,9 +7,10 @@
 	import type { Tile, Tileset } from '../types/tilesets';
 	import * as PIXI from 'pixi.js';
 
+	import { get_symbol_texture } from '../lib/texture_loader';
+
 	export let loadedTilesets: Tileset[];
 	export let data_terrain: terrain_data;
-	export let loaded_symbol_textures;
 
 	let tfield: terrain_field;
 	store_tfield.store.subscribe((newTField) => {
@@ -17,8 +18,6 @@
 	});
 
 	export let app: PIXI.Application;
-
-	export let symbolTextureLookupTable: { [key: string]: string };
 
 	$: {
 		tilePreview = generateTilePreview(data_terrain);
@@ -42,11 +41,6 @@
 		data_terrain.usingEraser = false;
 	}
 
-	function get_symbol_texture(tileId: string) {
-		// If tileId appears in the lookup table, use the lookup table version instead
-		return loaded_symbol_textures[ symbolTextureLookupTable[tileId] ]
-
-	}
 
 	function findSymbolScale(symbol, hexWidth: number, hexHeight: number) {
 		if (hexWidth < hexHeight) {

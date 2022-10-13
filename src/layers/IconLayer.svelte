@@ -19,11 +19,12 @@
 	import { tools } from '../types/toolData';
 	import type * as PIXI from 'pixi.js';
 	import { Container, Sprite } from 'svelte-pixi';
+	import { get_icon_texture } from '../lib/texture_loader'
 
 
 	export let icons: IconLayerIcon[] = [];
 
-	export let L: PIXI.Loader;
+
 	let pan: pan_state;
 	store_panning.store.subscribe((newPan) => {
 		pan = newPan;
@@ -40,7 +41,6 @@
 
 	export let data_icon: icon_data;
 	export let data_eraser: eraser_data;
-	export let iconTextureLookupTable: { [key: string]: string };
 
 	let floatingIcon: IconLayerIcon | null = null;
 	let draggedIcon: IconLayerIcon | null = null;
@@ -69,20 +69,12 @@
 	function getIconScale() {
 		let scale: number;
 		if (tfield.hexWidth < tfield.hexHeight) {
-			scale = (tfield.hexWidth * (data_icon.pHex / 100)) / L.resources[getIconTextureId(data_icon.texId)].texture.width;
+			scale = (tfield.hexWidth * (data_icon.pHex / 100)) / get_icon_texture(data_icon.texId).width;
 		} else {
-			scale = (tfield.hexHeight * (data_icon.pHex / 100)) / L.resources[getIconTextureId(data_icon.texId)].texture.height;
+			scale = (tfield.hexHeight * (data_icon.pHex / 100)) / get_icon_texture(data_icon.texId).height;
 		}
 
 		return scale;
-	}
-
-	function getIconTextureId(id: string): string {
-		if (Object.keys(iconTextureLookupTable).find((k) => k == id)) {
-			return iconTextureLookupTable[id];
-		}
-
-		return id;
 	}
 
 	export function newIcon() {
@@ -436,7 +428,7 @@
 
 {#if floatingIcon}
 	<Sprite
-		texture={L.resources[getIconTextureId(data_icon.texId)].texture}
+		texture={get_icon_texture(floatingIcon.texId)}
 		x={floatingIcon.x}
 		y={floatingIcon.y}
 		tint={data_icon.color}
@@ -449,7 +441,7 @@
 
 {#each icons as icon (icon.id)}
 	<Sprite
-		texture={L.resources[getIconTextureId(icon.texId)].texture}
+		texture={get_icon_texture(icon.texId)}
 		x={icon.x}
 		y={icon.y}
 		tint={icon.color}

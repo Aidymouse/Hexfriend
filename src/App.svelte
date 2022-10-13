@@ -71,10 +71,11 @@ hexfiend red: #FF6666
 	import type { Tileset } from './types/tilesets';
 	import { tools } from './types/toolData';
 	import * as PIXI from 'pixi.js';
-	import { tick } from 'svelte';
 	import { Container, Application } from 'svelte-pixi';
 
 	import * as PIXI_Assets from '@pixi/assets';
+
+	import * as texture_loader from './lib/texture_loader';
 
 	/* STATE */
 
@@ -211,19 +212,10 @@ hexfiend red: #FF6666
 		ignoreIcons: false,
 	};
 
-	const L: PIXI.Loader = new PIXI.Loader();
+	let L = new PIXI.Loader()
 
 	// Never cleared, to stop duplicate textures being added
 	// Theoretically a memory leak... but bounded by how many unique tiles can be loaded. Shouldn't be a problem?
-	let loaded_symbol_textures = {}
-
-	let symbolTextureLookupTable: { [key: string]: string } = {
-		// tile id: id of tile who's texture we use
-	};
-
-	let iconTextureLookupTable: { [key: string]: string } = {
-		// icon texId: id of tile who's texture we use
-	};
 
 	function exportMap(exportType) {
 		showLoader = true;
@@ -615,12 +607,12 @@ hexfiend red: #FF6666
 
 		// Load Textures
 		loadedTilesets.forEach((tileset) => {
-			addTilesetTextures(tileset, L);
+			texture_loader.load_tileset_textures(tileset);
 		});
 
 		// Load Icons
 		loadedIconsets.forEach((iconset: Iconset) => {
-			addIconsetTextures(iconset, L);
+			texture_loader.load_iconset_textures(iconset);
 		});
 
 		//L.onComplete.add( );
@@ -686,48 +678,6 @@ hexfiend red: #FF6666
 		//loadedId = id
 	}
 
-	// TEXTURES //
-	async function loadSymbolTexture(texture_id, base64) {
-		let new_texture;
-
-		if (PIXI_Assets.Cache.has(base64 as string)) {
-			new_texture = PIXI_Assets.Cache.has(base64 as string);
-			symbolTextureLookupTable[texture_id] = new_texture.textureCacheIds[1]
-		} else {
-			PIXI_Assets.Assets.add(texture_id, base64 as string)
-			loaded_symbol_textures[texture_id] = await PIXI_Assets.Assets.load(texture_id)
-			new_texture = loaded_symbol_textures[texture_id]
-			symbolTextureLookupTable[texture_id] = texture_id
-
-		}
-		return new_texture
-	}
-
-	function addTilesetTextures(tileset: Tileset, loader: PIXI.Loader) {
-		tileset.tiles.forEach(async (tile) => {
-			//console.log(tile.symbol.texId)
-
-			if (!tile.symbol) return;
-
-			loadSymbolTexture(tile.id, tile.symbol.base64)
-		});
-	}
-
-	function addIconsetTextures(iconset: Iconset, loader: PIXI.Loader) {
-		iconset.icons.forEach(async (icon) => {
-			//console.log(tile.symbol.texId)
-
-			let entry = Object.entries(L.resources).find(([id, r]) => r.url == icon.base64);
-
-			if (entry) {
-				// Texture already exists! Add this tile's ID to the lookup table
-				iconTextureLookupTable[icon.texId] = entry[0];
-			} else {
-				loader.add(icon.texId, icon.base64);
-			}
-		});
-	}
-
 	createNewMap();
 </script>
 
@@ -771,7 +721,7 @@ hexfiend red: #FF6666
 	>
 		<Application instance={app} resizeTo={window} >
 			<Container instance={offsetContainer} x={pan.offsetX} y={pan.offsetY} scale={{ x: pan.zoomScale, y: pan.zoomScale }}>
-				<TerrainLayer bind:this={comp_terrainLayer} bind:data_terrain {controls} {comp_coordsLayer} {symbolTextureLookupTable} {loaded_symbol_textures} />
+				<TerrainLayer bind:this={comp_terrainLayer} bind:data_terrain {controls} {comp_coordsLayer} />
 
 				<PathLayer bind:this={comp_pathLayer} bind:paths={loadedSave.paths} bind:data_path {controls} {selectedTool} />
 
@@ -780,10 +730,8 @@ hexfiend red: #FF6666
 					bind:icons={loadedSave.icons}
 					bind:data_icon
 					{data_eraser}
-					{L}
 					{selectedTool}
 					{controls}
-					{iconTextureLookupTable}
 				/>
 
 				<!--
@@ -803,9 +751,9 @@ hexfiend red: #FF6666
 	{#if showTerrainGenerator}
 		<TerrainGenerator {loadedTilesets} {comp_terrainLayer} bind:showTerrainGenerator />
 	{:else if selectedTool == 'terrain'}
-		<TerrainPanel {loadedTilesets} {app} bind:data_terrain {symbolTextureLookupTable} {loaded_symbol_textures} />
+		<TerrainPanel {loadedTilesets} {app} bind:data_terrain />
 	{:else if selectedTool == 'icon'}
-		<IconPanel {L} {app} {loadedIconsets} bind:data_icon {iconTextureLookupTable} />
+		<IconPanel {L} {app} {loadedIconsets} bind:data_icon />
 	{:else if selectedTool == 'path'}
 		<PathPanel bind:data_path {comp_pathLayer} bind:pathStyles={loadedSave.pathStyles} />
 	{:else if selectedTool == 'text'}
@@ -858,8 +806,6 @@ hexfiend red: #FF6666
 		bind:appState
 		bind:showTerrainGenerator
 		bind:data_coordinates
-		{addTilesetTextures}
-		{addIconsetTextures}
 		bind:loadedTilesets
 		bind:loadedIconsets
 		{comp_terrainLayer}
@@ -867,7 +813,6 @@ hexfiend red: #FF6666
 		{comp_iconLayer}
 		{comp_pathLayer}
 		{comp_textLayer}
-		{L}
 		renderAllHexes={() => {
 			comp_terrainLayer.renderAllHexes();
 		}}

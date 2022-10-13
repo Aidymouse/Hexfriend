@@ -45,11 +45,7 @@
 
 	//export let data_terrain: terrain_data
 	export let loadedTilesets: Tileset[];
-	export let addTilesetTextures: Function;
 	export let loadedIconsets: Iconset[];
-	export let addIconsetTextures: Function;
-
-	export let L: PIXI.Loader;
 
 	export let comp_iconLayer: IconLayer;
 	export let comp_pathLayer: PathLayer;
@@ -97,7 +93,7 @@
 			loadedTilesets = loadedTilesets;
 
 			/* We also have to load all of these textures */
-			addTilesetTextures(setToImport, L);
+			//addTilesetTextures(setToImport, L);
 		};
 	}
 
@@ -139,7 +135,7 @@
 			loadedIconsets = loadedIconsets;
 
 			/* We also have to load all of these textures */
-			addIconsetTextures(setToImport, L);
+			//addIconsetTextures(setToImport, L);
 		};
 	}
 
