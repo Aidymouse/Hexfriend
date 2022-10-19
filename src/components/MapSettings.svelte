@@ -764,7 +764,7 @@
 
 	<h2>About</h2>
 	<p class="helperText">
-		Hexfriend version 1.3.0 – "You're all grown up, Hexfriend!"
+		Hexfriend version 1.4.0 – "Looking cozy, Hexfriend"
 		<br />
 		By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
 	</p>
