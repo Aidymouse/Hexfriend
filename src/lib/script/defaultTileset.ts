@@ -1,5 +1,4 @@
-import type { Tileset } from "$lib/types/tilesets";
-const DEFAULTTILESET: Tileset = {
+const DEFAULTTILESET = {
   "name": "default",
   "id": "default",
   "author": "Aidymouse",
