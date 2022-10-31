@@ -1,0 +1,14 @@
+html {
+    --hexfriend-green: #8cc63f;
+    --hexfriend-red: #FF6666;
+
+    --background-default: #333333;
+
+}
+
+body {
+    margin: 0;
+
+    background-color: var(--background-default);
+
+}

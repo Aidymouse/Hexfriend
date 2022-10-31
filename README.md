@@ -1,38 +1,38 @@
-# Hexfriend
+# create-svelte
 
-A friendly online hexmapper - you can find it at https://www.hexfriend.net
+Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
 
-Hexfriend is a tool for building hexmaps for D&D type games. It aims to be as friendly and usable as possible.
+## Creating a project
 
-![Sample Hexfriend](https://user-images.githubusercontent.com/17463028/176241241-b48850c9-ab74-4999-a692-186579e2c429.png)
+If you're seeing this, you've probably already done this step. Congrats!
 
-### Feature List
-A list of neat things Hexfriend can do!
+```bash
+# create a new project in the current directory
+npm create svelte@latest
 
--   Create square or flower shaped maps
--   Easily add and remove new hexes to the edge of the map
--   Overlay larger hexes for multi-scale maps
--   Create, add and remove custom tiles and icons
--   Export maps as images and proprietary hexfriend format (it's JSON) for sharing across computers 
--   Save maps in browser
--   Create and edit path and text styles
+# create a new project in my-app
+npm create svelte@latest my-app
+```
 
-### Meat and Bones
+## Developing
 
-Hexfriend is built with Svelte and PIXI and some quite messy typescript.
-Thanks to mattjennings, without who's svelte-pixi project this would not have been possible. Go star it! https://github.com/mattjennings/svelte-pixi
+Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
 
-### License
+```bash
+npm run dev
 
-The software is free to use, copy, share, steal, whatever! Check the license file for real details :)
+# or start the server and open the app in a new browser tab
+npm run dev -- --open
+```
 
-### Coming Soon...
+## Building
 
-Hexfriend is never finished! Here's a list of stuff to do:
+To create a production version of your app:
 
--   Undo
--   Uploading a background image
--   Some fun easter eggs
--   More to come!
+```bash
+npm run build
+```
 
+You can preview the production build with `npm run preview`.
 
+> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
