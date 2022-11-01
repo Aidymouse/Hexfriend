@@ -1,4 +1,5 @@
-import { coords_qToCube, genHexId } from '$lib/helpers/hexHelpers';
+import { coords_qToCube, genHexId } from '$lib/helpers/hex_helpers';
+
 import { coord_system } from '$lib/types/coordinates';
 import type { coordinates_data } from '$lib/types/data';
 import type { Iconset } from '$lib/types/icon';
@@ -7,6 +8,7 @@ import { LATESTSAVEDATAVERSION } from '$lib/types/savedata';
 import { map_shape } from '$lib/types/settings';
 import { hex_orientation, hex_raised } from '$lib/types/terrain';
 import type { Tile, Tileset } from '$lib/types/tilesets';
+
 import { DEFAULTICONSET } from '$lib/script/defaultIconset';
 import { DEFAULTTILESET } from '$lib/script/defaultTileset';
 

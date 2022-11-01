@@ -1,9 +1,8 @@
-import type { TerrainHex } from '../types/terrain';
-import type { hex_id } from '../types/toolData';
-import { hex2rgb } from '@pixi/utils';
-import type { cube_coords } from '../types/coordinates';
+import type { TerrainHex } from '$lib/types/terrain';
+import type { hex_id } from '$lib/types/tool_data';
+import type { cube_coords } from '$lib/types/coordinates';
+import { hex_orientation } from '$lib/types/terrain';
 
-export type hexOrientation = 'flatTop' | 'pointyTop';
 type cubeCoords = { q: number; r: number; s: number };
 
 const hexDirVectors: cube_coords[] = [
@@ -18,7 +17,7 @@ const hexDirVectors: cube_coords[] = [
 export function getHexPath(
 	width: number,
 	height: number,
-	orientation: hexOrientation = 'flatTop',
+	orientation: hex_orientation = hex_orientation.FLATTOP,
 	centerX: number = 0,
 	centerY: number = 0
 ): number[] {
@@ -55,9 +54,9 @@ export function getHexPath(
 	}
 }
 
-export function getHexPathRadius(radius: number, orientation: hexOrientation = 'flatTop', centerX: number = 0, centerY: number = 0): number[] {
+export function getHexPathRadius(radius: number, orientation: hex_orientation = hex_orientation.FLATTOP, centerX: number = 0, centerY: number = 0): number[] {
 	let w: number, h: number;
-	if (orientation == 'pointyTop') {
+	if (orientation == hex_orientation.POINTYTOP) {
 		h = radius * 2;
 		w = Math.cos(Math.PI / 6) * radius * 2;
 	} else {
@@ -100,7 +99,7 @@ export function getRing(centerId: hex_id, radius: number): hex_id[] {
 
 	let curHexCoords = firstHexCoords;
 
-	let ringHexIds = [];
+	let ringHexIds: hex_id[] = [];
 
 	for (let i = 0; i < 6; i++) {
 		let currentHexDir = hexDirVectors[i];
@@ -157,8 +156,8 @@ export function cube_round(frac: cubeCoords): cubeCoords {
 	return { q: q, r: r, s: s };
 }
 
-export function coords_worldToCube(worldX: number, worldY: number, hexOrientation: hexOrientation, hexWidth: number, hexHeight: number): cubeCoords {
-	if (hexOrientation == 'flatTop') {
+export function coords_worldToCube(worldX: number, worldY: number, hexOrientation: hex_orientation, hexWidth: number, hexHeight: number): cubeCoords {
+	if (hexOrientation == hex_orientation.FLATTOP) {
 		// This is the inversion of the axialToWorld
 		// Of course, substituting -q-r in as S
 
@@ -168,7 +167,7 @@ export function coords_worldToCube(worldX: number, worldY: number, hexOrientatio
 		let roundedCoords = cube_round(AxialToCube(q, r));
 
 		return roundedCoords;
-	} else if (hexOrientation == 'pointyTop') {
+	} else { // hex_orientation == 'pointyTop'
 		let r = worldY / (hexHeight * 0.75);
 		let q = ((2 * worldX) / hexWidth - r) / 2;
 
@@ -182,11 +181,11 @@ export function coords_cubeToWorld(
 	q: number,
 	r: number,
 	s: number,
-	hexOrientation: hexOrientation,
+	hex_orientation: hex_orientation,
 	hexWidth: number,
 	hexHeight: number
 ): { x: number; y: number } {
-	if (hexOrientation == 'flatTop') {
+	if (hex_orientation == 'flatTop') {
 		let hx = q * hexWidth * 0.75;
 		let hy = (r * hexHeight) / 2 - (s * hexHeight) / 2;
 
@@ -194,7 +193,7 @@ export function coords_cubeToWorld(
 			x: hx,
 			y: hy,
 		};
-	} else if (hexOrientation == 'pointyTop') {
+	} else { //if (hex_orientation == 'pointyTop') {
 		let hx = (q * hexWidth) / 2 - (s * hexWidth) / 2;
 		let hy = r * hexHeight * 0.75;
 
@@ -207,21 +206,21 @@ export function coords_cubeToWorld(
 
 // EVEN Q = second column has raised tile - the DEFAULT for new maps
 // ODD Q = first column has raised tile
-function coords_cubeToEvenq(q: number, r: number, s) {
+function coords_cubeToEvenq(q: number, r: number) {
 	let col = q;
 	let row = r + (q + (q & 1)) / 2;
 	return { col: col, row: row };
 }
 
-function coords_cubeToOddq(q: number, r: number, s) {
+function coords_cubeToOddq(q: number, r: number) {
 	let col = q;
 	let row = r + (q - (q & 1)) / 2;
 	return { col: col, row: row };
 }
 
 export function coords_cubeToq(raisedColumn: 'odd' | 'even', q: number, r: number, s: number) {
-	if (raisedColumn == 'even') return coords_cubeToEvenq(q, r, s);
-	return coords_cubeToOddq(q, r, s);
+	if (raisedColumn == 'even') return coords_cubeToEvenq(q, r);
+	return coords_cubeToOddq(q, r);
 }
 
 function coords_evenqToCube(col: number, row: number) {
@@ -243,36 +242,36 @@ export function coords_qToCube(oddOrEven: 'odd' | 'even', col: number, row: numb
 
 // EVEN R = first row is indented
 // ODD R = second row is indented
-function coords_cubeToEvenr(q, r, s) {
+function coords_cubeToEvenr(q: number, r: number, s: number) {
 	let col = q + (r + (r & 1)) / 2;
 	let row = r;
 	return { col: col, row: row };
 }
 
-function coords_cubeToOddr(q, r, s) {
+function coords_cubeToOddr(q: number, r: number, s: number) {
 	let col = q + (r - (r & 1)) / 2;
 	let row = r;
 	return { col: col, row: row };
 }
 
-export function coords_cubeTor(indentedRow: 'odd' | 'even', q, r, s) {
+export function coords_cubeTor(indentedRow: 'odd' | 'even', q: number, r: number, s: number) {
 	if (indentedRow == 'even') return coords_cubeToEvenr(q, r, s);
 	return coords_cubeToOddr(q, r, s);
 }
 
-function coords_evenrToCube(col, row) {
+function coords_evenrToCube(col: number, row: number) {
 	var q = col - (row + (row & 1)) / 2;
 	var r = row;
 	return { q: q, r: r, s: -q - r };
 }
 
-function coords_oddrToCube(col, row) {
+function coords_oddrToCube(col: number, row: number) {
 	var q = col - (row - (row & 1)) / 2;
 	var r = row;
 	return { q: q, r: r, s: -q - r };
 }
 
-export function coords_rToCube(indentedRow: 'odd' | 'even', col, row) {
+export function coords_rToCube(indentedRow: 'odd' | 'even', col: number, row: number) {
 	if (indentedRow == 'even') return coords_evenrToCube(col, row);
 	return coords_oddrToCube(col, row);
 }

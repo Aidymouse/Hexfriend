@@ -1,6 +1,4 @@
-import type {Iconset} from '$lib/types/icon'
-
-const DEFAULTICONSET: Iconset = {
+{
   "name": "default",
   "id": "default",
   "author": "Aidymouse",
@@ -304,7 +302,4 @@ const DEFAULTICONSET: Iconset = {
       "texHeight": 101
     }
   ]
-};
-
-
-export { DEFAULTICONSET };
+}
