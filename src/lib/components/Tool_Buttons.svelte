@@ -6,6 +6,9 @@
 	export let data_icon: icon_data;
 	export let data_path: path_data;
 
+	// Import Assets
+	
+
 	$: {
 		data_terrain=data_terrain
 		data_icon=data_icon

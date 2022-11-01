@@ -25,6 +25,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"svelte-pixi": "^0.1.3"
+		"svelte-pixi": "^0.1.3",
+		"svelte-preprocess-import-assets": "^0.2.2"
 	}
 }

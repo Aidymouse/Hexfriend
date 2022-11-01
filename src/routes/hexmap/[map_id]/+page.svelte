@@ -7,6 +7,8 @@
 	import { coord_system } from '$lib/types/coordinates';
 	*/
     import { tools } from '$lib/types/tool_data';
+
+
     
     // Import Components
     import ToolButtons from '$lib/components/Tool_Buttons.svelte';
@@ -36,6 +38,15 @@
         <svelte:component this={app.default}>
 
         </svelte:component>
+
+        <ToolButtons 
+            bind:data_terrain={DATA.data_terrain}
+            bind:data_icon={DATA.data_icon}
+            bind:data_path={DATA.data_path}
+            bind:hexOrientation={loaded_save.TerrainField.orientation}
+            bind:selectedTool={selected_tool}
+        />
+
 
     {/await}
 </main>
