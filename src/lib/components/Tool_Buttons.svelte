@@ -27,7 +27,7 @@
 				{
 					display: "Hex Eraser",
 					action: function() { data_terrain.usingEraser = !data_terrain.usingEraser },
-					image: "$lib/assets.img/tools/mini_eraser.png",
+					image: "/assets/img/tools/mini_eraser.png",
 					obj: data_terrain,
 					field: "usingEraser"
 				},
@@ -35,7 +35,7 @@
 				{
 					display: "Hex Eyedropper",
 					action: function() { data_terrain.usingEyedropper = !data_terrain.usingEyedropper },
-					image: "$lib/assets.img/tools/eyedropper.png",
+					image: "/assets/img/tools/eyedropper.png",
 					obj: data_terrain,
 					field: "usingEyedropper"
 				},
@@ -44,7 +44,7 @@
 				{
 					display: "Hex Paintbucket",
 					action: function() { data_terrain.usingPaintbucket = !data_terrain.usingPaintbucket },
-					image: "$lib/assets.img/tools/paintbucket.png",
+					image: "/assets/img/tools/paintbucket.png",
 					obj: data_terrain,
 					field: "usingPaintbucket"
 				},
@@ -56,7 +56,7 @@
 			{
 				display: "Icon Eraser",
 				action: function() { data_icon.usingEraser = !data_icon.usingEraser },
-				image: "$lib/assets.img/tools/mini_eraser.png",
+				image: "/assets/img/tools/mini_eraser.png",
 				obj: data_icon,
 				field: "usingEraser"
 			},
@@ -64,7 +64,7 @@
 			{
 				display: "Drag Icons",
 				action: function() { data_icon.dragMode = !data_icon.dragMode },
-				image: "$lib/assets.img/tools/drag.png",
+				image: "/assets/img/tools/drag.png",
 				obj: data_icon,
 				field: "dragMode"
 			},
@@ -72,7 +72,7 @@
 			{
 				display: "Snap Icon",
 				action: function() { data_icon.snapToHex = !data_icon.snapToHex },
-				image: "$lib/assets.img/tools/snap_icon.png",
+				image: "/assets/img/tools/snap_icon.png",
 				obj: data_icon,
 				field: "snapToHex"
 			}
@@ -82,7 +82,7 @@
 			{
 				display: "Snap Path Point",
 				action: function() { data_path.snap = !data_path.snap },
-				image: "$lib/assets.img/tools/snap_path.png",
+				image: "/assets/img/tools/snap_path.png",
 				obj: data_path,
 				field: "snap"
 			}
@@ -107,14 +107,13 @@
 				title={`${b.display} Tool`}
 			>
 				<!-- Button Image 
-				{#if b.toolCode == 'terrain'}
-					<img src={`$lib/assets.img/tools/${b.toolCode}_${hexOrientation == 'flatTop' ? 'ft' : 'pt'}.png`} alt={`${b.display} Tool`} />
-				{:else}
-					<img src={`$lib/assets.img/tools/${b.toolCode}.png`} alt={`${b.display} Tool`} />
-				{/if}
 				-->
-				<img src={`$lib/assets.img/tools/${b.toolCode}.png`} alt={`${b.display} Tool`} />
-
+				{#if b.toolCode == 'terrain'}
+					<img src={`/assets/img/tools/${b.toolCode}_${hexOrientation == 'flatTop' ? 'ft' : 'pt'}.png`} alt={`${b.display} Tool`} />
+				{:else}
+					<img src={`/assets/img/tools/${b.toolCode}.png`} alt={`${b.display} Tool`} />
+				{/if}
+				
 			</button>
 
 			<!-- Mini Buttons -->

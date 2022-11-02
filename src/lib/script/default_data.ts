@@ -5,7 +5,7 @@ import { coord_system } from '$lib/types/coordinates';
 import type { terrain_data, icon_data, path_data, text_data, coordinates_data, eraser_data } from '$lib/types/data';
 import * as PIXI from 'pixi.js';
 
-export let data_terrain: terrain_data = {
+let data_terrain: terrain_data = {
     //bgColor: null,
     //symbol: null,
 
@@ -17,7 +17,7 @@ export let data_terrain: terrain_data = {
     renderOpacity: 1,
 };
 
-export let data_icon: icon_data = {
+let data_icon: icon_data = {
     color: 0x000000,
     texId: undefined,
     pHex: 80,
@@ -26,7 +26,7 @@ export let data_icon: icon_data = {
     dragMode: false
 };
 
-export let data_path: path_data = {
+let data_path: path_data = {
     style: { color: 0, width: 3, cap: PIXI.LINE_CAP.ROUND, join: PIXI.LINE_JOIN.ROUND },
     hoveredPath: undefined,
     selectedPath: undefined,
@@ -35,7 +35,7 @@ export let data_path: path_data = {
     contextPathId: undefined,
 };
 
-export let data_text: text_data = {
+let data_text: text_data = {
     style: {
         fontFamily: 'Segoe UI',
         fill: '#000000',
@@ -53,7 +53,7 @@ export let data_text: text_data = {
     contextStyleId: undefined,
 };
 
-export let data_coordinates: coordinates_data = {
+let data_coordinates: coordinates_data = {
     shown: true,
     style: { fill: 0x000000, fontSize: 10 },
     system: coord_system.ROWCOL,
@@ -61,7 +61,9 @@ export let data_coordinates: coordinates_data = {
     gap: 4,
 };
 
-export let data_eraser: eraser_data = {
+let data_eraser: eraser_data = {
     ignoreTerrain: false,
     ignoreIcons: false,
 };
+
+export { data_terrain, data_icon, data_text, data_path, data_coordinates, data_eraser } 

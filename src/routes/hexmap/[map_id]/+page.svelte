@@ -27,6 +27,11 @@
     
     let selected_tool: tools = tools.TERRAIN
 
+    function change_tool(new_tool: tools) {
+
+        selected_tool = new_tool
+
+    }
 
 </script>
 
@@ -45,6 +50,7 @@
             bind:data_path={DATA.data_path}
             bind:hexOrientation={loaded_save.TerrainField.orientation}
             bind:selectedTool={selected_tool}
+            changeTool={change_tool}
         />
 
 
