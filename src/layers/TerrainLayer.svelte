@@ -27,11 +27,16 @@
 	import type CoordsLayer from './CoordsLayer.svelte';
 	import * as PIXI from 'pixi.js';
 	import { onMount } from 'svelte';
-	import { Container, Graphics } from 'svelte-pixi';
+
+	export let cont_terrain: PIXI.Container;
 
 	let terrainGraphics = new PIXI.Graphics();
 	let symbolsContainer = new PIXI.Container();
 	let gridGraphics = new PIXI.Graphics();
+
+	cont_terrain.addChild(terrainGraphics);
+	cont_terrain.addChild(symbolsContainer);
+	cont_terrain.addChild(gridGraphics);
 
 	let terrainSprites: { [key: hex_id]: PIXI.Sprite } = {};
 
@@ -982,6 +987,7 @@
 	});
 </script>
 
+<!--
 <Graphics
 	instance={terrainGraphics}
 	draw={(g) => {
@@ -998,3 +1004,4 @@
 		}}
 	/>
 {/if}
+-->

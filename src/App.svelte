@@ -5,18 +5,26 @@ hexfiend red: #FF6666
 */
 
 	/* TODO 
-// CORE FUNCTIONS
-- tooltips
-- keyboard shortcuts
+	// CORE FUNCTIONS
+	- get rid of reliance on svelte-pixi
+	- tooltips
+	- keyboard shortcuts - make sure all are working
+		- coords
+		- overlay
+		- paths
+		- text
+
 // POLISH / ROADMAP
 // not ranked
-- terrain generator function validation
 - terrain generator
+- terrain generator function validation
 - floating loaders - better feedback
 - save data checking (if loading, making new map, quitting)
 - export at different sizes
 - dashed line
 - more fonts
+- tests?? I dont think I'm a real enough dev
+- abolish technical debt
 */
 
 	/* BUGS 
@@ -59,6 +67,8 @@ hexfiend red: #FF6666
 	import './styles/inputs.css';
 	import './styles/panels.css';
 	import './styles/scrollbar.css';
+
+	// TYPES
 	import { coord_system } from './types/coordinates';
 	import type { coordinates_data, eraser_data, icon_data, path_data, terrain_data, text_data, trace_data } from './types/data';
 	import type { Iconset } from './types/icon';
@@ -72,8 +82,6 @@ hexfiend red: #FF6666
 	import { tools } from './types/toolData';
 	import * as PIXI from 'pixi.js';
 	import { Container, Application } from 'svelte-pixi';
-
-	import * as PIXI_Assets from '@pixi/assets';
 
 	import * as texture_loader from './lib/texture_loader';
 
@@ -114,6 +122,11 @@ hexfiend red: #FF6666
 	let comp_shortcutList: ShortcutList;
 
 	//offsetContainer.addChild(terrainGraphics);
+
+
+	/* PIXI CONTAINERS */
+	let cont_icon = new PIXI.Container();
+	let cont_terrain = new PIXI.Container();
 
 	/* APPLICATION */
 	let app = new PIXI.Application({
@@ -678,6 +691,12 @@ hexfiend red: #FF6666
 	}
 
 	createNewMap();
+
+	/* Order matters */
+	/* TODO: Put this somewhere better, add other layers */
+
+	offsetContainer.addChild(cont_terrain);
+	offsetContainer.addChild(cont_icon);
 </script>
 
 <svelte:window on:keydown={keyDown} on:keyup|preventDefault={keyUp} />
@@ -720,7 +739,7 @@ hexfiend red: #FF6666
 	>
 		<Application instance={app} resizeTo={window} >
 			<Container instance={offsetContainer} x={pan.offsetX} y={pan.offsetY} scale={{ x: pan.zoomScale, y: pan.zoomScale }}>
-				<TerrainLayer bind:this={comp_terrainLayer} bind:data_terrain {controls} {comp_coordsLayer} />
+				<TerrainLayer bind:cont_terrain bind:this={comp_terrainLayer} bind:data_terrain {controls} {comp_coordsLayer} />
 
 				<PathLayer bind:this={comp_pathLayer} bind:paths={loadedSave.paths} bind:data_path {controls} {selectedTool} />
 
@@ -728,12 +747,15 @@ hexfiend red: #FF6666
 					bind:this={comp_iconLayer}
 					bind:icons={loadedSave.icons}
 					bind:data_icon
+					bind:cont_icon
 					{data_eraser}
 					{selectedTool}
 					{controls}
 				/>
-
 				<!--
+
+				<Container instance={cont_icon}></Container>
+
           Needs Optimization badly
         -->
 
