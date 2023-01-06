@@ -3,14 +3,17 @@
 	import { Vector } from '../lib/vector2d';
 	import * as store_panning from '../stores/panning';
 	import * as store_tfield from '../stores/tfield';
+	import { store_selected_tool } from '../stores/tools';
+	import * as PIXI from 'pixi.js';
+
 	import type { path_data } from '../types/data';
 	import type { pan_state } from '../types/panning';
 	import type { path_layer_path } from '../types/path';
-	import type { terrain_field } from '../types/terrain';
-	import * as PIXI from 'pixi.js';
+	import { hex_orientation, terrain_field } from '../types/terrain';
 	import type { shortcut_data } from 'src/types/inputs';
 	import type { tools } from 'src/types/toolData';
-	import { Container, Graphics } from 'svelte-pixi';
+	
+	import { afterUpdate } from 'svelte';
 
 	export let controls;
 	let pan: pan_state;
@@ -18,7 +21,8 @@
 		pan = newPan;
 	});
 
-	export let selectedTool: tools;
+	let selectedTool: tools;
+	store_selected_tool.subscribe(t => selectedTool = t);
 
 	let tfield: terrain_field;
 	store_tfield.store.subscribe((newTField) => {
@@ -28,6 +32,7 @@
 	export let data_path: path_data;
 
 	export let paths: path_layer_path[] = [];
+	export let cont_all_paths: PIXI.Container;
 
 	let pathId: number = 0;
 
@@ -57,10 +62,12 @@
 				}
 
 				appendPoint(data_path.selectedPath, pX, pY);
+
 			} else if (data_path.hoveredPath && !data_path.dontSelectPaths) {
 				data_path.selectedPath = paths[paths.indexOf(data_path.hoveredPath)];
 				data_path.style = { ...data_path.selectedPath.style };
 				data_path.hoveredPath = null;
+
 			} else {
 				addNewPath();
 			}
@@ -85,61 +92,30 @@
 	}
 
 	function getSnapPoint() {
-		let hW = tfield.hexWidth;
-		let hH = tfield.hexHeight;
 
-		let clickedCoords = coords_worldToCube(
+		// Overlay a grid of smaller opposite orientation hexes and it lines up perfectly!
+
+		let snap_grid_orientation = tfield.orientation == hex_orientation.FLATTOP ? hex_orientation.POINTYTOP : hex_orientation.FLATTOP
+		let snap_grid_hexWidth = tfield.hexWidth / (tfield.orientation == hex_orientation.FLATTOP ? 2 : 1.5)
+		let snap_grid_hexHeight = tfield.hexHeight / (tfield.orientation == hex_orientation.FLATTOP ? 1.5 : 2)
+
+		let snap_coords = coords_worldToCube(
 			store_panning.curWorldX(),
 			store_panning.curWorldY(),
-			tfield.orientation,
-			tfield.hexWidth,
-			tfield.hexHeight
-		);
-		let centerCoords = coords_cubeToWorld(
-			clickedCoords.q,
-			clickedCoords.r,
-			clickedCoords.s,
-			tfield.orientation,
-			tfield.hexWidth,
-			tfield.hexHeight
-		);
+			snap_grid_orientation,
+			snap_grid_hexWidth,
+			snap_grid_hexHeight,
+			)
+			
+		return coords_cubeToWorld(
+			snap_coords.q,
+			snap_coords.r,
+			snap_coords.s,
+			snap_grid_orientation,
+			snap_grid_hexWidth,
+			snap_grid_hexHeight,
+		)
 
-		let closestPoint = { x: Infinity, y: Infinity };
-		let shortestDist = Infinity;
-
-		let snapPoints;
-
-		if (tfield.orientation == 'flatTop') {
-			snapPoints = [
-				centerCoords,
-				{ x: centerCoords.x + hW / 4, y: centerCoords.y - hH / 2 },
-				{ x: centerCoords.x + hW / 2, y: centerCoords.y },
-				{ x: centerCoords.x + hW / 4, y: centerCoords.y + hH / 2 },
-				{ x: centerCoords.x - hW / 4, y: centerCoords.y + hH / 2 },
-				{ x: centerCoords.x - hW / 2, y: centerCoords.y },
-				{ x: centerCoords.x - hW / 4, y: centerCoords.y - hH / 2 },
-			];
-		} else if (tfield.orientation == 'pointyTop') {
-			snapPoints = [
-				centerCoords,
-				{ x: centerCoords.x, y: centerCoords.y - hH / 2 },
-				{ x: centerCoords.x + hW / 2, y: centerCoords.y - hH / 4 },
-				{ x: centerCoords.x + hW / 2, y: centerCoords.y + hH / 4 },
-				{ x: centerCoords.x, y: centerCoords.y },
-				{ x: centerCoords.x - hW / 2, y: centerCoords.y + hH / 4 },
-				{ x: centerCoords.x - hW / 2, y: centerCoords.y + hH / 4 },
-			];
-		}
-
-		snapPoints.forEach((p) => {
-			let dist = Math.sqrt((p.x - store_panning.curWorldX()) ** 2 + (p.y - store_panning.curWorldY()) ** 2);
-			if (dist < shortestDist) {
-				closestPoint = p;
-				shortestDist = dist;
-			}
-		});
-
-		return closestPoint;
 	}
 
 	function addNewPath() {
@@ -168,6 +144,7 @@
 		return points;
 	}
 
+	/* HIT AREA */
 	function findHitArea(path: path_layer_path) {
 		let boxWidth = 5 + path.style.width;
 
@@ -322,6 +299,7 @@
 		return { x, y };
 	}
 
+	/* idk */
 	export function moveAllPaths(xMod: number, yMod: number) {
 		paths.forEach((path) => {
 			for (let pI = 0; pI < path.points.length; pI += 2) {
@@ -333,6 +311,7 @@
 		paths = paths;
 	}
 
+	/* KEYBOARD */
 	export function handleKeyboardShortcut(shortcutData: shortcut_data) {
 		switch (shortcutData.function) {
 			case 'toggleSnap':
@@ -375,52 +354,84 @@
 
 	const HOVEREDSELECTORSTYLE: PIXI.LineStyle = { width: 1, color: 0x555555 };
 	const SELECTEDSELECTORSTYLE: PIXI.LineStyle = { width: 2, color: 0x333333 };
-</script>
 
-{#each paths as path (path.id)}
-	<Container
-		hitArea={findHitArea(path)}
-		interactive={selectedTool == 'path' && !data_path.selectedPath}
-		on:pointerover={() => {
-			data_path.hoveredPath = path;
-		}}
-		on:pointerout={() => {
-			data_path.hoveredPath = null;
-		}}
-	>
-		<Graphics
-			draw={(g) => {
-				g.clear();
-				g.lineStyle(path.style);
-				g.moveTo(path.points[0], path.points[1]);
-				for (let pI = 0; pI < path.points.length; pI += 2) {
-					g.lineTo(path.points[pI], path.points[pI + 1]);
-				}
-			}}
-		/>
-	</Container>
-{/each}
+	let path_containers = {};
+	let grph_hovered_path = new PIXI.Graphics();
+	let grph_selected_path = new PIXI.Graphics();
 
-{#if data_path.selectedPath}
-	<Graphics
-		draw={(g) => {
-			g.clear();
-			g.lineStyle(SELECTEDSELECTORSTYLE);
+	cont_all_paths.addChild(grph_hovered_path, grph_selected_path);
+
+	afterUpdate(() => {
+
+		for (const [path_id, cont_path] of Object.entries(path_containers)) {
+			cont_path.marked_for_death = true
+		}
+			// Update paths to match state
+		for (const path of paths) {
+
+			if (!path_containers[path.id]) {
+
+				let cont_path = new PIXI.Container();
+				cont_path.on('pointerover', () => { console.log(path.id); data_path.hoveredPath = path; })
+				cont_path.on('pointerout', () => { data_path.hoveredPath = null; })
+				
+				let grph_path = new PIXI.Graphics();
+				cont_path.addChild(grph_path)
+
+				path_containers[path.id] = cont_path;
+				cont_all_paths.addChild(cont_path)
+
+			}
+
+			let cont_path = path_containers[path.id]
+			cont_path.marked_for_death = false
+			cont_path.interactive = selectedTool == 'path' && !data_path.selectedPath
+			cont_path.hitArea = findHitArea(path)
+
+			let grph_path = cont_path.children[0]
+			grph_path.clear();
+			grph_path.lineStyle(path.style);
+			grph_path.moveTo(path.points[0], path.points[1]);
+			for (let pI = 0; pI < path.points.length; pI += 2) {
+				grph_path.lineTo(path.points[pI], path.points[pI + 1]);
+			}
+
+
+
+		}
+
+		for (const [path_id, cont_path] of Object.entries(path_containers)) {
+
+			if (cont_path.marked_for_death) {
+				cont_all_paths.removeChild(cont_path)
+				cont_path.destroy()
+				
+				delete path_containers[path_id]
+			}
+		}
+
+
+		/* Selector Graphics */
+		grph_selected_path.clear();
+		if (data_path.selectedPath) {
+			grph_selected_path.lineStyle(SELECTEDSELECTORSTYLE);
+			grph_selected_path.beginFill(0xf2f2f2);
 			for (let pI = 0; pI < data_path.selectedPath.points.length; pI += 2) {
-				g.drawCircle(data_path.selectedPath.points[pI], data_path.selectedPath.points[pI + 1], 4);
+				grph_selected_path.drawCircle(data_path.selectedPath.points[pI], data_path.selectedPath.points[pI + 1], 4);
 			}
-		}}
-	/>
-{/if}
-
-{#if data_path.hoveredPath && !data_path.dontSelectPaths}
-	<Graphics
-		draw={(g) => {
-			g.clear();
-			g.lineStyle(HOVEREDSELECTORSTYLE);
+			grph_selected_path.endFill();
+		}
+		
+		grph_hovered_path.clear();
+		if (data_path.hoveredPath && !data_path.dontSelectPaths) {
+			grph_hovered_path.lineStyle(HOVEREDSELECTORSTYLE);
+			grph_hovered_path.beginFill(0xf2f2f2);
 			for (let pI = 0; pI < data_path.hoveredPath.points.length; pI += 2) {
-				g.drawCircle(data_path.hoveredPath.points[pI], data_path.hoveredPath.points[pI + 1], 3);
+				grph_hovered_path.drawCircle(data_path.hoveredPath.points[pI], data_path.hoveredPath.points[pI + 1], 3);
 			}
-		}}
-	/>
-{/if}
+			grph_hovered_path.endFill();
+		}
+	})
+
+
+</script>

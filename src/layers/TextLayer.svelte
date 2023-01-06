@@ -6,11 +6,14 @@
 	import type { text_layer_text } from '../types/text';
 	import * as PIXI from 'pixi.js';
 	import { Graphics, Text } from 'svelte-pixi';
+	import { afterUpdate } from 'svelte';
 
 	let pan: pan_state;
 	store_panning.store.subscribe((newPan) => {
 		pan = newPan;
 	});
+
+	export let cont_all_text;
 
 	export let data_text: text_data;
 	let hoveredText;
@@ -30,6 +33,7 @@
 	$: {
 		if (data_text.selectedText) data_text.selectedText.style = { ...data_text.style };
 		texts = texts;
+		hoveredText = hoveredText;
 	}
 
 	export function pointerdown() {
@@ -127,34 +131,56 @@
 				break;
 		}
 	}
-</script>
 
-{#each texts as t (t.id)}
-	<Text
-		x={t.x}
-		y={t.y}
-		style={t.style}
-		text={t.text}
-		height={getTextHeight(t)}
-		width={getTextWidth(t)}
-		interactive={true}
-		on:pointerover={(e) => (hoveredText = t)}
-		on:pointerout={(e) => (hoveredText = null)}
-		anchor={alignMap[t.style.align]}
-	/>
-{/each}
+	let pixi_texts = {};
+	let cont_pixi_text = new PIXI.Container();
+	let grph_selector = new PIXI.Graphics();
 
-<Graphics
-	draw={(g) => {
-		g.clear();
+	cont_all_text.addChild(cont_pixi_text, grph_selector);
+
+	afterUpdate(() => {
+		for (const [text_id, pixi_text] of Object.entries(pixi_texts)) {
+			pixi_text.marked_for_death = true
+		}
+
+		for (const text of texts) {
+			if (!pixi_texts[text.id]) {
+				let new_text = new PIXI.Text()
+				new_text.interactive = true
+				new_text.on("pointerover", (e) => { hoveredText = text} )
+				new_text.on("pointerout", (e) => { hoveredText = null} )
+
+				pixi_texts[text.id] = new_text
+				cont_pixi_text.addChild(new_text)
+			}
+
+			let pixi_text = pixi_texts[text.id]
+			pixi_text.x = text.x
+			pixi_text.y = text.y
+			pixi_text.text = text.text
+			pixi_text.style = text.style
+			pixi_text.anchor = alignMap[text.style.align]
+			pixi_text.marked_for_death = false
+		}
+
+		for (const [text_id, pixi_text] of Object.entries(pixi_texts)) {
+			if (pixi_text.marked_for_death) {
+				cont_pixi_text.removeChild(pixi_text)
+				delete pixi_texts[text_id]
+			}
+		}
+
+
+		/* Selector */
+		grph_selector.clear();
 		if (!data_text.usingTextTool) return;
 
 		if (data_text.selectedText) {
 			let tW = getTextWidth(data_text.selectedText);
 			let tH = getTextHeight(data_text.selectedText);
 
-			g.lineStyle(4, 0x333333);
-			g.drawRect(
+			grph_selector.lineStyle(4, 0x333333);
+			grph_selector.drawRect(
 				data_text.selectedText.x - tW * alignMap[data_text.selectedText.style.align].x - 5,
 				data_text.selectedText.y - 5,
 				tW + 10,
@@ -166,8 +192,10 @@
 			let tW = getTextWidth(hoveredText);
 			let tH = getTextHeight(hoveredText);
 
-			g.lineStyle(2, 0x555555);
-			g.drawRect(hoveredText.x - tW * alignMap[hoveredText.style.align].x - 4, hoveredText.y - 4, tW + 8, tH + 8);
+			grph_selector.lineStyle(2, 0x555555);
+			grph_selector.drawRect(hoveredText.x - tW * alignMap[hoveredText.style.align].x - 4, hoveredText.y - 4, tW + 8, tH + 8);
 		}
-	}}
-/>
+
+	})
+</script>
+

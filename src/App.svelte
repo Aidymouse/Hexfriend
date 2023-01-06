@@ -1,45 +1,46 @@
 <script lang="ts">
-	/* COLORS
-hexfriend green: #8cc63f
-hexfiend red: #FF6666
-*/
+	/* COLORS //
+	hexfriend green: #8cc63f
+	hexfiend red: #FF6666
+	*/
 
-	/* TODO 
+	/* TODO //
+
 	// CORE FUNCTIONS
-	- get rid of reliance on svelte-pixi
 	- tooltips
 	- keyboard shortcuts - make sure all are working
+	- get rid of reliance on svelte-pixi
 		- coords
 		- overlay
-		- paths
-		- text
 
-// POLISH / ROADMAP
-// not ranked
-- terrain generator
-- terrain generator function validation
-- floating loaders - better feedback
-- save data checking (if loading, making new map, quitting)
-- export at different sizes
-- dashed line
-- more fonts
-- tests?? I dont think I'm a real enough dev
-- abolish technical debt
-*/
+	// POLISH / ROADMAP
+	// not ranked
+	- terrain generator
+	- terrain generator function validation
+	- floating loaders - better feedback
+	- save data checking (if loading, making new map, quitting)
+	- export at different sizes
+	- dashed line
+	- more fonts
+	- tests?? I dont think I'm a real enough dev
+	- abolish technical debt
+	*/
 
-	/* BUGS 
-- symbol size is weird in preview when hex size is big
-- coordinates show under some stuff for some reason
-*/
-	import Controls from './components/ControlTooltips.svelte';
+	/* BUGS //
+	- symbol size is weird in preview when hex size is big
+	- coordinates show under some stuff for some reason
+	*/
+
+	// Components
+	import ControlTooltips from './components/ControlTooltips.svelte';
 	import IconsetCreator from './components/IconsetCreator.svelte';
 	import MapSettings from './components/MapSettings.svelte';
 	import SavedMaps from './components/SavedMaps.svelte';
 	import ShortcutList from './components/ShortcutList.svelte';
 	import TerrainGenerator from './components/TerrainGenerator.svelte';
 	import TilesetCreator from './components/TilesetCreator.svelte';
-	// Like, whatever
 	import ToolButtons from './components/ToolButtons.svelte';
+	
 	// Layers
 	import CoordsLayer from './layers/CoordsLayer.svelte';
 	import IconLayer from './layers/IconLayer.svelte';
@@ -47,7 +48,7 @@ hexfiend red: #FF6666
 	import PathLayer from './layers/PathLayer.svelte';
 	import TerrainLayer from './layers/TerrainLayer.svelte';
 	import TextLayer from './layers/TextLayer.svelte';
-	import { db } from './lib/db';
+	
 	// Data
 	import DEFAULTSAVEDATA from './lib/defaultSaveData';
 	// Methods
@@ -55,6 +56,14 @@ hexfiend red: #FF6666
 	import { download } from './lib/download2';
 	import { getKeyboardShortcut } from './lib/keyboardShortcuts';
 	import { convertSaveDataToLatest } from './lib/saveDataConverter';
+	import { afterUpdate } from 'svelte';
+	
+	// Lib
+	import * as texture_loader from './lib/texture_loader';
+	import * as PIXI from 'pixi.js';
+	import { db } from './lib/db';
+	import { Container, Application } from 'svelte-pixi';
+	
 	// Panels
 	import IconPanel from './panels/IconPanel.svelte';
 	import PathPanel from './panels/PathPanel.svelte';
@@ -63,27 +72,29 @@ hexfiend red: #FF6666
 	import * as store_inputs from './stores/inputs';
 	import * as store_panning from './stores/panning';
 	import * as store_tfield from './stores/tfield';
+	import { store_selected_tool } from './stores/tools';
+	
 	// GLOBAL STYLES
 	import './styles/inputs.css';
 	import './styles/panels.css';
 	import './styles/scrollbar.css';
-
+	
 	// TYPES
-	import { coord_system } from './types/coordinates';
 	import type { coordinates_data, eraser_data, icon_data, path_data, terrain_data, text_data, trace_data } from './types/data';
 	import type { Iconset } from './types/icon';
 	import type { input_state } from './types/inputs';
 	import type { pan_state } from './types/panning';
 	import type { save_data } from './types/savedata';
-	import { LATESTSAVEDATAVERSION } from './types/savedata';
-	import { map_shape } from './types/settings';
 	import type { terrain_field } from './types/terrain';
 	import type { Tileset } from './types/tilesets';
+	
+	// Enums
 	import { tools } from './types/toolData';
-	import * as PIXI from 'pixi.js';
-	import { Container, Application } from 'svelte-pixi';
-
-	import * as texture_loader from './lib/texture_loader';
+	import { coord_system } from './types/coordinates';
+	import { map_shape } from './types/settings';
+	
+	// Constants
+	import { LATESTSAVEDATAVERSION } from './types/savedata';
 
 	/* STATE */
 
@@ -123,10 +134,13 @@ hexfiend red: #FF6666
 
 	//offsetContainer.addChild(terrainGraphics);
 
-
 	/* PIXI CONTAINERS */
 	let cont_icon = new PIXI.Container();
 	let cont_terrain = new PIXI.Container();
+	let cont_all_paths = new PIXI.Container();
+	let cont_all_text = new PIXI.Container();
+	let cont_coordinates = new PIXI.Container();
+	let cont_bighex_overlay = new PIXI.Container();
 
 	/* APPLICATION */
 	let app = new PIXI.Application({
@@ -158,7 +172,10 @@ hexfiend red: #FF6666
 		controls = newInputState;
 	});
 
-	let selectedTool: tools = tools.TERRAIN;
+	let selectedTool;
+	store_selected_tool.subscribe(t => {
+		selectedTool = t;
+	})
 
 	/* DATA */
 	/* Data is bound to both layer and panel of a particluar tool. It contains all the shared state they need, and is bound to both */
@@ -236,7 +253,7 @@ hexfiend red: #FF6666
 		switch (exportType) {
 			case 'image/png':
 				download(
-					app.renderer.plugins.extract.base64(offsetContainer),
+					app.renderer.extract.base64(offsetContainer),
 					`${loadedSave.title ? loadedSave.title : 'Untitled Hexfriend'}`,
 					exportType
 				);
@@ -261,7 +278,7 @@ hexfiend red: #FF6666
 		data_path.contextPathId = null;
 		data_text.contextStyleId = null;
 
-		selectedTool = newTool;
+		store_selected_tool.update(n => newTool);
 	}
 
 	/* ALL PURPOSE POINTER METHODS */
@@ -539,7 +556,7 @@ hexfiend red: #FF6666
 
 	async function asyncExtract(app, container): Promise<string> {
 		await null;
-		return new Promise((r) => r(app.renderer.plugins.extract.base64(container)));
+		return new Promise((r) => r(app.renderer.extract.base64(container)));
 	}
 
 	async function saveToDexie() {
@@ -615,6 +632,7 @@ hexfiend red: #FF6666
 
 		// Load Textures
 		for (const tileset of loadedTilesets) {
+			console.log(`Loading textures for ${tileset.name}`)
 			texture_loader.load_tileset_textures(tileset);
 		}
 
@@ -697,6 +715,12 @@ hexfiend red: #FF6666
 
 	offsetContainer.addChild(cont_terrain);
 	offsetContainer.addChild(cont_icon);
+	offsetContainer.addChild(cont_all_paths);
+	offsetContainer.addChild(cont_all_text);
+
+	afterUpdate(() => {
+		// Update offset container X, Y, scale
+	})
 </script>
 
 <svelte:window on:keydown={keyDown} on:keyup|preventDefault={keyUp} />
@@ -741,7 +765,13 @@ hexfiend red: #FF6666
 			<Container instance={offsetContainer} x={pan.offsetX} y={pan.offsetY} scale={{ x: pan.zoomScale, y: pan.zoomScale }}>
 				<TerrainLayer bind:cont_terrain bind:this={comp_terrainLayer} bind:data_terrain {controls} {comp_coordsLayer} />
 
-				<PathLayer bind:this={comp_pathLayer} bind:paths={loadedSave.paths} bind:data_path {controls} {selectedTool} />
+				<PathLayer 
+					bind:this={comp_pathLayer} 
+					bind:cont_all_paths
+					bind:paths={loadedSave.paths} 
+					bind:data_path 
+					{controls} 
+				/>
 
 				<IconLayer
 					bind:this={comp_iconLayer}
@@ -749,7 +779,6 @@ hexfiend red: #FF6666
 					bind:data_icon
 					bind:cont_icon
 					{data_eraser}
-					{selectedTool}
 					{controls}
 				/>
 				<!--
@@ -763,12 +792,12 @@ hexfiend red: #FF6666
 
 				<CoordsLayer bind:this={comp_coordsLayer} bind:data_coordinates />
 
-				<TextLayer bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text />
+				<TextLayer bind:cont_all_text bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text />
 			</Container>
 		</Application>
 	</main>
 
-	<!-- Terrain Buttons -->
+	<!-- Panels -->
 	{#if showTerrainGenerator}
 		<TerrainGenerator {loadedTilesets} {comp_terrainLayer} bind:showTerrainGenerator />
 	{:else if selectedTool == 'terrain'}
@@ -848,7 +877,7 @@ hexfiend red: #FF6666
 	/>
 
 	{#if showControls}
-		<Controls {selectedTool} {data_terrain} {data_icon} {data_path} {data_text} {data_eraser} />
+		<ControlTooltips {data_terrain} {data_icon} {data_path} {data_text} {data_eraser} />
 	{/if}
 {:else if appState == app_state.TILESETCREATOR}
 	<TilesetCreator bind:appState />

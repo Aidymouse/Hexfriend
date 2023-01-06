@@ -92,7 +92,7 @@
 			previewSprite.tint = tile.symbol.color;
 		}
 
-		return app.renderer.plugins.extract.base64(previewContainer);
+		return app.renderer.extract.base64(previewContainer);
 	}
 
 	function IDify(name: string): string {

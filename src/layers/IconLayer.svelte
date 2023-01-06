@@ -10,10 +10,12 @@
 	} from '../helpers/hexHelpers';
 	import * as store_panning from '../stores/panning';
 	import * as store_tfield from '../stores/tfield';
+	import { store_selected_tool } from '../stores/tools';
 	import type { eraser_data, icon_data } from '../types/data';
 	import type { IconLayerIcon } from '../types/icon';
 	import type { shortcut_data } from '../types/inputs';
 	import type { pan_state } from '../types/panning';
+	import { tools } from '../types/toolData';
 	import { map_shape } from '../types/settings';
 	import type { terrain_field } from '../types/terrain';
 	import * as PIXI from 'pixi.js';
@@ -33,7 +35,9 @@
 	store_panning.store.subscribe((newPan) => {
 		pan = newPan;
 	});
-	export let selectedTool: tools;
+	
+	let selectedTool: tools;
+	store_selected_tool.subscribe(n => selectedTool = n);
 
 	export let controls;
 
@@ -148,6 +152,7 @@
 	let cursorOnLayer: boolean = false;
 	export function pointerout(e: PointerEvent) {
 		cursorOnLayer = false;
+		spr_floating_icon.visible = false; // Not too happy about this but it's fine
 	}
 
 
@@ -205,6 +210,9 @@
 			floatingIcon.x = store_panning.curWorldX();
 			floatingIcon.y = store_panning.curWorldY();
 		}
+
+		floatingIcon.color = data_icon.color
+		floatingIcon.texId = data_icon.texId
 	}
 
 	export function moveAllIcons(xMod: number, yMod: number) {
@@ -433,7 +441,11 @@
 
 	createFloatingIcon();
 
-
+	let spr_floating_icon = new PIXI.Sprite()
+	spr_floating_icon.anchor.x = 0.5
+	spr_floating_icon.anchor.y = 0.5
+	spr_floating_icon.alpha = 0.5
+	cont_icon.addChild(spr_floating_icon)
 
 	// TODO: This could use a bit of cleanup...
 	afterUpdate(() => {
@@ -475,6 +487,22 @@
 			}
 		})		
 
+
+		/* Floating Icon */
+		spr_floating_icon.visible = false
+		if (floatingIcon) {
+			spr_floating_icon.visible = !data_icon.usingEraser && selectedTool == tools.ICON && cursorOnLayer && !data_icon.dragMode && draggedIcon == null
+			spr_floating_icon.texture = get_icon_texture(floatingIcon.texId)
+			spr_floating_icon.tint = floatingIcon.color
+
+			spr_floating_icon.x = floatingIcon.x
+			spr_floating_icon.y = floatingIcon.y
+			spr_floating_icon.tint = floatingIcon.color
+			spr_floating_icon.scale.x = floatingIcon.scale
+			spr_floating_icon.scale.y = floatingIcon.scale
+			//spr_floating_icon.interactive = true // !!! TODO
+
+		}
 
 
 

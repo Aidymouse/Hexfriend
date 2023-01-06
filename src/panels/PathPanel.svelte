@@ -133,7 +133,7 @@
 			<button
 				on:click={() => {
 					deselectPath();
-				}}>Deselect Current Path</button
+				}}>Deselect Path</button
 			>
 			<button
 				on:click={() => {

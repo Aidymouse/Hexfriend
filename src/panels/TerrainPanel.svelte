@@ -4,10 +4,11 @@
 	import * as store_tfield from '../stores/tfield';
 	import type { terrain_data } from '../types/data';
 	import type { terrain_field } from '../types/terrain';
-	import type { Tile, Tileset } from '../types/tilesets';
+	import type { Tile, Tileset, TileSymbol } from '../types/tilesets';
 	import * as PIXI from 'pixi.js';
 
 	import { get_symbol_texture } from '../lib/texture_loader';
+	import { afterUpdate, onMount } from 'svelte';
 
 	export let loadedTilesets: Tileset[];
 	export let data_terrain: terrain_data;
@@ -19,30 +20,23 @@
 
 	export let app: PIXI.Application;
 
-	$: {
-		tilePreview = generateTilePreview(data_terrain);
-		loadedTilesets = loadedTilesets;
-
-		tfield.orientation = tfield.orientation;
-	}
-
 	// Used for previews
 	let g = new PIXI.Graphics();
 	let s = new PIXI.Sprite();
 	let c = new PIXI.Container();
 	c.addChild(g).addChild(s);
 
-	let tilePreview: string = generateTilePreview(data_terrain);
+	let tilePreview: string; //generateTilePreview(data_terrain);
 
-	function changeTile(t: Tile) {
+	async function changeTile(t: Tile) {
 		data_terrain.tile = { ...t, symbol: t.symbol ? { ...t.symbol } : null };
-		tilePreview = generateTilePreview(data_terrain);
+		tilePreview = await generateTilePreview(data_terrain); // Not entirely sure why we have to await here when we already await in the function, but fuck it, it works
 		data_terrain.usingPaintbucket = false;
 		data_terrain.usingEraser = false;
 	}
 
 
-	function findSymbolScale(symbol, hexWidth: number, hexHeight: number) {
+	function findSymbolScale(symbol: TileSymbol, hexWidth: number, hexHeight: number) {
 		if (hexWidth < hexHeight) {
 			let s = (hexWidth * symbol.pHex) / 100 / symbol.texWidth;
 			return {
@@ -58,7 +52,7 @@
 		}
 	}
 
-	function generateTilePreview(data_terrain: terrain_data) {
+	async function generateTilePreview(data_terrain: terrain_data) {
 		g.clear();
 		g.beginFill(data_terrain.tile ? data_terrain.tile.bgColor : tfield.blankHexColor);
 
@@ -82,7 +76,9 @@
 			s.texture = null;
 		}
 
-		let b64 = app.renderer.plugins.extract.base64(c); //PIXI.autoDetectRenderer().plugins.extract.base64(c)
+		let b64 = app.renderer.extract.base64(c); //PIXI.autoDetectRenderer().plugins.extract.base64(c)
+
+		console.log(b64)
 
 		return b64;
 	}
@@ -110,13 +106,22 @@
 
 		return true;
 	}
+
+	afterUpdate(() => {
+		loadedTilesets = loadedTilesets
+		tfield.orientation = tfield.orientation
+	})
+
+	onMount(async () => {
+		tilePreview = await generateTilePreview(data_terrain);
+	})
 </script>
 
 <div class="panel">
 	<div id="terrain-preview">
 		<div id="preview-image-centerer">
 			<img
-				src={tilePreview}
+				src={ tilePreview }
 				alt={'Current Tile Preview'}
 				class:flatTop={tfield.orientation == 'flatTop'}
 				class:pointyTop={tfield.orientation == 'pointyTop'}
@@ -138,7 +143,7 @@
 			{/if}
 			<div class="button-grid">
 				{#each tileset.tiles as tile (tile.id)}
-					<button title={tile.display} on:click={() => changeTile(tile)} class:selected={styleMatchesData(tile)}
+					<button title={tile.display} on:click={async () => {await changeTile(tile) } } class:selected={styleMatchesData(tile)}
 						><img src={tile.preview} alt={tile.display} /></button
 					>
 				{/each}

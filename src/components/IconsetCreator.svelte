@@ -131,7 +131,7 @@
 		previewSprite.anchor.set(0.5);
 		previewSprite.tint = icon.color;
 
-		let p = app.renderer.plugins.extract.base64(previewSprite);
+		let p = app.renderer.extract.base64(previewSprite);
 
 		return p;
 	}
