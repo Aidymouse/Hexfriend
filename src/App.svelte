@@ -40,6 +40,7 @@
 	import TerrainGenerator from './components/TerrainGenerator.svelte';
 	import TilesetCreator from './components/TilesetCreator.svelte';
 	import ToolButtons from './components/ToolButtons.svelte';
+	import CanvasHolder from './components/CanvasHolder.svelte';
 	
 	// Layers
 	import CoordsLayer from './layers/CoordsLayer.svelte';
@@ -56,13 +57,12 @@
 	import { download } from './lib/download2';
 	import { getKeyboardShortcut } from './lib/keyboardShortcuts';
 	import { convertSaveDataToLatest } from './lib/saveDataConverter';
-	import { afterUpdate } from 'svelte';
+	import { afterUpdate, onMount } from 'svelte';
 	
 	// Lib
 	import * as texture_loader from './lib/texture_loader';
 	import * as PIXI from 'pixi.js';
 	import { db } from './lib/db';
-	import { Container, Application } from 'svelte-pixi';
 	
 	// Panels
 	import IconPanel from './panels/IconPanel.svelte';
@@ -167,6 +167,9 @@
 		pan = newPan;
 	});
 
+	// This makes panning update smoothly
+	$: {pan = pan}
+
 	let controls: input_state;
 	store_inputs.store.subscribe((newInputState) => {
 		controls = newInputState;
@@ -247,13 +250,13 @@
 	// Never cleared, to stop duplicate textures being added
 	// Theoretically a memory leak... but bounded by how many unique tiles can be loaded. Shouldn't be a problem?
 
-	function exportMap(exportType) {
+	async function exportMap(exportType) {
 		showLoader = true;
 
 		switch (exportType) {
 			case 'image/png':
 				download(
-					app.renderer.extract.base64(offsetContainer),
+					await app.renderer.extract.base64(offsetContainer),
 					`${loadedSave.title ? loadedSave.title : 'Untitled Hexfriend'}`,
 					exportType
 				);
@@ -364,6 +367,7 @@
 		}
 	}
 
+	/* KEYBOARD EVENTS */
 	function handleShortcuts(e: KeyboardEvent) {
 		// Generate key code
 		let keycode = '';
@@ -449,8 +453,8 @@
 			}
 		}
 	}
+	
 
-	/* KEYBOARD EVENTS */
 	function keyDown(e: KeyboardEvent) {
 		if (appState != app_state.NORMAL) return;
 
@@ -686,7 +690,6 @@
 		});
 
 		appState = app_state.NORMAL;
-		//await tick();
 
 		// Final Layer Setup
 		//comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
@@ -714,13 +717,32 @@
 	/* TODO: Put this somewhere better, add other layers */
 
 	offsetContainer.addChild(cont_terrain);
-	offsetContainer.addChild(cont_icon);
 	offsetContainer.addChild(cont_all_paths);
+	offsetContainer.addChild(cont_icon);
+	offsetContainer.addChild(cont_coordinates);
+	offsetContainer.addChild(cont_bighex_overlay);
 	offsetContainer.addChild(cont_all_text);
 
+	app.stage.addChild(offsetContainer)
+	
+	let canvas_made = false
+	
 	afterUpdate(() => {
 		// Update offset container X, Y, scale
+		
+		offsetContainer.x = pan.offsetX
+		offsetContainer.y = pan.offsetY
+		offsetContainer.scale.x = pan.zoomScale
+		offsetContainer.scale.y = pan.zoomScale
+
+		
 	})
+	
+	onMount(() => {
+
+	})
+
+	
 </script>
 
 <svelte:window on:keydown={keyDown} on:keyup|preventDefault={keyUp} />
@@ -742,6 +764,7 @@
 	{/if}
 
 	<main
+		id="main-app-space"
 		on:contextmenu|preventDefault={(e) => {}}
 		on:wheel={(e) => {
 			store_panning.handlers.zoom(e);
@@ -761,40 +784,23 @@
 		on:keydown={keyDown}
 		on:keyup={keyUp}
 	>
-		<Application instance={app} resizeTo={window} >
+
+	<CanvasHolder {app} />
+
+	<TerrainLayer bind:cont_terrain bind:this={comp_terrainLayer} bind:data_terrain {controls} {comp_coordsLayer} />
+	<PathLayer bind:this={comp_pathLayer} bind:cont_all_paths bind:paths={loadedSave.paths} bind:data_path {controls} />
+	<IconLayer bind:this={comp_iconLayer} bind:icons={loadedSave.icons} bind:data_icon bind:cont_icon {data_eraser} {controls} />
+	<CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} bind:data_coordinates />
+	<OverlayLayer bind:cont_bighex_overlay />
+	<TextLayer bind:cont_all_text bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text />
+
+	<!--
+	<Application instance={app} resizeTo={window} >
 			<Container instance={offsetContainer} x={pan.offsetX} y={pan.offsetY} scale={{ x: pan.zoomScale, y: pan.zoomScale }}>
-				<TerrainLayer bind:cont_terrain bind:this={comp_terrainLayer} bind:data_terrain {controls} {comp_coordsLayer} />
-
-				<PathLayer 
-					bind:this={comp_pathLayer} 
-					bind:cont_all_paths
-					bind:paths={loadedSave.paths} 
-					bind:data_path 
-					{controls} 
-				/>
-
-				<IconLayer
-					bind:this={comp_iconLayer}
-					bind:icons={loadedSave.icons}
-					bind:data_icon
-					bind:cont_icon
-					{data_eraser}
-					{controls}
-				/>
-				<!--
-
-				<Container instance={cont_icon}></Container>
-
-          Needs Optimization badly
-        -->
-
-				<OverlayLayer />
-
-				<CoordsLayer bind:this={comp_coordsLayer} bind:data_coordinates />
-
-				<TextLayer bind:cont_all_text bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text />
+				
 			</Container>
 		</Application>
+		-->
 	</main>
 
 	<!-- Panels -->

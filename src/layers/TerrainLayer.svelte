@@ -982,6 +982,12 @@
 	}
 
 	onMount(() => {
+
+		cont_terrain.removeChildren(0)
+		cont_terrain.addChild(terrainGraphics);
+		cont_terrain.addChild(symbolsContainer);
+		cont_terrain.addChild(gridGraphics);
+
 		renderAllHexes();
 		renderGrid();
 	});

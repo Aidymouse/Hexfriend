@@ -13,7 +13,7 @@
 	import type { shortcut_data } from 'src/types/inputs';
 	import type { tools } from 'src/types/toolData';
 	
-	import { afterUpdate } from 'svelte';
+	import { afterUpdate, onMount } from 'svelte';
 
 	export let controls;
 	let pan: pan_state;
@@ -373,7 +373,7 @@
 			if (!path_containers[path.id]) {
 
 				let cont_path = new PIXI.Container();
-				cont_path.on('pointerover', () => { console.log(path.id); data_path.hoveredPath = path; })
+				cont_path.on('pointerover', () => { data_path.hoveredPath = path; })
 				cont_path.on('pointerout', () => { data_path.hoveredPath = null; })
 				
 				let grph_path = new PIXI.Graphics();
@@ -434,5 +434,15 @@
 		}
 	})
 
+	onMount(() => {
+		grph_hovered_path.clear();
+		grph_selected_path.clear();
+
+		cont_all_paths.removeChildren(0);
+		cont_pixi_paths = new PIXI.Container();
+		cont_all_paths.addChild(cont_pixi_paths);
+		cont_all_paths.addChild(grph_hovered_path);
+		cont_all_paths.addChild(grph_selected_path);
+	})
 
 </script>

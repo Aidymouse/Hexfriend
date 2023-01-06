@@ -6,7 +6,7 @@
 	import type { text_layer_text } from '../types/text';
 	import * as PIXI from 'pixi.js';
 	import { Graphics, Text } from 'svelte-pixi';
-	import { afterUpdate } from 'svelte';
+	import { afterUpdate, onMount } from 'svelte';
 
 	let pan: pan_state;
 	store_panning.store.subscribe((newPan) => {
@@ -196,6 +196,13 @@
 			grph_selector.drawRect(hoveredText.x - tW * alignMap[hoveredText.style.align].x - 4, hoveredText.y - 4, tW + 8, tH + 8);
 		}
 
+	})
+
+	onMount(() => {
+		cont_all_text.removeChildren(0)
+		cont_pixi_text = new PIXI.Container()
+		cont_all_text.addChild(cont_pixi_text)
+		cont_all_text.addChild(grph_selector)
 	})
 </script>
 

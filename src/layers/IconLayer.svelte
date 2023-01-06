@@ -22,7 +22,7 @@
 
 	import { get_icon_texture } from '../lib/texture_loader'
 
-	import { afterUpdate } from 'svelte';
+	import { afterUpdate, onMount } from 'svelte';
 
 
 	export let icons: IconLayerIcon[] = [];
@@ -445,7 +445,6 @@
 	spr_floating_icon.anchor.x = 0.5
 	spr_floating_icon.anchor.y = 0.5
 	spr_floating_icon.alpha = 0.5
-	cont_icon.addChild(spr_floating_icon)
 
 	// TODO: This could use a bit of cleanup...
 	afterUpdate(() => {
@@ -505,6 +504,13 @@
 		}
 
 
+
+	})
+
+	onMount(() => {
+		cont_icon.removeChildren(0)
+		
+		cont_icon.addChild(spr_floating_icon)
 
 	})
 

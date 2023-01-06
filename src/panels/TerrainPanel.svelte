@@ -78,8 +78,6 @@
 
 		let b64 = app.renderer.extract.base64(c); //PIXI.autoDetectRenderer().plugins.extract.base64(c)
 
-		console.log(b64)
-
 		return b64;
 	}
 
