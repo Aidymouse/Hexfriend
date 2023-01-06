@@ -20,7 +20,7 @@ A list of neat things Hexfriend can do!
 ### Meat and Bones
 
 Hexfriend is built with Svelte and PIXI and some quite messy typescript.
-Thanks to mattjennings, without who's svelte-pixi project this would not have been possible. Go star it! https://github.com/mattjennings/svelte-pixi
+Thanks to mattjennings, without who's svelte-pixi project this would never have been possible. Go star it! https://github.com/mattjennings/svelte-pixi
 
 ### License
 

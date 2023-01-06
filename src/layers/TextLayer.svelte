@@ -5,7 +5,6 @@
 	import type { pan_state } from '../types/panning';
 	import type { text_layer_text } from '../types/text';
 	import * as PIXI from 'pixi.js';
-	import { Graphics, Text } from 'svelte-pixi';
 	import { afterUpdate, onMount } from 'svelte';
 
 	let pan: pan_state;

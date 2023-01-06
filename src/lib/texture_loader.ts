@@ -9,10 +9,10 @@ export let loaded_icon_textures: { [key: string]: Texture } = {}
 export let icon_texture_lookup_table: { [key: string]: string } = {}
 
 export async function load_icon_texture(icon_id: string, base64: string) {
-    let new_texture: string;
+	let new_texture = await PIXI.Assets.load(base64);
 	//console.log(`Loading Icon: ${icon_id}`)
 
-	loaded_icon_textures[icon_id] = await PIXI.Assets.load(base64)
+	loaded_icon_textures[icon_id] = new_texture
 	
 	/*
 	if (PIXI.Assets.cache.has(icon_id)) {

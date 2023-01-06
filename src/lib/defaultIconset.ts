@@ -1,8 +1,9 @@
 const DEFAULTICONSET = {
-  "name": "default",
+  "name": "Default Icons",
   "id": "default",
   "author": "Aidymouse",
   "version": 3,
+  "collapsed": false,
   "icons": [
     {
       "display": "Fort",

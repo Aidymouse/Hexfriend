@@ -286,6 +286,7 @@
 
 	/* ALL PURPOSE POINTER METHODS */
 	function pointerdown(e: PointerEvent) {
+		store_panning.handlers.handle(e);
 		controls.mouseDown[e.button] = true;
 
 		if (controls.mouseDown[2]) store_panning.handlers.startPan(e);

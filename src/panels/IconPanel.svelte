@@ -64,7 +64,8 @@
 		spr_preview.texture = get_icon_texture(data_icon.texId);
 		spr_preview.tint = iconData.color;
 		spr_preview.anchor.set(0.5, 0.5);
-		spr_preview.scale.set(getIconScale(hW, hH));
+		spr_preview.scale.x = getIconScale(hW, hH);
+		spr_preview.scale.y = getIconScale(hW, hH);
 
 		let b64 = await app.renderer.extract.base64(cont_preview); //PIXI.autoDetectRenderer().plugins.extract.base64(c)
 
@@ -86,6 +87,8 @@
 	onMount(async () => {
 		//iconPreview = await getIconPreview(data_icon);
 	})
+
+
 
 </script>
 
@@ -120,13 +123,16 @@
 
 	<div id="buttons" class="scroll-container">
 		{#each loadedIconsets as iconset (iconset.id)}
-			{#if iconset.id != 'default'}
-				<h2>{iconset.name}</h2>
+			{#if iconset.id != 'default' || loadedIconsets.length > 1 || iconset.collapsed}
+				<h2 class="iconset-heading">{iconset.name}
+				<button on:click={() => { iconset.collapsed = !iconset.collapsed } }><img class:rotated={iconset.collapsed} alt="Toggle Iconset Visibility" src={"/assets/img/ui/arrow.png"}></button>
+				</h2>
 			{/if}
 
-			<div class="button-grid">
+			<div class="button-grid" class:hidden={iconset.collapsed}>
 				{#each iconset.icons as iconData}
 					<button
+						class = "icon-button"
 						class:selected={iconMatchesData(iconData)}
 						on:click={() => {
 							selectIcon(iconData);
@@ -138,10 +144,46 @@
 				{/each}
 			</div>
 		{/each}
+
+		<!-- This keeps the selector around. Hacky but... works! -->
+		<div class="hidden" />
 	</div>
 </div>
 
 <style>
+
+	.hidden {
+		display: none !important;
+	}
+
+	.iconset-heading {
+		display: flex;
+		position: relative;
+	}
+
+	.iconset-heading button {
+		position: absolute;
+		margin: 0.25em;
+		margin-bottom: calc(0.25em + 5px);
+		box-sizing: border-box;
+		right: 0px;
+		display: flex;
+		height: 80%;
+		top: 0;
+		width: 3em;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.iconset-heading button img {
+		height: 100%;
+		transition-duration: 0.2s;
+	}
+
+	.iconset-heading button img.rotated {
+		rotate: 180deg;
+	}
+
 	.icon-preview-control-row {
 		display: flex;
 		align-items: center;
@@ -215,13 +257,13 @@
 		margin-top: 10px;
 	}
 
-	#buttons button {
+	#buttons .icon-button {
 		display: flex;
 		align-items: center;
 		justify-content: center;
 	}
 
-	button img {
+	.icon-button img {
 		width: 90%;
 		height: auto;
 	}

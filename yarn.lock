@@ -1527,11 +1527,6 @@ svelte-hmr@^0.15.0:
   resolved "https://registry.npmjs.org/svelte-hmr/-/svelte-hmr-0.15.0.tgz"
   integrity sha512-Aw21SsyoohyVn4yiKXWPNCSW2DQNH/76kvUnE9kpt4h9hcg9tfyQc6xshx9hzgMfGF0kVx0EGD8oBMWSnATeOg==
 
-svelte-pixi@^0.1.3:
-  version "0.1.3"
-  resolved "https://registry.npmjs.org/svelte-pixi/-/svelte-pixi-0.1.3.tgz"
-  integrity sha512-72/fIfQ1mXuxWRfHvZKXFfVquT1pkfrU/TpEthVvhGeoiXliOzwLksjQE3tn21XAptWFiS6whPoOHXJdJtTzwg==
-
 svelte-preprocess@^4.0.0, svelte-preprocess@^4.9.8:
   version "4.10.7"
   resolved "https://registry.npmjs.org/svelte-preprocess/-/svelte-preprocess-4.10.7.tgz"

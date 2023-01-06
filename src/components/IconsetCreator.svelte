@@ -6,7 +6,7 @@
 	import ColorInputPixi from './ColorInputPixi.svelte';
 	import * as PIXI from 'pixi.js';
 	import { afterUpdate, tick } from 'svelte';
-	import { Graphics, Application, Sprite } from 'svelte-pixi';
+	import CanvasHolder from './CanvasHolder.svelte';
 
 	let app = new PIXI.Application({
 		width: 300,
@@ -341,9 +341,11 @@
 
 	{#if selectedIcon}
 		<div id="icon-preview">
-			<Application instance={app}>
 
-				</Application>
+			<div id="pixi-container" style="width: 300px; height: 300px;">
+
+				<CanvasHolder {app} />
+			</div>
 
 			<input
 				type="text"
