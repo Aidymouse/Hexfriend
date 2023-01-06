@@ -8,7 +8,7 @@
 	import { afterUpdate, tick } from 'svelte';
 	import { Graphics, Application, Sprite } from 'svelte-pixi';
 	import CanvasHolder from './CanvasHolder.svelte';
-	import { preview } from 'vite';
+	
 
 	let app = new PIXI.Application({
 		height: 300,
@@ -121,7 +121,7 @@
 		r.readAsDataURL(symbolFiles[0]);
 		r.onload = async (eb) => {
 
-				let new_texture = await PIXI.Texture.from(r.result as string)
+				let new_texture = await PIXI.Texture.from(r.result as string);
 
 				selectedTile.symbol = {
 					color: selectedTile.symbol ? selectedTile.symbol.color : 0xffffff,
