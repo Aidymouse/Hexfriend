@@ -29,7 +29,18 @@ export function convertSaveDataToLatest(oldData: save_data): save_data {
 		}
 	}
 
-
+	// OVERLAY
+	// Didn't exist prior to version 5
+	if (!newData.overlay) {
+		newData.overlay = {
+			base64: "",
+			shown: true,
+			x: 0,
+			y: 0,
+			scale: 1, 
+			opacity: 0.5
+		}
+	}
 
 	// PATH STYLE AND TEXT STYLE IDS // Missing in some map version 2's (yeah, ok, I'm shit with version numbers)
 	let pId = 0;

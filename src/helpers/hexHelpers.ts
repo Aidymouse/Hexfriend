@@ -103,11 +103,10 @@ export function getRing(centerId: hex_id, radius: number): hex_id[] {
 	if (radius == 0) {
 		return [centerId]
 	}
-	
+
 	let firstHexCoords = cube_add(genCoordsObj(centerId), cube_scale(hexDirVectors[4], radius));
 
 	let curHexCoords = firstHexCoords;
-
 
 	let ringHexIds = [];
 

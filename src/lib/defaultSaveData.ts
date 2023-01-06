@@ -54,6 +54,15 @@ let DEFAULTSAVEDATA: save_data = {
 
 	iconsets: [DEFAULTICONSET],
 
+	overlay: {
+		base64: "",
+		shown: true,
+		x: 0,
+		y: 0,
+		scale: 1,
+		opacity: 0.5,
+	},
+
 	paths: [],
 	icons: [],
 	texts: [],

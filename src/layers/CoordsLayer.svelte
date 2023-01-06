@@ -159,6 +159,11 @@
 	}
 
 	onMount(() => {
+		cont_coordinates.removeChildren(0);
+
+		cont_textContainer = new PIXI.Container();
+		cont_coordinates.addChild(cont_textContainer);
+
 		cullUnusedCoordinates();
 		generateAllCoords(data_coordinates.system);
 	});

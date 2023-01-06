@@ -34,7 +34,7 @@
 	// Components
 	import ControlTooltips from './components/ControlTooltips.svelte';
 	import IconsetCreator from './components/IconsetCreator.svelte';
-	import MapSettings from './components/MapSettings.svelte';
+	import MapSettings from './components/Settings.svelte';
 	import SavedMaps from './components/SavedMaps.svelte';
 	import ShortcutList from './components/ShortcutList.svelte';
 	import TerrainGenerator from './components/TerrainGenerator.svelte';
@@ -49,6 +49,7 @@
 	import PathLayer from './layers/PathLayer.svelte';
 	import TerrainLayer from './layers/TerrainLayer.svelte';
 	import TextLayer from './layers/TextLayer.svelte';
+	import OverlayLayer from './layers/OverlayLayer.svelte';
 	
 	// Data
 	import DEFAULTSAVEDATA from './lib/defaultSaveData';
@@ -80,7 +81,7 @@
 	import './styles/scrollbar.css';
 	
 	// TYPES
-	import type { coordinates_data, eraser_data, icon_data, path_data, terrain_data, text_data, trace_data } from './types/data';
+	import type { coordinates_data, eraser_data, icon_data, overlay_data, path_data, terrain_data, text_data, trace_data } from './types/data';
 	import type { Iconset } from './types/icon';
 	import type { input_state } from './types/inputs';
 	import type { pan_state } from './types/panning';
@@ -95,6 +96,7 @@
 	
 	// Constants
 	import { LATESTSAVEDATAVERSION } from './types/savedata';
+	import OverlayPanel from './panels/OverlayPanel.svelte';
 
 	/* STATE */
 
@@ -129,6 +131,8 @@
 	let comp_pathLayer: PathLayer;
 	let comp_textLayer: TextLayer;
 	let comp_coordsLayer: CoordsLayer;
+	let comp_overlayLayer: OverlayLayer;	
+
 
 	let comp_shortcutList: ShortcutList;
 
@@ -141,6 +145,7 @@
 	let cont_all_text = new PIXI.Container();
 	let cont_coordinates = new PIXI.Container();
 	let cont_largehexes = new PIXI.Container();
+	let cont_overlay = new PIXI.Container();
 
 	/* APPLICATION */
 	let app = new PIXI.Application({
@@ -244,6 +249,15 @@
 		ignoreTerrain: false,
 		ignoreIcons: false,
 	};
+
+	let data_overlay: overlay_data = {
+		shown: true,
+		base64: "",
+		x: 0,
+		y: 0,
+		scale: 1,
+		opacity: 0.5,
+	}
 
 	//let L = new PIXI.Loader()
 
@@ -357,6 +371,11 @@
 				}
 				/* Icons are handled differently in the icon handler */
 				break;
+			
+			case tools.OVERLAY:
+				comp_overlayLayer.pointermove();
+				break;
+
 		}
 	}
 
@@ -652,6 +671,8 @@
 
 		data_coordinates = data.coords;
 
+		data_overlay = data.overlay;
+
 		//console.log(PIXI_Assets.Assets)
 
 		loadedSave = data;
@@ -724,6 +745,7 @@
 	offsetContainer.addChild(cont_coordinates);
 	offsetContainer.addChild(cont_largehexes);
 	offsetContainer.addChild(cont_all_text);
+	offsetContainer.addChild(cont_overlay);
 
 	app.stage.addChild(offsetContainer)
 	
@@ -793,6 +815,7 @@
 	<CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} bind:data_coordinates />
 	<LargeHexesLayer bind:cont_largehexes />
 	<TextLayer bind:cont_all_text bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text />
+	<OverlayLayer bind:this={comp_overlayLayer} bind:cont_overlay bind:data_overlay />
 
 	<!--
 	<Application instance={app} resizeTo={window} >
@@ -814,6 +837,8 @@
 		<PathPanel bind:data_path {comp_pathLayer} bind:pathStyles={loadedSave.pathStyles} />
 	{:else if selectedTool == 'text'}
 		<TextPanel bind:data_text {comp_textLayer} bind:textStyles={loadedSave.textStyles} />
+	{:else if selectedTool == tools.OVERLAY}
+		<OverlayPanel bind:data_overlay />
 	{/if}
 
 	<div id="tool-buttons">
@@ -862,6 +887,7 @@
 		bind:appState
 		bind:showTerrainGenerator
 		bind:data_coordinates
+		bind:data_overlay
 		bind:loadedTilesets
 		bind:loadedIconsets
 		{comp_terrainLayer}
@@ -883,7 +909,7 @@
 	/>
 
 	{#if showControls}
-		<ControlTooltips {data_terrain} {data_icon} {data_path} {data_text} {data_eraser} />
+		<ControlTooltips {data_terrain} {data_icon} {data_path} {data_text} {data_eraser} {data_overlay} />
 	{/if}
 {:else if appState == app_state.TILESETCREATOR}
 	<TilesetCreator bind:appState />

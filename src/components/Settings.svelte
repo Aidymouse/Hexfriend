@@ -1,8 +1,8 @@
 <script lang="ts">
 	// Components
-	import Checkbox from '../components/Checkbox.svelte';
-	import ColorInputPixi from '../components/ColorInputPixi.svelte';
-	import SelectGrid from '../components/SelectGrid.svelte';
+	import Checkbox from './Checkbox.svelte';
+	import ColorInputPixi from './ColorInputPixi.svelte';
+	import SelectGrid from './SelectGrid.svelte';
 	
 	// Lib
 	import type * as PIXI from 'pixi.js';
@@ -17,7 +17,7 @@
 	import type PathLayer from '../layers/PathLayer.svelte';
 	import type TerrainLayer from '../layers/TerrainLayer.svelte';
 	import type TextLayer from '../layers/TextLayer.svelte';
-	import type { coordinates_data, terrain_data, trace_data } from '../types/data';
+	import type { coordinates_data, overlay_data, terrain_data, trace_data } from '../types/data';
 	import type { Iconset } from '../types/icon';
 	import type { save_data } from '../types/savedata';
 	import type { Tileset } from '../types/tilesets';
@@ -27,6 +27,8 @@
 	import { map_shape } from '../types/settings';
 	import { hex_orientation, terrain_field } from '../types/terrain';
 	import { hex_raised } from '../types/terrain';
+	import { store_selected_tool } from '../stores/tools';
+	import { tools } from '../types/toolData';
 	
 	export let loadedSave: save_data;
 	export let showSettings: boolean;
@@ -40,9 +42,10 @@
 		hexes: true,
 		dimensions: true,
 		coordinates: true,
+		overlay: true,
 		tilesets: true,
 		iconsets: true,
-		experimental: true
+		experimental: true,
 
 	}
 
@@ -55,19 +58,20 @@
 		return tfield;
 	});
 
-	export let comp_terrainLayer: TerrainLayer;
 	export let renderAllHexes: Function;
 	export let renderGrid: Function;
 	export let redrawEntireMap: Function;
-
+	
 	// For Coordinates
 	export let comp_coordsLayer: CoordsLayer;
 	export let data_coordinates: coordinates_data;
-
+	export let data_overlay: overlay_data;
+	
 	//export let data_terrain: terrain_data
 	export let loadedTilesets: Tileset[];
 	export let loadedIconsets: Iconset[];
-
+	
+	export let comp_terrainLayer: TerrainLayer;
 	export let comp_iconLayer: IconLayer;
 	export let comp_pathLayer: PathLayer;
 	export let comp_textLayer: TextLayer;
@@ -77,6 +81,8 @@
 	let retainIconPosition: boolean = true;
 
 	let exportType: 'Export As...' | 'image/png' | 'application/json' = 'Export As...';
+
+	let iconset_text = "Icon Set";
 
 	function changeOrientation() {
 		let t = tfield.hexWidth;
@@ -162,6 +168,7 @@
 		};
 	}
 
+	/* Map Dimensions and Map Shape */
 	function square_expandMapDimension(direction, amount) {
 		comp_terrainLayer.square_expandMapDimension(direction, amount);
 
@@ -276,6 +283,7 @@
 		}
 	}
 
+	// Imports
 	let mapImportFiles: FileList;
 	function importMap() {
 		if (!mapImportFiles[0]) return;
@@ -286,6 +294,22 @@
 			let saveData = JSON.parse(eb.target.result);
 			//console.log(saveData)
 			load(saveData, null);
+		};
+	}
+
+
+	let overlay_files: FileList;
+	function import_overlay_image() {
+		if (!overlay_files[0]) return;
+
+		let r = new FileReader();
+		r.readAsDataURL(overlay_files[0]);
+		r.onload = (eb) => {
+			let b64 = r.result as string;
+
+			data_overlay.base64 = b64;
+			showSettings = false;
+			store_selected_tool.update(n => tools.OVERLAY)
 		};
 	}
 
@@ -723,6 +747,28 @@
 
 
 
+	<!-- OVERLAY -->
+	<h2 class="setting-heading">
+		Overlay
+		<button on:click={() => {hidden_settings.overlay = !hidden_settings.overlay}}>
+			<img  alt={"Toggle Experimental Settings"} class:rotated={hidden_settings.overlay} src={"/assets/img/ui/arrow.png"}>
+		</button>	
+	</h2>
+
+	<div class="settings-grid">
+
+		<button class="file-input-button">
+			Load Overlay Image
+			<input type="file" accept="image/*" bind:files={overlay_files} on:change={() => { import_overlay_image(); }} />
+		</button>
+
+
+	</div>
+
+
+
+
+
 	<!-- TILE SETS -->
 	<h2 class="setting-heading">
 		Tilesets
@@ -774,7 +820,7 @@
 
 	<!-- ICON SETS -->
 	<h2 class="setting-heading">
-		<span on:click={e => {e.target.innerHTML = e.target.innerHTML == "Iconsets"? "Icon Sets" : "Iconsets"}}>Icon Sets</span>
+		<span on:click={e => {iconset_text = (iconset_text == "Icon Set" ? "Iconset" : "Icon Set")}}>{iconset_text}s</span>
 		<button on:click={() => {hidden_settings.iconsets = !hidden_settings.iconsets}}>
 			<img alt={"Toggle Icon Set Settings"} src={"/assets/img/ui/arrow.png"} class:rotated={hidden_settings.iconsets}>
 		</button>
@@ -799,7 +845,7 @@
 
 		<span>
 			<button class="file-input-button"
-				>Import Iconset <input
+				>Import {iconset_text} <input
 					type="file"
 					accept=".hfis"
 					bind:files={iconsetFiles}
@@ -811,7 +857,7 @@
 			<button
 				on:click={() => {
 					appState = 'iconsetCreator';
-				}}>Iconset Builder</button
+				}}>{iconset_text} Builder</button
 			>
 		</span>
 	</div>
@@ -987,7 +1033,7 @@
 	}
 
 	.file-input-button input {
-		width: 100%;
+		width: 100% !important;
 		height: 100%;
 		position: absolute;
 		top: 0px;

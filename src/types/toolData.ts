@@ -6,10 +6,12 @@ export enum tools {
 	PATH = 'path',
 	TEXT = 'text',
 	ERASER = 'eraser',
+	OVERLAY = 'overlay'
 }
 
 type hex_id = `${number}:${number}:${number}`;
 
+/*
 interface ToolData {
 	selectedTool: tools;
 
@@ -32,5 +34,6 @@ interface ToolData {
 		mouseDown: boolean[];
 	};
 }
+*/
 
-export type { ToolData, hex_id };
+export type { hex_id };

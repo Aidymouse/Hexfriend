@@ -86,6 +86,8 @@
 		] },
 		{ display: 'Text', toolCode: tools.TEXT, miniButtons: [] },
 		{ display: 'Eraser', toolCode: tools.ERASER, miniButtons: [] },
+
+		{display: 'Overlay', toolCode: tools.OVERLAY, miniButtons: []},
 	];
 
 	export let selectedTool: string;

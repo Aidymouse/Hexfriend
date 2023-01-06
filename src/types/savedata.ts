@@ -3,7 +3,7 @@ import type { Iconset } from './icon';
 import type { terrain_field } from './terrain';
 import type { Tileset } from './tilesets';
 
-export const LATESTSAVEDATAVERSION = 4;
+export const LATESTSAVEDATAVERSION = 5;
 
 export interface save_data {
 	saveVersion: number;
@@ -14,6 +14,17 @@ export interface save_data {
 	TerrainField: terrain_field;
 	tilesets: Tileset[];
 	iconsets: Iconset[];
+
+	overlay: {
+		base64: string,
+		shown: boolean,
+		x: number,
+		y: number,
+		scale: number,
+		opacity: number,
+
+	};
+
 	paths: [];
 	texts: [];
 	icons: [];
