@@ -356,10 +356,11 @@
 	const SELECTEDSELECTORSTYLE: PIXI.LineStyle = { width: 2, color: 0x333333 };
 
 	let path_containers = {};
+	let cont_pixi_paths = new PIXI.Container();
 	let grph_hovered_path = new PIXI.Graphics();
 	let grph_selected_path = new PIXI.Graphics();
 
-	cont_all_paths.addChild(grph_hovered_path, grph_selected_path);
+	cont_all_paths.addChild(cont_pixi_paths, grph_hovered_path, grph_selected_path);
 
 	afterUpdate(() => {
 
@@ -379,7 +380,7 @@
 				cont_path.addChild(grph_path)
 
 				path_containers[path.id] = cont_path;
-				cont_all_paths.addChild(cont_path)
+				cont_pixi_paths.addChild(cont_path)
 
 			}
 
