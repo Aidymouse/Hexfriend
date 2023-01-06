@@ -224,8 +224,7 @@
 	let grph_hex = new PIXI.Graphics();
 	let spr_hex_symbol = new PIXI.Sprite();
 
-	//previewContainer.addChild(grph_hex, spr_hex_symbol)
-	//app.stage.addChild(previewContainer)
+	app.stage.addChild(grph_hex, spr_hex_symbol)
 
 	afterUpdate(async () => {
 		if (selectedTile) {

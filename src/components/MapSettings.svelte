@@ -1,22 +1,33 @@
 <script lang="ts">
+	// Components
 	import Checkbox from '../components/Checkbox.svelte';
 	import ColorInputPixi from '../components/ColorInputPixi.svelte';
 	import SelectGrid from '../components/SelectGrid.svelte';
+	
+	// Lib
+	import type * as PIXI from 'pixi.js';
+	import * as texture_loader from '../lib/texture_loader';
+	
+	// Stores
+	import * as store_tfield from '../stores/tfield';
+	
+	// Types
 	import type CoordsLayer from '../layers/CoordsLayer.svelte';
 	import type IconLayer from '../layers/IconLayer.svelte';
 	import type PathLayer from '../layers/PathLayer.svelte';
 	import type TerrainLayer from '../layers/TerrainLayer.svelte';
 	import type TextLayer from '../layers/TextLayer.svelte';
-	import * as store_tfield from '../stores/tfield';
-	import { coord_system } from '../types/coordinates';
 	import type { coordinates_data, terrain_data, trace_data } from '../types/data';
 	import type { Iconset } from '../types/icon';
 	import type { save_data } from '../types/savedata';
+	import type { Tileset } from '../types/tilesets';
+	
+	// Enums
+	import { coord_system } from '../types/coordinates';
 	import { map_shape } from '../types/settings';
 	import { hex_orientation, terrain_field } from '../types/terrain';
 	import { hex_raised } from '../types/terrain';
-	import type { Tileset } from '../types/tilesets';
-	import type * as PIXI from 'pixi.js';
+	
 
 	export let loadedSave: save_data;
 	export let showSettings: boolean;
@@ -94,6 +105,7 @@
 
 			/* We also have to load all of these textures */
 			//addTilesetTextures(setToImport, L);
+			texture_loader.load_tileset_textures(setToImport)
 		};
 	}
 
