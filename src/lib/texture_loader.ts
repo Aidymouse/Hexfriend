@@ -31,10 +31,10 @@ export async function load_icon_texture(icon_id: string, base64: string) {
 	return new_texture
 }
 
-export function load_iconset_textures(iconset: Iconset) {
-    iconset.icons.forEach(async (icon) => {
+export async function load_iconset_textures(iconset: Iconset) {
+	for (const icon of iconset.icons) {
         await load_icon_texture(icon.texId, icon.base64)
-    })
+	}
 }
 
 export function get_icon_texture(icon_id: string): Texture {
@@ -77,7 +77,6 @@ export async function load_tileset_textures(tileset: Tileset) {
     for (const tile of tileset.tiles) {
 		
         if (!tile.symbol) continue;
-
 
         await load_symbol_texture(tile.id, tile.symbol.base64)
 

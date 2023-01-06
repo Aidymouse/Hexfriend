@@ -148,6 +148,7 @@
 
 			/* We also have to load all of these textures */
 			//addIconsetTextures(setToImport, L);
+			texture_loader.load_iconset_textures(setToImport);
 		};
 	}
 

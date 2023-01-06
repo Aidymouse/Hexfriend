@@ -637,13 +637,14 @@
 		// Load Textures
 		for (const tileset of loadedTilesets) {
 			console.log(`Loading textures for ${tileset.name}`)
-			texture_loader.load_tileset_textures(tileset);
+			await texture_loader.load_tileset_textures(tileset);
 		}
 
 		// Load Icons
-		loadedIconsets.forEach((iconset: Iconset) => {
-			texture_loader.load_iconset_textures(iconset);
-		});
+		for (const iconset of loadedIconsets) {
+			console.log(`Loading icon textures for ${iconset.name}`)
+			await texture_loader.load_iconset_textures(iconset);
+		}
 
 		store_tfield.store.set(data.TerrainField);
 		//tfield = data.TerrainField;

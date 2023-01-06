@@ -6,7 +6,6 @@
 	import type { Tile, TileSymbol, Tileset } from '../types/tilesets';
 	import * as PIXI from 'pixi.js';
 	import { afterUpdate, tick } from 'svelte';
-	import { Graphics, Application, Sprite } from 'svelte-pixi';
 	import CanvasHolder from './CanvasHolder.svelte';
 	
 
