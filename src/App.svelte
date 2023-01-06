@@ -45,7 +45,7 @@
 	// Layers
 	import CoordsLayer from './layers/CoordsLayer.svelte';
 	import IconLayer from './layers/IconLayer.svelte';
-	import OverlayLayer from './layers/OverlayLayer.svelte';
+	import LargeHexesLayer from './layers/LargeHexesLayer.svelte';
 	import PathLayer from './layers/PathLayer.svelte';
 	import TerrainLayer from './layers/TerrainLayer.svelte';
 	import TextLayer from './layers/TextLayer.svelte';
@@ -140,7 +140,7 @@
 	let cont_all_paths = new PIXI.Container();
 	let cont_all_text = new PIXI.Container();
 	let cont_coordinates = new PIXI.Container();
-	let cont_bighex_overlay = new PIXI.Container();
+	let cont_largehexes = new PIXI.Container();
 
 	/* APPLICATION */
 	let app = new PIXI.Application({
@@ -722,12 +722,10 @@
 	offsetContainer.addChild(cont_all_paths);
 	offsetContainer.addChild(cont_icon);
 	offsetContainer.addChild(cont_coordinates);
-	offsetContainer.addChild(cont_bighex_overlay);
+	offsetContainer.addChild(cont_largehexes);
 	offsetContainer.addChild(cont_all_text);
 
 	app.stage.addChild(offsetContainer)
-	
-	let canvas_made = false
 	
 	afterUpdate(() => {
 		// Update offset container X, Y, scale
@@ -793,7 +791,7 @@
 	<PathLayer bind:this={comp_pathLayer} bind:cont_all_paths bind:paths={loadedSave.paths} bind:data_path {controls} />
 	<IconLayer bind:this={comp_iconLayer} bind:icons={loadedSave.icons} bind:data_icon bind:cont_icon {data_eraser} {controls} />
 	<CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} bind:data_coordinates />
-	<OverlayLayer bind:cont_bighex_overlay />
+	<LargeHexesLayer bind:cont_largehexes />
 	<TextLayer bind:cont_all_text bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text />
 
 	<!--

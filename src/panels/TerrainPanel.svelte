@@ -105,9 +105,13 @@
 		return true;
 	}
 
-	afterUpdate(() => {
+	afterUpdate(async () => {
 		loadedTilesets = loadedTilesets
 		tfield.orientation = tfield.orientation
+
+		tilePreview = await generateTilePreview(data_terrain);
+		
+
 	})
 
 	onMount(async () => {
@@ -186,7 +190,7 @@
 	}
 	
 	.tileset-heading button img.rotated {
-		rotate: 180deg;
+		rotate: -180deg;
 	}
 
 

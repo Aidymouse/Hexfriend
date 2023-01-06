@@ -28,13 +28,23 @@
 	import { hex_orientation, terrain_field } from '../types/terrain';
 	import { hex_raised } from '../types/terrain';
 	
-
 	export let loadedSave: save_data;
 	export let showSettings: boolean;
 	export let appState;
 	export let showTerrainGenerator: boolean;
 
 	export let exportMap: Function;
+
+	let hidden_settings = {
+		grid: true,
+		hexes: true,
+		dimensions: true,
+		coordinates: true,
+		tilesets: true,
+		iconsets: true,
+		experimental: true
+
+	}
 
 	let tfield: terrain_field;
 	store_tfield.store.subscribe((newTField) => {
@@ -295,7 +305,7 @@
 	}}
 	title={'Close Settings'}
 >
-	<img src="/assets/img/tools/back.png" alt={'Back'} />
+	<img src="/assets/img/ui/back.png" alt={'Back'} />
 </button>
 
 <div id="settings" class:shown={showSettings}>
@@ -335,9 +345,16 @@
 		</button>
 	</span>
 
+
+
 	<!-- GRID -->
-	<h2>Grid</h2>
-	<div class="settings-grid">
+	<h2 class="setting-heading">
+		Grid
+		<button on:click={() => {hidden_settings.grid = !hidden_settings.grid}}>
+			<img alt={"Toggle Grid Settings"} class:rotated={hidden_settings.grid} src={"/assets/img/ui/arrow.png"}>
+		</button>
+	</h2>
+	<div class="settings-grid" class:hidden={hidden_settings.grid}>
 		<label for="showGrid">Show Grid</label>
 		<!-- Weird bug where the grid wont render if you turn it off then resize the hex flower map ?? -->
 		<Checkbox bind:checked={tfield.grid.shown} id={'showGrid'} on:change={comp_terrainLayer.renderGrid} />
@@ -366,42 +383,50 @@
 		<div />
 
 		<!-- OVERLAY -->
-		<label for="showOverlay">Big Hex Overlay</label>
-		<Checkbox bind:checked={tfield.overlay.shown} id="showOverlay" />
+		<label for="showOverlay">Large Hexes</label>
+		<Checkbox bind:checked={tfield.largehexes.shown} id="showOverlay" />
 
-		{#if tfield.overlay.shown}
-			<label for="overlayDiameter">Overlay Size</label>
-			<input type="number" id="overlayDiameter" min={2} bind:value={tfield.overlay.diameterInHexes} />
+		{#if tfield.largehexes.shown}
+			<label for="overlayDiameter">Size</label>
+			<input type="number" id="overlayDiameter" min={2} bind:value={tfield.largehexes.diameterInHexes} />
 
 			<label for="overlayColor">Color</label>
-			<ColorInputPixi id={'overlayColor'} bind:value={tfield.overlay.style.color} />
+			<ColorInputPixi id={'overlayColor'} bind:value={tfield.largehexes.style.color} />
 
 			<label for="overlayThickness">Outline Thickness</label>
-			<input type="number" id={'overlayThickness'} bind:value={tfield.overlay.style.width} />
+			<input type="number" id={'overlayThickness'} bind:value={tfield.largehexes.style.width} />
 
 			<label for="overlayOffsetX" title="Measured in Hex Widths">Horizontal Offset</label>
-			<input type="number" bind:value={tfield.overlay.offset.x} min={0} step={0.25} />
+			<input type="number" bind:value={tfield.largehexes.offset.x} min={0} step={0.25} />
 
 			<label for="overlayOffsetY" title="Measured in Hex Heights">Vertical Offset</label>
-			<input type="number" bind:value={tfield.overlay.offset.y} min={0} step={0.25} />
+			<input type="number" bind:value={tfield.largehexes.offset.y} min={0} step={0.25} />
 
 			<label for="overlayEncompass">Encompass Map Edges</label>
-			<Checkbox bind:checked={tfield.overlay.encompassEdges} id="overlayEncompass" />
+			<Checkbox bind:checked={tfield.largehexes.encompassEdges} id="overlayEncompass" />
 
 			<p>{tfield.orientation == hex_orientation.FLATTOP ? 'Overlay Raised Column' : 'Overlay Indented Row'}</p>
 			<div style={'height: 100%; display: flex; align-items: center;'}>
 				<SelectGrid
 					values={['even', 'odd']}
 					filenamePrefix={tfield.orientation == hex_orientation.FLATTOP ? 'overlayraisedcolumn' : 'overlayindentedrow'}
-					bind:value={tfield.overlay.raised}
+					bind:value={tfield.largehexes.raised}
 				/>
 			</div>
 		{/if}
 	</div>
 
+
+
+
 	<!-- HEXES -->
-	<h2>Hexes</h2>
-	<div class="settings-grid">
+	<h2 class="setting-heading">
+		Hexes
+		<button on:click={() => {hidden_settings.hexes = !hidden_settings.hexes}}>
+			<img alt={"Toggle Hex Settings"} class:rotated={hidden_settings.hexes} src={"/assets/img/ui/arrow.png"}>
+		</button>
+	</h2>
+	<div class="settings-grid" class:hidden={hidden_settings.hexes}>
 		<label for="blankHexColor">Blank Hex Color</label>
 		<ColorInputPixi
 			bind:value={tfield.blankHexColor}
@@ -511,10 +536,17 @@
 		<Checkbox bind:checked={retainIconPosition} id="retainIcon" />
 	</div>
 
-	<!-- DIMENSIONS AND SHAPE -->
-	<h2>Map Dimensions</h2>
 
-	<div class="settings-grid" style="margin-bottom: 5px;">
+
+	<!-- DIMENSIONS AND SHAPE -->
+	<h2 class="setting-heading">
+		Map Dimensions
+		<button on:click={() => {hidden_settings.dimensions = !hidden_settings.dimensions}}>
+			<img alt={"Toggle Map Dimension Settings"} class:rotated={hidden_settings.dimensions} src={"/assets/img/ui/arrow.png"}>
+		</button>
+	</h2>
+
+	<div class="settings-grid" style="margin-bottom: 5px;" class:hidden={hidden_settings.dimensions}>
 		<label for="mapShape">Map Shape</label>
 
 		<select
@@ -529,7 +561,7 @@
 	</div>
 
 	{#if tfield.mapShape == map_shape.SQUARE}
-		<section id="map-dimensions-container">
+		<section id="map-dimensions-container" class:hidden={hidden_settings.dimensions}>
 			<div id="map-dimensions">
 				{#if addOrRemoveMapDimensions == 'add'}
 					<button
@@ -609,7 +641,7 @@
 			</div>
 		</section>
 	{:else if tfield.mapShape == map_shape.FLOWER}
-		<section id="flower-dimensions-container">
+		<section id="flower-dimensions-container" class:hidden={hidden_settings.dimensions}>
 			<p>Hexes out from center</p>
 			<div id="flower-dimensions-controls-grid">
 				<button
@@ -627,9 +659,17 @@
 		</section>
 	{/if}
 
-	<h2 style="margin-bottom: 0px;">Coordinates</h2>
+
+
+	<!-- COORDINATES -->
+	<h2 class="setting-heading" style="margin-bottom: 0px;">
+		Coordinates
+		<button on:click={() => {hidden_settings.coordinates = !hidden_settings.coordinates}}>
+			<img alt={"Toggle Coordinate Settings"} class:rotated={hidden_settings.coordinates} src={"/assets/img/ui/arrow.png"}>
+		</button>
+	</h2>
 	<p class="helperText">Coordinates can slow down map changes such as adding hexes or changing orientation.</p>
-	<div class="settings-grid">
+	<div class="settings-grid" class:hidden={hidden_settings.coordinates}>
 		<label for="showCoords">Show Coordinates</label>
 		<Checkbox bind:checked={data_coordinates.shown} id={'showCoords'} />
 
@@ -681,8 +721,16 @@
 		{/if}
 	</div>
 
-	<h2>Tilesets</h2>
-	<div id="tilesets">
+
+
+	<!-- TILE SETS -->
+	<h2 class="setting-heading">
+		Tilesets
+		<button on:click={() => {hidden_settings.tilesets = !hidden_settings.tilesets}}>
+			<img  alt={"Toggle Experimental Settings"} class:rotated={hidden_settings.tilesets} src={"/assets/img/ui/arrow.png"}>
+		</button>	
+	</h2>
+	<div id="tilesets" class:hidden={hidden_settings.tilesets}>
 		{#each loadedTilesets as tileset (tileset.id)}
 			<div
 				class="loaded-tileset"
@@ -722,8 +770,16 @@
 		</span>
 	</div>
 
-	<h2>Icon Sets</h2>
-	<div id="iconsets">
+
+
+	<!-- ICON SETS -->
+	<h2 class="setting-heading">
+		<span on:click={e => {e.target.innerHTML = e.target.innerHTML == "Iconsets"? "Icon Sets" : "Iconsets"}}>Icon Sets</span>
+		<button on:click={() => {hidden_settings.iconsets = !hidden_settings.iconsets}}>
+			<img alt={"Toggle Icon Set Settings"} src={"/assets/img/ui/arrow.png"} class:rotated={hidden_settings.iconsets}>
+		</button>
+	</h2>
+	<div id="iconsets" class:hidden={hidden_settings.iconsets}>
 		{#each loadedIconsets as iconset (iconset.id)}
 			<div
 				class="loaded-tileset"
@@ -760,10 +816,15 @@
 		</span>
 	</div>
 
-	<h2>Experimental</h2>
+	<h2 class="setting-heading">
+		Experimental
+		<button on:click={() => {hidden_settings.experimental = !hidden_settings.experimental}}>
+			<img alt={"Toggle Experimental Settings"} class:rotated={hidden_settings.experimental} src={"/assets/img/ui/arrow.png"}>
+		</button>
+	</h2>
 	<p class="helperText">Not polished and maybe broken.</p>
 
-	<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+	<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;" class:hidden={hidden_settings.experimental}>
 		<button
 			on:click={() => {
 				showTerrainGenerator = true;
@@ -777,7 +838,7 @@
 
 	<h2>About</h2>
 	<p class="helperText">
-		Hexfriend version 1.4.0 – "Looking cozy, Hexfriend"
+		Hexfriend version 1.4.1 – "Looking cozy, Hexfriend"
 		<br />
 		By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
 	</p>
@@ -790,6 +851,35 @@
 </div>
 
 <style>
+
+	.setting-heading {
+		display: flex;
+		position: relative;
+	}
+
+	.setting-heading button {
+		width: 3em;
+		height: 2em;
+		position: absolute;
+		right: 0px;
+	}
+
+	.setting-heading button img {
+		height: 100%;
+		transition-duration: 0.2s;
+		
+	}
+	
+	.setting-heading button img.rotated {
+		rotate: 180deg;
+		transition-duration: 0.2s;
+
+	}
+
+	.hidden {
+		display: none !important;
+	}
+
 	a {
 		color: var(--hexfriend-green);
 	}

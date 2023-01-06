@@ -181,7 +181,7 @@
 	}
 
 	.iconset-heading button img.rotated {
-		rotate: 180deg;
+		rotate: -180deg;
 	}
 
 	.icon-preview-control-row {

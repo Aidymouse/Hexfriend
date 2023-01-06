@@ -3,7 +3,7 @@ import type { Iconset } from './icon';
 import type { terrain_field } from './terrain';
 import type { Tileset } from './tilesets';
 
-export const LATESTSAVEDATAVERSION = 3;
+export const LATESTSAVEDATAVERSION = 4;
 
 export interface save_data {
 	saveVersion: number;

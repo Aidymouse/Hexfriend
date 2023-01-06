@@ -30,7 +30,7 @@ let DEFAULTSAVEDATA: save_data = {
 
 		grid: { stroke: 0x333333, thickness: 2, shown: true },
 
-		overlay: {
+		largehexes: {
 			shown: false,
 			style: { width: 3, color: 0x333333 },
 			offset: { x: 0, y: 1 },

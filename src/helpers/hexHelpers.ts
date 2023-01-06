@@ -66,6 +66,11 @@ export function getHexPathRadius(radius: number, orientation: hexOrientation = '
 	return getHexPath(w, h, orientation, centerX, centerY);
 }
 
+export function id_to_coords(hex_id: hex_id): cubeCoords {
+	let id_parts = hex_id.split(":")
+	return {q: +id_parts[0], r: +id_parts[1], s: +id_parts[2]}
+}
+
 export function genHexId(q: number, r: number, s: number): hex_id {
 	return `${q}:${r}:${s}`;
 }
@@ -95,9 +100,14 @@ export function genCoordsObj(hexId: hex_id): cube_coords {
 
 /* NEIGHBOURS */
 export function getRing(centerId: hex_id, radius: number): hex_id[] {
+	if (radius == 0) {
+		return [centerId]
+	}
+	
 	let firstHexCoords = cube_add(genCoordsObj(centerId), cube_scale(hexDirVectors[4], radius));
 
 	let curHexCoords = firstHexCoords;
+
 
 	let ringHexIds = [];
 
