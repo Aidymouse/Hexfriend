@@ -5,8 +5,9 @@
 	import { download } from '../lib/download2';
 	import type { Tile, TileSymbol, Tileset } from '../types/tilesets';
 	import * as PIXI from 'pixi.js';
-	import { tick } from 'svelte';
-	import { Graphics, Application, Sprite } from 'svelte-pixi';
+	import { afterUpdate, tick } from 'svelte';
+	import CanvasHolder from './CanvasHolder.svelte';
+	
 
 	let app = new PIXI.Application({
 		height: 300,
@@ -29,12 +30,10 @@
 
 	let selectedTile: Tile | null = null;
 
-	let loader = new PIXI.Loader();
-
 	let previewSprite = new PIXI.Sprite();
 	let previewGraphics = new PIXI.Graphics();
 	let previewContainer = new PIXI.Container();
-	previewContainer.addChild(previewGraphics).addChild(previewSprite);
+	previewContainer.addChild(previewGraphics, previewSprite);
 
 	function findID(baseId: string): string {
 		let counter = 0;
@@ -48,7 +47,7 @@
 		return proposedId;
 	}
 
-	function newTile() {
+	async function newTile() {
 		let newTile: Tile = {
 			display: 'New Hex',
 			id: findID(IDify('new-hex')),
@@ -57,7 +56,7 @@
 			preview: '',
 		};
 
-		newTile.preview = generatePreview(newTile);
+		newTile.preview = await generatePreview(newTile);
 
 		workingTileset.tiles = [...workingTileset.tiles, newTile];
 
@@ -78,7 +77,7 @@
 		workingTileset.tiles = workingTileset.tiles.filter((t: Tile) => t.id != tile.id);
 	}
 
-	function generatePreview(tile: Tile) {
+	async function generatePreview(tile: Tile) {
 		previewGraphics.clear();
 		previewGraphics.beginFill(tile.bgColor);
 		previewGraphics.drawPolygon(getHexPathRadius(25, orientation, 0, 0));
@@ -92,13 +91,14 @@
 			previewSprite.tint = tile.symbol.color;
 		}
 
-		return app.renderer.plugins.extract.base64(previewContainer);
+		return await app.renderer.extract.base64(previewContainer);
 	}
 
 	function IDify(name: string): string {
 		return name.toLowerCase().replace(' ', '-');
 	}
 
+	/*
 	$: {
 		//if (selectedTile) selectedTile.preview = generatePreview(workingTileset.tiles[stIndex])
 
@@ -109,29 +109,27 @@
 			workingTileset.tiles.forEach((tile) => (tile.preview = generatePreview(tile)));
 		}
 
-		if (selectedTile) {
-			selectedTile.preview = generatePreview(selectedTile);
-			selectedTile.id = findID(IDify(selectedTile.display));
-		}
 	}
+	*/
 
 	let symbolFiles = [];
 
-	function updateSymbolFile() {
+	async function updateSymbolFile() {
+
 		let r = new FileReader();
 		r.readAsDataURL(symbolFiles[0]);
-		r.onload = (eb) => {
-			loader.reset();
-			loader.add('s', eb.target.result);
-			loader.load(() => {
+		r.onload = async (eb) => {
+
+				let new_texture = await PIXI.Texture.from(r.result as string);
+
 				selectedTile.symbol = {
 					color: selectedTile.symbol ? selectedTile.symbol.color : 0xffffff,
-					texWidth: loader.resources.s.texture.width,
-					texHeight: loader.resources.s.texture.height,
+					texWidth: new_texture.width,
+					texHeight: new_texture.height,
 					pHex: 80,
 					base64: r.result as string,
 				};
-			});
+
 		};
 	}
 
@@ -158,7 +156,7 @@
 	const DEFAULTBLANKHEXCOLOR = 0xf2f2f2;
 
 	function exportTileset() {
-		workingTileset.id = IDify(workingTileset.name);
+		workingTileset.id = `${IDify(workingTileset.name)}_v${workingTileset.version}`;
 
 		download(JSON.stringify(workingTileset), workingTileset.name + '.hfts', 'application/json');
 	}
@@ -219,6 +217,48 @@
 
 		workingTileset = workingTileset;
 	}
+
+	let pixi_tiles = {};
+
+	let grph_hex = new PIXI.Graphics();
+	let spr_hex_symbol = new PIXI.Sprite();
+
+	app.stage.addChild(grph_hex, spr_hex_symbol)
+
+	afterUpdate(async () => {
+		if (selectedTile) {
+			let new_preview = await generatePreview(selectedTile)
+			if (selectedTile.preview != new_preview) {
+				selectedTile.preview = new_preview
+				workingTileset = workingTileset
+			}
+
+			grph_hex.clear();
+			grph_hex.beginFill(selectedTile.bgColor);
+			grph_hex.drawPolygon(getHexPathRadius(150, orientation, 150, 150));
+			grph_hex.endFill();
+
+			
+			let spr_symbol = spr_hex_symbol
+			spr_symbol.visible = false
+			
+			if (selectedTile.symbol) {
+				spr_symbol.visible = true
+				let symbol_texture = await PIXI.Texture.from(selectedTile.symbol.base64) 
+				
+				spr_symbol.texture = symbol_texture
+				spr_symbol.x = 150
+				spr_symbol.y = 150
+				spr_symbol.anchor.x = 0.5
+				spr_symbol.tint = selectedTile.symbol.color 
+				spr_symbol.anchor.y = 0.5
+				spr_symbol.scale = getSymbolScale(selectedTile.symbol)
+			}
+		}
+
+
+		
+	})
 </script>
 
 <main>
@@ -300,27 +340,10 @@
 	{#if selectedTile}
 		<div id="tile-preview">
 			<div id="pixi-container" style="height: 300px; width: 300px;">
-				<Application {app}>
-					<Graphics
-						draw={(g) => {
-							g.clear();
-							g.beginFill(selectedTile.bgColor);
-							g.drawPolygon(getHexPathRadius(150, orientation, 150, 150));
-							g.endFill();
-						}}
-					/>
 
-					{#if selectedTile.symbol}
-						<Sprite
-							texture={PIXI.Texture.from(selectedTile.symbol.base64)}
-							x={150}
-							y={150}
-							anchor={{ x: 0.5, y: 0.5 }}
-							tint={selectedTile.symbol.color}
-							scale={getSymbolScale(selectedTile.symbol)}
-						/>
-					{/if}
-					</Application>
+				<CanvasHolder {app} />
+				
+
 			</div>
 
 			<input

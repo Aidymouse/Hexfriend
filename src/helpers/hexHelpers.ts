@@ -1,6 +1,5 @@
 import type { TerrainHex } from '../types/terrain';
 import type { hex_id } from '../types/toolData';
-import { hex2rgb } from '@pixi/utils';
 import type { cube_coords } from '../types/coordinates';
 
 export type hexOrientation = 'flatTop' | 'pointyTop';

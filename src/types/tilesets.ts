@@ -24,6 +24,7 @@ interface Tileset {
 	id: string;
 	author: string;
 	version: number;
+	collapsed: boolean;
 	tiles: Tile[];
 }
 

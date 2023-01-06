@@ -1,7 +1,8 @@
 const DEFAULTTILESET = {
-  "name": "default",
+  "name": "Default Tiles",
   "id": "default",
   "author": "Aidymouse",
+  "collapsed": false,
   "tiles": [
     {
       "display": "Plains",

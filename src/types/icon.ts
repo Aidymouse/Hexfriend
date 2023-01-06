@@ -16,6 +16,7 @@ export interface Iconset {
 	id: string;
 	author: string;
 	version: number;
+	collapsed: boolean;
 	icons: Icon[];
 }
 

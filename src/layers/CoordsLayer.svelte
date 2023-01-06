@@ -9,7 +9,6 @@
 	import type { hex_id } from '../types/toolData';
 	import * as PIXI from 'pixi.js';
 	import { onMount } from 'svelte';
-	import { Container, Text } from 'svelte-pixi';
 
 	interface coordText {
 		pixiText: PIXI.Text;
@@ -20,11 +19,15 @@
 		Object.entries(coordTexts).forEach(([hexId, text]) => {
 			text.pixiText.style = data_coordinates.style;
 		});
+
+		cont_textContainer.visible = data_coordinates.shown
 	}
 
 	let coordTexts: { [key: hex_id]: coordText } = {}; // hex id: coordText
 
+	export let cont_coordinates;
 	let cont_textContainer = new PIXI.Container();
+	cont_coordinates.addChild(cont_textContainer);
 
 	let tfield: terrain_field;
 	store_tfield.store.subscribe((newTField) => {
@@ -161,6 +164,3 @@
 	});
 </script>
 
-{#if data_coordinates.shown}
-	<Container instance={cont_textContainer} />
-{/if}

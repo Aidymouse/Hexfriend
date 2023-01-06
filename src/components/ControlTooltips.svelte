@@ -2,7 +2,11 @@
 	import type { eraser_data, icon_data, path_data, terrain_data, text_data } from '../types/data';
 	import { tools } from '../types/toolData';
 
-	export let selectedTool: tools;
+	import { store_selected_tool } from '../stores/tools'
+
+	let selectedTool: tools;
+	store_selected_tool.subscribe(n => selectedTool = n)
+	
 	export let data_terrain: terrain_data;
 
 	export let data_icon: icon_data;

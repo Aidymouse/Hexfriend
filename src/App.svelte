@@ -1,37 +1,47 @@
 <script lang="ts">
-	/* COLORS
-hexfriend green: #8cc63f
-hexfiend red: #FF6666
-*/
+	/* COLORS //
+	hexfriend green: #8cc63f
+	hexfiend red: #FF6666
+	*/
 
-	/* TODO 
-// CORE FUNCTIONS
-- tooltips
-- keyboard shortcuts
-// POLISH / ROADMAP
-// not ranked
-- terrain generator function validation
-- terrain generator
-- floating loaders - better feedback
-- save data checking (if loading, making new map, quitting)
-- export at different sizes
-- dashed line
-- more fonts
-*/
+	/* TODO //
 
-	/* BUGS 
-- symbol size is weird in preview when hex size is big
-- coordinates show under some stuff for some reason
-*/
-	import Controls from './components/ControlTooltips.svelte';
+	// CORE FUNCTIONS
+	- tooltips
+	- keyboard shortcuts - make sure all are working
+	- get rid of reliance on svelte-pixi
+		- coords
+		- overlay
+
+	// POLISH / ROADMAP
+	// not ranked
+	- terrain generator
+	- terrain generator function validation
+	- floating loaders - better feedback
+	- save data checking (if loading, making new map, quitting)
+	- export at different sizes
+	- dashed line
+	- more fonts
+	- tests?? I dont think I'm a real enough dev
+	- abolish technical debt
+	*/
+
+	/* BUGS //
+	- symbol size is weird in preview when hex size is big
+	- coordinates show under some stuff for some reason
+	*/
+
+	// Components
+	import ControlTooltips from './components/ControlTooltips.svelte';
 	import IconsetCreator from './components/IconsetCreator.svelte';
 	import MapSettings from './components/MapSettings.svelte';
 	import SavedMaps from './components/SavedMaps.svelte';
 	import ShortcutList from './components/ShortcutList.svelte';
 	import TerrainGenerator from './components/TerrainGenerator.svelte';
 	import TilesetCreator from './components/TilesetCreator.svelte';
-	// Like, whatever
 	import ToolButtons from './components/ToolButtons.svelte';
+	import CanvasHolder from './components/CanvasHolder.svelte';
+	
 	// Layers
 	import CoordsLayer from './layers/CoordsLayer.svelte';
 	import IconLayer from './layers/IconLayer.svelte';
@@ -39,7 +49,7 @@ hexfiend red: #FF6666
 	import PathLayer from './layers/PathLayer.svelte';
 	import TerrainLayer from './layers/TerrainLayer.svelte';
 	import TextLayer from './layers/TextLayer.svelte';
-	import { db } from './lib/db';
+	
 	// Data
 	import DEFAULTSAVEDATA from './lib/defaultSaveData';
 	// Methods
@@ -47,6 +57,13 @@ hexfiend red: #FF6666
 	import { download } from './lib/download2';
 	import { getKeyboardShortcut } from './lib/keyboardShortcuts';
 	import { convertSaveDataToLatest } from './lib/saveDataConverter';
+	import { afterUpdate, onMount } from 'svelte';
+	
+	// Lib
+	import * as texture_loader from './lib/texture_loader';
+	import * as PIXI from 'pixi.js';
+	import { db } from './lib/db';
+	
 	// Panels
 	import IconPanel from './panels/IconPanel.svelte';
 	import PathPanel from './panels/PathPanel.svelte';
@@ -55,27 +72,29 @@ hexfiend red: #FF6666
 	import * as store_inputs from './stores/inputs';
 	import * as store_panning from './stores/panning';
 	import * as store_tfield from './stores/tfield';
+	import { store_selected_tool } from './stores/tools';
+	
 	// GLOBAL STYLES
 	import './styles/inputs.css';
 	import './styles/panels.css';
 	import './styles/scrollbar.css';
-	import { coord_system } from './types/coordinates';
+	
+	// TYPES
 	import type { coordinates_data, eraser_data, icon_data, path_data, terrain_data, text_data, trace_data } from './types/data';
 	import type { Iconset } from './types/icon';
 	import type { input_state } from './types/inputs';
 	import type { pan_state } from './types/panning';
 	import type { save_data } from './types/savedata';
-	import { LATESTSAVEDATAVERSION } from './types/savedata';
-	import { map_shape } from './types/settings';
 	import type { terrain_field } from './types/terrain';
 	import type { Tileset } from './types/tilesets';
+	
+	// Enums
 	import { tools } from './types/toolData';
-	import * as PIXI from 'pixi.js';
-	import { Container, Application } from 'svelte-pixi';
-
-	import * as PIXI_Assets from '@pixi/assets';
-
-	import * as texture_loader from './lib/texture_loader';
+	import { coord_system } from './types/coordinates';
+	import { map_shape } from './types/settings';
+	
+	// Constants
+	import { LATESTSAVEDATAVERSION } from './types/savedata';
 
 	/* STATE */
 
@@ -115,6 +134,14 @@ hexfiend red: #FF6666
 
 	//offsetContainer.addChild(terrainGraphics);
 
+	/* PIXI CONTAINERS */
+	let cont_icon = new PIXI.Container();
+	let cont_terrain = new PIXI.Container();
+	let cont_all_paths = new PIXI.Container();
+	let cont_all_text = new PIXI.Container();
+	let cont_coordinates = new PIXI.Container();
+	let cont_bighex_overlay = new PIXI.Container();
+
 	/* APPLICATION */
 	let app = new PIXI.Application({
 		backgroundAlpha: 0,
@@ -140,12 +167,18 @@ hexfiend red: #FF6666
 		pan = newPan;
 	});
 
+	// This makes panning update smoothly
+	$: {pan = pan}
+
 	let controls: input_state;
 	store_inputs.store.subscribe((newInputState) => {
 		controls = newInputState;
 	});
 
-	let selectedTool: tools = tools.TERRAIN;
+	let selectedTool;
+	store_selected_tool.subscribe(t => {
+		selectedTool = t;
+	})
 
 	/* DATA */
 	/* Data is bound to both layer and panel of a particluar tool. It contains all the shared state they need, and is bound to both */
@@ -217,13 +250,13 @@ hexfiend red: #FF6666
 	// Never cleared, to stop duplicate textures being added
 	// Theoretically a memory leak... but bounded by how many unique tiles can be loaded. Shouldn't be a problem?
 
-	function exportMap(exportType) {
+	async function exportMap(exportType) {
 		showLoader = true;
 
 		switch (exportType) {
 			case 'image/png':
 				download(
-					app.renderer.plugins.extract.base64(offsetContainer),
+					await app.renderer.extract.base64(offsetContainer),
 					`${loadedSave.title ? loadedSave.title : 'Untitled Hexfriend'}`,
 					exportType
 				);
@@ -248,11 +281,12 @@ hexfiend red: #FF6666
 		data_path.contextPathId = null;
 		data_text.contextStyleId = null;
 
-		selectedTool = newTool;
+		store_selected_tool.update(n => newTool);
 	}
 
 	/* ALL PURPOSE POINTER METHODS */
 	function pointerdown(e: PointerEvent) {
+		store_panning.handlers.handle(e);
 		controls.mouseDown[e.button] = true;
 
 		if (controls.mouseDown[2]) store_panning.handlers.startPan(e);
@@ -334,6 +368,7 @@ hexfiend red: #FF6666
 		}
 	}
 
+	/* KEYBOARD EVENTS */
 	function handleShortcuts(e: KeyboardEvent) {
 		// Generate key code
 		let keycode = '';
@@ -419,8 +454,8 @@ hexfiend red: #FF6666
 			}
 		}
 	}
+	
 
-	/* KEYBOARD EVENTS */
 	function keyDown(e: KeyboardEvent) {
 		if (appState != app_state.NORMAL) return;
 
@@ -526,7 +561,7 @@ hexfiend red: #FF6666
 
 	async function asyncExtract(app, container): Promise<string> {
 		await null;
-		return new Promise((r) => r(app.renderer.plugins.extract.base64(container)));
+		return new Promise((r) => r(app.renderer.extract.base64(container)));
 	}
 
 	async function saveToDexie() {
@@ -602,13 +637,15 @@ hexfiend red: #FF6666
 
 		// Load Textures
 		for (const tileset of loadedTilesets) {
-			texture_loader.load_tileset_textures(tileset);
+			console.log(`Loading textures for ${tileset.name}`)
+			await texture_loader.load_tileset_textures(tileset);
 		}
 
 		// Load Icons
-		loadedIconsets.forEach((iconset: Iconset) => {
-			texture_loader.load_iconset_textures(iconset);
-		});
+		for (const iconset of loadedIconsets) {
+			console.log(`Loading icon textures for ${iconset.name}`)
+			await texture_loader.load_iconset_textures(iconset);
+		}
 
 		store_tfield.store.set(data.TerrainField);
 		//tfield = data.TerrainField;
@@ -655,7 +692,6 @@ hexfiend red: #FF6666
 		});
 
 		appState = app_state.NORMAL;
-		//await tick();
 
 		// Final Layer Setup
 		//comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
@@ -678,6 +714,37 @@ hexfiend red: #FF6666
 	}
 
 	createNewMap();
+
+	/* Order matters */
+	/* TODO: Put this somewhere better, add other layers */
+
+	offsetContainer.addChild(cont_terrain);
+	offsetContainer.addChild(cont_all_paths);
+	offsetContainer.addChild(cont_icon);
+	offsetContainer.addChild(cont_coordinates);
+	offsetContainer.addChild(cont_bighex_overlay);
+	offsetContainer.addChild(cont_all_text);
+
+	app.stage.addChild(offsetContainer)
+	
+	let canvas_made = false
+	
+	afterUpdate(() => {
+		// Update offset container X, Y, scale
+		
+		offsetContainer.x = pan.offsetX
+		offsetContainer.y = pan.offsetY
+		offsetContainer.scale.x = pan.zoomScale
+		offsetContainer.scale.y = pan.zoomScale
+
+		
+	})
+	
+	onMount(() => {
+
+	})
+
+	
 </script>
 
 <svelte:window on:keydown={keyDown} on:keyup|preventDefault={keyUp} />
@@ -699,6 +766,7 @@ hexfiend red: #FF6666
 	{/if}
 
 	<main
+		id="main-app-space"
 		on:contextmenu|preventDefault={(e) => {}}
 		on:wheel={(e) => {
 			store_panning.handlers.zoom(e);
@@ -718,35 +786,26 @@ hexfiend red: #FF6666
 		on:keydown={keyDown}
 		on:keyup={keyUp}
 	>
-		<Application instance={app} resizeTo={window} >
+
+	<CanvasHolder {app} />
+
+	<TerrainLayer bind:cont_terrain bind:this={comp_terrainLayer} bind:data_terrain {controls} {comp_coordsLayer} />
+	<PathLayer bind:this={comp_pathLayer} bind:cont_all_paths bind:paths={loadedSave.paths} bind:data_path {controls} />
+	<IconLayer bind:this={comp_iconLayer} bind:icons={loadedSave.icons} bind:data_icon bind:cont_icon {data_eraser} {controls} />
+	<CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} bind:data_coordinates />
+	<OverlayLayer bind:cont_bighex_overlay />
+	<TextLayer bind:cont_all_text bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text />
+
+	<!--
+	<Application instance={app} resizeTo={window} >
 			<Container instance={offsetContainer} x={pan.offsetX} y={pan.offsetY} scale={{ x: pan.zoomScale, y: pan.zoomScale }}>
-				<TerrainLayer bind:this={comp_terrainLayer} bind:data_terrain {controls} {comp_coordsLayer} />
-
-				<PathLayer bind:this={comp_pathLayer} bind:paths={loadedSave.paths} bind:data_path {controls} {selectedTool} />
-
-				<IconLayer
-					bind:this={comp_iconLayer}
-					bind:icons={loadedSave.icons}
-					bind:data_icon
-					{data_eraser}
-					{selectedTool}
-					{controls}
-				/>
-
-				<!--
-          Needs Optimization badly
-        -->
-
-				<OverlayLayer />
-
-				<CoordsLayer bind:this={comp_coordsLayer} bind:data_coordinates />
-
-				<TextLayer bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text />
+				
 			</Container>
 		</Application>
+		-->
 	</main>
 
-	<!-- Terrain Buttons -->
+	<!-- Panels -->
 	{#if showTerrainGenerator}
 		<TerrainGenerator {loadedTilesets} {comp_terrainLayer} bind:showTerrainGenerator />
 	{:else if selectedTool == 'terrain'}
@@ -826,7 +885,7 @@ hexfiend red: #FF6666
 	/>
 
 	{#if showControls}
-		<Controls {selectedTool} {data_terrain} {data_icon} {data_path} {data_text} {data_eraser} />
+		<ControlTooltips {data_terrain} {data_icon} {data_path} {data_text} {data_eraser} />
 	{/if}
 {:else if appState == app_state.TILESETCREATOR}
 	<TilesetCreator bind:appState />

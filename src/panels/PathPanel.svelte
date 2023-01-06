@@ -6,6 +6,7 @@
 	import type { path_data } from '../types/data';
 	import type { listed_path_style } from '../types/path';
 	import * as PIXI from 'pixi.js';
+	import { onMount } from 'svelte';
 
 	export let data_path: path_data;
 	export let comp_pathLayer: PathLayer;
@@ -94,6 +95,7 @@
 
 		data_path.contextPathId = null;
 	}
+
 </script>
 
 <div
@@ -133,7 +135,7 @@
 			<button
 				on:click={() => {
 					deselectPath();
-				}}>Deselect Current Path</button
+				}}>Deselect Path</button
 			>
 			<button
 				on:click={() => {

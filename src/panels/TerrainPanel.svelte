@@ -4,10 +4,11 @@
 	import * as store_tfield from '../stores/tfield';
 	import type { terrain_data } from '../types/data';
 	import type { terrain_field } from '../types/terrain';
-	import type { Tile, Tileset } from '../types/tilesets';
+	import type { Tile, Tileset, TileSymbol } from '../types/tilesets';
 	import * as PIXI from 'pixi.js';
 
 	import { get_symbol_texture } from '../lib/texture_loader';
+	import { afterUpdate, onMount } from 'svelte';
 
 	export let loadedTilesets: Tileset[];
 	export let data_terrain: terrain_data;
@@ -19,30 +20,23 @@
 
 	export let app: PIXI.Application;
 
-	$: {
-		tilePreview = generateTilePreview(data_terrain);
-		loadedTilesets = loadedTilesets;
-
-		tfield.orientation = tfield.orientation;
-	}
-
 	// Used for previews
 	let g = new PIXI.Graphics();
 	let s = new PIXI.Sprite();
 	let c = new PIXI.Container();
-	c.addChild(g).addChild(s);
+	c.addChild(g, s);
 
-	let tilePreview: string = generateTilePreview(data_terrain);
+	let tilePreview: string; //generateTilePreview(data_terrain);
 
-	function changeTile(t: Tile) {
+	async function changeTile(t: Tile) {
 		data_terrain.tile = { ...t, symbol: t.symbol ? { ...t.symbol } : null };
-		tilePreview = generateTilePreview(data_terrain);
+		tilePreview = await generateTilePreview(data_terrain); // Not entirely sure why we have to await here when we already await in the function, but fuck it, it works
 		data_terrain.usingPaintbucket = false;
 		data_terrain.usingEraser = false;
 	}
 
 
-	function findSymbolScale(symbol, hexWidth: number, hexHeight: number) {
+	function findSymbolScale(symbol: TileSymbol, hexWidth: number, hexHeight: number) {
 		if (hexWidth < hexHeight) {
 			let s = (hexWidth * symbol.pHex) / 100 / symbol.texWidth;
 			return {
@@ -58,7 +52,7 @@
 		}
 	}
 
-	function generateTilePreview(data_terrain: terrain_data) {
+	async function generateTilePreview(data_terrain: terrain_data) {
 		g.clear();
 		g.beginFill(data_terrain.tile ? data_terrain.tile.bgColor : tfield.blankHexColor);
 
@@ -82,7 +76,7 @@
 			s.texture = null;
 		}
 
-		let b64 = app.renderer.plugins.extract.base64(c); //PIXI.autoDetectRenderer().plugins.extract.base64(c)
+		let b64 = await app.renderer.extract.base64(c); //PIXI.autoDetectRenderer().plugins.extract.base64(c)
 
 		return b64;
 	}
@@ -110,13 +104,22 @@
 
 		return true;
 	}
+
+	afterUpdate(() => {
+		loadedTilesets = loadedTilesets
+		tfield.orientation = tfield.orientation
+	})
+
+	onMount(async () => {
+		tilePreview = await generateTilePreview(data_terrain);
+	})
 </script>
 
 <div class="panel">
 	<div id="terrain-preview">
 		<div id="preview-image-centerer">
 			<img
-				src={tilePreview}
+				src={ tilePreview }
 				alt={'Current Tile Preview'}
 				class:flatTop={tfield.orientation == 'flatTop'}
 				class:pointyTop={tfield.orientation == 'pointyTop'}
@@ -133,21 +136,61 @@
 
 	<div id="buttons" class="scroll-container">
 		{#each loadedTilesets as tileset (tileset.id)}
-			{#if tileset.id != 'default'}
-				<h2>{tileset.name}</h2>
+			{#if tileset.id != 'default' || loadedTilesets.length > 1 || tileset.collapsed}
+				<h2 class="tileset-heading">{tileset.name}
+				<button on:click={() => { tileset.collapsed = !tileset.collapsed }}><img alt="Toggle Tileset Visibility" src={"/assets/img/ui/arrow.png"} class:rotated={tileset.collapsed} ></button>
+				</h2>
 			{/if}
-			<div class="button-grid">
+			<div class="button-grid" class:hidden = {tileset.collapsed}>
 				{#each tileset.tiles as tile (tile.id)}
-					<button title={tile.display} on:click={() => changeTile(tile)} class:selected={styleMatchesData(tile)}
+					<button class="tile-button" title={tile.display} on:click={async () => {await changeTile(tile) } } class:selected={styleMatchesData(tile)}
 						><img src={tile.preview} alt={tile.display} /></button
 					>
 				{/each}
 			</div>
 		{/each}
 	</div>
+
+	<!-- This keeps the selector around. Hacky but... works! -->
+	<div class="hidden"></div>
 </div>
 
 <style>
+
+	.hidden {
+		display: none !important;
+	}
+
+	.tileset-heading {
+		display: flex;
+		position: relative;
+	}
+
+	.tileset-heading button {
+		position: absolute;
+		margin: 0.25em;
+		margin-bottom: calc(0.25em + 5px);
+		box-sizing: border-box;
+		right: 0px;
+		display: flex;
+		height: 80%;
+		top: 0;
+		width: 3em;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.tileset-heading button img {
+		height: 100%;
+		transition-duration: 0.2s;
+	}
+	
+	.tileset-heading button img.rotated {
+		rotate: 180deg;
+	}
+
+
+ 
 	.panel {
 		display: grid;
 		grid-template-columns: 1fr;
@@ -159,34 +202,6 @@
 		max-height: 100%;
 		height: auto;
 		overflow-y: scroll;
-	}
-
-	.small-panel-button {
-		position: absolute;
-		width: 25px;
-		height: 25px;
-		margin: 0;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		padding: 0;
-	}
-
-	.small-panel-button img {
-		width: 80% !important;
-	}
-
-	#eyedropper {
-		right: 10px;
-	}
-
-	#paintbucket {
-		right: 10px;
-		top: 45px;
-	}
-
-	#eraser {
-		right: 45px;
 	}
 
 	#terrain-preview {
@@ -219,6 +234,7 @@
 		grid-template-rows: 50px;
 		grid-auto-rows: 50px;
 		gap: 5px;
+
 	}
 
 	#buttons h2 {
@@ -232,7 +248,7 @@
 		padding: 10px;
 	}
 
-	#buttons button {
+	#buttons .tile-button {
 		box-sizing: border-box;
 		padding: 5px;
 		display: flex;
@@ -240,7 +256,7 @@
 		justify-content: center;
 	}
 
-	#buttons button img {
+	#buttons .tile-button img {
 		width: 90%;
 	}
 

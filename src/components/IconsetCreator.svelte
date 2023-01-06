@@ -4,10 +4,9 @@
 	import { download } from '../lib/download2';
 	import type { Icon, Iconset } from '../types/icon';
 	import ColorInputPixi from './ColorInputPixi.svelte';
-	import * as PIXI_Assets from '@pixi/assets';
 	import * as PIXI from 'pixi.js';
-	import { tick } from 'svelte';
-	import { Graphics, Application, Sprite } from 'svelte-pixi';
+	import { afterUpdate, tick } from 'svelte';
+	import CanvasHolder from './CanvasHolder.svelte';
 
 	let app = new PIXI.Application({
 		width: 300,
@@ -58,24 +57,13 @@
 
 	let newIconFiles: FileList;
 
-	async function createIcon(base64) {}
-
 	async function loadTexture(texId, result) {
-		let newTexture;
-		// Check: has the goysloppigus texture already been loaded?
-		if (PIXI_Assets.Cache.has(result as string)) {
-			newTexture = PIXI_Assets.Cache.get(result as string);
-			iconTextureLookupTable[texId] = newTexture.textureCacheIds[1];
-		} else {
-			PIXI_Assets.Assets.add(texId, result as string);
-			loadedTextures[texId] = await PIXI_Assets.Assets.load(texId);
-			newTexture = loadedTextures[texId];
-			iconTextureLookupTable[texId] = texId;
-		}
+		let newTexture = await PIXI.Assets.load(result);
+		loadedTextures[texId] = newTexture;
 		return newTexture
 	}
 
-	function newIcon() {
+	async function newIcon() {
 		//console.log(newIconFiles)
 
 		Array.from(newIconFiles).forEach((file) => {
@@ -87,11 +75,12 @@
 				let iconName = file.name.split('.')[0];
 				let texId = findID(IDify(iconName));
 
-				let newTexture = loadTexture(texId, r.result);
+				let newTexture = await loadTexture(texId, r.result);
+				console.log(newTexture);
 
 				let newIcon: Icon = {
 					display: iconName,
-					texId: findID(IDify(iconName)),
+					texId: texId,
 					id: findID(IDify(iconName)),
 					color: 0xffffff,
 					pHex: 80,
@@ -120,7 +109,7 @@
 		workingIconset.icons = workingIconset.icons.filter((t: Icon) => t.id != icon.id);
 	}
 
-	function generatePreview(icon: Icon) {
+	async function generatePreview(icon: Icon) {
 		//previewGraphics.clear();
 		//previewGraphics.beginFill(DEFAULTBLANKHEXCOLOR);
 		//previewGraphics.drawPolygon( getHexPathRadius(25, orientation, 0, 0) );
@@ -131,7 +120,7 @@
 		previewSprite.anchor.set(0.5);
 		previewSprite.tint = icon.color;
 
-		let p = app.renderer.plugins.extract.base64(previewSprite);
+		let p = await app.renderer.extract.base64(previewSprite);
 
 		return p;
 	}
@@ -141,10 +130,6 @@
 
 		orientation = orientation;
 
-		if (selectedIcon) {
-			selectedIcon.preview = generatePreview(selectedIcon);
-			selectedIcon.id = findID(IDify(selectedIcon.display));
-		}
 	}
 
 	function getIconScale(symbol, radius = 150) {
@@ -170,7 +155,7 @@
 	const DEFAULTBLANKHEXCOLOR = 0xf2f2f2;
 
 	function exportIconset() {
-		workingIconset.id = IDify(workingIconset.name);
+		workingIconset.id = `${IDify(workingIconset.name)}_v${workingIconset.version}`;
 
 		download(JSON.stringify(workingIconset), workingIconset.name + '.hfis');
 	}
@@ -235,6 +220,40 @@
 
 		workingIconset = workingIconset;
 	}
+
+	let grph_background_hex = new PIXI.Graphics();
+	let spr_icon = new PIXI.Sprite();
+
+	app.stage.addChild(grph_background_hex, spr_icon)
+
+	afterUpdate(async () => {
+
+		if (selectedIcon) {
+
+			grph_background_hex.clear();
+			grph_background_hex.beginFill(DEFAULTBLANKHEXCOLOR);
+			grph_background_hex.drawPolygon(getHexPathRadius(150, orientation, 150, 150));
+			grph_background_hex.endFill();
+	
+			spr_icon.texture = loadedTextures[selectedIcon.texId] 
+			spr_icon.x= 150
+			spr_icon.y= 150
+			spr_icon.anchor.x = 0.5
+			spr_icon.anchor.y = 0.5
+			spr_icon.tint = selectedIcon.color 
+			spr_icon.scale = getIconScale(selectedIcon)
+
+			let new_preview = await generatePreview(selectedIcon);
+			if (selectedIcon.preview != new_preview) {
+				selectedIcon.preview = new_preview;
+				workingIconset = workingIconset;
+			} 
+		
+		}
+
+
+
+	})
 </script>
 
 <main>
@@ -322,25 +341,11 @@
 
 	{#if selectedIcon}
 		<div id="icon-preview">
-			<Application {app}>
-				<Graphics
-					draw={(g) => {
-						g.clear();
-						g.beginFill(DEFAULTBLANKHEXCOLOR);
-						g.drawPolygon(getHexPathRadius(150, orientation, 150, 150));
-						g.endFill();
-					}}
-				/>
 
-				<Sprite
-					texture={loadedTextures[iconTextureLookupTable[selectedIcon.texId]]}
-					x={150}
-					y={150}
-					anchor={{ x: 0.5, y: 0.5 }}
-					tint={selectedIcon.color}
-					scale={getIconScale(selectedIcon)}
-				/>
-				</Application>
+			<div id="pixi-container" style="width: 300px; height: 300px;">
+
+				<CanvasHolder {app} />
+			</div>
 
 			<input
 				type="text"
@@ -365,7 +370,7 @@
 					}}
 					title="Duplicate this Hex"
 				>
-					<img src="/assets/img/tools/duplicate.png" alt="Hex Duplicate" />
+					<img src="/assets/img/tools/duplicate.png" alt="Duplicate Hex" />
 				</button>
 				<button
 					on:click={() => {

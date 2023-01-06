@@ -10,28 +10,34 @@
 	} from '../helpers/hexHelpers';
 	import * as store_panning from '../stores/panning';
 	import * as store_tfield from '../stores/tfield';
+	import { store_selected_tool } from '../stores/tools';
 	import type { eraser_data, icon_data } from '../types/data';
 	import type { IconLayerIcon } from '../types/icon';
 	import type { shortcut_data } from '../types/inputs';
 	import type { pan_state } from '../types/panning';
+	import { tools } from '../types/toolData';
 	import { map_shape } from '../types/settings';
 	import type { terrain_field } from '../types/terrain';
-	import { tools } from '../types/toolData';
-	import type * as PIXI from 'pixi.js';
-	import { Container, Sprite } from 'svelte-pixi';
+	import * as PIXI from 'pixi.js';
 
 	import { get_icon_texture } from '../lib/texture_loader'
 
+	import { afterUpdate, onMount } from 'svelte';
+
 
 	export let icons: IconLayerIcon[] = [];
+	let pixi_icons: {[key: number]: PIXI.Sprite} = {}; // keeps up to date with icons
+	
+	export let cont_icon: PIXI.Container;
 
 
 	let pan: pan_state;
 	store_panning.store.subscribe((newPan) => {
 		pan = newPan;
 	});
-	export let selectedTool: tools;
-
+	
+	let selectedTool: tools;
+	store_selected_tool.subscribe(n => selectedTool = n);
 
 	export let controls;
 
@@ -146,6 +152,7 @@
 	let cursorOnLayer: boolean = false;
 	export function pointerout(e: PointerEvent) {
 		cursorOnLayer = false;
+		spr_floating_icon.visible = false; // Not too happy about this but it's fine
 	}
 
 
@@ -203,6 +210,9 @@
 			floatingIcon.x = store_panning.curWorldX();
 			floatingIcon.y = store_panning.curWorldY();
 		}
+
+		floatingIcon.color = data_icon.color
+		floatingIcon.texId = data_icon.texId
 	}
 
 	export function moveAllIcons(xMod: number, yMod: number) {
@@ -430,6 +440,80 @@
 	
 
 	createFloatingIcon();
+
+	let spr_floating_icon = new PIXI.Sprite()
+	spr_floating_icon.anchor.x = 0.5
+	spr_floating_icon.anchor.y = 0.5
+	spr_floating_icon.alpha = 0.5
+
+	// TODO: This could use a bit of cleanup...
+	afterUpdate(() => {
+
+		Object.keys(pixi_icons).forEach(icon_id => {
+			pixi_icons[icon_id].marked_for_death = true
+		})
+
+		// Update icons to be in line with state
+		icons.forEach(icon => {
+			if (!pixi_icons[icon.id]) {
+				// Create icon
+				let new_icon = new PIXI.Sprite( get_icon_texture(icon.texId) )
+				new_icon.anchor.x = 0.5
+				new_icon.anchor.y = 0.5
+
+				new_icon.on('pointerdown', (e) => { icon_pointerdown(e, icon) })
+				new_icon.on('pointerover', (e) => { icon_pointerover(e, icon) })
+
+				pixi_icons[icon.id] = new_icon
+				cont_icon.addChild(new_icon)
+			}
+
+
+			pixi_icons[icon.id].x = icon.x
+			pixi_icons[icon.id].y = icon.y
+			pixi_icons[icon.id].tint = icon.color
+			pixi_icons[icon.id].scale.x = icon.scale
+			pixi_icons[icon.id].scale.y = icon.scale
+			pixi_icons[icon.id].interactive = true // !!! TODO
+
+			pixi_icons[icon.id].marked_for_death = false
+		});
+
+		Object.keys(pixi_icons).forEach(icon_id => {
+			if (pixi_icons[icon_id].marked_for_death) {
+				cont_icon.removeChild(pixi_icons[icon_id])
+				delete pixi_icons[icon_id]
+			}
+		})		
+
+
+		/* Floating Icon */
+		spr_floating_icon.visible = false
+		if (floatingIcon) {
+			spr_floating_icon.visible = !data_icon.usingEraser && selectedTool == tools.ICON && cursorOnLayer && !data_icon.dragMode && draggedIcon == null
+			spr_floating_icon.texture = get_icon_texture(floatingIcon.texId)
+			spr_floating_icon.tint = floatingIcon.color
+
+			spr_floating_icon.x = floatingIcon.x
+			spr_floating_icon.y = floatingIcon.y
+			spr_floating_icon.tint = floatingIcon.color
+			spr_floating_icon.scale.x = floatingIcon.scale
+			spr_floating_icon.scale.y = floatingIcon.scale
+			//spr_floating_icon.interactive = true // !!! TODO
+
+		}
+
+
+
+	})
+
+	onMount(() => {
+		cont_icon.removeChildren(0)
+		
+		cont_icon.addChild(spr_floating_icon)
+
+	})
+
 </script>
 
 
@@ -449,6 +533,9 @@
 {/if}
 -->
 
+
+<!--
+	<Container instance={cont_icon}></Container>
 {#each icons as icon (icon.id)}
 	<Sprite
 		texture={get_icon_texture(icon.texId)}
@@ -467,3 +554,4 @@
 		
 	/>
 {/each}
+-->
