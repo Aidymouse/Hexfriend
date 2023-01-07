@@ -1,10 +1,11 @@
 <script lang="ts">
-	import type { path_data, terrain_data, icon_data } from '../types/data';
+	import type { path_data, terrain_data, icon_data, overlay_data } from '../types/data';
 	import { tools } from '../types/toolData';
 
 	export let data_terrain: terrain_data;
 	export let data_icon: icon_data;
 	export let data_path: path_data;
+	export let data_overlay: overlay_data;
 
 	$: {
 		data_terrain=data_terrain
@@ -98,7 +99,8 @@
 
 <main>
 	{#each buttons as b}
-		<div class="tool-button-container">
+
+		<div class="tool-button-container" class:hidden={ b.toolCode == tools.OVERLAY && data_overlay.base64 == "" }>
 
 			<button
 				class:selected={selectedTool == b.toolCode}
@@ -139,6 +141,11 @@
 </main>
 
 <style>
+
+	.hidden {
+		display: none !important;
+	}
+
 	main {
 		display: grid;
 		grid-template-columns: 50px;

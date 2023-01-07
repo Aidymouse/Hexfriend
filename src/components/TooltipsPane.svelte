@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Tooltip from './Tooltip.svelte';
+
 	import type { eraser_data, icon_data, overlay_data, path_data, terrain_data, text_data } from '../types/data';
 	import { tools } from '../types/toolData';
 
@@ -93,6 +95,7 @@
 		}
 	}
 
+	/* Eraser */
 	let c_eraser = {
 		leftMouse: 'Erase Terrain + Icons',
 	};
@@ -105,8 +108,15 @@
 		else if (data_eraser.ignoreTerrain) c_eraser.leftMouse = 'Erase Only Icons';
 	}
 
-	function setTooltips_overlay() {
 
+
+	/* Overlay */
+	let c_overlay = {
+		clickAndDrag: 'Move Overlay'
+	}
+
+	function setTooltips_overlay() {
+		c_overlay.clickAndDrag = data_overlay.shown ? "Move Overlay" : ""
 	}
 
 	$: {
@@ -153,50 +163,36 @@
 </script>
 
 <span>
-	<div class="control">
-		<p>Right Mouse</p>
-		<p>Pan</p>
-	</div>
-	<div class="control">
-		<p>Scroll</p>
-		<p>Zoom</p>
-	</div>
-
+	<Tooltip control={"Right Mouse"} tip={"Pan"} />
+	<Tooltip control={"Scroll"} tip={"Zoom"} />
+	
 	{#if selectedTool == tools.TERRAIN}
-		<div class="control">
-			<p>Left Mouse</p>
-			<p>{c_terrain.leftMouse}</p>
-		</div>
+		<Tooltip control={"Left Mouse"} tip={c_terrain.leftMouse} />
+		
 	{:else if selectedTool == tools.ICON}
-		<div class="control">
-			<p>Left Mouse</p>
-			<p>{c_icon.leftMouse}</p>
-		</div>
+		<Tooltip control={"Left Mouse"} tip={c_icon.leftMouse} />
+		
 	{:else if selectedTool == tools.PATH}
-		<div class="control">
-			<p>Left Mouse</p>
-			<p>{c_path.leftMouse}</p>
-		</div>
+		<Tooltip control={"Left Mouse"} tip={c_path.leftMouse} />
+		
 	{:else if selectedTool == tools.TEXT}
-		<div class="control">
-			<p>Left Mouse</p>
-			<p>{c_text.leftMouse}</p>
-		</div>
-		<div class="control">
-			<p>Click and Drag</p>
-			<p>{c_text.clickAndDrag}</p>
-		</div>
+		<Tooltip control={"Left Mouse"} tip={c_text.leftMouse} />
+		<Tooltip control={"Click and Drag"} tip={c_text.clickAndDrag} />
+		
 	{:else if selectedTool == tools.ERASER}
-		<div class="control">
-			<p>Left Mouse</p>
-			<p>{c_eraser.leftMouse}</p>
-		</div>
+		<Tooltip control={"Left Mouse"} tip={c_text.leftMouse} />
+		
+	{:else if selectedTool == tools.OVERLAY}
+		<Tooltip control={"Click and Drag"} tip={c_overlay.clickAndDrag} />
+	
 	{/if}
 
-	<div class="control" style="margin-top: 4px;">
-		<p>Ctrl+K</p>
-		<p>View Keybinds</p>
-	</div>
+	{#if data_overlay.base64 != ""}
+		<Tooltip control="Ctrl+Q" tip="Toggle Overlay" />
+	{/if}
+
+	<Tooltip control="Ctrl+K" tip="View Keybinds" style="margin-top: 4px;"/>
+
 </span>
 
 <style>

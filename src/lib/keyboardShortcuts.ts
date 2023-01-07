@@ -7,8 +7,8 @@ export let shortcuts: shortcut_data[] = [
 	// Keycodes that work anywhere
 	// These will override tool specific commands
 	{ keycode: 'control+s', function: 'save', tool: null, display: 'Save Current Map' },
-	{ keycode: 'control+z', function: 'undo', tool: null, display: 'Undo <wip>' },
-	{ keycode: 'control+shift+z', function: 'redo', tool: null, display: 'Redo <wip>' },
+	// { keycode: 'control+z', function: 'undo', tool: null, display: 'Undo <wip>' },
+	// { keycode: 'control+shift+z', function: 'redo', tool: null, display: 'Redo <wip>' },
 	{ keycode: 'shift+m', function: 'toggleViewMaps', tool: null, display: 'Toggle Maps' },
 	{ keycode: 'shift+s', function: 'toggleViewSettings', tool: null, display: 'Toggle Settings' },
 	{ keycode: 'escape', function: 'backToMainView', tool: null, display: 'Back to Main View' },
@@ -20,6 +20,9 @@ export let shortcuts: shortcut_data[] = [
 	{ keycode: '3', function: 'changeTool_path', tool: null, display: 'Path Tool' },
 	{ keycode: '4', function: 'changeTool_text', tool: null, display: 'Text Tool' },
 	{ keycode: '5', function: 'changeTool_eraser', tool: null, display: 'Eraser Tool' },
+	{ keycode: '6', function: 'changeTool_overlay', tool: null, display: 'Overlay Tool' },
+
+	{ keycode: 'control+q', function: 'toggle_overlay', tool: null, display: 'Toggle Overlay Visibility' },
 
 	// TERRAIN
 	{ keycode: 'e', function: 'toggleEraser', tool: tools.TERRAIN, display: 'Toggle Eraser' },
@@ -49,6 +52,8 @@ export let shortcuts: shortcut_data[] = [
 	// ERASER
 	{ keycode: 'shift', function: null, tool: tools.ERASER, display: 'Only Erase Terrain', displayKeycode: 'shift (Hold)' },
 	{ keycode: 'control', function: null, tool: tools.ERASER, display: 'Only Erase Icons', displayKeycode: 'control (Hold)' },
+
+	// OVERLAY
 ];
 
 export function getKeyboardShortcut(keyCode: string, selectedTool: tools) {

@@ -1,22 +1,26 @@
 <script lang="ts">
     
     import * as PIXI from 'pixi.js';
-	import { tools } from '../types/toolData';
 	import { afterUpdate } from 'svelte';
-
+    
     import { store_selected_tool } from '../stores/tools';
 	import * as store_panning from '../stores/panning';
+	
+    import type { shortcut_data } from '../types/inputs';
+	import type { overlay_data } from '../types/data';
+	import type { pan_state } from '../types/panning';
+	import { tools } from '../types/toolData';
 
     export let data_overlay: overlay_data;
 
-    export let cont_overlay;
+    export let cont_overlay: PIXI.Container;
     
     // Stores
-    let selected_tool;
+    let selected_tool: tools;
     store_selected_tool.subscribe(n => selected_tool = n)
     $: { selected_tool = selected_tool }
     
-    let pan;
+    let pan: pan_state;
     store_panning.store.subscribe((newPan) => {
 		pan = newPan;
 	});
@@ -36,6 +40,10 @@
         oldY = store_panning.curWorldY()
         moving_image = true
     } )
+    spr_overlay_image.on("pointerup", () => {
+        moving_image = false
+    })
+    cont_overlay.addChild(spr_overlay_image);
 
     export function pointermove() {
         if (moving_image) {
@@ -50,12 +58,7 @@
         }
 
     }
-
-    spr_overlay_image.on("pointerup", () => {
-        moving_image = false
-    })
     
-    cont_overlay.addChild(spr_overlay_image);
 
     afterUpdate(async () => {
         if (current_base64 != data_overlay.base64) {

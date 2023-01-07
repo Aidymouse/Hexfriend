@@ -32,7 +32,7 @@
 	*/
 
 	// Components
-	import ControlTooltips from './components/ControlTooltips.svelte';
+	import ControlTooltips from './components/TooltipsPane.svelte';
 	import IconsetCreator from './components/IconsetCreator.svelte';
 	import MapSettings from './components/Settings.svelte';
 	import SavedMaps from './components/SavedMaps.svelte';
@@ -402,76 +402,84 @@
 		if (e.key == 'Control') keycode = 'control';
 
 		let shortcutData = getKeyboardShortcut(keycode, selectedTool);
-
+		if (!shortcutData) return
 		//console.log(keycode);
-		if (shortcutData) {
-			switch (shortcutData.tool) {
-				case null:
-					switch (shortcutData.function) {
-						case 'save':
-							saveInit();
-							break;
 
-						case 'toggleViewMaps':
-							showSavedMaps = !showSavedMaps;
-							break;
+		switch (shortcutData.tool) {
+			case null:
+				switch (shortcutData.function) {
+					case 'save':
+						saveInit();
+						break;
 
-						case 'toggleViewSettings':
-							showSettings = !showSettings;
-							break;
+					case 'toggleViewMaps':
+						showSavedMaps = !showSavedMaps;
+						break;
 
-						case 'toggleShortcutList':
-							showKeyboardShortcuts = !showKeyboardShortcuts;
-							break;
+					case 'toggleViewSettings':
+						showSettings = !showSettings;
+						break;
 
-						case 'toggleControls':
-							showControls = !showControls;
-							break;
+					case 'toggleShortcutList':
+						showKeyboardShortcuts = !showKeyboardShortcuts;
+						break;
 
-						case 'backToMainView':
-							showSavedMaps = false;
-							showSettings = false;
-							showKeyboardShortcuts = false;
-							data_path.contextPathId = null;
-							data_text.contextStyleId = null;
-							break;
+					case 'toggleControls':
+						showControls = !showControls;
+						break;
 
-						case 'changeTool_terrain':
-							changeTool(tools.TERRAIN);
-							break;
-						case 'changeTool_icon':
-							changeTool(tools.ICON);
-							break;
-						case 'changeTool_path':
-							changeTool(tools.PATH);
-							break;
-						case 'changeTool_text':
-							changeTool(tools.TEXT);
-							break;
-						case 'changeTool_eraser':
-							changeTool(tools.ERASER);
-							break;
-					}
+					case 'backToMainView':
+						showSavedMaps = false;
+						showSettings = false;
+						showKeyboardShortcuts = false;
+						data_path.contextPathId = null;
+						data_text.contextStyleId = null;
+						break;
 
-					break;
+					case 'changeTool_terrain':
+						changeTool(tools.TERRAIN);
+						break;
+					case 'changeTool_icon':
+						changeTool(tools.ICON);
+						break;
+					case 'changeTool_path':
+						changeTool(tools.PATH);
+						break;
+					case 'changeTool_text':
+						changeTool(tools.TEXT);
+						break;
+					case 'changeTool_eraser':
+						changeTool(tools.ERASER);
+						break;
+					case 'changeTool_overlay':
+						if (data_overlay.base64 != "") changeTool(tools.OVERLAY);
+						break;
+						
+					case 'toggle_overlay':
+						if (data_overlay.base64 != "") data_overlay.shown = !data_overlay.shown;
+						break
 
-				case tools.TERRAIN:
-					comp_terrainLayer.handleKeyboardShortcut(shortcutData);
-					break;
+				}
 
-				case tools.ICON:
-					comp_iconLayer.handleKeyboardShortcut(shortcutData);
-					break;
+				break;
 
-				case tools.PATH:
-					comp_pathLayer.handleKeyboardShortcut(shortcutData);
-					break;
+			case tools.TERRAIN:
+				comp_terrainLayer.handleKeyboardShortcut(shortcutData);
+				break;
 
-				case tools.TEXT:
-					comp_textLayer.handleKeyboardShortcut(shortcutData);
-					break;
-			}
+			case tools.ICON:
+				comp_iconLayer.handleKeyboardShortcut(shortcutData);
+				break;
+
+			case tools.PATH:
+				comp_pathLayer.handleKeyboardShortcut(shortcutData);
+				break;
+
+			case tools.TEXT:
+				comp_textLayer.handleKeyboardShortcut(shortcutData);
+				break;
 		}
+		
 	}
 	
 
@@ -849,6 +857,7 @@
 			bind:data_terrain	
 			bind:data_icon	
 			bind:data_path	
+			bind:data_overlay
 		/>
 	</div>
 
