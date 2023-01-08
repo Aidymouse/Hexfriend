@@ -44,6 +44,7 @@
     let old_handle_y = -1
     let OG_width = -1
     let OG_height = -1
+    let tex_overlay: PIXI.Texture;
 
     let spr_overlay_image: PIXI.Sprite;    
     let grph_resizer: PIXI.Graphics;
@@ -147,21 +148,29 @@
     afterUpdate(() => {
 
         if (current_base64 != data_overlay.base64) {
-            let new_texture;
+
             if (data_overlay.base64 == "") {
-                new_texture = null
+                tex_overlay = null
                 OG_width = -1
                 OG_height = -1
+
             } else {
-                new_texture = PIXI.Texture.from(data_overlay.base64)
-                OG_width = new_texture.width
-                OG_height = new_texture.height
+                tex_overlay = PIXI.Texture.from(data_overlay.base64)
+                OG_width = tex_overlay.width
+                OG_height = tex_overlay.height
             }
             
             
-            spr_overlay_image.texture = new_texture
+            spr_overlay_image.texture = tex_overlay
             current_base64 = data_overlay.base64
         }
+
+        // Update texture width and height
+        if (tex_overlay && OG_width != tex_overlay.width) {
+            OG_width = tex_overlay.width
+            OG_height = tex_overlay.height
+        }
+
         
         spr_overlay_image.visible = data_overlay.shown
         spr_overlay_image.alpha = data_overlay.opacity

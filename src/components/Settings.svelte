@@ -886,7 +886,7 @@
 
 	<h2>About</h2>
 	<p class="helperText">
-		Hexfriend version 1.5.0 – "Up high, Hexfriend!"
+		Hexfriend version 1.5.1 – "Up high, Hexfriend!"
 		<br />
 		By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
 	</p>
