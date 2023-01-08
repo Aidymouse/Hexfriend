@@ -196,16 +196,6 @@
 </span>
 
 <style>
-	p {
-		margin: 0;
-		font-size: 10pt;
-	}
-
-	.control {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		width: 100%;
-	}
 
 	span {
 		position: absolute;

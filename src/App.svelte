@@ -7,11 +7,11 @@
 	/* TODO //
 
 	// CORE FUNCTIONS
+	- overlay layer
 	- tooltips
 	- keyboard shortcuts - make sure all are working
-	- get rid of reliance on svelte-pixi
-		- coords
-		- overlay
+	- undo / redo
+	- find more of a fix for why PIXI objects stick around when a new map is loaded
 
 	// POLISH / ROADMAP
 	// not ranked
@@ -345,6 +345,10 @@
 
 			case tools.TEXT:
 				comp_textLayer.pointerup();
+				break;
+			
+			case tools.OVERLAY:
+				comp_overlayLayer.pointerup();
 				break;
 		}
 	}
@@ -680,6 +684,7 @@
 		data_coordinates = data.coords;
 
 		data_overlay = data.overlay;
+		if (selectedTool == tools.OVERLAY && data_overlay.base64 == "") store_selected_tool.update(n => tools.TERRAIN)
 
 		//console.log(PIXI_Assets.Assets)
 
@@ -823,7 +828,7 @@
 	<CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} bind:data_coordinates />
 	<LargeHexesLayer bind:cont_largehexes />
 	<TextLayer bind:cont_all_text bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text />
-	<OverlayLayer bind:this={comp_overlayLayer} bind:cont_overlay bind:data_overlay />
+	<OverlayLayer bind:this={comp_overlayLayer} bind:cont_overlay bind:data_overlay {app} />
 
 	<!--
 	<Application instance={app} resizeTo={window} >
