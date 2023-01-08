@@ -1,4 +1,6 @@
 /* GLOBAL BUTTON STYLING */
+
+
 button {
 	border: solid 1px #777777;
 	border-radius: 3px;
@@ -26,6 +28,16 @@ button:disabled:hover {
 	border: solid 1px #222222;
 	background-color: #222222;
 }
+
+button.evil {
+	color: var(--hexfriend-red);
+	border: solid 1px var(--hexfriend-red);
+}
+
+button:hover.evil {
+	background-color: #885555;
+}
+
 
 /* GLOBAL INPUT STYLE */
 input {

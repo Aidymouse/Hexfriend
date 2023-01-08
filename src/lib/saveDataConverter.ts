@@ -37,7 +37,7 @@ export function convertSaveDataToLatest(oldData: save_data): save_data {
 			shown: true,
 			x: 0,
 			y: 0,
-			scale: 1, 
+			scale: {x: 1, y: 1}, 
 			opacity: 0.5
 		}
 	}

@@ -76,6 +76,7 @@
 	import { store_selected_tool } from './stores/tools';
 	
 	// GLOBAL STYLES
+	import './styles/variables.css';
 	import './styles/inputs.css';
 	import './styles/panels.css';
 	import './styles/scrollbar.css';
@@ -255,7 +256,7 @@
 		base64: "",
 		x: 0,
 		y: 0,
-		scale: 1,
+		scale: {x: 1, y: 1},
 		opacity: 0.5,
 	}
 
@@ -581,7 +582,6 @@
 			if (t != null) {
 				loadedSave.title = t;
 			} else {
-				alert('Cancelled save');
 				saving = false;
 				return;
 			}

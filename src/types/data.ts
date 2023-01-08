@@ -61,7 +61,7 @@ export interface overlay_data {
 	base64: string,
 	x: number,
 	y: number,
-	scale: number,
+	scale: {x: number, y: number},
 	opacity: number,
 }
 

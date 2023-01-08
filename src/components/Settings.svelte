@@ -308,6 +308,8 @@
 			let b64 = r.result as string;
 
 			data_overlay.base64 = b64;
+			data_overlay.scale.x = 1
+			data_overlay.scale.y = 1
 			showSettings = false;
 			store_selected_tool.update(n => tools.OVERLAY)
 		};
@@ -406,7 +408,7 @@
 		<div style="height: 10px;" />
 		<div />
 
-		<!-- OVERLAY -->
+		<!-- LARGE HEXES -->
 		<label for="showOverlay">Large Hexes</label>
 		<Checkbox bind:checked={tfield.largehexes.shown} id="showOverlay" />
 
@@ -755,10 +757,10 @@
 		</button>	
 	</h2>
 
-	<div class="settings-grid">
+	<div class="settings-grid" class:hidden={hidden_settings.overlay}>
 
 		<button class="file-input-button">
-			Load Overlay Image
+			{#if data_overlay.base64 == ""}Load Overlay Image{:else}Replace Overlay Image{/if} 
 			<input type="file" accept="image/*" bind:files={overlay_files} on:change={() => { import_overlay_image(); }} />
 		</button>
 
@@ -884,7 +886,7 @@
 
 	<h2>About</h2>
 	<p class="helperText">
-		Hexfriend version 1.4.1 – "Looking cozy, Hexfriend"
+		Hexfriend version 1.5.0 – "Up high, Hexfriend!"
 		<br />
 		By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
 	</p>

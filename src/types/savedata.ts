@@ -1,4 +1,4 @@
-import type { coordinates_data } from './data';
+import type { coordinates_data, overlay_data } from './data';
 import type { Iconset } from './icon';
 import type { terrain_field } from './terrain';
 import type { Tileset } from './tilesets';
@@ -15,15 +15,7 @@ export interface save_data {
 	tilesets: Tileset[];
 	iconsets: Iconset[];
 
-	overlay: {
-		base64: string,
-		shown: boolean,
-		x: number,
-		y: number,
-		scale: number,
-		opacity: number,
-
-	};
+	overlay: overlay_data;
 
 	paths: [];
 	texts: [];

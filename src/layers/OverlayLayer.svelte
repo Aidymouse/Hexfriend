@@ -106,14 +106,14 @@
             if (grabbed_handle.x != 0.5) {
                 new_width = cur_width + (dX * (grabbed_handle.x == 0 ? -1 : 1))
                 let new_x_scale = new_width / OG_width           
-                spr_overlay_image.scale.x = new_x_scale
+                data_overlay.scale.x = new_x_scale
                 data_overlay.x += dX/2
             }
             // Y Transform
             if (grabbed_handle.y != 0.5) {
                 new_height = cur_height + (dY * (grabbed_handle.y == 0 ? -1 : 1))
                 let new_y_scale = new_height / OG_height
-                spr_overlay_image.scale.y = new_y_scale
+                data_overlay.scale.y = new_y_scale
                 data_overlay.y += dY/2
             }            
 
@@ -147,10 +147,17 @@
     afterUpdate(() => {
 
         if (current_base64 != data_overlay.base64) {
-            let new_texture = PIXI.Texture.from(data_overlay.base64)
+            let new_texture;
+            if (data_overlay.base64 == "") {
+                new_texture = null
+                OG_width = -1
+                OG_height = -1
+            } else {
+                new_texture = PIXI.Texture.from(data_overlay.base64)
+                OG_width = new_texture.width
+                OG_height = new_texture.height
+            }
             
-            OG_width = new_texture.width
-            OG_height = new_texture.height
             
             spr_overlay_image.texture = new_texture
             current_base64 = data_overlay.base64
@@ -160,6 +167,8 @@
         spr_overlay_image.alpha = data_overlay.opacity
         spr_overlay_image.x = data_overlay.x
         spr_overlay_image.y = data_overlay.y        
+        spr_overlay_image.scale.x = data_overlay.scale.x
+        spr_overlay_image.scale.y = data_overlay.scale.y
         spr_overlay_image.interactive = (selected_tool == tools.OVERLAY)
 
 

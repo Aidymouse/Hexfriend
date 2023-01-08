@@ -143,7 +143,7 @@
 				}}>Remove Last Point</button
 			>
 			<button
-				style="color: #FF6666;"
+				class="evil"
 				on:click={() => {
 					comp_pathLayer.deletePath(data_path.selectedPath);
 				}}>Delete Path</button

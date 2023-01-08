@@ -11,11 +11,13 @@ A list of neat things Hexfriend can do!
 
 -   Create square or flower shaped maps
 -   Easily add and remove new hexes to the edge of the map
--   Overlay larger hexes for multi-scale maps
--   Create, add and remove custom tiles and icons
+-   Show large hexes for multi-scale maps
+-   Import user made custom tiles and icons
+-   Create new tile or icon sets with inbuilt editors
 -   Export maps as images and proprietary hexfriend format (it's JSON) for sharing across computers 
 -   Save maps in browser
 -   Create and edit path and text styles
+-   Overlay any image on top of the map for easy tracing
 
 ### Meat and Bones
 
@@ -30,8 +32,7 @@ The software is free to use, copy, share, steal, whatever! Check the license fil
 
 Hexfriend is never finished! Here's a list of stuff to do:
 
--   Undo
--   Uploading a background image
+-   Undo and Redo
 -   Some fun easter eggs
 -   More to come!
 
