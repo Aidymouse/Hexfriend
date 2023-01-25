@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { afterUpdate } from 'svelte';
 	import type { path_data, terrain_data, icon_data, overlay_data } from '../types/data';
 	import { tools } from '../types/toolData';
 
@@ -95,28 +96,39 @@
 	export let hexOrientation: 'flatTop' | 'pointyTop';
 
 	export let changeTool: Function;
+
+	afterUpdate(() => {
+
+		let el_selected_button = document.getElementById(`tool-button-${selectedTool}`)
+
+		document.getElementById("highlighter").style.left = el_selected_button.offsetLeft + "px";
+
+	})
+
 </script>
 
 <main>
+	<span id="highlighter"></span>
+
 	{#each buttons as b}
 
-		<div class="tool-button-container" class:hidden={ b.toolCode == tools.OVERLAY && data_overlay.base64 == "" }>
 
-			<button
-				class:selected={selectedTool == b.toolCode}
-				on:click={() => { changeTool(b.toolCode) }}
-				title={`${b.display} Tool`}
-			>
-				<!-- Button Image -->
-				{#if b.toolCode == 'terrain'}
-					<img src={`/assets/img/tools/${b.toolCode}_${hexOrientation == 'flatTop' ? 'ft' : 'pt'}.png`} alt={`${b.display} Tool`} />
-				{:else}
-					<img src={`/assets/img/tools/${b.toolCode}.png`} alt={`${b.display} Tool`} />
-				{/if}
+	<button
+		class:selected={selectedTool == b.toolCode}
+		on:click={() => { changeTool(b.toolCode) }}
+		title={`${b.display} Tool`}
+		class="tool-button"
+		class:hidden = {b.toolCode == tools.OVERLAY && data_overlay.base64 == ""}
+		id={`tool-button-${b.toolCode}`}
+	>
+		<!-- Button Image -->
+		<span class="tool-img-wrapper" class:rotated90={ (b.toolCode == tools.TERRAIN || b.toolCode == tools.OVERLAY) && hexOrientation == "pointyTop"}>
+			<img src={`/assets/img/tools/${b.toolCode}.png`} alt={`${b.display} Tool`} />
+			<img src={`/assets/img/tools/w_${b.toolCode}.png`} alt={`${b.display} Tool`} class:see-through={selectedTool != b.toolCode}/>
+		</span>
+	</button>
 
-			</button>
-
-			<!-- Mini Buttons -->
+			<!-- Mini Buttons 
 			{#if selectedTool == b.toolCode && b.miniButtons.length > 0}
 			<div class="mini-button-container">
 				{#each b.miniButtons as mb}
@@ -128,100 +140,93 @@
 						>
 
 							<img draggable={false} src={mb.image} alt={mb.display}>
-							<img draggable={false} class="selected-img" src={mb.image.replace(".png", "_white.png")} alt={mb.display}>
-
+							
 						</button>
 					{/each}
 				</div>
 			{/if}
+			-->
 			
 
-		</div>
 	{/each}
+
+	
 </main>
 
 <style>
 
-	.hidden {
-		display: none !important;
-	}
-
 	main {
-		display: grid;
-		grid-template-columns: 50px;
-		grid-template-rows: 50px;
-		grid-auto-rows: 50px;
-		gap: 10px;
-	}
-
-	main button {
-		width: 50px;
-		height: 50px;
-	}
-
-	button {
 		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition-duration: 0.2s;
+		height: 2.5em;
+		padding: 0.5em;
+
+		background-color: var(--primary-bg);
+
+		border-radius: 1.75em;
+		gap: 0.5em;
 	}
 
-	.selected {
-		border-color: #8cc63f;
-		outline: #8cc63f solid 1px;
-		transition-duration: 0.2s;
-	}
 
-	.tool-button-container {
-		width: 50px;
-		height: 50px;
+	.tool-button {
+
+		height: 100%;
+		aspect-ratio: 1/1;
+
 		position: relative;
-	}
-
-	/* MINI BUTTONS */
-	.mini-button-container {
-		position: absolute;
-		left: 100%;
-		margin-left: 10px;
-		top: 0;
-
-		background-color: #555555;
-
-		display: flex;
-		flex-direction: column;
-		gap: 1px;
-		border: solid 1px #555555;
-		border-radius: 3px;
-	}
-
-	.mini-button {
-		width: 35px;
-		height: 35px;
 
 		border: none;
-		border-radius: 0px;
-	}
+		background-color: transparent;
 
-	.mini-button.selected {
 		outline: none;
-		background-color: #8cc63f;
+		cursor: pointer;
 	}
 
-	.mini-button.selected img {
-		display: none;
+
+	.tool-button:hover {
+		background-color: rgba;
 	}
 
-	.mini-button .selected-img {
-		display: none;
-	}
-
-	.mini-button.selected .selected-img {
-		display: block !important;
-	}
-	
-	.mini-button img {
+	.tool-img-wrapper {
+		position: relative;
 		width: 100%;
 		height: 100%;
+
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.tool-img-wrapper img {
+		position: absolute;
+		height: 96%;
+		transition-duration: 0.2s;
+	}
+
+	.tool-img-wrapper img.see-through {
+		opacity: 0;
+		transition-duration: 0.2s;
+	}
+
+	.rotated90 {
+		rotate: 90deg;
+	}
+
+
+	#highlighter {
+		height: 2.5em;
+		aspect-ratio: 1/1;
+
+		background-color: var(--hexfriend-green);
+		position: absolute;
+		border-radius: 50%;
+
+		transition-duration: 0.2s;
+		transition-timing-function: cubic-bezier(0.0, 0.1, 0.265, 1.3);
+	}
+
+
+	.hidden {
+		display: none;
 	}
 
 </style>

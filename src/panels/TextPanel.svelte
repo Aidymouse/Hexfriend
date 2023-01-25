@@ -100,48 +100,46 @@
 	}}
 >
 	<div id="controls">
-		<label for="textFill">Color</label>
-		<ColorInput bind:value={data_text.style.fill} name="textFill" />
-
-		<label for="fontSize">Font Size</label>
-		<input id="fontSize" type="number" bind:value={data_text.style.fontSize} />
-
-		<label for="textStroke">Outline</label>
-		<ColorInput bind:value={data_text.style.stroke} name="textStroke" />
-
-		<label for="textStrokeThickness">Thickness</label>
-		<input for="textStrokeThickness" type="number" bind:value={data_text.style.strokeThickness} />
-
-		<label for="textFont">Font</label>
-		<select id="textFont" bind:value={data_text.style.fontFamily}>
-			{#each fonts as font}
-				<option value={font}>{font}</option>
-			{/each}
-		</select>
-
-		<div id="font-style-controls">
-			<span>
-				<div id="font-style-container">
-					<div id="font-style-options">
-						<div class="font-style-option">
-							<CustomValueToggle offValue={'normal'} onValue={'italic'} bind:value={data_text.style.fontStyle}
-								><i style="font-family: Times New Roman">I</i></CustomValueToggle
-							>
-						</div>
-
-						<div class="font-style-option">
-							<CustomValueToggle offValue={'normal'} onValue={'bold'} bind:value={data_text.style.fontWeight}
-								><b>B</b></CustomValueToggle
-							>
-						</div>
+		
+		<span>
+			<ColorInput bind:value={data_text.style.fill} name="textFill" />
+			
+			<input id="fontSize" type="number" bind:value={data_text.style.fontSize} />
+			
+			<div id="font-style-container">
+				<div id="font-style-options">
+					<div class="font-style-option">
+						<CustomValueToggle offValue={'normal'} onValue={'bold'} bind:value={data_text.style.fontWeight}
+							><b>B</b></CustomValueToggle
+						>
 					</div>
-				</div>
-			</span>
 
-			<span>
-				<SelectGrid values={['left', 'center', 'right']} bind:value={data_text.style.align} filenamePrefix={'textalign'} />
-			</span>
-		</div>
+					<div class="font-style-option">
+						<CustomValueToggle offValue={'normal'} onValue={'italic'} bind:value={data_text.style.fontStyle}
+							><i style="font-family: Times New Roman">I</i></CustomValueToggle
+						>
+					</div>
+
+				</div>
+			</div>
+
+			<SelectGrid values={['left', 'center', 'right']} bind:value={data_text.style.align} filenamePrefix={'textalign'} />
+
+		</span>
+
+		<span>
+			<select id="textFont" bind:value={data_text.style.fontFamily}>
+				{#each fonts as font}
+					<option value={font}>{font}</option>
+				{/each}
+			</select>
+		</span>
+
+		<span>
+			<label for="textStroke">Outline</label>
+			<ColorInput bind:value={data_text.style.stroke} name="textStroke" />
+			<input type="number" bind:value={data_text.style.strokeThickness} />
+		</span>
 	</div>
 
 	{#if data_text.selectedText}
@@ -150,11 +148,11 @@
 				<textarea bind:value={data_text.selectedText.text} use:focus bind:this={data_text.editorRef} />
 				<!-- The editor ref is literally jsut used to let us focus the text area by clicking on the text. -->
 				<button
-					on:click={() => {
-						comp_textLayer.deleteText(data_text.selectedText);
-					}}
-				>
-					<img src="/assets/img/tools/trash.png" alt="Trash" title="Delete Selected Text" />
+				on:click={() => {
+					comp_textLayer.deleteText(data_text.selectedText);
+				}}
+				class="evil"
+				>Delete Selected Text
 				</button>
 			</div>
 		</div>
@@ -206,10 +204,29 @@
 	}
 
 	#controls {
-		padding: 10px;
-		display: grid;
-		grid-template-columns: 1fr 2fr;
-		row-gap: 5px;
+		padding: 1em;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5em;
+	}
+
+	#controls span {
+		display: flex;
+		justify-content: flex-start;
+		flex-direction: row;
+		gap: 0.5em;
+		width: 100%;
+		flex-grow: 0;
+		align-items: center;
+	}
+
+	#controls span select {
+		width: 100%;
+	}
+
+	#controls span input[type="number"] {
+		flex: 2 1 50px;
+		width: 2em;
 	}
 
 	.selected {
@@ -218,7 +235,7 @@
 	}
 
 	#selected-text-controls {
-		padding: 10px;
+		padding: 1em;
 		background-color: #555555;
 	}
 
@@ -238,26 +255,17 @@
 	}
 
 	#selected-text-controls button {
-		position: absolute;
-		top: 5px;
-		right: 5px;
-		width: 30px;
-		height: 30px;
-		padding: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	#selected-text-controls button img {
-		height: 80%;
+		width: 100%;
+		margin-top: 0.5em;
 	}
 
 	#text-styles {
-		padding: 10px;
+		padding: 0.5em;
 		background-color: #555555;
 	}
 
+
+	/* FONT STYLE */
 	#font-style-options {
 		display: flex;
 		gap: 1px;
@@ -276,10 +284,4 @@
 		border-radius: 3px;
 	}
 
-	#font-style-controls {
-		grid-column: 1/3;
-		display: flex;
-		justify-content: center;
-		gap: 5px;
-	}
 </style>

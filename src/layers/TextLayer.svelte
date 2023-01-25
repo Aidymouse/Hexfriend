@@ -1,4 +1,7 @@
 <script lang="ts">
+
+	// Floating text areas on top of the text???
+
 	import * as store_panning from '../stores/panning';
 	import type { text_data } from '../types/data';
 	import type { shortcut_data } from '../types/inputs';

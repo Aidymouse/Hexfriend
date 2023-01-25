@@ -783,148 +783,144 @@
 <svelte:window on:keydown={keyDown} on:keyup|preventDefault={keyUp} />
 
 {#if appState == app_state.NORMAL}
-	{#if saving}
-		<div id="save-indicator">
-			<img
-				src="../assets/img/site/hexfriend.png"
-				on:load={() => {
-					setTimeout(() => {
-						saveToDexie();
-					}, 30);
-				}}
-				alt={'Saving...'}
+	<main id="content-arranger">
+		{#if saving}
+			<div id="save-indicator">
+				<img
+					src="../assets/img/site/hexfriend.png"
+					on:load={() => {
+						setTimeout(() => {
+							saveToDexie();
+						}, 30);
+					}}
+					alt={'Saving...'}
+				/>
+				<p>Saving...</p>
+			</div>
+		{/if}
+
+		<section
+			id="main-app"
+			on:contextmenu|preventDefault={(e) => {}}
+			on:wheel={(e) => {
+				store_panning.handlers.zoom(e);
+			}}
+			on:pointerdown={(e) => {
+				pointerdown(e);
+			}}
+			on:pointermove={(e) => {
+				pointermove(e);
+			}}
+			on:pointerup={(e) => {
+				pointerup(e);
+			}}
+			on:pointerout={(e) => {
+				pointerOffLayers(e);
+			}}
+			on:keydown={keyDown}
+			on:keyup={keyUp}
+		>
+
+		<CanvasHolder {app} />
+
+		<TerrainLayer bind:cont_terrain bind:this={comp_terrainLayer} bind:data_terrain {controls} {comp_coordsLayer} />
+		<PathLayer bind:this={comp_pathLayer} bind:cont_all_paths bind:paths={loadedSave.paths} bind:data_path {controls} />
+		<IconLayer bind:this={comp_iconLayer} bind:icons={loadedSave.icons} bind:data_icon bind:cont_icon {data_eraser} {controls} />
+		<CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} bind:data_coordinates />
+		<LargeHexesLayer bind:cont_largehexes />
+		<TextLayer bind:cont_all_text bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text />
+		<OverlayLayer bind:this={comp_overlayLayer} bind:cont_overlay bind:data_overlay {app} />
+
+		</section>
+
+		<!-- Panels -->
+		{#if showTerrainGenerator}
+			<TerrainGenerator {loadedTilesets} {comp_terrainLayer} bind:showTerrainGenerator />
+		{:else if selectedTool == 'terrain'}
+			<TerrainPanel {loadedTilesets} {app} bind:data_terrain />
+		{:else if selectedTool == 'icon'}
+			<IconPanel {app} {loadedIconsets} bind:data_icon />
+		{:else if selectedTool == 'path'}
+			<PathPanel bind:data_path {comp_pathLayer} bind:pathStyles={loadedSave.pathStyles} />
+		{:else if selectedTool == 'text'}
+			<TextPanel bind:data_text {comp_textLayer} bind:textStyles={loadedSave.textStyles} />
+		{:else if selectedTool == tools.OVERLAY}
+			<OverlayPanel bind:data_overlay />
+		{/if}
+
+		<div id="tool-buttons">
+			<ToolButtons
+				bind:selectedTool
+				bind:hexOrientation={tfield.orientation}
+				{changeTool}
+				bind:data_terrain	
+				bind:data_icon	
+				bind:data_path	
+				bind:data_overlay
 			/>
-			<p>Saving...</p>
 		</div>
-	{/if}
 
-	<main
-		id="main-app-space"
-		on:contextmenu|preventDefault={(e) => {}}
-		on:wheel={(e) => {
-			store_panning.handlers.zoom(e);
-		}}
-		on:pointerdown={(e) => {
-			pointerdown(e);
-		}}
-		on:pointermove={(e) => {
-			pointermove(e);
-		}}
-		on:pointerup={(e) => {
-			pointerup(e);
-		}}
-		on:pointerout={(e) => {
-			pointerOffLayers(e);
-		}}
-		on:keydown={keyDown}
-		on:keyup={keyUp}
-	>
+		<div id="setting-buttons">
+			<div id="save-buttons">
+				<button on:click={saveInit} title={'Save'}> <img src="assets/img/tools/save.png" alt="Save" /> </button>
+			</div>
+			<button
+				on:click={() => {
+					showSavedMaps = true;
+				}}
+				title={'Maps'}
+			>
+				<img src="assets/img/tools/maps.png" alt="Maps" />
+			</button>
 
-	<CanvasHolder {app} />
+			<button
+				on:click={() => {
+					showSettings = true;
+				}}
+				title={'Map Settings'}><img src="assets/img/tools/settings.png" alt="Map Settings" /></button
+			>
+		</div>
 
-	<TerrainLayer bind:cont_terrain bind:this={comp_terrainLayer} bind:data_terrain {controls} {comp_coordsLayer} />
-	<PathLayer bind:this={comp_pathLayer} bind:cont_all_paths bind:paths={loadedSave.paths} bind:data_path {controls} />
-	<IconLayer bind:this={comp_iconLayer} bind:icons={loadedSave.icons} bind:data_icon bind:cont_icon {data_eraser} {controls} />
-	<CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} bind:data_coordinates />
-	<LargeHexesLayer bind:cont_largehexes />
-	<TextLayer bind:cont_all_text bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text />
-	<OverlayLayer bind:this={comp_overlayLayer} bind:cont_overlay bind:data_overlay {app} />
+		{#if showSavedMaps}
+			<SavedMaps bind:showSavedMaps {createNewMap} load={loadInit} />
+		{/if}
 
-	<!--
-	<Application instance={app} resizeTo={window} >
-			<Container instance={offsetContainer} x={pan.offsetX} y={pan.offsetY} scale={{ x: pan.zoomScale, y: pan.zoomScale }}>
-				
-			</Container>
-		</Application>
-		-->
-	</main>
+		{#if showKeyboardShortcuts}
+			<ShortcutList bind:this={comp_shortcutList} />
+		{/if}
 
-	<!-- Panels -->
-	{#if showTerrainGenerator}
-		<TerrainGenerator {loadedTilesets} {comp_terrainLayer} bind:showTerrainGenerator />
-	{:else if selectedTool == 'terrain'}
-		<TerrainPanel {loadedTilesets} {app} bind:data_terrain />
-	{:else if selectedTool == 'icon'}
-		<IconPanel {app} {loadedIconsets} bind:data_icon />
-	{:else if selectedTool == 'path'}
-		<PathPanel bind:data_path {comp_pathLayer} bind:pathStyles={loadedSave.pathStyles} />
-	{:else if selectedTool == 'text'}
-		<TextPanel bind:data_text {comp_textLayer} bind:textStyles={loadedSave.textStyles} />
-	{:else if selectedTool == tools.OVERLAY}
-		<OverlayPanel bind:data_overlay />
-	{/if}
-
-	<div id="tool-buttons">
-		<ToolButtons
-			bind:selectedTool
-			bind:hexOrientation={tfield.orientation}
-			{changeTool}
-			bind:data_terrain	
-			bind:data_icon	
-			bind:data_path	
+		<MapSettings
+			{loadedSave}
+			bind:showSettings
+			bind:appState
+			bind:showTerrainGenerator
+			bind:data_coordinates
 			bind:data_overlay
+			bind:loadedTilesets
+			bind:loadedIconsets
+			{comp_terrainLayer}
+			{comp_coordsLayer}
+			{comp_iconLayer}
+			{comp_pathLayer}
+			{comp_textLayer}
+			renderAllHexes={() => {
+				comp_terrainLayer.renderAllHexes();
+			}}
+			renderGrid={() => {
+				comp_terrainLayer.renderGrid();
+			}}
+			redrawEntireMap={() => {
+				redrawEntireMap();
+			}}
+			{exportMap}
+			load={loadInit}
 		/>
-	</div>
 
-	<div id="setting-buttons">
-		<div id="save-buttons">
-			<button on:click={saveInit} title={'Save'}> <img src="assets/img/tools/save.png" alt="Save" /> </button>
-		</div>
-		<button
-			on:click={() => {
-				showSavedMaps = true;
-			}}
-			title={'Maps'}
-		>
-			<img src="assets/img/tools/maps.png" alt="Maps" />
-		</button>
+		{#if showControls}
+			<ControlTooltips {data_terrain} {data_icon} {data_path} {data_text} {data_eraser} {data_overlay} />
+		{/if}
 
-		<button
-			on:click={() => {
-				showSettings = true;
-			}}
-			title={'Map Settings'}><img src="assets/img/tools/settings.png" alt="Map Settings" /></button
-		>
-	</div>
-
-	{#if showSavedMaps}
-		<SavedMaps bind:showSavedMaps {createNewMap} load={loadInit} />
-	{/if}
-
-	{#if showKeyboardShortcuts}
-		<ShortcutList bind:this={comp_shortcutList} />
-	{/if}
-
-	<MapSettings
-		{loadedSave}
-		bind:showSettings
-		bind:appState
-		bind:showTerrainGenerator
-		bind:data_coordinates
-		bind:data_overlay
-		bind:loadedTilesets
-		bind:loadedIconsets
-		{comp_terrainLayer}
-		{comp_coordsLayer}
-		{comp_iconLayer}
-		{comp_pathLayer}
-		{comp_textLayer}
-		renderAllHexes={() => {
-			comp_terrainLayer.renderAllHexes();
-		}}
-		renderGrid={() => {
-			comp_terrainLayer.renderGrid();
-		}}
-		redrawEntireMap={() => {
-			redrawEntireMap();
-		}}
-		{exportMap}
-		load={loadInit}
-	/>
-
-	{#if showControls}
-		<ControlTooltips {data_terrain} {data_icon} {data_path} {data_text} {data_eraser} {data_overlay} />
-	{/if}
+	</main>
 {:else if appState == app_state.TILESETCREATOR}
 	<TilesetCreator bind:appState />
 {:else if appState == app_state.ICONSETCREATOR}
@@ -976,6 +972,15 @@
 	:global(#app) {
 		height: 100%;
 		width: 100%;
+	}
+
+	#content-arranger {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	#loading-screen {
@@ -1032,7 +1037,7 @@
 		margin: 0;
 	}
 
-	main {
+	section#main-app {
 		text-align: center;
 		padding: 1em;
 		margin: 0 auto;
@@ -1046,9 +1051,9 @@
 	/* Tools */
 
 	#tool-buttons {
-		position: fixed;
-		top: 10px;
-		left: 10px;
+		position: absolute;
+		align-self: flex-end;
+		margin-bottom: 1em;
 	}
 
 	/* SETTING BUTTONS */

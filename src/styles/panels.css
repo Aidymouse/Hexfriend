@@ -1,6 +1,6 @@
 .panel {
 	background-color: #333333;
-	border-radius: 4px;
+	border-radius: 0.5em;
 	overflow: hidden;
 	width: 300px;
 	box-sizing: border-box;

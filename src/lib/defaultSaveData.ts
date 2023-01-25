@@ -28,7 +28,7 @@ let DEFAULTSAVEDATA: save_data = {
 
 		blankHexColor: 0xf2f2f2,
 
-		grid: { stroke: 0x333333, thickness: 2, shown: true },
+		grid: { stroke: 0x333333, thickness: 1, shown: true },
 
 		largehexes: {
 			shown: false,
