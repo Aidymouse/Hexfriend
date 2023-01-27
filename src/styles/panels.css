@@ -2,11 +2,11 @@
 	background-color: #333333;
 	border-radius: 0.5em;
 	overflow: hidden;
-	width: 300px;
+	width: 19em;
 	box-sizing: border-box;
 	position: fixed;
-	top: 10px;
-	right: 10px;
+	top: 1em;
+	right: 1em;
 
 	max-height: 80%;
 	height: auto;

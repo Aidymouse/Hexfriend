@@ -20,7 +20,7 @@
 			}}
 		/>
 		{#if checked}
-			<img src={checkboxBase64} alt="check" />
+			<img src={checkboxBase64} alt="Check" />
 		{/if}
 	</div>
 </span>
@@ -32,11 +32,11 @@
 	}
 
 	.cb {
-		width: 25px;
-		height: 25px;
+		width: 1.5em;
+		height: 1.5em;
 		border: solid 2px white;
 		box-sizing: border-box;
-		border-radius: 3px;
+		border-radius: 0.25em;
 		position: relative;
 		background-color: #222222;
 

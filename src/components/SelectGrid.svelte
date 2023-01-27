@@ -4,61 +4,72 @@
 
 	let dispatch = createEventDispatcher();
 
-	export let values: any[] = [];
+	export let options: {title: string, value: string, filename: string}[] = [];
 	export let value: any;
 
-	export let filenamePrefix: string = '';
 
 	function changeValue(newValue: any) {
 		if (value == newValue) return;
 		value = newValue;
 		dispatch('change', {});
 	}
+
 </script>
 
-<div id="border-container">
-	<div id="grid">
-		{#each values as v}
-			<div
-				class="option"
-				class:selected={value == v}
-				on:click={() => {
-					changeValue(v);
-				}}
-				title={capitialize(v)}
-			>
-				<img src={`/assets/img/selectgrids/${filenamePrefix}${v}.png`} alt={`${v}`} />
+<main>
+	{#each options as o}
+		<div
+			class="option"
+			class:selected={value == o.value}
+			on:click={() => {
+				changeValue(o.value);
+			}}
+			title={capitialize(o.title)}
+		>
+			<div 
+				class="svg-bg"
+				class:selected = {value == o.value}
+				style={`-webkit-mask: url(/assets/img/selectgrids/${o.filename}.svg)`}
+				title={`${o.title}`}>
 			</div>
-		{/each}
-	</div>
-</div>
+		</div>
+	{/each}
+</main>
+
+
+
 
 <style>
-	#border-container {
-		border: solid 1px #555555;
-		background-color: #555555;
-		border-radius: 3px;
-		display: inline-block;
+	main {
+		background-color: var(--primary-bg);
+		flex-direction: row;
+		display: flex;
+		height: 2em;
+		border-radius: 0.5em;
+		overflow: hidden;
 	}
 
-	#grid {
-		display: flex;
-		gap: 1px;
+	.svg-bg {
+		width: 100%;
+		height: 100%;
+		background-color: #f2f2f2;
+	}
+
+	.svg-bg.selected {
+		background-color: #333333;
 	}
 
 	.option {
-		width: 30px;
-		height: 30px;
+		height: 100%;
+		aspect-ratio: 1/1;
 		background-color: #222222;
 
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		transition-duration: 0.1s;
-	}
-
-	.option img {
-		width: 70%;
+		padding: 0.3em;
+		box-sizing: border-box;
 	}
 
 	.option:hover {
@@ -66,8 +77,12 @@
 		transition-duration: 0.1s;
 	}
 
-	.selected {
-		background-color: #8cc63f !important;
-		transition-duration: 0s;
+	.option.selected {
+		background-color: var(--hexfriend-green);
+		outline: 0;
+	}
+
+	.option.selected:hover {
+		background-color: var(--hexfriend-green);
 	}
 </style>

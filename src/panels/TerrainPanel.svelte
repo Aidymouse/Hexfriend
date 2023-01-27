@@ -225,19 +225,19 @@
 	}
 
 	#terrain-preview img.flatTop {
-		width: 60px;
+		width: 100%;
 	}
 
 	#terrain-preview img.pointyTop {
-		height: 60px;
+		height: 100%;
 	}
 
 	.button-grid {
 		display: grid;
-		grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-		grid-template-rows: 50px;
-		grid-auto-rows: 50px;
-		gap: 5px;
+		grid-template-columns: repeat(5, 1fr);
+		grid-template-rows: auto;
+		grid-auto-rows: auto;
+		gap: 0.25em;
 
 	}
 
@@ -251,8 +251,9 @@
 		background-color: #555555;
 		padding: 10px;
 	}
-
+	
 	#buttons .tile-button {
+		aspect-ratio: 1/1;
 		box-sizing: border-box;
 		padding: 5px;
 		display: flex;
@@ -264,10 +265,5 @@
 		width: 90%;
 	}
 
-	.selected {
-		outline-style: solid;
-		outline-color: #8cc63f;
-		outline-width: 1px;
-		border-color: #8cc63f;
-	}
+
 </style>

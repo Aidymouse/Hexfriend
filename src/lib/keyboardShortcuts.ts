@@ -12,8 +12,8 @@ export let shortcuts: shortcut_data[] = [
 	{ keycode: 'shift+m', function: 'toggleViewMaps', tool: null, display: 'Toggle Maps' },
 	{ keycode: 'shift+s', function: 'toggleViewSettings', tool: null, display: 'Toggle Settings' },
 	{ keycode: 'escape', function: 'backToMainView', tool: null, display: 'Back to Main View' },
-	{ keycode: 'control+k', function: 'toggleShortcutList', tool: null, display: 'View Shortcut List' },
-	{ keycode: 'shift+k', function: 'toggleControls', tool: null, display: 'Toggle Controls' },
+	{ keycode: 'control+/', function: 'toggleShortcutList', tool: null, display: 'View Shortcut List' },
+	{ keycode: 'shift+/', function: 'toggleControls', tool: null, display: 'Toggle Controls' },
 
 	{ keycode: '1', function: 'changeTool_terrain', tool: null, display: 'Terrain Tool' },
 	{ keycode: '2', function: 'changeTool_icon', tool: null, display: 'Icon Tool' },

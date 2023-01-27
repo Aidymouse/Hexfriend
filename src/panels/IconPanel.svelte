@@ -156,23 +156,35 @@
 		display: none !important;
 	}
 
+	.iconset-heading:first-of-type {
+		margin-top: 0px;
+	}
+
 	.iconset-heading {
 		display: flex;
 		position: relative;
+		align-items: center;
+
+		border-color: var(--primary-bg);
+		margin-bottom: 0.25em;
+		margin-top: 0.25em;
 	}
 
 	.iconset-heading button {
 		position: absolute;
-		margin: 0.25em;
-		margin-bottom: calc(0.25em + 5px);
 		box-sizing: border-box;
-		right: 0px;
 		display: flex;
-		height: 80%;
 		top: 0;
+		right: 0;
+		height: 2em;
 		width: 3em;
 		justify-content: center;
 		align-items: center;
+		background-color: transparent;
+	}
+
+	.iconset-heading button:hover {
+		background-color: #333333;
 	}
 
 	.iconset-heading button img {
@@ -207,13 +219,6 @@
 		color: white;
 	}
 
-	.selected {
-		outline-style: solid;
-		outline-width: 1px;
-		outline-color: #8cc63f;
-		border-color: #8cc63f;
-	}
-
 	#icon-preview {
 		display: grid;
 		grid-template-columns: 60px 1fr;
@@ -245,22 +250,18 @@
 
 	.button-grid {
 		display: grid;
-		grid-template-columns: repeat(5, 51px);
-		grid-template-rows: 51px;
-		grid-auto-rows: 51px;
-		gap: 5px;
+		grid-template-columns: repeat(5, 1fr);
+		grid-template-rows: auto;
+		grid-auto-rows: auto;
+		gap: 0.25em;
 	}
 
-	#buttons h2 {
-		border-color: #333333;
-		margin-bottom: 5px;
-		margin-top: 10px;
-	}
 
 	#buttons .icon-button {
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		aspect-ratio: 1/1;
 	}
 
 	.icon-button img {
@@ -268,27 +269,4 @@
 		height: auto;
 	}
 
-	#eraser {
-		position: absolute;
-		top: 10px;
-		right: 10px;
-		width: 25px;
-		height: 25px;
-		padding: 2px;
-	}
-
-	#eraser img {
-		width: 100%;
-		height: 100%;
-		margin: 0;
-	}
-
-	#dragmode {
-		position: absolute;
-		top: 10px;
-		right: 45px;
-		width: 25px;
-		height: 25px;
-		padding: 2px;
-	}
 </style>

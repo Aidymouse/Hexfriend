@@ -123,7 +123,13 @@
 				</div>
 			</div>
 
-			<SelectGrid values={['left', 'center', 'right']} bind:value={data_text.style.align} filenamePrefix={'textalign'} />
+			<SelectGrid 
+				options={[
+					{title: "Left", value: 'left', filename: 'textalignleft'},
+					{title: "Center", value: 'center', filename: 'textaligncenter'},
+					{title: "Right", value: 'right', filename: 'textalignright'},
+				]}
+				bind:value={data_text.style.align} />
 
 		</span>
 
@@ -229,10 +235,6 @@
 		width: 2em;
 	}
 
-	.selected {
-		outline: #8cc63f solid 1px;
-		border-color: #8cc63f;
-	}
 
 	#selected-text-controls {
 		padding: 1em;

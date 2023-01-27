@@ -3,6 +3,8 @@
 	import type { path_data, terrain_data, icon_data, overlay_data } from '../types/data';
 	import { tools } from '../types/toolData';
 
+	import InlineSVG from 'svelte-inline-svg';
+
 	export let data_terrain: terrain_data;
 	export let data_icon: icon_data;
 	export let data_path: path_data;
@@ -100,35 +102,79 @@
 	afterUpdate(() => {
 
 		let el_selected_button = document.getElementById(`tool-button-${selectedTool}`)
+		
+		let clip_layer = document.getElementById("bottom-layer") 
 
-		document.getElementById("highlighter").style.left = el_selected_button.offsetLeft + "px";
+		let new_clip_path = `circle(1.25em at ${el_selected_button.offsetLeft+el_selected_button.offsetWidth/2}px ${el_selected_button.offsetTop+el_selected_button.offsetHeight/2}px)`
+
+		clip_layer.style.clipPath = new_clip_path
+
 
 	})
 
 </script>
 
-<main>
-	<span id="highlighter"></span>
+<main>	
+		
 
-	{#each buttons as b}
+	<div class="layer" id="top-layer">
+		{#each buttons as b}
 
+			<button
+				on:click={() => { changeTool(b.toolCode) }}
+				title={`${b.display} Tool`}
+				class="tool-button"
+				class:hidden = {b.toolCode == tools.OVERLAY && data_overlay.base64 == ""}
+				id={`tool-button-${b.toolCode}`}
+			>
+				<!-- Button Image 
+				<span class="tool-img-wrapper" >
+					<img src={`/assets/img/tools/${b.toolCode}.png`} alt={`${b.display} Tool`} />
+					<img src={`/assets/img/tools/w_${b.toolCode}.png`} alt={`${b.display} Tool`} class:see-through={selectedTool != b.toolCode}/>
+				</span>
+				-->
 
-	<button
-		class:selected={selectedTool == b.toolCode}
-		on:click={() => { changeTool(b.toolCode) }}
-		title={`${b.display} Tool`}
-		class="tool-button"
-		class:hidden = {b.toolCode == tools.OVERLAY && data_overlay.base64 == ""}
-		id={`tool-button-${b.toolCode}`}
-	>
-		<!-- Button Image -->
-		<span class="tool-img-wrapper" class:rotated90={ (b.toolCode == tools.TERRAIN || b.toolCode == tools.OVERLAY) && hexOrientation == "pointyTop"}>
-			<img src={`/assets/img/tools/${b.toolCode}.png`} alt={`${b.display} Tool`} />
-			<img src={`/assets/img/tools/w_${b.toolCode}.png`} alt={`${b.display} Tool`} class:see-through={selectedTool != b.toolCode}/>
-		</span>
-	</button>
+				<div 
+					class="tool-icon"
+					class:rotated90={ (b.toolCode == tools.TERRAIN || b.toolCode == tools.OVERLAY) && hexOrientation == "pointyTop"}
+					style={`-webkit-mask: url(/assets/img/tools/${b.toolCode}.svg) no-repeat center`}>
+				</div>
 
-			<!-- Mini Buttons 
+			</button>
+
+		{/each}
+	</div>	
+
+	<div class="layer" id="bottom-layer">
+		{#each buttons as b}
+
+			<button
+				on:click={() => { changeTool(b.toolCode) }}
+				title={`${b.display} Tool`}
+				class="tool-button"
+				class:hidden = {b.toolCode == tools.OVERLAY && data_overlay.base64 == ""}
+				id={`b-tool-button-${b.toolCode}`}
+			>
+				<!-- Button Image 
+				<span class="tool-img-wrapper" >
+					<img src={`/assets/img/tools/${b.toolCode}.png`} alt={`${b.display} Tool`} />
+					<img src={`/assets/img/tools/w_${b.toolCode}.png`} alt={`${b.display} Tool`} class:see-through={selectedTool != b.toolCode}/>
+				</span>
+				-->
+
+				<div 
+					class="tool-icon"
+					class:rotated90={ (b.toolCode == tools.TERRAIN || b.toolCode == tools.OVERLAY) && hexOrientation == "pointyTop"}
+					style={`-webkit-mask: url(/assets/img/tools/${b.toolCode}.svg) no-repeat center`}>
+				</div>
+
+			</button>
+
+		{/each}
+	</div>			
+	
+
+	<!-- Mini Buttons 
 			{#if selectedTool == b.toolCode && b.miniButtons.length > 0}
 			<div class="mini-button-container">
 				{#each b.miniButtons as mb}
@@ -148,7 +194,6 @@
 			-->
 			
 
-	{/each}
 
 	
 </main>
@@ -156,16 +201,37 @@
 <style>
 
 	main {
+		position: relative;
+	}
+
+	div.layer {
 		display: flex;
 		height: 2.5em;
 		padding: 0.5em;
-
 		background-color: var(--primary-bg);
 
 		border-radius: 1.75em;
 		gap: 0.5em;
 	}
 
+
+	div#top-layer {
+		position: absolute;
+	}
+	#top-layer .tool-icon {
+		background-color: #999999;
+	}
+	
+	div#bottom-layer {
+		background-color: var(--hexfriend-green);
+		clip-path: circle(50px at 8px 8px);
+		transition-duration: 0.2s;
+		transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1.2);
+		
+	}
+	#bottom-layer .tool-icon {
+		background-color: var(--primary-bg);
+	}
 
 	.tool-button {
 
@@ -181,34 +247,16 @@
 		cursor: pointer;
 	}
 
-
-	.tool-button:hover {
-		background-color: rgba;
-	}
-
-	.tool-img-wrapper {
-		position: relative;
+	.tool-icon {
 		width: 100%;
 		height: 100%;
-
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	.tool-img-wrapper img {
-		position: absolute;
-		height: 96%;
 		transition-duration: 0.2s;
 	}
 
-	.tool-img-wrapper img.see-through {
-		opacity: 0;
-		transition-duration: 0.2s;
-	}
 
 	.rotated90 {
 		rotate: 90deg;
+		transition-duration: 0.2s;
 	}
 
 

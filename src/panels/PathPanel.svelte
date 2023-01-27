@@ -105,28 +105,32 @@
 	}}
 >
 	<div id="controls">
-		<label for="pathColor">Color</label>
 		<ColorInputPixi bind:value={data_path.style.color} id={'pathColor'} />
 
-		<label for="pathThickness">Thickness</label>
 		<input id="pathThickness" type="number" min={1} bind:value={data_path.style.width} />
 
-		<p class="control-label">Line Cap</p>
 		<span>
-			<SelectGrid
-				values={[PIXI.LINE_CAP.ROUND, PIXI.LINE_CAP.BUTT, PIXI.LINE_CAP.SQUARE]}
-				bind:value={data_path.style.cap}
-				filenamePrefix={'lineend'}
-			/>
-		</span>
+			<span>
+				<SelectGrid
+					options = {[
+						{title: "Round Ends", value: PIXI.LINE_CAP.ROUND, filename: "lineendround"},		
+						{title: "Butt Ends", value: PIXI.LINE_CAP.BUTT, filename: "lineendbutt"},		
+						{title: "Square Ends", value: PIXI.LINE_CAP.SQUARE, filename: "lineendsquare"},		
+					]}
+					bind:value={data_path.style.cap}
+				/>
+			</span>
 
-		<p class="control-label">Line End</p>
-		<span>
-			<SelectGrid
-				values={[PIXI.LINE_JOIN.ROUND, PIXI.LINE_JOIN.MITER, PIXI.LINE_JOIN.BEVEL]}
-				bind:value={data_path.style.join}
-				filenamePrefix={'linecorner'}
-			/>
+			<span>
+				<SelectGrid
+					options = {[
+						{title: "Round Corners", value: PIXI.LINE_JOIN.ROUND, filename: "linecornerround"},		
+						{title: "Miter Corners", value: PIXI.LINE_JOIN.MITER, filename: "linecornermiter"},		
+						{title: "Bevel Corners", value: PIXI.LINE_JOIN.BEVEL, filename: "linecornerbevel"},		
+					]}
+					bind:value={data_path.style.join}
+				/>
+			</span>
 		</span>
 	</div>
 
@@ -198,20 +202,21 @@
 <style>
 	span {
 		display: flex;
+		gap: 0.5em;
 	}
+
 	div {
 		color: white;
 	}
 
-	.control-label {
-		margin: 0;
-	}
 
 	#controls {
-		padding: 10px;
-		display: grid;
+		padding: 1em;
+		display: flex;
+		flex-wrap: wrap;
 		grid-template-columns: 1fr 2fr;
 		row-gap: 5px;
+		gap: 0.5em;
 	}
 
 	#selected-path-controls {
@@ -228,9 +233,4 @@
 		background-color: #555555;
 	}
 
-	.selected {
-		border-color: #8cc63f;
-		outline: #8cc63f solid 1px;
-		transition-duration: 0.2s;
-	}
 </style>

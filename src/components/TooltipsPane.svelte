@@ -191,7 +191,7 @@
 		<Tooltip control="Ctrl+Q" tip="Toggle Overlay" />
 	{/if}
 
-	<Tooltip control="Ctrl+K" tip="View Keybinds" style="margin-top: 4px;"/>
+	<Tooltip control="Ctrl+/" tip="View Keybinds" style="margin-top: 4px;"/>
 
 </span>
 

@@ -2,12 +2,13 @@
 
 
 button {
-	border: solid 1px #777777;
-	border-radius: 3px;
+	border: none;
+	border-radius: 0.25em;
 	background-color: #333333;
 	color: white;
 	padding: 5px;
-	transition-duration: 0.2s;
+	transition-duration: 0.1s;
+	transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
 button:hover {
@@ -19,19 +20,17 @@ button:active {
 }
 
 button:disabled {
-	border: solid 1px #222222;
 	background-color: #222222;
 	color: #777777;
 }
 
 button:disabled:hover {
-	border: solid 1px #222222;
 	background-color: #222222;
 }
 
 button.evil {
+	background-color: #634242;
 	color: var(--hexfriend-red);
-	border: solid 1px var(--hexfriend-red);
 }
 
 button:hover.evil {
@@ -89,13 +88,13 @@ select {
 /* CLASSES */
 .selected {
 	outline-style: solid;
-	outline-width: 1px;
+	outline-width: 2px;
 	outline-color: #8cc63f;
 	border-color: #8cc63f;
+	transition-duration: 0s;
 }
 
 .green-button {
-	border-color: #648d2e;
 	background-color: #8cc63f;
 	color: white;
 }

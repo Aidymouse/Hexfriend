@@ -335,15 +335,17 @@
 </button>
 
 <div id="settings" class:shown={showSettings}>
+
+
 	<input
-		style="font-size: 20pt; font-family: Segoe UI; border-radius: 3px; width: 100%; box-sizing: border-box;"
+		style="font-size: 20pt; font-family: Segoe UI; border-radius: 0.25em; width: 100%; box-sizing: border-box;"
 		type="text"
 		placeholder="Map Title"
 		bind:value={loadedSave.title}
 	/>
 
 	<!-- EXPORT / IMPORT -->
-	<span style="display: grid; grid-template-columns: 1fr 1fr; margin-top: 5px; column-gap: 5px;">
+	<span style="display: grid; grid-template-columns: 1fr 1fr; margin-top: 0.25em; column-gap: 0.25em;">
 		<select
 			id="export-map-select"
 			bind:value={exportType}
@@ -431,14 +433,16 @@
 			<label for="overlayEncompass">Encompass Map Edges</label>
 			<Checkbox bind:checked={tfield.largehexes.encompassEdges} id="overlayEncompass" />
 
-			<p>{tfield.orientation == hex_orientation.FLATTOP ? 'Overlay Raised Column' : 'Overlay Indented Row'}</p>
-			<div style={'height: 100%; display: flex; align-items: center;'}>
+			<p>{tfield.orientation == hex_orientation.FLATTOP ? 'Large Raised Column' : 'Large Indented Row'}</p>
+			<span style={'height: 100%; display: flex; align-items: center;'}>
 				<SelectGrid
-					values={['even', 'odd']}
-					filenamePrefix={tfield.orientation == hex_orientation.FLATTOP ? 'overlayraisedcolumn' : 'overlayindentedrow'}
+					options={[
+						{title: "Even", value: "even", filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'overlayraisedcolumn' : 'overlayindentedrow'}even`},
+						{title: "Even", value: "odd", filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'overlayraisedcolumn' : 'overlayindentedrow'}odd`},
+					]}
 					bind:value={tfield.largehexes.raised}
 				/>
-			</div>
+			</span>
 		{/if}
 	</div>
 
@@ -473,7 +477,10 @@
 		<p>Hex Orientation</p>
 		<div style={'height: 100%; display: flex; align-items: center;'}>
 			<SelectGrid
-				values={['flatTop', 'pointyTop']}
+				options={[
+					{title: "Flat Top", value: hex_orientation.FLATTOP, filename: "flatTop"},
+					{title: "Pointy Top", value: hex_orientation.POINTYTOP, filename: "pointyTop"}
+				]}
 				bind:value={tfield.orientation}
 				on:change={() => {
 					changeOrientation();
@@ -529,33 +536,22 @@
         -->
 
 		{#if tfield.mapShape == map_shape.SQUARE}
-			{#if tfield.orientation == 'flatTop'}
-				<p>Raised Column</p>
-				<div style={'height: 100%; display: flex; align-items: center;'}>
-					<SelectGrid
-						values={['even', 'odd']}
-						filenamePrefix={'raisedcolumn'}
-						bind:value={tfield.raised}
-						on:change={() => {
-							comp_terrainLayer.square_updateRaisedColumn();
-							comp_coordsLayer.cullUnusedCoordinates();
-						}}
-					/>
-				</div>
-			{:else if tfield.orientation == 'pointyTop'}
-				<p>Indented Row</p>
-				<div style={'height: 100%; display: flex; align-items: center;'}>
-					<SelectGrid
-						values={['even', 'odd']}
-						filenamePrefix={'indentedrow'}
-						bind:value={tfield.raised}
-						on:change={() => {
-							comp_terrainLayer.square_changeIndentedRow();
-							comp_coordsLayer.cullUnusedCoordinates();
-						}}
-					/>
-				</div>
-			{/if}
+
+			<p>{tfield.orientation == hex_orientation.FLATTOP ? "Raised Column" : "Indented Row"}</p>
+			<span style={'height: 100%; display: flex; align-items: center;'}>
+				<SelectGrid
+				options = {[
+					{title: "Even", value: "even", filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}even`},
+					{title: "Even", value: "odd", filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}odd`},
+				]}
+				bind:value={tfield.raised}
+				on:change={() => {
+					comp_terrainLayer.square_updateRaisedColumn();
+					comp_coordsLayer.cullUnusedCoordinates();
+				}}
+				/>
+			</span>
+
 		{/if}
 
 		<label for="retainIcon" title="Icons will atempt to remain in their hex when transformations occur">Retain Icon Position</label>
@@ -886,7 +882,7 @@
 
 	<h2>About</h2>
 	<p class="helperText">
-		Hexfriend version 1.5.1 – "Up high, Hexfriend!"
+		Hexfriend version 1.6.0 – "Looking <span style="font-weight: bold">good</span>, Hexfriend!"
 		<br />
 		By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
 	</p>
@@ -900,6 +896,12 @@
 
 <style>
 
+	button {
+		border: solid 1px grey;
+	}
+
+	
+
 	.setting-heading {
 		display: flex;
 		position: relative;
@@ -910,6 +912,7 @@
 		height: 2em;
 		position: absolute;
 		right: 0px;
+		border: none;
 	}
 
 	.setting-heading button img {
@@ -1074,16 +1077,9 @@
 	}
 
 	h2 {
-		margin-bottom: 10px;
+		margin-bottom: 0.8em;
 	}
-
-	button.shown {
-		left: 275px !important;
-	}
-
-	#settings.shown {
-		left: 0px !important;
-	}
+	
 
 	.helperText {
 		font-size: 12px;
@@ -1113,30 +1109,41 @@
 	#settings {
 		position: absolute;
 		top: 0;
-		left: -325px;
-		width: 300px;
+		left: -19em;
+		width: 19em;
 		height: 100%;
 		background: #333333;
-
-		padding: 10px;
 		box-sizing: border-box;
 
+		padding: 1em;
+
 		overflow-y: scroll;
-		overflow-x: hidden;
 		transition-duration: 0.2s;
+	}
+
+	#settings.shown {
+		left: 0px !important;
 	}
 
 	#close-tab {
 		position: absolute;
-		left: -50px;
 
-		top: calc(50% - 25px);
+		left: -5em;
+		top: 0;
 
-		width: 50px;
-		height: 50px;
-		border-radius: 50%;
+		width: 5em;
+		height: 8em;
+		border-radius: 0.5em;
 		border: none;
 		background: #333333;
+		transition-duration: 0.2s;
+		transition-timing-function: ease;
+		padding: 0;
+		box-sizing: border-box;
+	}
+
+	#close-tab.shown {
+		left: 20.25em;
 	}
 
 	#close-tab:hover {

@@ -861,9 +861,12 @@
 		</div>
 
 		<div id="setting-buttons">
-			<div id="save-buttons">
-				<button on:click={saveInit} title={'Save'}> <img src="assets/img/tools/save.png" alt="Save" /> </button>
-			</div>
+			<button
+				on:click={() => {
+					showSettings = true;
+				}}
+				title={'Map Settings'}><img src="assets/img/tools/settings.png" alt="Map Settings" /></button
+			>
 			<button
 				on:click={() => {
 					showSavedMaps = true;
@@ -872,13 +875,11 @@
 			>
 				<img src="assets/img/tools/maps.png" alt="Maps" />
 			</button>
-
-			<button
-				on:click={() => {
-					showSettings = true;
-				}}
-				title={'Map Settings'}><img src="assets/img/tools/settings.png" alt="Map Settings" /></button
-			>
+			<div id="save-buttons">
+				<button on:click={saveInit} title={'Save'}> <img src="assets/img/tools/save.png" alt="Save" /> </button>
+			</div>
+			
+			
 		</div>
 
 		{#if showSavedMaps}
@@ -1059,18 +1060,33 @@
 	/* SETTING BUTTONS */
 	#setting-buttons {
 		position: fixed;
-		bottom: 10px;
-		left: 10px;
+		top: 0.5em;
+		left: 0.5em;
 		display: flex;
-		flex-direction: column;
-		gap: 10px;
+		flex-direction: row;
+
 	}
 
 	#setting-buttons button {
-		width: 50px;
-		height: 50px;
+		width: 3em;
+		height: 3em;
 		display: flex;
 		justify-content: center;
 		align-items: center;
+
+		background-color: transparent;
+		opacity: 0.5;
+
+		padding: 0.25em;
 	}
+
+	#setting-buttons button:hover {
+		background-color: var(--mid-dark-bg);
+	}
+
+	#setting-buttons button img {
+		width: 100%;
+
+	}
+
 </style>
