@@ -101,51 +101,50 @@
 >
 	<div id="controls">
 		
-		<span>
+		<section>
 			<ColorInput bind:value={data_text.style.fill} name="textFill" />
 			
 			<input id="fontSize" type="number" bind:value={data_text.style.fontSize} />
 			
-			<div id="font-style-container">
-				<div id="font-style-options">
-					<div class="font-style-option">
-						<CustomValueToggle offValue={'normal'} onValue={'bold'} bind:value={data_text.style.fontWeight}
-							><b>B</b></CustomValueToggle
-						>
-					</div>
-
-					<div class="font-style-option">
-						<CustomValueToggle offValue={'normal'} onValue={'italic'} bind:value={data_text.style.fontStyle}
-							><i style="font-family: Times New Roman">I</i></CustomValueToggle
-						>
-					</div>
-
+			<div id="font-style-options">
+				<div class="font-style-option">
+					<CustomValueToggle offValue={'normal'} onValue={'bold'} bind:value={data_text.style.fontWeight}
+						><b>B</b></CustomValueToggle
+					>
 				</div>
+
+				<div class="font-style-option">
+					<CustomValueToggle offValue={'normal'} onValue={'italic'} bind:value={data_text.style.fontStyle}
+						><i style="font-family: Times New Roman">I</i></CustomValueToggle
+					>
+				</div>
+
 			</div>
+			
 
 			<SelectGrid 
 				options={[
-					{title: "Left", value: 'left', filename: 'textalignleft'},
-					{title: "Center", value: 'center', filename: 'textaligncenter'},
-					{title: "Right", value: 'right', filename: 'textalignright'},
+					{title: "Left Align", value: 'left', filename: 'textalignleft'},
+					{title: "Center Align", value: 'center', filename: 'textaligncenter'},
+					{title: "Right Align", value: 'right', filename: 'textalignright'},
 				]}
 				bind:value={data_text.style.align} />
 
-		</span>
+		</section>
 
-		<span>
+		<section>
 			<select id="textFont" bind:value={data_text.style.fontFamily}>
 				{#each fonts as font}
 					<option value={font}>{font}</option>
 				{/each}
 			</select>
-		</span>
+		</section>
 
-		<span>
+		<section>
 			<label for="textStroke">Outline</label>
 			<ColorInput bind:value={data_text.style.stroke} name="textStroke" />
 			<input type="number" bind:value={data_text.style.strokeThickness} />
-		</span>
+		</section>
 	</div>
 
 	{#if data_text.selectedText}
@@ -166,6 +165,7 @@
 
 	<!-- TEXT STYLES -->
 	<div id="text-styles" style={data_text.selectedText ? 'padding-top: 0px' : ''}>
+		
 		<div style="display: flex; gap: 5px; flex-wrap: wrap">
 			{#each textStyles as ts (ts.id)}
 				<button
@@ -216,7 +216,7 @@
 		gap: 0.5em;
 	}
 
-	#controls span {
+	#controls section {
 		display: flex;
 		justify-content: flex-start;
 		flex-direction: row;
@@ -224,15 +224,20 @@
 		width: 100%;
 		flex-grow: 0;
 		align-items: center;
+		height: 2em;
 	}
 
-	#controls span select {
+	#controls section select {
 		width: 100%;
+		height: 100%;
 	}
 
-	#controls span input[type="number"] {
+	#controls section input[type="number"] {
 		flex: 2 1 50px;
 		width: 2em;
+		height: 100%;
+		box-sizing: border-box;
+		border-radius: 0.5em;
 	}
 
 
@@ -261,6 +266,7 @@
 		margin-top: 0.5em;
 	}
 
+	/* TEXT STYLES */
 	#text-styles {
 		padding: 0.5em;
 		background-color: #555555;
@@ -270,20 +276,13 @@
 	/* FONT STYLE */
 	#font-style-options {
 		display: flex;
-		gap: 1px;
-		background-color: #555555;
-		border: solid 1px #555555;
-		border-radius: 3px;
+		border-radius: 0.5em;
+		overflow: hidden;
 	}
 
 	.font-style-option {
-		width: 30px;
-		height: 30px;
-	}
-
-	#font-style-container {
-		display: inline-block;
-		border-radius: 3px;
+		width: 2em;
+		height: 2em;
 	}
 
 </style>

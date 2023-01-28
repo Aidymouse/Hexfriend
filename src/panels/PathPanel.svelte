@@ -105,33 +105,40 @@
 	}}
 >
 	<div id="controls">
-		<ColorInputPixi bind:value={data_path.style.color} id={'pathColor'} />
-
-		<input id="pathThickness" type="number" min={1} bind:value={data_path.style.width} />
-
 		<span>
-			<span>
-				<SelectGrid
-					options = {[
-						{title: "Round Ends", value: PIXI.LINE_CAP.ROUND, filename: "lineendround"},		
-						{title: "Butt Ends", value: PIXI.LINE_CAP.BUTT, filename: "lineendbutt"},		
-						{title: "Square Ends", value: PIXI.LINE_CAP.SQUARE, filename: "lineendsquare"},		
-					]}
-					bind:value={data_path.style.cap}
-				/>
-			</span>
+			<ColorInputPixi bind:value={data_path.style.color} id={'pathColor'} />
+			<input id="pathThickness" type="number" min={1} bind:value={data_path.style.width} />
+		</span>
 
+		
+		<span class="path-control-grid">
+			<p>Line Ends</p>
 			<span>
-				<SelectGrid
-					options = {[
-						{title: "Round Corners", value: PIXI.LINE_JOIN.ROUND, filename: "linecornerround"},		
-						{title: "Miter Corners", value: PIXI.LINE_JOIN.MITER, filename: "linecornermiter"},		
-						{title: "Bevel Corners", value: PIXI.LINE_JOIN.BEVEL, filename: "linecornerbevel"},		
-					]}
-					bind:value={data_path.style.join}
-				/>
+			<SelectGrid
+				options = {[
+					{title: "Round Ends", value: PIXI.LINE_CAP.ROUND, filename: "lineendround"},		
+					{title: "Butt Ends", value: PIXI.LINE_CAP.BUTT, filename: "lineendbutt"},		
+					{title: "Square Ends", value: PIXI.LINE_CAP.SQUARE, filename: "lineendsquare"},		
+				]}
+				bind:value={data_path.style.cap}
+			/>
 			</span>
 		</span>
+
+		<span class="path-control-grid">
+			<p>Corners</p>
+			<span>
+			<SelectGrid
+				options = {[
+					{title: "Round Corners", value: PIXI.LINE_JOIN.ROUND, filename: "linecornerround"},		
+					{title: "Miter Corners", value: PIXI.LINE_JOIN.MITER, filename: "linecornermiter"},		
+					{title: "Bevel Corners", value: PIXI.LINE_JOIN.BEVEL, filename: "linecornerbevel"},		
+				]}
+				bind:value={data_path.style.join}
+			/>
+			</span>
+		</span>
+		
 	</div>
 
 	{#if data_path.selectedPath}
@@ -213,10 +220,12 @@
 	#controls {
 		padding: 1em;
 		display: flex;
-		flex-wrap: wrap;
-		grid-template-columns: 1fr 2fr;
-		row-gap: 5px;
+		flex-direction: column;
 		gap: 0.5em;
+	}
+
+	#controls input[type="number"] {
+		flex-grow: 1;
 	}
 
 	#selected-path-controls {
@@ -231,6 +240,17 @@
 	#path-styles {
 		padding: 10px;
 		background-color: #555555;
+	}
+
+	.path-control-grid {
+		display: grid;
+		grid-template-columns: 1fr 2fr;
+	}
+
+	.path-control-grid p {
+		margin: 0;
+		display: flex;
+		align-items: center;
 	}
 
 </style>

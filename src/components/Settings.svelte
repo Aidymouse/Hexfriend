@@ -542,11 +542,17 @@
 				<SelectGrid
 				options = {[
 					{title: "Even", value: "even", filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}even`},
-					{title: "Even", value: "odd", filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}odd`},
+					{title: "Odd", value: "odd", filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}odd`},
 				]}
 				bind:value={tfield.raised}
 				on:change={() => {
-					comp_terrainLayer.square_updateRaisedColumn();
+					if (tfield.orientation == hex_orientation.FLATTOP) {
+
+						comp_terrainLayer.square_updateRaisedColumn();
+					} else {
+						comp_terrainLayer.square_changeIndentedRow();
+
+					}
 					comp_coordsLayer.cullUnusedCoordinates();
 				}}
 				/>

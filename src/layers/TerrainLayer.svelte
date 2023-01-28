@@ -20,7 +20,7 @@
 	import type { shortcut_data } from '../types/inputs';
 	import type { pan_state } from '../types/panning';
 	import { map_shape } from '../types/settings';
-	import { hex_raised, TerrainHex, terrain_field } from '../types/terrain';
+	import { hex_orientation, hex_raised, TerrainHex, terrain_field } from '../types/terrain';
 	import type { Tile } from '../types/tilesets';
 	import type { TileSymbol } from '../types/tilesets';
 	import type { hex_id } from '../types/toolData';
@@ -555,7 +555,7 @@
 
 		for (let col = 0; col < tfield.columns; col++) {
 			for (let row = 0; row < tfield.rows; row++) {
-				let cubeCoords = coords_qToCube(tfield.raised, col, row);
+				let cubeCoords = tfield.orientation == hex_orientation.FLATTOP ? coords_qToCube(tfield.raised, col, row) : coords_rToCube(tfield.raised, col, row);
 
 				createBlankHex(cubeCoords);
 			}

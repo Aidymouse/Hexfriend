@@ -9,8 +9,8 @@
 	export let label: string = null;
 	export let id: string = null;
 
-	export let w = 25;
-	export let h = 25;
+	export let w = "2em";
+	export let h = "2em";
 
 	let oldStringValue = PIXI.utils.hex2string(value);
 	let stringValue = oldStringValue;
@@ -28,21 +28,18 @@
 	}
 </script>
 
-<span>
-	<div style="--bg-color: {stringValue}; width: {w}px; height: {h}px">
+<span style="width: {w}; height: {h}">
+	<div style="--bg-color: {stringValue};">
 		<input type="color" bind:value={stringValue} {id} />
 	</div>
-
-	{#if label}
-		<label for={id}>{label}</label>
-	{/if}
 </span>
 
 <style>
 	span {
 		display: flex;
-		gap: 10px;
+		gap: 0.5em;
 		align-items: center;
+		justify-content: center;
 	}
 
 	div {
@@ -52,8 +49,8 @@
 		box-sizing: border-box;
 		background-color: var(--bg-color);
 
-		width: 100%;
-		height: 100%;
+		width: 90%;
+		height: 90%;
 		transition-duration: 0.2s;
 		transition-property: border-color;
 	}

@@ -130,10 +130,16 @@
 			/>
 		</div>
 
-		<ColorInputPixi bind:value={data_terrain.tile.bgColor} id={'terrainColor'} label={'Terrain Color'} />
-
+		<span class="terrain-preview-control-row">
+			<ColorInputPixi bind:value={data_terrain.tile.bgColor} id={'terrainColor'} label={'Terrain Color'} />
+			<label for="terrainColor">Terrain Color</label>
+		</span>
+		
 		{#if data_terrain.tile.symbol}
-			<ColorInputPixi bind:value={data_terrain.tile.symbol.color} id={'symbolColor'} label={'Symbol Color'} />
+			<span class="terrain-preview-control-row">
+				<ColorInputPixi bind:value={data_terrain.tile.symbol.color} id={'symbolColor'} label={'Symbol Color'} />
+				<label for="symbolColor">Symbol Color</label>
+			</span>
 		{/if}
 
 	</div>
@@ -160,6 +166,12 @@
 </div>
 
 <style>
+
+	.terrain-preview-control-row {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+	}
 
 	.hidden {
 		display: none !important;
@@ -210,11 +222,11 @@
 
 	#terrain-preview {
 		display: grid;
-		grid-template-columns: 60px 1fr;
-		grid-template-rows: 30px 30px;
-		column-gap: 5px;
-		background-color: #333333;
-		padding: 10px;
+		grid-template-columns: 4em 1fr;
+		grid-template-rows: 2em 2em;
+		gap: 0.5em;
+		background-color: var(--primary-bg);
+		padding: 1em;
 	}
 
 	#preview-image-centerer {

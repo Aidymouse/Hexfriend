@@ -5,8 +5,8 @@
 
 	export let value: string = '#000000';
 
-	export let width: number = 25;
-	export let height: number = 25;
+	export let width: string = "2em";
+	export let height: string = "2em";
 
 	export let label: string = null;
 	export let name: string = null;
@@ -17,8 +17,8 @@
 	}
 </script>
 
-<main>
-	<div style="--bg-color: {value}; width: {width}px; height: {height}px;">
+<main style="width: {width}; height: {height};">
+	<div style="--bg-color: {value};">
 		<input type="color" id={name} bind:value />
 	</div>
 
@@ -32,6 +32,7 @@
 		display: flex;
 		color: white;
 		align-items: center;
+		justify-content: center;
 	}
 
 	div {
@@ -41,7 +42,8 @@
 		box-sizing: border-box;
 		background-color: var(--bg-color);
 
-		margin-right: 5px;
+		width: 90%;
+		height: 90%;
 	}
 
 	div:hover {

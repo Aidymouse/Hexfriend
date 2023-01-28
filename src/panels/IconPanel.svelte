@@ -104,19 +104,12 @@
 		</div>
 
 		<span class="icon-preview-control-row">
-			<ColorInputPixi bind:value={data_icon.color} w={25} h={25} id={'iconPanelColor'} />
+			<ColorInputPixi bind:value={data_icon.color} id={'iconPanelColor'} />
 			<label for="iconPanelColor">Icon Color</label>
 		</span>
 
-		<!--
-		<span class="icon-preview-control-row">
-			<Checkbox id={'cb_snapIcon'} bind:checked={data_icon.snapToHex} />
-			<label for="cb_snapIcon">Snap to Hex Center</label>
-		</span>
-		-->
-
-		<span class="icon-preview-control-row" style="grid-column: 1/3;">
-			<input type="range" id="iconSize" min={10} max={100} bind:value={data_icon.pHex} style="margin-bottom: 0;" />
+		<span class="icon-preview-control-row" >
+			<input type="range" id="iconSize" min={10} max={100} bind:value={data_icon.pHex} />
 		</span>
 
 	</div>
@@ -199,7 +192,7 @@
 	.icon-preview-control-row {
 		display: flex;
 		align-items: center;
-		gap: 10px;
+		gap: 0.5em;
 	}
 
 	.panel {
@@ -221,11 +214,11 @@
 
 	#icon-preview {
 		display: grid;
-		grid-template-columns: 60px 1fr;
-		grid-template-rows: 30px 30px;
-		column-gap: 5px;
-		background-color: #333333;
-		padding: 10px;
+		grid-template-columns: 4em 1fr;
+		grid-template-rows: 2em 2em;
+		gap: 0.5em;
+		background-color: var(--primary-bg);
+		padding: 1em;
 	}
 
 	#preview-image-centerer {
@@ -236,11 +229,11 @@
 	}
 
 	#icon-preview img.flatTop {
-		width: 60px;
+		width: 100%;
 	}
 
 	#icon-preview img.pointyTop {
-		height: 60px;
+		height: 100%;
 	}
 
 	#buttons {
