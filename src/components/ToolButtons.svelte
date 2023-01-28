@@ -28,7 +28,7 @@
 				{
 					display: "Hex Eraser",
 					action: function() { data_terrain.usingEraser = !data_terrain.usingEraser },
-					image: "/assets/img/tools/mini_eraser.png",
+					image: "/assets/img/tools/mini_eraser.svg",
 					obj: data_terrain,
 					field: "usingEraser"
 				},
@@ -36,7 +36,7 @@
 				{
 					display: "Hex Eyedropper",
 					action: function() { data_terrain.usingEyedropper = !data_terrain.usingEyedropper },
-					image: "/assets/img/tools/eyedropper.png",
+					image: "/assets/img/tools/eyedropper.svg",
 					obj: data_terrain,
 					field: "usingEyedropper"
 				},
@@ -45,7 +45,7 @@
 				{
 					display: "Hex Paintbucket",
 					action: function() { data_terrain.usingPaintbucket = !data_terrain.usingPaintbucket },
-					image: "/assets/img/tools/paintbucket.png",
+					image: "/assets/img/tools/paintbucket.svg",
 					obj: data_terrain,
 					field: "usingPaintbucket"
 				},
@@ -57,7 +57,7 @@
 			{
 				display: "Icon Eraser",
 				action: function() { data_icon.usingEraser = !data_icon.usingEraser },
-				image: "/assets/img/tools/mini_eraser.png",
+				image: "/assets/img/tools/mini_eraser.svg",
 				obj: data_icon,
 				field: "usingEraser"
 			},
@@ -65,7 +65,7 @@
 			{
 				display: "Drag Icons",
 				action: function() { data_icon.dragMode = !data_icon.dragMode },
-				image: "/assets/img/tools/drag.png",
+				image: "/assets/img/tools/drag.svg",
 				obj: data_icon,
 				field: "dragMode"
 			},
@@ -73,7 +73,7 @@
 			{
 				display: "Snap Icon",
 				action: function() { data_icon.snapToHex = !data_icon.snapToHex },
-				image: "/assets/img/tools/snap_icon.png",
+				image: "/assets/img/tools/snap_icon.svg",
 				obj: data_icon,
 				field: "snapToHex"
 			}
@@ -83,7 +83,7 @@
 			{
 				display: "Snap Path Point",
 				action: function() { data_path.snap = !data_path.snap },
-				image: "/assets/img/tools/snap_path.png",
+				image: "/assets/img/tools/snap_path.svg",
 				obj: data_path,
 				field: "snap"
 			}
@@ -115,7 +115,27 @@
 </script>
 
 <main>	
-		
+	{#each buttons as b}
+		{#if b.miniButtons.length > 0}
+				<div class="mini-button-container" class:risen={b.toolCode == selectedTool}>
+					{#each b.miniButtons as mb}
+						<button 
+							class="mini-button"
+							class:selected={ mb.obj ? mb.obj[mb.field] : false }
+							
+							on:click={mb.action}
+							title={mb.display}
+						>
+
+							<span class="mini-button-bg" style="-webkit-mask: url({mb.image})">
+
+							</span>
+							
+						</button>
+					{/each}
+				</div>
+			{/if}
+	{/each}
 
 	<div class="layer" id="top-layer">
 		{#each buttons as b}
@@ -141,6 +161,8 @@
 				</div>
 
 			</button>
+
+			
 
 		{/each}
 	</div>	
@@ -193,15 +215,16 @@
 			{/if}
 			-->
 			
-
-
-	
 </main>
+
+
 
 <style>
 
 	main {
 		position: relative;
+		display: flex;
+		justify-content: center;
 	}
 
 	div.layer {
@@ -259,22 +282,65 @@
 		transition-duration: 0.2s;
 	}
 
-
-	#highlighter {
-		height: 2.5em;
-		aspect-ratio: 1/1;
-
-		background-color: var(--hexfriend-green);
-		position: absolute;
-		border-radius: 50%;
-
-		transition-duration: 0.2s;
-		transition-timing-function: cubic-bezier(0.0, 0.1, 0.265, 1.3);
-	}
-
-
 	.hidden {
 		display: none;
+	}
+
+	/* Mini buttons */
+	.mini-button-container {
+		position: absolute;
+
+		display: flex;
+		gap: 0.5em;
+
+		transition-duration: 0.2s;
+		top: 0.25em;
+		background-color: var(--dark-bg);
+		padding: 0.5em;
+		box-sizing: border-box;
+		border-top-right-radius: 0.5em;
+		border-top-left-radius: 0.5em;
+	}
+
+	.mini-button-container.risen {
+		top: -2.5em;
+		transition-duration: 0.2s;
+	}
+
+	.mini-button {
+		width: 2em;
+		height: 2em;
+		border-radius: 50%;
+		
+		background-color: var(--dark-bg);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 0;
+	}
+
+	.mini-button:hover {
+		background-color: var(--mid-dark-bg);
+	}
+
+	
+	.mini-button.selected {
+		background-color: var(--hexfriend-green);
+		outline: none;
+		
+	}
+
+	.mini-button span {
+		width: 70%;
+		height: 70%;
+		background-color: var(--light-bg);
+	}
+	
+
+	.mini-button.selected span {
+		background-color: var(--primary-bg);
+		outline: none;
+		
 	}
 
 </style>

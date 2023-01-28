@@ -323,6 +323,12 @@
 	}
 </script>
 
+
+
+
+
+
+
 <button
 	id="close-tab"
 	class:shown={showSettings}
@@ -563,8 +569,6 @@
 		<label for="retainIcon" title="Icons will atempt to remain in their hex when transformations occur">Retain Icon Position</label>
 		<Checkbox bind:checked={retainIconPosition} id="retainIcon" />
 	</div>
-
-
 
 	<!-- DIMENSIONS AND SHAPE -->
 	<h2 class="setting-heading">
@@ -888,7 +892,7 @@
 
 	<h2>About</h2>
 	<p class="helperText">
-		Hexfriend version 1.6.0 – "Looking <span style="font-weight: bold">good</span>, Hexfriend!"
+		Hexfriend version 1.6.1 – "Looking snazzy, Hexfriend!"
 		<br />
 		By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
 	</p>
@@ -900,10 +904,16 @@
 	<p class="helperText" style="text-align: center; font-size: 20pt; font-style: normal">☺</p>
 </div>
 
+
+
+
+
+
+
 <style>
 
 	button {
-		border: solid 1px grey;
+		border: solid 1px var(--mid-light-bg);
 	}
 
 	
@@ -1134,31 +1144,32 @@
 	#close-tab {
 		position: absolute;
 
-		left: -5em;
+		left: -2.5em;
 		top: 0;
 
-		width: 5em;
+		width: 2.5em;
 		height: 8em;
-		border-radius: 0.5em;
+		border-radius: 0em;
+		border-top-right-radius: 0.5em;
+		border-bottom-right-radius: 0.5em;
 		border: none;
 		background: #333333;
 		transition-duration: 0.2s;
 		transition-timing-function: ease;
-		padding: 0;
+		padding: 0.5em;
 		box-sizing: border-box;
 	}
 
 	#close-tab.shown {
-		left: 20.25em;
+		left: 22.75em;
 	}
 
 	#close-tab:hover {
-		background: #555555;
+		background: var(--mid-dark-bg);
 	}
 
 	#close-tab img {
 		margin: 0;
-		width: 50%;
-		margin-left: 50%;
+		width: 100%;
 	}
 </style>

@@ -780,6 +780,16 @@
 	
 </script>
 
+
+
+
+
+
+
+
+
+
+
 <svelte:window on:keydown={keyDown} on:keyup|preventDefault={keyUp} />
 
 {#if appState == app_state.NORMAL}
@@ -882,13 +892,12 @@
 			
 		</div>
 
-		{#if showSavedMaps}
-			<SavedMaps bind:showSavedMaps {createNewMap} load={loadInit} />
-		{/if}
-
+		
 		{#if showKeyboardShortcuts}
 			<ShortcutList bind:this={comp_shortcutList} />
 		{/if}
+		
+		<SavedMaps bind:showSavedMaps {createNewMap} load={loadInit} />
 
 		<MapSettings
 			{loadedSave}
@@ -939,6 +948,16 @@
 		/>
 	</div>
 {/if}
+
+
+
+
+
+
+
+
+
+
 
 <style>
 	:root {
@@ -1060,11 +1079,24 @@
 	/* SETTING BUTTONS */
 	#setting-buttons {
 		position: fixed;
-		top: 0.5em;
-		left: 0.5em;
+		top: 0em;
+		left: 0em;
 		display: flex;
+		padding: 0.5em;
 		flex-direction: row;
+		background-color: #000000;
+		border-bottom-right-radius: 0.5em;
+		opacity: 0.5;
+		gap: 0.25em;
 
+		transition-duration: 0.2s;
+		
+		
+	}
+	
+	#setting-buttons:hover {
+		opacity: 1;
+		transition-duration: 0.2s;
 	}
 
 	#setting-buttons button {
@@ -1075,7 +1107,6 @@
 		align-items: center;
 
 		background-color: transparent;
-		opacity: 0.5;
 
 		padding: 0.25em;
 	}
