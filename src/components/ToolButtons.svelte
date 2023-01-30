@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { afterUpdate } from 'svelte';
-	import type { path_data, terrain_data, icon_data, overlay_data } from '../types/data';
+	import type { icon_data, overlay_data, path_data, terrain_data } from '../types/data';
 	import { tools } from '../types/toolData';
-
+	import { afterUpdate } from 'svelte';
 	import InlineSVG from 'svelte-inline-svg';
 
 	export let data_terrain: terrain_data;
@@ -11,87 +10,106 @@
 	export let data_overlay: overlay_data;
 
 	$: {
-		data_terrain=data_terrain
-		data_icon=data_icon
-		data_path=data_path
+		data_terrain = data_terrain;
+		data_icon = data_icon;
+		data_path = data_path;
 
-		buttons=buttons
+		buttons = buttons;
 	}
 
 	let buttons = [
-		{ 
+		{
 			display: 'Terrain',
 			toolCode: tools.TERRAIN,
 
 			miniButtons: [
-				
 				{
-					display: "Hex Eraser",
-					action: function() { data_terrain.usingEraser = !data_terrain.usingEraser },
-					image: "/assets/img/tools/mini_eraser.svg",
+					display: 'Hex Eraser',
+					action: function () {
+						data_terrain.usingEraser = !data_terrain.usingEraser;
+					},
+					image: '/assets/img/tools/mini_eraser.svg',
 					obj: data_terrain,
-					field: "usingEraser"
+					field: 'usingEraser',
 				},
 
 				{
-					display: "Hex Eyedropper",
-					action: function() { data_terrain.usingEyedropper = !data_terrain.usingEyedropper },
-					image: "/assets/img/tools/eyedropper.svg",
+					display: 'Hex Eyedropper',
+					action: function () {
+						data_terrain.usingEyedropper = !data_terrain.usingEyedropper;
+					},
+					image: '/assets/img/tools/eyedropper.svg',
 					obj: data_terrain,
-					field: "usingEyedropper"
+					field: 'usingEyedropper',
 				},
-
 
 				{
-					display: "Hex Paintbucket",
-					action: function() { data_terrain.usingPaintbucket = !data_terrain.usingPaintbucket },
-					image: "/assets/img/tools/paintbucket.svg",
+					display: 'Hex Paintbucket',
+					action: function () {
+						data_terrain.usingPaintbucket = !data_terrain.usingPaintbucket;
+					},
+					image: '/assets/img/tools/paintbucket.svg',
 					obj: data_terrain,
-					field: "usingPaintbucket"
+					field: 'usingPaintbucket',
 				},
-			]
+			],
 		},
 
+		{
+			display: 'Icon',
+			toolCode: tools.ICON,
+			miniButtons: [
+				{
+					display: 'Icon Eraser',
+					action: function () {
+						data_icon.usingEraser = !data_icon.usingEraser;
+					},
+					image: '/assets/img/tools/mini_eraser.svg',
+					obj: data_icon,
+					field: 'usingEraser',
+				},
 
-		{ display: 'Icon', toolCode: tools.ICON, miniButtons: [
-			{
-				display: "Icon Eraser",
-				action: function() { data_icon.usingEraser = !data_icon.usingEraser },
-				image: "/assets/img/tools/mini_eraser.svg",
-				obj: data_icon,
-				field: "usingEraser"
-			},
+				{
+					display: 'Drag Icons',
+					action: function () {
+						data_icon.dragMode = !data_icon.dragMode;
+					},
+					image: '/assets/img/tools/drag.svg',
+					obj: data_icon,
+					field: 'dragMode',
+				},
 
-			{
-				display: "Drag Icons",
-				action: function() { data_icon.dragMode = !data_icon.dragMode },
-				image: "/assets/img/tools/drag.svg",
-				obj: data_icon,
-				field: "dragMode"
-			},
+				{
+					display: 'Snap Icon',
+					action: function () {
+						data_icon.snapToHex = !data_icon.snapToHex;
+					},
+					image: '/assets/img/tools/snap_icon.svg',
+					obj: data_icon,
+					field: 'snapToHex',
+				},
+			],
+		},
 
-			{
-				display: "Snap Icon",
-				action: function() { data_icon.snapToHex = !data_icon.snapToHex },
-				image: "/assets/img/tools/snap_icon.svg",
-				obj: data_icon,
-				field: "snapToHex"
-			}
-		] },
-
-		{ display: 'Path', toolCode: tools.PATH, miniButtons: [
-			{
-				display: "Snap Path Point",
-				action: function() { data_path.snap = !data_path.snap },
-				image: "/assets/img/tools/snap_path.svg",
-				obj: data_path,
-				field: "snap"
-			}
-		] },
+		{
+			display: 'Path',
+			toolCode: tools.PATH,
+			miniButtons: [
+				{
+					display: 'Snap Path Point',
+					action: function () {
+						data_path.snap = !data_path.snap;
+					},
+					image: '/assets/img/tools/snap_path.svg',
+					obj: data_path,
+					field: 'snap',
+				},
+			],
+		},
 		{ display: 'Text', toolCode: tools.TEXT, miniButtons: [] },
 		{ display: 'Eraser', toolCode: tools.ERASER, miniButtons: [] },
 
-		{display: 'Overlay', toolCode: tools.OVERLAY, miniButtons: []},
+		{ display: 'Overlay', toolCode: tools.OVERLAY, miniButtons: [] },
 	];
 
 	export let selectedTool: string;
@@ -100,51 +118,40 @@
 	export let changeTool: Function;
 
 	afterUpdate(() => {
+		let el_selected_button = document.getElementById(`tool-button-${selectedTool}`);
 
-		let el_selected_button = document.getElementById(`tool-button-${selectedTool}`)
-		
-		let clip_layer = document.getElementById("bottom-layer") 
+		let clip_layer = document.getElementById('bottom-layer');
 
-		let new_clip_path = `circle(1.25em at ${el_selected_button.offsetLeft+el_selected_button.offsetWidth/2}px ${el_selected_button.offsetTop+el_selected_button.offsetHeight/2}px)`
+		let new_clip_path = `circle(1.25em at ${el_selected_button.offsetLeft + el_selected_button.offsetWidth / 2}px ${
+			el_selected_button.offsetTop + el_selected_button.offsetHeight / 2
+		}px)`;
 
-		clip_layer.style.clipPath = new_clip_path
-
-
-	})
-
+		clip_layer.style.clipPath = new_clip_path;
+	});
 </script>
 
-<main>	
+<main>
 	{#each buttons as b}
 		{#if b.miniButtons.length > 0}
-				<div class="mini-button-container" class:risen={b.toolCode == selectedTool}>
-					{#each b.miniButtons as mb}
-						<button 
-							class="mini-button"
-							class:selected={ mb.obj ? mb.obj[mb.field] : false }
-							
-							on:click={mb.action}
-							title={mb.display}
-						>
-
-							<span class="mini-button-bg" style="-webkit-mask: url({mb.image})">
-
-							</span>
-							
-						</button>
-					{/each}
-				</div>
-			{/if}
+			<div class="mini-button-container" class:risen={b.toolCode == selectedTool}>
+				{#each b.miniButtons as mb}
+					<button class="mini-button" class:selected={mb.obj ? mb.obj[mb.field] : false} on:click={mb.action} title={mb.display}>
+						<span class="mini-button-bg" style="-webkit-mask: url({mb.image})" />
+					</button>
+				{/each}
+			</div>
+		{/if}
 	{/each}
 
 	<div class="layer" id="top-layer">
 		{#each buttons as b}
-
 			<button
-				on:click={() => { changeTool(b.toolCode) }}
+				on:click={() => {
+					changeTool(b.toolCode);
+				}}
 				title={`${b.display} Tool`}
 				class="tool-button"
-				class:hidden = {b.toolCode == tools.OVERLAY && data_overlay.base64 == ""}
+				class:hidden={b.toolCode == tools.OVERLAY && data_overlay.base64 == ''}
 				id={`tool-button-${b.toolCode}`}
 			>
 				<!-- Button Image 
@@ -154,27 +161,24 @@
 				</span>
 				-->
 
-				<div 
+				<div
 					class="tool-icon"
-					class:rotated90={ (b.toolCode == tools.TERRAIN || b.toolCode == tools.OVERLAY) && hexOrientation == "pointyTop"}
-					style={`-webkit-mask: url(/assets/img/tools/${b.toolCode}.svg) no-repeat center`}>
-				</div>
-
+					class:rotated90={(b.toolCode == tools.TERRAIN || b.toolCode == tools.OVERLAY) && hexOrientation == 'pointyTop'}
+					style={`-webkit-mask: url(/assets/img/tools/${b.toolCode}.svg) no-repeat center`}
+				/>
 			</button>
-
-			
-
 		{/each}
-	</div>	
+	</div>
 
 	<div class="layer" id="bottom-layer">
 		{#each buttons as b}
-
 			<button
-				on:click={() => { changeTool(b.toolCode) }}
+				on:click={() => {
+					changeTool(b.toolCode);
+				}}
 				title={`${b.display} Tool`}
 				class="tool-button"
-				class:hidden = {b.toolCode == tools.OVERLAY && data_overlay.base64 == ""}
+				class:hidden={b.toolCode == tools.OVERLAY && data_overlay.base64 == ''}
 				id={`b-tool-button-${b.toolCode}`}
 			>
 				<!-- Button Image 
@@ -184,17 +188,14 @@
 				</span>
 				-->
 
-				<div 
+				<div
 					class="tool-icon"
-					class:rotated90={ (b.toolCode == tools.TERRAIN || b.toolCode == tools.OVERLAY) && hexOrientation == "pointyTop"}
-					style={`-webkit-mask: url(/assets/img/tools/${b.toolCode}.svg) no-repeat center`}>
-				</div>
-
+					class:rotated90={(b.toolCode == tools.TERRAIN || b.toolCode == tools.OVERLAY) && hexOrientation == 'pointyTop'}
+					style={`-webkit-mask: url(/assets/img/tools/${b.toolCode}.svg) no-repeat center`}
+				/>
 			</button>
-
 		{/each}
-	</div>			
-	
+	</div>
 
 	<!-- Mini Buttons 
 			{#if selectedTool == b.toolCode && b.miniButtons.length > 0}
@@ -214,13 +215,9 @@
 				</div>
 			{/if}
 			-->
-			
 </main>
 
-
-
 <style>
-
 	main {
 		position: relative;
 		display: flex;
@@ -231,12 +228,11 @@
 		display: flex;
 		height: 2.5em;
 		padding: 0.5em;
-		background-color: var(--primary-bg);
+		background-color: var(--background);
 
 		border-radius: 1.75em;
 		gap: 0.5em;
 	}
-
 
 	div#top-layer {
 		position: absolute;
@@ -244,20 +240,18 @@
 	#top-layer .tool-icon {
 		background-color: #999999;
 	}
-	
+
 	div#bottom-layer {
-		background-color: var(--hexfriend-green);
+		background-color: var(--primary);
 		clip-path: circle(50px at 8px 8px);
 		transition-duration: 0.2s;
 		transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1.2);
-		
 	}
 	#bottom-layer .tool-icon {
-		background-color: var(--primary-bg);
+		background-color: var(--background);
 	}
 
 	.tool-button {
-
 		height: 100%;
 		aspect-ratio: 1/1;
 
@@ -275,7 +269,6 @@
 		height: 100%;
 		transition-duration: 0.2s;
 	}
-
 
 	.rotated90 {
 		rotate: 90deg;
@@ -295,7 +288,7 @@
 
 		transition-duration: 0.2s;
 		top: 0.25em;
-		background-color: var(--dark-bg);
+		background-color: var(--dark-background);
 		padding: 0.5em;
 		box-sizing: border-box;
 		border-top-right-radius: 0.5em;
@@ -311,8 +304,8 @@
 		width: 2em;
 		height: 2em;
 		border-radius: 50%;
-		
-		background-color: var(--dark-bg);
+
+		background-color: var(--dark-background);
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -320,27 +313,22 @@
 	}
 
 	.mini-button:hover {
-		background-color: var(--mid-dark-bg);
+		background-color: var(--light-background);
 	}
 
-	
 	.mini-button.selected {
-		background-color: var(--hexfriend-green);
+		background-color: var(--primary);
 		outline: none;
-		
 	}
 
 	.mini-button span {
 		width: 70%;
 		height: 70%;
-		background-color: var(--light-bg);
+		background-color: var(--lightest-background);
 	}
-	
 
 	.mini-button.selected span {
-		background-color: var(--primary-bg);
+		background-color: var(--background);
 		outline: none;
-		
 	}
-
 </style>

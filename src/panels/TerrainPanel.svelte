@@ -1,13 +1,12 @@
 <script lang="ts">
 	import ColorInputPixi from '../components/ColorInputPixi.svelte';
 	import { getHexPath } from '../helpers/hexHelpers';
+	import { get_symbol_texture } from '../lib/texture_loader';
 	import * as store_tfield from '../stores/tfield';
 	import type { terrain_data } from '../types/data';
 	import type { terrain_field } from '../types/terrain';
-	import type { Tile, Tileset, TileSymbol } from '../types/tilesets';
+	import type { Tile, TileSymbol, Tileset } from '../types/tilesets';
 	import * as PIXI from 'pixi.js';
-
-	import { get_symbol_texture } from '../lib/texture_loader';
 	import { afterUpdate, onMount } from 'svelte';
 
 	export let loadedTilesets: Tileset[];
@@ -34,7 +33,6 @@
 		data_terrain.usingPaintbucket = false;
 		data_terrain.usingEraser = false;
 	}
-
 
 	function findSymbolScale(symbol: TileSymbol, hexWidth: number, hexHeight: number) {
 		if (hexWidth < hexHeight) {
@@ -106,24 +104,22 @@
 	}
 
 	afterUpdate(async () => {
-		loadedTilesets = loadedTilesets
-		tfield.orientation = tfield.orientation
+		loadedTilesets = loadedTilesets;
+		tfield.orientation = tfield.orientation;
 
 		tilePreview = await generateTilePreview(data_terrain);
-		
-
-	})
+	});
 
 	onMount(async () => {
 		tilePreview = await generateTilePreview(data_terrain);
-	})
+	});
 </script>
 
 <div class="panel">
 	<div id="terrain-preview">
 		<div id="preview-image-centerer">
 			<img
-				src={ tilePreview }
+				src={tilePreview}
 				alt={'Current Tile Preview'}
 				class:flatTop={tfield.orientation == 'flatTop'}
 				class:pointyTop={tfield.orientation == 'pointyTop'}
@@ -134,27 +130,36 @@
 			<ColorInputPixi bind:value={data_terrain.tile.bgColor} id={'terrainColor'} label={'Terrain Color'} />
 			<label for="terrainColor">Terrain Color</label>
 		</span>
-		
+
 		{#if data_terrain.tile.symbol}
 			<span class="terrain-preview-control-row">
 				<ColorInputPixi bind:value={data_terrain.tile.symbol.color} id={'symbolColor'} label={'Symbol Color'} />
 				<label for="symbolColor">Symbol Color</label>
 			</span>
 		{/if}
-
 	</div>
 
 	<div id="buttons" class="scroll-container">
 		{#each loadedTilesets as tileset (tileset.id)}
 			{#if tileset.id != 'default' || loadedTilesets.length > 1 || tileset.collapsed}
-				<h2 class="tileset-heading">{tileset.name}
-				<button on:click={() => { tileset.collapsed = !tileset.collapsed }}><img alt="Toggle Tileset Visibility" src={"/assets/img/ui/arrow.png"} class:rotated={tileset.collapsed} ></button>
+				<h2 class="tileset-heading">
+					{tileset.name}
+					<button
+						on:click={() => {
+							tileset.collapsed = !tileset.collapsed;
+						}}><img alt="Toggle Tileset Visibility" src={'/assets/img/ui/arrow.png'} class:rotated={tileset.collapsed} /></button
+					>
 				</h2>
 			{/if}
-			<div class="button-grid" class:hidden = {tileset.collapsed}>
+			<div class="button-grid" class:hidden={tileset.collapsed}>
 				{#each tileset.tiles as tile (tile.id)}
-					<button class="tile-button" title={tile.display} on:click={async () => {await changeTile(tile) } } class:selected={styleMatchesData(tile)}
-						><img src={tile.preview} alt={tile.display} /></button
+					<button
+						class="tile-button"
+						title={tile.display}
+						on:click={async () => {
+							await changeTile(tile);
+						}}
+						class:selected={styleMatchesData(tile)}><img src={tile.preview} alt={tile.display} /></button
 					>
 				{/each}
 			</div>
@@ -162,11 +167,10 @@
 	</div>
 
 	<!-- This keeps the selector around. Hacky but... works! -->
-	<div class="hidden"></div>
+	<div class="hidden" />
 </div>
 
 <style>
-
 	.terrain-preview-control-row {
 		display: flex;
 		align-items: center;
@@ -200,13 +204,11 @@
 		height: 100%;
 		transition-duration: 0.2s;
 	}
-	
+
 	.tileset-heading button img.rotated {
 		rotate: -180deg;
 	}
 
-
- 
 	.panel {
 		display: grid;
 		grid-template-columns: 1fr;
@@ -225,7 +227,7 @@
 		grid-template-columns: 4em 1fr;
 		grid-template-rows: 2em 2em;
 		gap: 0.5em;
-		background-color: var(--primary-bg);
+		background-color: var(--background);
 		padding: 1em;
 	}
 
@@ -250,7 +252,6 @@
 		grid-template-rows: auto;
 		grid-auto-rows: auto;
 		gap: 0.25em;
-
 	}
 
 	#buttons h2 {
@@ -263,7 +264,7 @@
 		background-color: #555555;
 		padding: 10px;
 	}
-	
+
 	#buttons .tile-button {
 		aspect-ratio: 1/1;
 		box-sizing: border-box;
@@ -276,6 +277,4 @@
 	#buttons .tile-button img {
 		width: 90%;
 	}
-
-
 </style>

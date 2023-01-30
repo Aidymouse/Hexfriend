@@ -1,7 +1,5 @@
-html {
+:root {
 
-    --hexfriend-green: #8cc63f;
-
-    --primary-bg: #333333;
+    --background: #333333;
 
 }

@@ -3,34 +3,34 @@
 
 button {
 	border: none;
-	border-radius: 0.25em;
-	background-color: #333333;
-	color: white;
-	padding: 5px;
+	border-radius: var(--small-radius);
+	background-color: var(--primary-background);
+	color: var(--text);
+	padding: 0.3125em;
 	transition-duration: 0.1s;
 	transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
 button:hover {
-	background-color: #555555;
+	background-color: var(--light-background);
 }
 
 button:active {
-	background-color: #444444;
+	background-color: var(--light-background);
 }
 
 button:disabled {
-	background-color: #222222;
-	color: #777777;
+	background-color: var(--dark-background);
+	color: var(--lighter-background);
 }
 
 button:disabled:hover {
-	background-color: #222222;
+	background-color: var(--dark-background);
 }
 
 button.evil {
 	background-color: #634242;
-	color: var(--hexfriend-red);
+	color: var(--secondary);
 }
 
 button:hover.evil {
@@ -40,25 +40,25 @@ button:hover.evil {
 
 /* GLOBAL INPUT STYLE */
 input {
-	background-color: #777777;
+	background-color: var(--lighter-background);
 	border: 0;
-	border-bottom: solid 2px #222222;
+	border-bottom: solid 0.125em var(--dark-background);
 	transition-duration: 0.2s;
 	transition-property: border-color;
-	color: #f2f2f2;
+	color: var(--text);
 }
 
 input[type='text'] {
-	padding: 5px;
+	padding: 0.3125em;
 }
 
 input[type='number'] {
 	padding: 0.25em;
-	border-radius: 0.5em;
+	border-radius: var(--large-radius);
 }
 
 input:focus {
-	border-color: #8cc63f;
+	border-color: var(--primary);
 	transition-duration: 0.2s;
 	transition-property: border-color;
 	outline: none;
@@ -67,23 +67,23 @@ input:focus {
 /* TEXTAREA */
 textarea {
 	outline: none;
-	color: #f2f2f2;
-	background-color: #333333;
-	border-radius: 3px;
+	color: var(--text);
+	background-color: var(--primary-background);
+	border-radius: var(--small-radius);
 }
 
 textarea:focus {
 	outline-style: solid;
 	outline-width: 1px;
-	outline-color: #8cc63f;
-	border-color: #8cc63f;
+	outline-color: var(--primary);
+	border-color: var(--primary);
 }
 
 select {
-	background-color: #777777;
-	color: #f2f2f2;
-	padding: 5px;
-	border-radius: 3px;
+	background-color: var(--lighter-background);
+	color: var(--text);
+	padding: 0.3125em;
+	border-radius: var(--small-radius);
 }
 
 /* SELECT */
@@ -97,25 +97,25 @@ select {
 .selected {
 	outline-style: solid;
 	outline-width: 2px;
-	outline-color: #8cc63f;
-	border-color: #8cc63f;
+	outline-color: var(--primary);
+	border-color: var(--primary);
 	transition-duration: 0s;
 }
 
 .green-button {
-	background-color: #8cc63f;
+	background-color: var(--primary);
 	color: white;
 }
 
 .green-button:hover {
 	border: none;
-	background-color: #648d2e;
+	background-color: var(--dark-primary);
 }
 
 /* RANGE */
 input[type='range'] {
 	-webkit-appearance: none;
-	margin: 10px 0;
+	margin: 0.625em 0;
 	width: 100%;
 	border: none;
 	background-color: transparent;
@@ -129,50 +129,50 @@ input[type='range']:focus {
 /* Webkit */
 input[type='range']::-webkit-slider-runnable-track {
 	width: 100%;
-	height: 6px;
+	height: 0.375em;
 	cursor: pointer;
-	background: #222222;
-	border-radius: 6px;
+	background: var(--light-background);
+	border-radius: var(--large-radius);
 	transition-duration: 0.2s;
 }
 
 input[type='range']:active::-webkit-slider-runnable-track {
-	background: #8cc63f;
+	background: var(--primary);
 	transition-duration: 0.2s;
 }
 
 input[type='range']::-webkit-slider-thumb {
 	-webkit-appearance: none;
-	margin-top: -6px;
-	border: 2px solid #f2f2f2;
-	height: 18px;
-	width: 18px;
+	margin-top: -0.375em;
+	border: 0.125em solid var(--text);
+	height: 1.125em;
+	width: 1.125em;
 	border-radius: 50%;
-	background: #8cc63f;
+	background: var(--primary);
 	cursor: pointer;
 }
 
 /* Mozilla */
 input[type='range']::-moz-range-track {
 	width: 100%;
-	height: 6px;
+	height: 0.375em;
 	cursor: pointer;
-	background: #222222;
-	border-radius: 6px;
+	background: var(--light-background);
+	border-radius: var(--large-radius);
 	transition-duration: 0.2s;
 }
 
 input[type='range']:active::-moz-range-track {
-	background: #8cc63f;
+	background: var(--primary);
 	transition-duration: 0.2s;
 }
 
 input[type='range']::-moz-range-thumb {
-	border: 2px solid #f2f2f2;
-	height: 14px;
-	width: 14px;
+	border: 0.125em solid var(--text);
+	height: 0.875em;
+	width: 0.875em;
 	border-radius: 50%;
-	background: #8cc63f;
+	background: var(--primary);
 	cursor: pointer;
 }
 
@@ -182,9 +182,9 @@ input[type='range']::-moz-range-thumb {
 	display: flex;
 	flex-direction: column;
 	border: none;
-	background-color: grey;
+	background-color: var(--lighter-background);
 	position: fixed;
-	border-radius: 0.5em;
+	border-radius: var(--large-radius);
 	overflow: hidden;
 }
 

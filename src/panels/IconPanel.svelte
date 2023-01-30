@@ -1,13 +1,12 @@
 <script lang="ts">
 	import ColorInputPixi from '../components/ColorInputPixi.svelte';
 	import { getHexPath } from '../helpers/hexHelpers';
+	import { get_icon_texture } from '../lib/texture_loader';
 	import * as store_tfield from '../stores/tfield';
 	import type { icon_data } from '../types/data';
 	import type { Icon, Iconset } from '../types/icon';
 	import * as PIXI from 'pixi.js';
 	import type { terrain_field } from 'src/types/terrain';
-
-	import { get_icon_texture } from '../lib/texture_loader';
 	import { afterUpdate, onMount } from 'svelte';
 
 	export let loadedIconsets: Iconset[];
@@ -82,14 +81,11 @@
 		loadedIconsets = loadedIconsets;
 		tfield.orientation = tfield.orientation;
 		iconPreview = await getIconPreview(data_icon);
-	})
+	});
 
 	onMount(async () => {
 		//iconPreview = await getIconPreview(data_icon);
-	})
-
-
-
+	});
 </script>
 
 <div class="panel">
@@ -108,24 +104,28 @@
 			<label for="iconPanelColor">Icon Color</label>
 		</span>
 
-		<span class="icon-preview-control-row" >
+		<span class="icon-preview-control-row">
 			<input type="range" id="iconSize" min={10} max={100} bind:value={data_icon.pHex} />
 		</span>
-
 	</div>
 
 	<div id="buttons" class="scroll-container">
 		{#each loadedIconsets as iconset (iconset.id)}
 			{#if iconset.id != 'default' || loadedIconsets.length > 1 || iconset.collapsed}
-				<h2 class="iconset-heading">{iconset.name}
-				<button on:click={() => { iconset.collapsed = !iconset.collapsed } }><img class:rotated={iconset.collapsed} alt="Toggle Iconset Visibility" src={"/assets/img/ui/arrow.png"}></button>
+				<h2 class="iconset-heading">
+					{iconset.name}
+					<button
+						on:click={() => {
+							iconset.collapsed = !iconset.collapsed;
+						}}><img class:rotated={iconset.collapsed} alt="Toggle Iconset Visibility" src={'/assets/img/ui/arrow.png'} /></button
+					>
 				</h2>
 			{/if}
 
 			<div class="button-grid" class:hidden={iconset.collapsed}>
 				{#each iconset.icons as iconData}
 					<button
-						class = "icon-button"
+						class="icon-button"
 						class:selected={iconMatchesData(iconData)}
 						on:click={() => {
 							selectIcon(iconData);
@@ -144,7 +144,6 @@
 </div>
 
 <style>
-
 	.hidden {
 		display: none !important;
 	}
@@ -158,7 +157,7 @@
 		position: relative;
 		align-items: center;
 
-		border-color: var(--primary-bg);
+		border-color: var(--background);
 		margin-bottom: 0.25em;
 		margin-top: 0.25em;
 	}
@@ -217,7 +216,7 @@
 		grid-template-columns: 4em 1fr;
 		grid-template-rows: 2em 2em;
 		gap: 0.5em;
-		background-color: var(--primary-bg);
+		background-color: var(--background);
 		padding: 1em;
 	}
 
@@ -249,7 +248,6 @@
 		gap: 0.25em;
 	}
 
-
 	#buttons .icon-button {
 		display: flex;
 		align-items: center;
@@ -261,5 +259,4 @@
 		width: 90%;
 		height: auto;
 	}
-
 </style>

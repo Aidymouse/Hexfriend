@@ -4,16 +4,14 @@
 
 	let dispatch = createEventDispatcher();
 
-	export let options: {title: string, value: string, filename: string}[] = [];
+	export let options: { title: string; value: string; filename: string }[] = [];
 	export let value: any;
-
 
 	function changeValue(newValue: any) {
 		if (value == newValue) return;
 		value = newValue;
 		dispatch('change', {});
 	}
-
 </script>
 
 <main>
@@ -26,22 +24,19 @@
 			}}
 			title={capitialize(o.title)}
 		>
-			<div 
+			<div
 				class="svg-bg"
-				class:selected = {value == o.value}
+				class:selected={value == o.value}
 				style={`-webkit-mask: url(/assets/img/selectgrids/${o.filename}.svg)`}
-				title={`${o.title}`}>
-			</div>
+				title={`${o.title}`}
+			/>
 		</div>
 	{/each}
 </main>
 
-
-
-
 <style>
 	main {
-		background-color: var(--primary-bg);
+		background-color: var(--background);
 		flex-direction: row;
 		display: flex;
 		height: 2em;
@@ -78,11 +73,11 @@
 	}
 
 	.option.selected {
-		background-color: var(--hexfriend-green);
+		background-color: var(--primary);
 		outline: 0;
 	}
 
 	.option.selected:hover {
-		background-color: var(--hexfriend-green);
+		background-color: var(--primary);
 	}
 </style>

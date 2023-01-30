@@ -1,56 +1,52 @@
 <script lang="ts">
 	/* COLORS //
-	hexfriend green: #8cc63f
-	hexfiend red: #FF6666
-	*/
+hexfriend green: #8cc63f
+hexfiend red: #FF6666
+*/
 
 	/* TODO //
-
-	// CORE FUNCTIONS
-	- overlay layer
-	- tooltips
-	- keyboard shortcuts - make sure all are working
-	- undo / redo
-	- find more of a fix for why PIXI objects stick around when a new map is loaded
-
-	// POLISH / ROADMAP
-	// not ranked
-	- terrain generator
-	- terrain generator function validation
-	- floating loaders - better feedback
-	- save data checking (if loading, making new map, quitting)
-	- export at different sizes
-	- dashed line
-	- more fonts
-	- tests?? I dont think I'm a real enough dev
-	- abolish technical debt
-	*/
+// CORE FUNCTIONS
+- overlay layer
+- tooltips
+- keyboard shortcuts - make sure all are working
+- undo / redo
+- find more of a fix for why PIXI objects stick around when a new map is loaded
+// POLISH / ROADMAP
+// not ranked
+- terrain generator
+- terrain generator function validation
+- floating loaders - better feedback
+- save data checking (if loading, making new map, quitting)
+- export at different sizes
+- dashed line
+- more fonts
+- tests?? I dont think I'm a real enough dev
+- abolish technical debt
+*/
 
 	/* BUGS //
-	- symbol size is weird in preview when hex size is big
-	- coordinates show under some stuff for some reason
-	*/
-
+- symbol size is weird in preview when hex size is big
+- coordinates show under some stuff for some reason
+*/
 	// Components
-	import ControlTooltips from './components/TooltipsPane.svelte';
+	import CanvasHolder from './components/CanvasHolder.svelte';
 	import IconsetCreator from './components/IconsetCreator.svelte';
-	import MapSettings from './components/Settings.svelte';
 	import SavedMaps from './components/SavedMaps.svelte';
+	import MapSettings from './components/Settings.svelte';
 	import ShortcutList from './components/ShortcutList.svelte';
 	import TerrainGenerator from './components/TerrainGenerator.svelte';
 	import TilesetCreator from './components/TilesetCreator.svelte';
 	import ToolButtons from './components/ToolButtons.svelte';
-	import CanvasHolder from './components/CanvasHolder.svelte';
-	
+	import ControlTooltips from './components/TooltipsPane.svelte';
 	// Layers
 	import CoordsLayer from './layers/CoordsLayer.svelte';
 	import IconLayer from './layers/IconLayer.svelte';
 	import LargeHexesLayer from './layers/LargeHexesLayer.svelte';
+	import OverlayLayer from './layers/OverlayLayer.svelte';
 	import PathLayer from './layers/PathLayer.svelte';
 	import TerrainLayer from './layers/TerrainLayer.svelte';
 	import TextLayer from './layers/TextLayer.svelte';
-	import OverlayLayer from './layers/OverlayLayer.svelte';
-	
+	import { db } from './lib/db';
 	// Data
 	import DEFAULTSAVEDATA from './lib/defaultSaveData';
 	// Methods
@@ -58,15 +54,11 @@
 	import { download } from './lib/download2';
 	import { getKeyboardShortcut } from './lib/keyboardShortcuts';
 	import { convertSaveDataToLatest } from './lib/saveDataConverter';
-	import { afterUpdate, onMount } from 'svelte';
-	
 	// Lib
 	import * as texture_loader from './lib/texture_loader';
-	import * as PIXI from 'pixi.js';
-	import { db } from './lib/db';
-	
 	// Panels
 	import IconPanel from './panels/IconPanel.svelte';
+	import OverlayPanel from './panels/OverlayPanel.svelte';
 	import PathPanel from './panels/PathPanel.svelte';
 	import TerrainPanel from './panels/TerrainPanel.svelte';
 	import TextPanel from './panels/TextPanel.svelte';
@@ -74,30 +66,27 @@
 	import * as store_panning from './stores/panning';
 	import * as store_tfield from './stores/tfield';
 	import { store_selected_tool } from './stores/tools';
-	
-	// GLOBAL STYLES
-	import './styles/variables.css';
 	import './styles/inputs.css';
 	import './styles/panels.css';
 	import './styles/scrollbar.css';
-	
+	// GLOBAL STYLES
+	import './styles/variables.css';
+	import { coord_system } from './types/coordinates';
 	// TYPES
 	import type { coordinates_data, eraser_data, icon_data, overlay_data, path_data, terrain_data, text_data, trace_data } from './types/data';
 	import type { Iconset } from './types/icon';
 	import type { input_state } from './types/inputs';
 	import type { pan_state } from './types/panning';
 	import type { save_data } from './types/savedata';
-	import type { terrain_field } from './types/terrain';
-	import type { Tileset } from './types/tilesets';
-	
-	// Enums
-	import { tools } from './types/toolData';
-	import { coord_system } from './types/coordinates';
-	import { map_shape } from './types/settings';
-	
 	// Constants
 	import { LATESTSAVEDATAVERSION } from './types/savedata';
-	import OverlayPanel from './panels/OverlayPanel.svelte';
+	import { map_shape } from './types/settings';
+	import type { terrain_field } from './types/terrain';
+	import type { Tileset } from './types/tilesets';
+	// Enums
+	import { tools } from './types/toolData';
+	import * as PIXI from 'pixi.js';
+	import { afterUpdate, onMount } from 'svelte';
 
 	/* STATE */
 
@@ -132,8 +121,7 @@
 	let comp_pathLayer: PathLayer;
 	let comp_textLayer: TextLayer;
 	let comp_coordsLayer: CoordsLayer;
-	let comp_overlayLayer: OverlayLayer;	
-
+	let comp_overlayLayer: OverlayLayer;
 
 	let comp_shortcutList: ShortcutList;
 
@@ -174,7 +162,9 @@
 	});
 
 	// This makes panning update smoothly
-	$: {pan = pan}
+	$: {
+		pan = pan;
+	}
 
 	let controls: input_state;
 	store_inputs.store.subscribe((newInputState) => {
@@ -182,9 +172,9 @@
 	});
 
 	let selectedTool;
-	store_selected_tool.subscribe(t => {
+	store_selected_tool.subscribe((t) => {
 		selectedTool = t;
-	})
+	});
 
 	/* DATA */
 	/* Data is bound to both layer and panel of a particluar tool. It contains all the shared state they need, and is bound to both */
@@ -207,7 +197,7 @@
 		pHex: 80,
 		snapToHex: true,
 		usingEraser: false,
-		dragMode: false
+		dragMode: false,
 	};
 
 	let data_path: path_data = {
@@ -253,12 +243,12 @@
 
 	let data_overlay: overlay_data = {
 		shown: true,
-		base64: "",
+		base64: '',
 		x: 0,
 		y: 0,
-		scale: {x: 1, y: 1},
+		scale: { x: 1, y: 1 },
 		opacity: 0.5,
-	}
+	};
 
 	//let L = new PIXI.Loader()
 
@@ -296,7 +286,7 @@
 		data_path.contextPathId = null;
 		data_text.contextStyleId = null;
 
-		store_selected_tool.update(n => newTool);
+		store_selected_tool.update((n) => newTool);
 	}
 
 	/* ALL PURPOSE POINTER METHODS */
@@ -347,7 +337,7 @@
 			case tools.TEXT:
 				comp_textLayer.pointerup();
 				break;
-			
+
 			case tools.OVERLAY:
 				comp_overlayLayer.pointerup();
 				break;
@@ -376,11 +366,10 @@
 				}
 				/* Icons are handled differently in the icon handler */
 				break;
-			
+
 			case tools.OVERLAY:
 				comp_overlayLayer.pointermove();
 				break;
-
 		}
 	}
 
@@ -407,7 +396,7 @@
 		if (e.key == 'Control') keycode = 'control';
 
 		let shortcutData = getKeyboardShortcut(keycode, selectedTool);
-		if (!shortcutData) return
+		if (!shortcutData) return;
 		//console.log(keycode);
 
 		switch (shortcutData.tool) {
@@ -457,13 +446,12 @@
 						changeTool(tools.ERASER);
 						break;
 					case 'changeTool_overlay':
-						if (data_overlay.base64 != "") changeTool(tools.OVERLAY);
+						if (data_overlay.base64 != '') changeTool(tools.OVERLAY);
 						break;
-						
-					case 'toggle_overlay':
-						if (data_overlay.base64 != "") data_overlay.shown = !data_overlay.shown;
-						break
 
+					case 'toggle_overlay':
+						if (data_overlay.base64 != '') data_overlay.shown = !data_overlay.shown;
+						break;
 				}
 
 				break;
@@ -484,9 +472,7 @@
 				comp_textLayer.handleKeyboardShortcut(shortcutData);
 				break;
 		}
-		
 	}
-	
 
 	function keyDown(e: KeyboardEvent) {
 		if (appState != app_state.NORMAL) return;
@@ -668,13 +654,13 @@
 
 		// Load Textures
 		for (const tileset of loadedTilesets) {
-			console.log(`Loading textures for ${tileset.name}`)
+			console.log(`Loading textures for ${tileset.name}`);
 			await texture_loader.load_tileset_textures(tileset);
 		}
 
 		// Load Icons
 		for (const iconset of loadedIconsets) {
-			console.log(`Loading icon textures for ${iconset.name}`)
+			console.log(`Loading icon textures for ${iconset.name}`);
 			await texture_loader.load_iconset_textures(iconset);
 		}
 
@@ -684,7 +670,7 @@
 		data_coordinates = data.coords;
 
 		data_overlay = data.overlay;
-		if (selectedTool == tools.OVERLAY && data_overlay.base64 == "") store_selected_tool.update(n => tools.TERRAIN)
+		if (selectedTool == tools.OVERLAY && data_overlay.base64 == '') store_selected_tool.update((n) => tools.TERRAIN);
 
 		//console.log(PIXI_Assets.Assets)
 
@@ -739,7 +725,6 @@
 
 		// Jolt all the layers that respond to the data into place. Without this the text, icons and paths kinda get stuck. It's odd. Warrants further investigation.
 		loadedSave = loadedSave;
-		
 
 		/* Set up tools - would be nice to remember tool settings but this works regardless of loaded tileset */
 
@@ -760,35 +745,19 @@
 	offsetContainer.addChild(cont_all_text);
 	offsetContainer.addChild(cont_overlay);
 
-	app.stage.addChild(offsetContainer)
-	
+	app.stage.addChild(offsetContainer);
+
 	afterUpdate(() => {
 		// Update offset container X, Y, scale
-		
-		offsetContainer.x = pan.offsetX
-		offsetContainer.y = pan.offsetY
-		offsetContainer.scale.x = pan.zoomScale
-		offsetContainer.scale.y = pan.zoomScale
 
-		
-	})
-	
-	onMount(() => {
+		offsetContainer.x = pan.offsetX;
+		offsetContainer.y = pan.offsetY;
+		offsetContainer.scale.x = pan.zoomScale;
+		offsetContainer.scale.y = pan.zoomScale;
+	});
 
-	})
-
-	
+	onMount(() => {});
 </script>
-
-
-
-
-
-
-
-
-
-
 
 <svelte:window on:keydown={keyDown} on:keyup|preventDefault={keyUp} />
 
@@ -830,17 +799,15 @@
 			on:keydown={keyDown}
 			on:keyup={keyUp}
 		>
+			<CanvasHolder {app} />
 
-		<CanvasHolder {app} />
-
-		<TerrainLayer bind:cont_terrain bind:this={comp_terrainLayer} bind:data_terrain {controls} {comp_coordsLayer} />
-		<PathLayer bind:this={comp_pathLayer} bind:cont_all_paths bind:paths={loadedSave.paths} bind:data_path {controls} />
-		<IconLayer bind:this={comp_iconLayer} bind:icons={loadedSave.icons} bind:data_icon bind:cont_icon {data_eraser} {controls} />
-		<CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} bind:data_coordinates />
-		<LargeHexesLayer bind:cont_largehexes />
-		<TextLayer bind:cont_all_text bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text />
-		<OverlayLayer bind:this={comp_overlayLayer} bind:cont_overlay bind:data_overlay {app} />
-
+			<TerrainLayer bind:cont_terrain bind:this={comp_terrainLayer} bind:data_terrain {controls} {comp_coordsLayer} />
+			<PathLayer bind:this={comp_pathLayer} bind:cont_all_paths bind:paths={loadedSave.paths} bind:data_path {controls} />
+			<IconLayer bind:this={comp_iconLayer} bind:icons={loadedSave.icons} bind:data_icon bind:cont_icon {data_eraser} {controls} />
+			<CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} bind:data_coordinates />
+			<LargeHexesLayer bind:cont_largehexes />
+			<TextLayer bind:cont_all_text bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text />
+			<OverlayLayer bind:this={comp_overlayLayer} bind:cont_overlay bind:data_overlay {app} />
 		</section>
 
 		<!-- Panels -->
@@ -863,9 +830,9 @@
 				bind:selectedTool
 				bind:hexOrientation={tfield.orientation}
 				{changeTool}
-				bind:data_terrain	
-				bind:data_icon	
-				bind:data_path	
+				bind:data_terrain
+				bind:data_icon
+				bind:data_path
 				bind:data_overlay
 			/>
 		</div>
@@ -888,15 +855,12 @@
 			<div id="save-buttons">
 				<button on:click={saveInit} title={'Save'}> <img src="assets/img/tools/save.png" alt="Save" /> </button>
 			</div>
-			
-			
 		</div>
 
-		
 		{#if showKeyboardShortcuts}
 			<ShortcutList bind:this={comp_shortcutList} />
 		{/if}
-		
+
 		<SavedMaps bind:showSavedMaps {createNewMap} load={loadInit} />
 
 		<MapSettings
@@ -929,7 +893,6 @@
 		{#if showControls}
 			<ControlTooltips {data_terrain} {data_icon} {data_path} {data_text} {data_eraser} {data_overlay} />
 		{/if}
-
 	</main>
 {:else if appState == app_state.TILESETCREATOR}
 	<TilesetCreator bind:appState />
@@ -949,16 +912,6 @@
 	</div>
 {/if}
 
-
-
-
-
-
-
-
-
-
-
 <style>
 	:root {
 		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -969,7 +922,7 @@
 		height: 100%;
 		overflow: hidden;
 
-		--hexfriend-green: #8cc63f;
+		--primary: #8cc63f;
 	}
 
 	:global(h2) {
@@ -1052,7 +1005,7 @@
 	}
 
 	#save-indicator p {
-		color: var(--hexfriend-green);
+		color: var(--primary);
 		font-size: 20pt;
 		margin: 0;
 	}
@@ -1090,10 +1043,8 @@
 		gap: 0.25em;
 
 		transition-duration: 0.2s;
-		
-		
 	}
-	
+
 	#setting-buttons:hover {
 		opacity: 1;
 		transition-duration: 0.2s;
@@ -1112,12 +1063,10 @@
 	}
 
 	#setting-buttons button:hover {
-		background-color: var(--mid-dark-bg);
+		background-color: var(--light-background);
 	}
 
 	#setting-buttons button img {
 		width: 100%;
-
 	}
-
 </style>
