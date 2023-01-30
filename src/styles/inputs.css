@@ -52,6 +52,11 @@ input[type='text'] {
 	padding: 0.3125em;
 }
 
+::placeholder {
+	color: var(--text);
+	opacity: 0.5;
+}
+
 input[type='number'] {
 	padding: 0.25em;
 	border-radius: var(--large-radius);
