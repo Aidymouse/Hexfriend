@@ -47,17 +47,17 @@
 	.svg-bg {
 		width: 100%;
 		height: 100%;
-		background-color: #f2f2f2;
+		background-color: var(--text);
 	}
 
 	.svg-bg.selected {
-		background-color: #333333;
+		background-color: var(--primary-background);
 	}
 
 	.option {
 		height: 100%;
 		aspect-ratio: 1/1;
-		background-color: #222222;
+		background-color: var(--lighter-background);
 
 		display: flex;
 		align-items: center;
@@ -68,7 +68,7 @@
 	}
 
 	.option:hover {
-		background-color: #777777;
+		background-color: var(--lightest-background);
 		transition-duration: 0.1s;
 	}
 

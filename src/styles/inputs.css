@@ -58,7 +58,7 @@ input[type='text'] {
 }
 
 input[type='number'] {
-	padding: 0.25em;
+	padding: 0 0.5em;
 	border-radius: var(--large-radius);
 }
 

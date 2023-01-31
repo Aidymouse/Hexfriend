@@ -236,8 +236,10 @@
 		flex: 2 1 3.125em;
 		width: 2em;
 		height: 100%;
-		box-sizing: border-box;
 		border-radius: 0.5em;
+		/* fix vertical sizing and alignment issues */
+		margin-top: 0.125em;
+		box-sizing: content-box;
 	}
 
 
