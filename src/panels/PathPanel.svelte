@@ -163,7 +163,7 @@
 	{/if}
 
 	<!-- PATH STYLES -->
-	<div id="path-styles" style={data_path.selectedPath ? 'padding-top: 0px;' : ''}>
+	<div id="path-styles" style={data_path.selectedPath ? 'padding-top: 0;' : ''}>
 		<!-- Path Style Listing -->
 		<div style="display: flex; gap: 5px; flex-wrap: wrap">
 			{#each pathStyles as pb (pb.id)}
@@ -213,7 +213,7 @@
 	}
 
 	div {
-		color: white;
+		color: var(--text);
 	}
 
 
@@ -229,17 +229,17 @@
 	}
 
 	#selected-path-controls {
-		background-color: #555555;
-		padding: 10px;
+		background-color: var(--light-background);
+		padding: 0.625em;
 		display: grid;
 		grid-template-rows: auto;
 		grid-template-columns: 1fr 1fr 1fr;
-		gap: 5px;
+		gap: 0.3125em;
 	}
 
 	#path-styles {
-		padding: 10px;
-		background-color: #555555;
+		padding: 0.625em;
+		background-color: var(--light-background);
 	}
 
 	.path-control-grid {

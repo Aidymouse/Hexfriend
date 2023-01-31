@@ -1,6 +1,6 @@
 .panel {
-	background-color: #333333;
-	border-radius: 0.5em;
+	background-color: var(--primary-background);
+	border-radius: var(--large-radius);
 	overflow: hidden;
 	width: 19em;
 	box-sizing: border-box;
