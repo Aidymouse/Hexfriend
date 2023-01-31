@@ -37,7 +37,7 @@
 <div id="maps-container">
 	<div id="maps">
 		{#each toolHeadings as toolHeading}
-			<h2 style={toolHeading.heading == GENERALHEADING ? 'margin-top: 0px;' : ''}>{toolHeading.heading}</h2>
+			<h2 style={toolHeading.heading == GENERALHEADING ? 'margin-top: 0;' : ''}>{toolHeading.heading}</h2>
 
 			{#each shortcuts.filter((s) => s.tool == toolHeading.tool) as shortcut}
 				<span class="shortcut-listing">
@@ -66,42 +66,6 @@
 </div>
 
 <style>
-	.highlighted {
-		color: #8cc63f;
-	}
-
-	.shortcut-listing {
-		display: grid;
-		grid-template-columns: 1fr 1fr 1fr;
-
-		margin-bottom: 5px;
-
-		padding-top: 1px;
-		padding-bottom: 1px;
-		padding-left: 5px;
-	}
-
-	.shortcut-listing:hover {
-		background-color: rgba(255, 255, 255, 0.2);
-		border-radius: 4px;
-	}
-
-	.keycode {
-		font-family: monospace;
-		background-color: #222222;
-		color: #f2f2f2;
-		padding-left: 5px;
-		border-radius: 4px;
-		display: flex;
-	}
-
-	h2 {
-		margin-bottom: 5px;
-	}
-
-	p {
-		margin: 0;
-	}
 
 	#maps-container {
 		position: fixed;
@@ -118,15 +82,55 @@
 	#maps {
 		width: 50%;
 		height: 75%;
-		background: #333333;
-		border: solid 1px grey;
-		border-radius: 3px;
+		background: var(--primary-background);
+		border-radius: var(--large-radius);
 
 		position: relative;
 
-		padding: 10px;
+		padding: 1em;
 		box-sizing: border-box;
 
 		overflow-y: scroll;
 	}
+
+	h2 {
+		padding-bottom: 0.2em;
+		margin-bottom: 0.4em;
+	}
+
+	.shortcut-listing {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		padding: 0.125em 0.5em;
+		margin-bottom: 0.3125em;
+	}
+
+	.shortcut-listing:hover {
+		background-color: var(--lighter-background);
+		border-radius: var(--large-radius);
+	}
+
+	p {
+		margin: 0;
+	}
+
+	.keycode {
+		font-family: monospace;
+		background-color: var(--light-background);
+		color: var(--text);
+		padding-left: 1ch;
+		border-radius: var(--small-radius);
+		display: flex;
+	}
+
+	.keycode div {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+
+	.highlighted {
+		color: var(--primary);
+	}
+
 </style>

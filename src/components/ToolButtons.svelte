@@ -237,13 +237,14 @@
 	div#top-layer {
 		position: absolute;
 	}
+
 	#top-layer .tool-icon {
-		background-color: #999999;
+		background-color: var(--lightest-background);
 	}
 
 	div#bottom-layer {
 		background-color: var(--primary);
-		clip-path: circle(50px at 8px 8px);
+		clip-path: circle(3.125em at 0.5em 0.5em);
 		transition-duration: 0.2s;
 		transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1.2);
 	}

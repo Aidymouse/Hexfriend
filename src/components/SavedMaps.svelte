@@ -146,7 +146,7 @@
 		height: 1em;
 		justify-content: center;
 		align-items: center;
-		border-radius: 0.25em;
+		border-radius: var(--small-radius);
 
 		font-size: 30pt;
 		margin: 0;
@@ -161,6 +161,10 @@
 	#new-map-button:hover {
 		transition-duration: 0.1s;
 		transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
+		background-color: var(--light-background);
+	}
+
+	#new-map-button:active {
 		background-color: var(--lighter-background);
 	}
 
@@ -199,11 +203,12 @@
 
 	p {
 		position: absolute;
-		bottom: 0px;
+		bottom: 0;
 		text-align: center;
 		margin: 0;
-		padding: 5px;
-		background-color: rgba(51, 51, 51, 0.5);
+		padding: 0.3125em;
+		background-color: var(--primary-background);
+		opacity: 0.75;
 		width: 100%;
 		box-sizing: border-box;
 	}

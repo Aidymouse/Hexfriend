@@ -34,11 +34,11 @@
 	.cb {
 		width: 1.5em;
 		height: 1.5em;
-		border: solid 2px white;
+		border: solid 0.125em var(--text);
 		box-sizing: border-box;
 		border-radius: 0.25em;
 		position: relative;
-		background-color: #222222;
+		background-color: var(--dark-background);
 
 		display: flex;
 		justify-content: center;
@@ -53,11 +53,11 @@
 	}
 
 	.cb:hover {
-		background-color: #555555;
+		background-color: var(--light-background);
 	}
 
 	.cb.checked {
-		border-color: #8cc63f;
+		border-color: var(--primary);
 	}
 
 	.cb input {

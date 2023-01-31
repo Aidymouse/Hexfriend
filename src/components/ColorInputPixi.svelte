@@ -29,7 +29,7 @@
 </script>
 
 <span style="width: {w}; height: {h}">
-	<div style="--bg-color: {stringValue};">
+	<div style="--user-input-color: {stringValue};">
 		<input type="color" bind:value={stringValue} {id} />
 	</div>
 </span>
@@ -45,9 +45,9 @@
 	div {
 		border-radius: 50%;
 		overflow: none;
-		border: solid 2px #f2f2f2;
+		border: solid 0.125em var(--text);
 		box-sizing: border-box;
-		background-color: var(--bg-color);
+		background-color: var(--user-input-color);
 
 		width: 90%;
 		height: 90%;
@@ -56,7 +56,7 @@
 	}
 
 	div:hover {
-		border-color: #8cc63f;
+		border-color: var(--primary);
 		transition-duration: 0.2s;
 		transition-property: border-color;
 	}
