@@ -49,7 +49,8 @@ input {
 }
 
 input[type='text'] {
-	padding: 0.3125em;
+	padding: 0 0.5em;
+	border-radius: var(--large-radius);
 }
 
 ::placeholder {

@@ -330,7 +330,7 @@
 
 <div id="settings" class:shown={showSettings}>
 	<input
-		style="font-size: 20pt; font-family: Segoe UI; border-radius: 0.25em; width: 100%; box-sizing: border-box;"
+		style="font-size: 20pt; font-family: Segoe UI; border-radius: var(--small-radius); padding: 0.3em; width: 100%; box-sizing: border-box;"
 		type="text"
 		placeholder="Map Title"
 		bind:value={loadedSave.title}
@@ -385,6 +385,8 @@
 			<input
 				id="gridThickness"
 				type="number"
+				min="0"
+				max="99"
 				bind:value={tfield.grid.thickness}
 				on:change={() => {
 					renderGrid();
@@ -399,10 +401,6 @@
 				id={'gridColor'}
 			/>
 		{/if}
-
-		<!-- PLACEHOLDER to give distance between the overlay and grid options -->
-		<div style="height: 10px;" />
-		<div />
 
 		<!-- LARGE HEXES -->
 		<label for="showOverlay">Large Hexes</label>
@@ -461,7 +459,8 @@
 	</h2>
 	<div class="settings-grid" class:hidden={hidden_settings.hexes}>
 		<label for="blankHexColor">Blank Hex Color</label>
-		<ColorInputPixi
+		<div style="display: flex; gap: 0.25em; align-items: center;">
+			<ColorInputPixi
 			bind:value={tfield.blankHexColor}
 			on:change={() => {
 				renderAllHexes();
@@ -470,14 +469,14 @@
 		/>
 
 		<button
-			style={'margin-right: 10px'}
+			style={"height: fit-content;"}
 			on:click={() => {
 				tfield.blankHexColor = 0xf2f2f2;
-			}}>Reset to default color</button
+			}}>Reset</button
 		>
-		<p />
-
-		<p>Hex Orientation</p>
+		</div>
+		
+		<label>Hex Orientation</label>
 		<div style={'height: 100%; display: flex; align-items: center;'}>
 			<SelectGrid
 				options={[
@@ -697,7 +696,7 @@
 	{/if}
 
 	<!-- COORDINATES -->
-	<h2 class="setting-heading" style="margin-bottom: 0px;">
+	<h2 class="setting-heading">
 		Coordinates
 		<button
 			on:click={() => {
@@ -707,8 +706,8 @@
 			<img alt={'Toggle Coordinate Settings'} class:rotated={hidden_settings.coordinates} src={'/assets/img/ui/arrow.png'} />
 		</button>
 	</h2>
-	<p class="helperText">Coordinates can slow down map changes such as adding hexes or changing orientation.</p>
 	<div class="settings-grid" class:hidden={hidden_settings.coordinates}>
+		<label class="helperText">Coordinates can slow down map changes such as adding hexes or changing orientation.</label>
 		<label for="showCoords">Show Coordinates</label>
 		<Checkbox bind:checked={data_coordinates.shown} id={'showCoords'} />
 
@@ -738,7 +737,7 @@
 			<label for="coordsStrokeThickness">Outline Thickness</label>
 			<input id="coordsStrokeThickness" type="number" bind:value={data_coordinates.style.strokeThickness} />
 
-			<label for="coordSeperator">Seperator</label>
+			<label for="coordSeperator">Separator</label>
 			<input
 				id="coordSeperator"
 				type="text"
@@ -772,7 +771,7 @@
 		</button>
 	</h2>
 
-	<div class="settings-grid" class:hidden={hidden_settings.overlay}>
+	<div class="settings-grid" class:hidden={hidden_settings.overlay} style={"justify-items: start;"}>
 		<button class="file-input-button">
 			{#if data_overlay.base64 == ''}Load Overlay Image{:else}Replace Overlay Image{/if}
 			<input
@@ -904,9 +903,10 @@
 			<img alt={'Toggle Experimental Settings'} class:rotated={hidden_settings.experimental} src={'/assets/img/ui/arrow.png'} />
 		</button>
 	</h2>
-	<p class="helperText">Not polished and maybe broken.</p>
+	
 
 	<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;" class:hidden={hidden_settings.experimental}>
+		<p class="helperText">Not polished and maybe broken.</p>
 		<button
 			on:click={() => {
 				showTerrainGenerator = true;
@@ -920,7 +920,7 @@
 
 	<h2>About</h2>
 	<p class="helperText">
-		Hexfriend version 1.6.1 – "Looking snazzy, Hexfriend!"
+		Hexfriend version 1.6.1 - "Looking snazzy, Hexfriend!"
 		<br />
 		By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
 	</p>
@@ -1110,12 +1110,13 @@
 	}
 
 	h2 {
-		margin-bottom: 0.8em;
+		margin-bottom: 0.2em;
 	}
 
 	.helperText {
+		grid-column: span 2;
 		font-size: 12px;
-		color: #999999;
+		color: var(--lightest-background);
 		line-height: 1.2;
 		margin: 0;
 		margin-bottom: 5px;
@@ -1126,12 +1127,19 @@
 	.settings-grid {
 		display: grid;
 		grid-template-columns: 3fr 2fr;
-		grid-template-rows: auto;
-		row-gap: 5px;
+		grid-auto-rows: 2em;
+		align-items: center;
+		justify-items: center;
+		row-gap: 0.3em;
+	}
+
+	.settings-grid label {
+		justify-self: start;
 	}
 
 	.settings-grid input {
-		width: 50px;
+		width: 5ch;
+		height: 2em;
 	}
 
 	p {
