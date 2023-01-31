@@ -4,16 +4,14 @@
 
 	let dispatch = createEventDispatcher();
 
-	export let options: {title: string, value: string, filename: string}[] = [];
+	export let options: { title: string; value: string; filename: string }[] = [];
 	export let value: any;
-
 
 	function changeValue(newValue: any) {
 		if (value == newValue) return;
 		value = newValue;
 		dispatch('change', {});
 	}
-
 </script>
 
 <main>
@@ -26,22 +24,19 @@
 			}}
 			title={capitialize(o.title)}
 		>
-			<div 
+			<div
 				class="svg-bg"
-				class:selected = {value == o.value}
+				class:selected={value == o.value}
 				style={`-webkit-mask: url(/assets/img/selectgrids/${o.filename}.svg)`}
-				title={`${o.title}`}>
-			</div>
+				title={`${o.title}`}
+			/>
 		</div>
 	{/each}
 </main>
 
-
-
-
 <style>
 	main {
-		background-color: var(--primary-bg);
+		background-color: var(--primary-background);
 		flex-direction: row;
 		display: flex;
 		height: 2em;
@@ -52,17 +47,17 @@
 	.svg-bg {
 		width: 100%;
 		height: 100%;
-		background-color: #f2f2f2;
+		background-color: var(--text);
 	}
 
 	.svg-bg.selected {
-		background-color: #333333;
+		background-color: var(--primary-background);
 	}
 
 	.option {
 		height: 100%;
 		aspect-ratio: 1/1;
-		background-color: #222222;
+		background-color: var(--lighter-background);
 
 		display: flex;
 		align-items: center;
@@ -73,16 +68,16 @@
 	}
 
 	.option:hover {
-		background-color: #777777;
+		background-color: var(--lightest-background);
 		transition-duration: 0.1s;
 	}
 
 	.option.selected {
-		background-color: var(--hexfriend-green);
+		background-color: var(--primary);
 		outline: 0;
 	}
 
 	.option.selected:hover {
-		background-color: var(--hexfriend-green);
+		background-color: var(--primary);
 	}
 </style>

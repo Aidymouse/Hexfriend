@@ -1,35 +1,31 @@
 <script lang="ts">
 	// Components
-	import Checkbox from './Checkbox.svelte';
-	import ColorInputPixi from './ColorInputPixi.svelte';
-	import SelectGrid from './SelectGrid.svelte';
-	
-	// Lib
-	import type * as PIXI from 'pixi.js';
-	import * as texture_loader from '../lib/texture_loader';
-	
-	// Stores
-	import * as store_tfield from '../stores/tfield';
-	
 	// Types
 	import type CoordsLayer from '../layers/CoordsLayer.svelte';
 	import type IconLayer from '../layers/IconLayer.svelte';
 	import type PathLayer from '../layers/PathLayer.svelte';
 	import type TerrainLayer from '../layers/TerrainLayer.svelte';
 	import type TextLayer from '../layers/TextLayer.svelte';
+	import * as texture_loader from '../lib/texture_loader';
+	// Stores
+	import * as store_tfield from '../stores/tfield';
+	import { store_selected_tool } from '../stores/tools';
+	// Enums
+	import { coord_system } from '../types/coordinates';
 	import type { coordinates_data, overlay_data, terrain_data, trace_data } from '../types/data';
 	import type { Iconset } from '../types/icon';
 	import type { save_data } from '../types/savedata';
-	import type { Tileset } from '../types/tilesets';
-	
-	// Enums
-	import { coord_system } from '../types/coordinates';
 	import { map_shape } from '../types/settings';
 	import { hex_orientation, terrain_field } from '../types/terrain';
 	import { hex_raised } from '../types/terrain';
-	import { store_selected_tool } from '../stores/tools';
+	import type { Tileset } from '../types/tilesets';
 	import { tools } from '../types/toolData';
-	
+	import Checkbox from './Checkbox.svelte';
+	import ColorInputPixi from './ColorInputPixi.svelte';
+	import SelectGrid from './SelectGrid.svelte';
+	// Lib
+	import type * as PIXI from 'pixi.js';
+
 	export let loadedSave: save_data;
 	export let showSettings: boolean;
 	export let appState;
@@ -46,8 +42,7 @@
 		tilesets: true,
 		iconsets: true,
 		experimental: true,
-
-	}
+	};
 
 	let tfield: terrain_field;
 	store_tfield.store.subscribe((newTField) => {
@@ -61,16 +56,16 @@
 	export let renderAllHexes: Function;
 	export let renderGrid: Function;
 	export let redrawEntireMap: Function;
-	
+
 	// For Coordinates
 	export let comp_coordsLayer: CoordsLayer;
 	export let data_coordinates: coordinates_data;
 	export let data_overlay: overlay_data;
-	
+
 	//export let data_terrain: terrain_data
 	export let loadedTilesets: Tileset[];
 	export let loadedIconsets: Iconset[];
-	
+
 	export let comp_terrainLayer: TerrainLayer;
 	export let comp_iconLayer: IconLayer;
 	export let comp_pathLayer: PathLayer;
@@ -82,7 +77,7 @@
 
 	let exportType: 'Export As...' | 'image/png' | 'application/json' = 'Export As...';
 
-	let iconset_text = "Icon Set";
+	let iconset_text = 'Icon Set';
 
 	function changeOrientation() {
 		let t = tfield.hexWidth;
@@ -121,7 +116,7 @@
 
 			/* We also have to load all of these textures */
 			//addTilesetTextures(setToImport, L);
-			texture_loader.load_tileset_textures(setToImport)
+			texture_loader.load_tileset_textures(setToImport);
 		};
 	}
 
@@ -132,12 +127,12 @@
 		//data_terrain.tile = {...loadedTilesets[0].tiles[0]}
 
 		loadedTilesets = loadedTilesets.filter((ts: Tileset) => ts.id != setId);
-		loadedSave.tilesets = loadedTilesets
+		loadedSave.tilesets = loadedTilesets;
 	}
 
 	function removeIconset(setId: string) {
 		loadedIconsets = loadedIconsets.filter((is: Iconset) => is.id != setId);
-		loadedSave.iconsets = loadedIconsets
+		loadedSave.iconsets = loadedIconsets;
 	}
 
 	let iconsetFiles: FileList;
@@ -297,7 +292,6 @@
 		};
 	}
 
-
 	let overlay_files: FileList;
 	function import_overlay_image() {
 		if (!overlay_files[0]) return;
@@ -308,10 +302,10 @@
 			let b64 = r.result as string;
 
 			data_overlay.base64 = b64;
-			data_overlay.scale.x = 1
-			data_overlay.scale.y = 1
+			data_overlay.scale.x = 1;
+			data_overlay.scale.y = 1;
 			showSettings = false;
-			store_selected_tool.update(n => tools.OVERLAY)
+			store_selected_tool.update((n) => tools.OVERLAY);
 		};
 	}
 
@@ -322,12 +316,6 @@
 		});
 	}
 </script>
-
-
-
-
-
-
 
 <button
 	id="close-tab"
@@ -341,10 +329,8 @@
 </button>
 
 <div id="settings" class:shown={showSettings}>
-
-
 	<input
-		style="font-size: 20pt; font-family: Segoe UI; border-radius: 0.25em; width: 100%; box-sizing: border-box;"
+		style="font-size: 20pt; font-family: Segoe UI; border-radius: var(--small-radius); padding: 0.3em; width: 100%; box-sizing: border-box;"
 		type="text"
 		placeholder="Map Title"
 		bind:value={loadedSave.title}
@@ -379,13 +365,15 @@
 		</button>
 	</span>
 
-
-
 	<!-- GRID -->
 	<h2 class="setting-heading">
 		Grid
-		<button on:click={() => {hidden_settings.grid = !hidden_settings.grid}}>
-			<img alt={"Toggle Grid Settings"} class:rotated={hidden_settings.grid} src={"/assets/img/ui/arrow.png"}>
+		<button
+			on:click={() => {
+				hidden_settings.grid = !hidden_settings.grid;
+			}}
+		>
+			<img alt={'Toggle Grid Settings'} class:rotated={hidden_settings.grid} src={'/assets/img/ui/arrow.png'} />
 		</button>
 	</h2>
 	<div class="settings-grid" class:hidden={hidden_settings.grid}>
@@ -397,6 +385,8 @@
 			<input
 				id="gridThickness"
 				type="number"
+				min="0"
+				max="99"
 				bind:value={tfield.grid.thickness}
 				on:change={() => {
 					renderGrid();
@@ -411,10 +401,6 @@
 				id={'gridColor'}
 			/>
 		{/if}
-
-		<!-- PLACEHOLDER to give distance between the overlay and grid options -->
-		<div style="height: 10px;" />
-		<div />
 
 		<!-- LARGE HEXES -->
 		<label for="showOverlay">Large Hexes</label>
@@ -443,8 +429,16 @@
 			<span style={'height: 100%; display: flex; align-items: center;'}>
 				<SelectGrid
 					options={[
-						{title: "Even", value: "even", filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'overlayraisedcolumn' : 'overlayindentedrow'}even`},
-						{title: "Even", value: "odd", filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'overlayraisedcolumn' : 'overlayindentedrow'}odd`},
+						{
+							title: 'Even',
+							value: 'even',
+							filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'overlayraisedcolumn' : 'overlayindentedrow'}even`,
+						},
+						{
+							title: 'Even',
+							value: 'odd',
+							filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'overlayraisedcolumn' : 'overlayindentedrow'}odd`,
+						},
 					]}
 					bind:value={tfield.largehexes.raised}
 				/>
@@ -452,19 +446,21 @@
 		{/if}
 	</div>
 
-
-
-
 	<!-- HEXES -->
 	<h2 class="setting-heading">
 		Hexes
-		<button on:click={() => {hidden_settings.hexes = !hidden_settings.hexes}}>
-			<img alt={"Toggle Hex Settings"} class:rotated={hidden_settings.hexes} src={"/assets/img/ui/arrow.png"}>
+		<button
+			on:click={() => {
+				hidden_settings.hexes = !hidden_settings.hexes;
+			}}
+		>
+			<img alt={'Toggle Hex Settings'} class:rotated={hidden_settings.hexes} src={'/assets/img/ui/arrow.png'} />
 		</button>
 	</h2>
 	<div class="settings-grid" class:hidden={hidden_settings.hexes}>
 		<label for="blankHexColor">Blank Hex Color</label>
-		<ColorInputPixi
+		<div style="display: flex; gap: 0.25em; align-items: center;">
+			<ColorInputPixi
 			bind:value={tfield.blankHexColor}
 			on:change={() => {
 				renderAllHexes();
@@ -473,19 +469,19 @@
 		/>
 
 		<button
-			style={'margin-right: 10px'}
+			style={"height: fit-content;"}
 			on:click={() => {
 				tfield.blankHexColor = 0xf2f2f2;
-			}}>Reset to default color</button
+			}}>Reset</button
 		>
-		<p />
-
-		<p>Hex Orientation</p>
+		</div>
+		
+		<label>Hex Orientation</label>
 		<div style={'height: 100%; display: flex; align-items: center;'}>
 			<SelectGrid
 				options={[
-					{title: "Flat Top", value: hex_orientation.FLATTOP, filename: "flatTop"},
-					{title: "Pointy Top", value: hex_orientation.POINTYTOP, filename: "pointyTop"}
+					{ title: 'Flat Top', value: hex_orientation.FLATTOP, filename: 'flatTop' },
+					{ title: 'Pointy Top', value: hex_orientation.POINTYTOP, filename: 'pointyTop' },
 				]}
 				bind:value={tfield.orientation}
 				on:change={() => {
@@ -542,28 +538,32 @@
         -->
 
 		{#if tfield.mapShape == map_shape.SQUARE}
-
-			<p>{tfield.orientation == hex_orientation.FLATTOP ? "Raised Column" : "Indented Row"}</p>
+			<p>{tfield.orientation == hex_orientation.FLATTOP ? 'Raised Column' : 'Indented Row'}</p>
 			<span style={'height: 100%; display: flex; align-items: center;'}>
 				<SelectGrid
-				options = {[
-					{title: "Even", value: "even", filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}even`},
-					{title: "Odd", value: "odd", filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}odd`},
-				]}
-				bind:value={tfield.raised}
-				on:change={() => {
-					if (tfield.orientation == hex_orientation.FLATTOP) {
-
-						comp_terrainLayer.square_updateRaisedColumn();
-					} else {
-						comp_terrainLayer.square_changeIndentedRow();
-
-					}
-					comp_coordsLayer.cullUnusedCoordinates();
-				}}
+					options={[
+						{
+							title: 'Even',
+							value: 'even',
+							filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}even`,
+						},
+						{
+							title: 'Odd',
+							value: 'odd',
+							filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}odd`,
+						},
+					]}
+					bind:value={tfield.raised}
+					on:change={() => {
+						if (tfield.orientation == hex_orientation.FLATTOP) {
+							comp_terrainLayer.square_updateRaisedColumn();
+						} else {
+							comp_terrainLayer.square_changeIndentedRow();
+						}
+						comp_coordsLayer.cullUnusedCoordinates();
+					}}
 				/>
 			</span>
-
 		{/if}
 
 		<label for="retainIcon" title="Icons will atempt to remain in their hex when transformations occur">Retain Icon Position</label>
@@ -573,8 +573,12 @@
 	<!-- DIMENSIONS AND SHAPE -->
 	<h2 class="setting-heading">
 		Map Dimensions
-		<button on:click={() => {hidden_settings.dimensions = !hidden_settings.dimensions}}>
-			<img alt={"Toggle Map Dimension Settings"} class:rotated={hidden_settings.dimensions} src={"/assets/img/ui/arrow.png"}>
+		<button
+			on:click={() => {
+				hidden_settings.dimensions = !hidden_settings.dimensions;
+			}}
+		>
+			<img alt={'Toggle Map Dimension Settings'} class:rotated={hidden_settings.dimensions} src={'/assets/img/ui/arrow.png'} />
 		</button>
 	</h2>
 
@@ -691,17 +695,19 @@
 		</section>
 	{/if}
 
-
-
 	<!-- COORDINATES -->
-	<h2 class="setting-heading" style="margin-bottom: 0px;">
+	<h2 class="setting-heading">
 		Coordinates
-		<button on:click={() => {hidden_settings.coordinates = !hidden_settings.coordinates}}>
-			<img alt={"Toggle Coordinate Settings"} class:rotated={hidden_settings.coordinates} src={"/assets/img/ui/arrow.png"}>
+		<button
+			on:click={() => {
+				hidden_settings.coordinates = !hidden_settings.coordinates;
+			}}
+		>
+			<img alt={'Toggle Coordinate Settings'} class:rotated={hidden_settings.coordinates} src={'/assets/img/ui/arrow.png'} />
 		</button>
 	</h2>
-	<p class="helperText">Coordinates can slow down map changes such as adding hexes or changing orientation.</p>
 	<div class="settings-grid" class:hidden={hidden_settings.coordinates}>
+		<label class="helperText">Coordinates can slow down map changes such as adding hexes or changing orientation.</label>
 		<label for="showCoords">Show Coordinates</label>
 		<Checkbox bind:checked={data_coordinates.shown} id={'showCoords'} />
 
@@ -731,7 +737,7 @@
 			<label for="coordsStrokeThickness">Outline Thickness</label>
 			<input id="coordsStrokeThickness" type="number" bind:value={data_coordinates.style.strokeThickness} />
 
-			<label for="coordSeperator">Seperator</label>
+			<label for="coordSeperator">Separator</label>
 			<input
 				id="coordSeperator"
 				type="text"
@@ -753,36 +759,42 @@
 		{/if}
 	</div>
 
-
-
 	<!-- OVERLAY -->
 	<h2 class="setting-heading">
 		Overlay
-		<button on:click={() => {hidden_settings.overlay = !hidden_settings.overlay}}>
-			<img  alt={"Toggle Experimental Settings"} class:rotated={hidden_settings.overlay} src={"/assets/img/ui/arrow.png"}>
-		</button>	
+		<button
+			on:click={() => {
+				hidden_settings.overlay = !hidden_settings.overlay;
+			}}
+		>
+			<img alt={'Toggle Experimental Settings'} class:rotated={hidden_settings.overlay} src={'/assets/img/ui/arrow.png'} />
+		</button>
 	</h2>
 
-	<div class="settings-grid" class:hidden={hidden_settings.overlay}>
-
+	<div class="settings-grid" class:hidden={hidden_settings.overlay} style={"justify-items: start;"}>
 		<button class="file-input-button">
-			{#if data_overlay.base64 == ""}Load Overlay Image{:else}Replace Overlay Image{/if} 
-			<input type="file" accept="image/*" bind:files={overlay_files} on:change={() => { import_overlay_image(); }} />
+			{#if data_overlay.base64 == ''}Load Overlay Image{:else}Replace Overlay Image{/if}
+			<input
+				type="file"
+				accept="image/*"
+				bind:files={overlay_files}
+				on:change={() => {
+					import_overlay_image();
+				}}
+			/>
 		</button>
-
-
 	</div>
-
-
-
-
 
 	<!-- TILE SETS -->
 	<h2 class="setting-heading">
 		Tilesets
-		<button on:click={() => {hidden_settings.tilesets = !hidden_settings.tilesets}}>
-			<img  alt={"Toggle Experimental Settings"} class:rotated={hidden_settings.tilesets} src={"/assets/img/ui/arrow.png"}>
-		</button>	
+		<button
+			on:click={() => {
+				hidden_settings.tilesets = !hidden_settings.tilesets;
+			}}
+		>
+			<img alt={'Toggle Experimental Settings'} class:rotated={hidden_settings.tilesets} src={'/assets/img/ui/arrow.png'} />
+		</button>
 	</h2>
 	<div id="tilesets" class:hidden={hidden_settings.tilesets}>
 		{#each loadedTilesets as tileset (tileset.id)}
@@ -824,13 +836,19 @@
 		</span>
 	</div>
 
-
-
 	<!-- ICON SETS -->
 	<h2 class="setting-heading">
-		<span on:click={e => {iconset_text = (iconset_text == "Icon Set" ? "Iconset" : "Icon Set")}}>{iconset_text}s</span>
-		<button on:click={() => {hidden_settings.iconsets = !hidden_settings.iconsets}}>
-			<img alt={"Toggle Icon Set Settings"} src={"/assets/img/ui/arrow.png"} class:rotated={hidden_settings.iconsets}>
+		<span
+			on:click={(e) => {
+				iconset_text = iconset_text == 'Icon Set' ? 'Iconset' : 'Icon Set';
+			}}>{iconset_text}s</span
+		>
+		<button
+			on:click={() => {
+				hidden_settings.iconsets = !hidden_settings.iconsets;
+			}}
+		>
+			<img alt={'Toggle Icon Set Settings'} src={'/assets/img/ui/arrow.png'} class:rotated={hidden_settings.iconsets} />
 		</button>
 	</h2>
 	<div id="iconsets" class:hidden={hidden_settings.iconsets}>
@@ -844,16 +862,21 @@
 				{iconset.name}
 
 				{#if iconset.id != 'default'}
-					<button on:click={() => {
+					<button
+						on:click={() => {
 							removeIconset(iconset.id);
-						}}> <img src="/assets/img/tools/trash.png" alt={'Trash'} title={'Remove Iconset'} /> </button>
+						}}
+					>
+						<img src="/assets/img/tools/trash.png" alt={'Trash'} title={'Remove Iconset'} />
+					</button>
 				{/if}
 			</div>
 		{/each}
 
 		<span>
 			<button class="file-input-button"
-				>Import {iconset_text} <input
+				>Import {iconset_text}
+				<input
 					type="file"
 					accept=".hfis"
 					bind:files={iconsetFiles}
@@ -872,13 +895,18 @@
 
 	<h2 class="setting-heading">
 		Experimental
-		<button on:click={() => {hidden_settings.experimental = !hidden_settings.experimental}}>
-			<img alt={"Toggle Experimental Settings"} class:rotated={hidden_settings.experimental} src={"/assets/img/ui/arrow.png"}>
+		<button
+			on:click={() => {
+				hidden_settings.experimental = !hidden_settings.experimental;
+			}}
+		>
+			<img alt={'Toggle Experimental Settings'} class:rotated={hidden_settings.experimental} src={'/assets/img/ui/arrow.png'} />
 		</button>
 	</h2>
-	<p class="helperText">Not polished and maybe broken.</p>
+	
 
 	<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;" class:hidden={hidden_settings.experimental}>
+		<p class="helperText">Not polished and maybe broken.</p>
 		<button
 			on:click={() => {
 				showTerrainGenerator = true;
@@ -892,7 +920,7 @@
 
 	<h2>About</h2>
 	<p class="helperText">
-		Hexfriend version 1.6.1 – "Looking snazzy, Hexfriend!"
+		Hexfriend version 1.6.1 - "Looking snazzy, Hexfriend!"
 		<br />
 		By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
 	</p>
@@ -904,19 +932,10 @@
 	<p class="helperText" style="text-align: center; font-size: 20pt; font-style: normal">☺</p>
 </div>
 
-
-
-
-
-
-
 <style>
-
 	button {
-		border: solid 1px var(--mid-light-bg);
+		border: solid 1px var(--lighter-background);
 	}
-
-	
 
 	.setting-heading {
 		display: flex;
@@ -934,13 +953,11 @@
 	.setting-heading button img {
 		height: 100%;
 		transition-duration: 0.2s;
-		
 	}
-	
+
 	.setting-heading button img.rotated {
 		rotate: 180deg;
 		transition-duration: 0.2s;
-
 	}
 
 	.hidden {
@@ -948,11 +965,11 @@
 	}
 
 	a {
-		color: var(--hexfriend-green);
+		color: var(--primary);
 	}
 
 	a:visited {
-		color: var(--hexfriend-green);
+		color: var(--primary);
 	}
 
 	#flower-dimensions-controls-grid {
@@ -1093,13 +1110,13 @@
 	}
 
 	h2 {
-		margin-bottom: 0.8em;
+		margin-bottom: 0.2em;
 	}
-	
 
 	.helperText {
+		grid-column: span 2;
 		font-size: 12px;
-		color: #999999;
+		color: var(--lightest-background);
 		line-height: 1.2;
 		margin: 0;
 		margin-bottom: 5px;
@@ -1110,12 +1127,19 @@
 	.settings-grid {
 		display: grid;
 		grid-template-columns: 3fr 2fr;
-		grid-template-rows: auto;
-		row-gap: 5px;
+		grid-auto-rows: 2em;
+		align-items: center;
+		justify-items: center;
+		row-gap: 0.3em;
+	}
+
+	.settings-grid label {
+		justify-self: start;
 	}
 
 	.settings-grid input {
-		width: 50px;
+		width: 5ch;
+		height: 2em;
 	}
 
 	p {
@@ -1165,7 +1189,7 @@
 	}
 
 	#close-tab:hover {
-		background: var(--mid-dark-bg);
+		background: var(--light-background);
 	}
 
 	#close-tab img {

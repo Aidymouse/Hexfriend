@@ -23,23 +23,23 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		background-color: #222222;
+		background-color: var(--lighter-background);
 		transition-duration: 0.1s;
 	}
 
 	.customValueToggle:hover {
-		background-color: #555555;
+		background-color: var(--lightest-background);
 		transition-duration: 0.1s;
 		cursor: inherit;
 		user-select: none;
 	}
 
 	.customValueToggle.on {
-		background-color: #8cc63f;
+		background-color: var(--primary);
 	}
 
 	.customValueToggle.on:hover {
-		background-color: #6f9e32;
+		background-color: var(--primary);
 	}
 
 	.customValueToggle.error {

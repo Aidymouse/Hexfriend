@@ -1,12 +1,19 @@
-html {
-    --hexfriend-red: #FF6666;
+:root {
+    --secondary: #FF6666;
     --dark-red: #992222;
 
-    --hexfriend-green: #8cc63f;
+    --dark-primary: #648D2E;
+    --primary: #8CC63F;
 
-    --dark-bg: #222222;
+    --text: #F2F2F2;
+
+    --dark-background: #222222;
     --primary-background: #333333;
-    --mid-dark-bg: #555555;
-    --mid-light-bg: #777777;
-    --light-bg: #999999;
+    --light-background: #555555;
+    --lighter-background: #777777;
+    --lightest-background: #999999;
+
+
+    --small-radius: 0.25em;
+    --large-radius: 0.5em;
 }

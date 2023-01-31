@@ -40,7 +40,7 @@
 
 <style>
     .panel {
-        padding: 10px;
+        padding: 0.625em;;
     }
 
     .panel-grid {

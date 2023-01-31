@@ -39,22 +39,17 @@
 	}
 </script>
 
-
-
-
 <main class:shown={showSavedMaps}>
-
 	<button
-			id="close-button"
-			on:click={() => {
-				showSavedMaps = false;
-			}}
-		>
-			<img src="/assets/img/ui/back.png" alt={'Close Maps'} />
+		id="close-button"
+		on:click={() => {
+			showSavedMaps = false;
+		}}
+	>
+		<img src="/assets/img/ui/back.png" alt={'Close Maps'} />
 	</button>
 
 	<div id="maps-container" class="shown">
-
 		<div
 			id="new-map-button"
 			on:click={() => {
@@ -62,11 +57,10 @@
 				showSavedMaps = false;
 			}}
 		>
-			<img src="/assets/img/ui/plus.png" alt={'Create New Map'}>
+			<img src="/assets/img/ui/plus.png" alt={'Create New Map'} />
 		</div>
 		<div id="maps">
 			{#if $saves}
-
 				{#each $saves as save (save.id)}
 					<div class="map-save" class:error={save.saveVersion != LATESTSAVEDATAVERSION}>
 						<div
@@ -109,18 +103,11 @@
 			{:else}
 				<p id="loading-text">Loading...</p>
 			{/if}
-
-			
 		</div>
 	</div>
-
-
 </main>
 
-
-
 <style>
-
 	main {
 		position: absolute;
 		top: 0;
@@ -129,7 +116,7 @@
 		height: 100%;
 		transition-duration: 0.2s;
 	}
-	
+
 	main.shown {
 		left: 0em;
 		transition-duration: 0.2s;
@@ -140,14 +127,14 @@
 		width: 100%;
 		padding: 1em;
 		max-height: 100%;
-		background-color: var(--primary-bg);
+		background-color: var(--primary-background);
 		display: flex;
 		gap: 1em;
 		flex-direction: column;
 		box-sizing: border-box;
 		overflow: scroll;
 	}
-	
+
 	#maps-container.shown {
 		left: 0em;
 	}
@@ -159,14 +146,14 @@
 		height: 1em;
 		justify-content: center;
 		align-items: center;
-		border-radius: 0.25em;
+		border-radius: var(--small-radius);
 
 		font-size: 30pt;
 		margin: 0;
 		padding: 0;
 		transition-duration: 0.1s;
-		border: solid 1px var(--mid-light-bg);
-		
+		border: solid 1px var(--lighter-background);
+
 		cursor: pointer;
 		padding: 0.25em;
 	}
@@ -174,7 +161,11 @@
 	#new-map-button:hover {
 		transition-duration: 0.1s;
 		transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
-		background-color: var(--mid-light-bg);
+		background-color: var(--light-background);
+	}
+
+	#new-map-button:active {
+		background-color: var(--lighter-background);
 	}
 
 	#new-map-button img {
@@ -183,7 +174,7 @@
 
 	#maps {
 		width: 100%;
-		background: var(--primary-bg);
+		background: var(--primary-background);
 
 		position: relative;
 
@@ -203,7 +194,6 @@
 		cursor: pointer;
 		height: 8.25em;
 		aspect-ratio: 1/1;
-
 	}
 
 	#loading-text {
@@ -213,11 +203,12 @@
 
 	p {
 		position: absolute;
-		bottom: 0px;
+		bottom: 0;
 		text-align: center;
 		margin: 0;
-		padding: 5px;
-		background-color: rgba(51, 51, 51, 0.5);
+		padding: 0.3125em;
+		background-color: var(--primary-background);
+		opacity: 0.75;
 		width: 100%;
 		box-sizing: border-box;
 	}
@@ -245,9 +236,6 @@
 		justify-content: center;
 		align-items: center;
 	}
-
-	
-
 
 	#close-button {
 		position: absolute;
@@ -278,14 +266,8 @@
 	}
 
 	#close-button:hover {
-		background: var(--mid-dark-bg);
+		background: var(--light-background);
 	}
-
-	
-
-	
-
-	
 
 	.delete-button {
 		position: absolute;
@@ -315,7 +297,6 @@
 		background-color: #555555;
 		outline: #8cc63f solid 2px;
 	}
-	
 
 	.image-container {
 		width: 100%;

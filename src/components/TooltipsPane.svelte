@@ -199,12 +199,12 @@
 
 	span {
 		position: absolute;
-		right: 0px;
-		bottom: 0px;
+		right: 0;
+		bottom: 0;
 
-		padding: 10px;
+		padding: 1em;
 
-		width: 200px;
+		width: 12.5em;
 		display: flex;
 
 		align-items: flex-end;

@@ -342,7 +342,7 @@
 	{#if selectedIcon}
 		<div id="icon-preview">
 
-			<div id="pixi-container" style="width: 300px; height: 300px;">
+			<div id="pixi-container" style="width: 18.75em; height: 18.75em;">
 
 				<CanvasHolder {app} />
 			</div>
@@ -391,7 +391,7 @@
 
 		<div id="icon-style">
 			<!-- Background Color -->
-			<div class="color" style="margin-bottom: 10px">
+			<div class="color" style="margin-bottom: 0.625em">
 				<ColorInputPixi bind:value={selectedIcon.color} w={50} h={50} />
 
 				<div>
@@ -401,14 +401,17 @@
 			</div>
 
 			<div id="symbol-scale">
-				Icon Scale
-				<input type="range" min="5" max="100" bind:value={selectedIcon.pHex} />
-				<input type="number" bind:value={selectedIcon.pHex} />%
+				<div id="scale-holder">
+					<p>Icon scale</p><input type="number" bind:value={selectedIcon.pHex} /><p>%</p>
+				</div>
+				<div>
+					<input type="range" min="5" max="100" bind:value={selectedIcon.pHex} />
+				</div>
 			</div>
 		</div>
 	{:else}
 		<div id="editor-placeholder">
-			<p style="color: #f2f2f2; margin-bottom: 10px;">Select a icon or make a new one!</p>
+			<p style="color: var(--text); margin-bottom: 0.625em;">Select a icon or make a new one!</p>
 
 			<p style="font-size: 10pt">For best results, use white 100px by 100px images.</p>
 			<p style="font-size: 10pt">Hint: You can upload multiple images at once!</p>
@@ -417,28 +420,25 @@
 </main>
 
 <style>
-	#icon-controls {
-		margin-top: 5px;
-		display: flex;
-		gap: 5px;
+
+	main {
+		display: grid;
+		grid-template-columns: 19.375em 1fr 1fr;
+		grid-template-rows: 1fr;
+		margin: 0;
+		height: 100%;
+		color: var(--text);
+		background-color: var(--dark-background);
 	}
 
-	#icon-controls button {
-		width: 40px;
-		height: 40px;
-		padding: 0px;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	#icon-controls button img {
-		height: 80%;
+	nav {
+		height: 100%;
+		background-color: var(--light-background);
 	}
 
 	#set-controls {
-		padding: 10px;
-		background-color: #555555;
+		padding: 0.625em;
+		background-color: var(--primary-background);
 		box-sizing: border-box;
 	}
 
@@ -446,13 +446,21 @@
 		width: 100%;
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		grid-template-rows: auto;
-		gap: 5px;
+		grid-auto-rows: 1fr;
+		gap: 0.3125em;
 	}
 
 	#grid input {
 		width: 100%;
 		box-sizing: border-box;
+	}
+
+	button {
+		border: solid 1px var(--lighter-background);
+	}
+
+	input[type='text'] {
+		border-radius: var(--large-radius);
 	}
 
 	.file-input-button {
@@ -463,18 +471,31 @@
 		width: 100%;
 		height: 100%;
 		position: absolute;
-		top: 0px;
-		left: 0px;
+		top: 0;
+		left: 0;
 		opacity: 0;
 	}
 
-	main {
+	#icon-buttons {
+		padding: 0.625em;
 		display: grid;
-		grid-template-columns: 310px 1fr 1fr;
-		grid-template-rows: 1fr;
-		margin: 0;
-		height: 100%;
-		color: #f2f2f2;
+		gap: 0.625em;
+		grid-template-columns: repeat(5, 3.125em);
+		grid-template-rows: 3.125em;
+		grid-auto-rows: 3.125em;
+	}
+
+	.icon-button {
+		width: 3.125em;
+		height: 3.125em;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		overflow: hidden;
+	}
+
+	.icon-button img {
+		width: 100%;
 	}
 
 	#editor-placeholder {
@@ -486,7 +507,7 @@
 	}
 
 	#editor-placeholder p {
-		color: #aaaaaa;
+		color: var(--lightest-background);
 		margin: 0;
 	}
 
@@ -497,6 +518,25 @@
 		flex-direction: column;
 	}
 
+	#icon-controls {
+		margin-top: 0.3125em;
+		display: flex;
+		gap: 0.3125em;
+	}
+
+	#icon-controls button {
+		width: 2.5em;
+		height: 2.5em;
+		padding: 0;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	#icon-controls button img {
+		height: 80%;
+	}
+
 	#icon-style {
 		display: flex;
 		justify-content: center;
@@ -504,37 +544,11 @@
 		width: 50%;
 	}
 
-	nav {
-		height: 100%;
-		background-color: #222222;
-	}
-
-	#icon-buttons {
-		padding: 10px;
-		display: grid;
-		gap: 10px;
-		grid-template-columns: repeat(5, 50px);
-		grid-template-rows: 50px;
-		grid-auto-rows: 50px;
-	}
-
-	.icon-button {
-		width: 50px;
-		height: 50px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.icon-button img {
-		width: 100%;
-	}
-
 	.color {
 		display: grid;
-		grid-template-columns: 60px 1fr;
-		grid-template-rows: 60px;
-		column-gap: 10px;
+		grid-template-columns: 3.75em 1fr;
+		grid-template-rows: 3.75em;
+		column-gap: 0.625em;
 	}
 
 	.color div {
@@ -549,6 +563,30 @@
 
 	.color .color-string {
 		font-size: 10pt;
-		color: #bbbbbb;
+		color: var(--lightest-background);
+	}
+
+	#scale-holder {
+		display: flex;
+		align-items: baseline;
+		justify-content: flex-end;
+	}
+
+	#scale-holder p {
+		margin: 0;
+	}
+
+	#scale-holder :first-child {
+		flex-grow: 1;
+	}
+
+	#scale-holder input {
+		flex-shrink: 1;
+		width: 6ch;
+		height: 2em;
+	}
+
+	#scale-holder :last-child {
+		margin-inline-start: 0.5em;
 	}
 </style>
