@@ -164,9 +164,9 @@
 	{/if}
 
 	<!-- TEXT STYLES -->
-	<div id="text-styles" style={data_text.selectedText ? 'padding-top: 0px' : ''}>
+	<div id="text-styles" style={data_text.selectedText ? 'padding-top: 0' : ''}>
 		
-		<div style="display: flex; gap: 5px; flex-wrap: wrap">
+		<div style="display: flex; gap: 0.3125em; flex-wrap: wrap">
 			{#each textStyles as ts (ts.id)}
 				<button
 					on:click={() => {
@@ -183,7 +183,7 @@
 			{/each}
 			<button
 				class="green-button"
-				style="width: 28px;"
+				style="width: 1.75em;"
 				on:click={() => {
 					newTextStyle();
 				}}
@@ -206,7 +206,7 @@
 
 <style>
 	.panel {
-		color: white;
+		color: var(--text);
 	}
 
 	#controls {
@@ -233,7 +233,7 @@
 	}
 
 	#controls section input[type="number"] {
-		flex: 2 1 50px;
+		flex: 2 1 3.125em;
 		width: 2em;
 		height: 100%;
 		box-sizing: border-box;
@@ -243,19 +243,19 @@
 
 	#selected-text-controls {
 		padding: 1em;
-		background-color: #555555;
+		background-color: var(--light-background);
 	}
 
 	#selected-text-controls #text-area-wrapper {
 		position: relative;
 		width: 100%;
 		box-sizing: border-box;
-		min-height: 60px;
+		min-height: 3.75em;
 	}
 
 	#selected-text-controls textarea {
 		box-sizing: border-box;
-		min-height: 60px;
+		min-height: 3.75em;
 		max-width: 100%;
 		min-width: 100%;
 		height: 100%;
@@ -269,7 +269,7 @@
 	/* TEXT STYLES */
 	#text-styles {
 		padding: 0.5em;
-		background-color: #555555;
+		background-color: var(--light-background);
 	}
 
 

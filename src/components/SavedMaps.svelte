@@ -127,7 +127,7 @@
 		width: 100%;
 		padding: 1em;
 		max-height: 100%;
-		background-color: var(--background);
+		background-color: var(--primary-background);
 		display: flex;
 		gap: 1em;
 		flex-direction: column;
@@ -170,7 +170,7 @@
 
 	#maps {
 		width: 100%;
-		background: var(--background);
+		background: var(--primary-background);
 
 		position: relative;
 

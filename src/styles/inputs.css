@@ -12,11 +12,11 @@ button {
 }
 
 button:hover {
-	background-color: var(--light-background);
+	background-color: var(--lighter-background);
 }
 
 button:active {
-	background-color: var(--light-background);
+	background-color: var(--lightest-background);
 }
 
 button:disabled {

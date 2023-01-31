@@ -149,7 +149,7 @@
 	}
 
 	.iconset-heading:first-of-type {
-		margin-top: 0px;
+		margin-top: 0;
 	}
 
 	.iconset-heading {
@@ -157,7 +157,7 @@
 		position: relative;
 		align-items: center;
 
-		border-color: var(--background);
+		border-color: var(--primary-background);
 		margin-bottom: 0.25em;
 		margin-top: 0.25em;
 	}
@@ -176,7 +176,7 @@
 	}
 
 	.iconset-heading button:hover {
-		background-color: #333333;
+		background-color: var(--primary-background);
 	}
 
 	.iconset-heading button img {
@@ -208,7 +208,7 @@
 	}
 
 	div {
-		color: white;
+		color: var(--text);
 	}
 
 	#icon-preview {
@@ -216,7 +216,7 @@
 		grid-template-columns: 4em 1fr;
 		grid-template-rows: 2em 2em;
 		gap: 0.5em;
-		background-color: var(--background);
+		background-color: var(--primary-background);
 		padding: 1em;
 	}
 
@@ -236,8 +236,8 @@
 	}
 
 	#buttons {
-		background-color: #555555;
-		padding: 10px;
+		background-color: var(--light-background);
+		padding: 0.625em;
 	}
 
 	.button-grid {

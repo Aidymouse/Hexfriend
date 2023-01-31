@@ -36,7 +36,7 @@
 
 <style>
 	main {
-		background-color: var(--background);
+		background-color: var(--primary-background);
 		flex-direction: row;
 		display: flex;
 		height: 2em;

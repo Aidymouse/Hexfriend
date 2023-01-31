@@ -191,7 +191,7 @@
 		margin: 0.25em;
 		margin-bottom: calc(0.25em + 5px);
 		box-sizing: border-box;
-		right: 0px;
+		right: 0;
 		display: flex;
 		height: 80%;
 		top: 0;
@@ -227,7 +227,7 @@
 		grid-template-columns: 4em 1fr;
 		grid-template-rows: 2em 2em;
 		gap: 0.5em;
-		background-color: var(--background);
+		background-color: var(--primary-background);
 		padding: 1em;
 	}
 
@@ -255,20 +255,20 @@
 	}
 
 	#buttons h2 {
-		border-color: #333333;
-		margin-bottom: 5px;
-		margin-top: 10px;
+		border-color: var(--primary-background);
+		margin-bottom: 0.3125em;
+		margin-top: 0.625em;
 	}
 
 	#buttons {
-		background-color: #555555;
-		padding: 10px;
+		background-color: var(--light-background);
+		padding: 0.625em;
 	}
 
 	#buttons .tile-button {
 		aspect-ratio: 1/1;
 		box-sizing: border-box;
-		padding: 5px;
+		padding: 0.3125em;
 		display: flex;
 		align-items: center;
 		justify-content: center;
