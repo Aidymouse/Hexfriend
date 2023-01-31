@@ -4,7 +4,7 @@
 button {
 	border: none;
 	border-radius: var(--small-radius);
-	background-color: var(--primary-background);
+	background-color: var(--hexfriend-green-background);
 	color: var(--text);
 	padding: 0.3125em;
 	transition-duration: 0.1s;
@@ -64,7 +64,7 @@ input[type='number'] {
 }
 
 input:focus {
-	border-color: var(--primary);
+	border-color: var(--hexfriend-green);
 	transition-duration: 0.2s;
 	transition-property: border-color;
 	outline: none;
@@ -74,15 +74,15 @@ input:focus {
 textarea {
 	outline: none;
 	color: var(--text);
-	background-color: var(--primary-background);
+	background-color: var(--hexfriend-green-background);
 	border-radius: var(--small-radius);
 }
 
 textarea:focus {
 	outline-style: solid;
 	outline-width: 1px;
-	outline-color: var(--primary);
-	border-color: var(--primary);
+	outline-color: var(--hexfriend-green);
+	border-color: var(--hexfriend-green);
 }
 
 select {
@@ -103,13 +103,13 @@ select {
 .selected {
 	outline-style: solid;
 	outline-width: 2px;
-	outline-color: var(--primary);
-	border-color: var(--primary);
+	outline-color: var(--hexfriend-green);
+	border-color: var(--hexfriend-green);
 	transition-duration: 0s;
 }
 
 .green-button {
-	background-color: var(--primary);
+	background-color: var(--hexfriend-green);
 	color: white;
 }
 
@@ -143,7 +143,7 @@ input[type='range']::-webkit-slider-runnable-track {
 }
 
 input[type='range']:active::-webkit-slider-runnable-track {
-	background: var(--primary);
+	background: var(--hexfriend-green);
 	transition-duration: 0.2s;
 }
 
@@ -154,7 +154,7 @@ input[type='range']::-webkit-slider-thumb {
 	height: 1.125em;
 	width: 1.125em;
 	border-radius: 50%;
-	background: var(--primary);
+	background: var(--hexfriend-green);
 	cursor: pointer;
 }
 
@@ -169,7 +169,7 @@ input[type='range']::-moz-range-track {
 }
 
 input[type='range']:active::-moz-range-track {
-	background: var(--primary);
+	background: var(--hexfriend-green);
 	transition-duration: 0.2s;
 }
 
@@ -178,7 +178,7 @@ input[type='range']::-moz-range-thumb {
 	height: 0.875em;
 	width: 0.875em;
 	border-radius: 50%;
-	background: var(--primary);
+	background: var(--hexfriend-green);
 	cursor: pointer;
 }
 

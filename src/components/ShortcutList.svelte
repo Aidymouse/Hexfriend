@@ -82,7 +82,7 @@
 	#maps {
 		width: 50%;
 		height: 75%;
-		background: var(--primary-background);
+		background: var(--hexfriend-green-background);
 		border-radius: var(--large-radius);
 
 		position: relative;
@@ -130,7 +130,7 @@
 	}
 
 	.highlighted {
-		color: var(--primary);
+		color: var(--hexfriend-green);
 	}
 
 </style>

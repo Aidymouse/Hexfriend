@@ -36,7 +36,7 @@
 
 <style>
 	main {
-		background-color: var(--primary-background);
+		background-color: var(--hexfriend-green-background);
 		flex-direction: row;
 		display: flex;
 		height: 2em;
@@ -51,7 +51,7 @@
 	}
 
 	.svg-bg.selected {
-		background-color: var(--primary-background);
+		background-color: var(--hexfriend-green-background);
 	}
 
 	.option {
@@ -73,11 +73,11 @@
 	}
 
 	.option.selected {
-		background-color: var(--primary);
+		background-color: var(--hexfriend-green);
 		outline: 0;
 	}
 
 	.option.selected:hover {
-		background-color: var(--primary);
+		background-color: var(--hexfriend-green);
 	}
 </style>

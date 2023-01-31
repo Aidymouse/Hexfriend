@@ -35,11 +35,11 @@
 	}
 
 	.customValueToggle.on {
-		background-color: var(--primary);
+		background-color: var(--hexfriend-green);
 	}
 
 	.customValueToggle.on:hover {
-		background-color: var(--primary);
+		background-color: var(--hexfriend-green);
 	}
 
 	.customValueToggle.error {

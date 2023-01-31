@@ -28,6 +28,10 @@ Thanks to mattjennings, without who's svelte-pixi project this would never have 
 
 The software is free to use, copy, share, steal, whatever! Check the license file for real details :)
 
+### How to Build
+
+Make sure you use [Yarn](https://yarnpkg.com/) instead of NPM. Just type `yarn` into the command line in the folder this readme is in to install all the dependencies. Use `yarn run dev` to start a development server. Happy coding!
+
 ### Coming Soon...
 
 Hexfriend is never finished! Here's a list of stuff to do:

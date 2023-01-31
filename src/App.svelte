@@ -922,7 +922,7 @@ hexfiend red: #FF6666
 		height: 100%;
 		overflow: hidden;
 
-		--primary: #8cc63f;
+		--hexfriend-green: #8cc63f;
 	}
 
 	:global(h2) {
@@ -1005,7 +1005,7 @@ hexfiend red: #FF6666
 	}
 
 	#save-indicator p {
-		color: var(--primary);
+		color: var(--hexfriend-green);
 		font-size: 20pt;
 		margin: 0;
 	}

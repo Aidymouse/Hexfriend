@@ -1,7 +1,7 @@
 {
 	"name": "hexfriend",
 	"private": true,
-	"version": "1.6.1",
+	"version": "1.6.2",
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
@@ -27,7 +27,6 @@
 		"gh-pages": "^4.0.0",
 		"pixi.js": "^7.0.5",
 		"prettier-plugin-svelte": "^2.7.0",
-		"svelte-inline-svg": "^1.2.0",
 		"yarn": "^1.22.19"
 	}
 }

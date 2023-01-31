@@ -438,7 +438,7 @@
 
 	#set-controls {
 		padding: 0.625em;
-		background-color: var(--primary-background);
+		background-color: var(--hexfriend-green-background);
 		box-sizing: border-box;
 	}
 

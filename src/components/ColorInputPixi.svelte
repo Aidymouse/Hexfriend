@@ -56,7 +56,7 @@
 	}
 
 	div:hover {
-		border-color: var(--primary);
+		border-color: var(--hexfriend-green);
 		transition-duration: 0.2s;
 		transition-property: border-color;
 	}

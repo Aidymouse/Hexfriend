@@ -2,7 +2,6 @@
 	import type { icon_data, overlay_data, path_data, terrain_data } from '../types/data';
 	import { tools } from '../types/toolData';
 	import { afterUpdate } from 'svelte';
-	import InlineSVG from 'svelte-inline-svg';
 
 	export let data_terrain: terrain_data;
 	export let data_icon: icon_data;
@@ -228,7 +227,7 @@
 		display: flex;
 		height: 2.5em;
 		padding: 0.5em;
-		background-color: var(--primary-background);
+		background-color: var(--hexfriend-green-background);
 
 		border-radius: 1.75em;
 		gap: 0.5em;
@@ -243,13 +242,13 @@
 	}
 
 	div#bottom-layer {
-		background-color: var(--primary);
+		background-color: var(--hexfriend-green);
 		clip-path: circle(3.125em at 0.5em 0.5em);
 		transition-duration: 0.2s;
 		transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1.2);
 	}
 	#bottom-layer .tool-icon {
-		background-color: var(--primary-background);
+		background-color: var(--hexfriend-green-background);
 	}
 
 	.tool-button {
@@ -318,7 +317,7 @@
 	}
 
 	.mini-button.selected {
-		background-color: var(--primary);
+		background-color: var(--hexfriend-green);
 		outline: none;
 	}
 
@@ -329,7 +328,7 @@
 	}
 
 	.mini-button.selected span {
-		background-color: var(--primary-background);
+		background-color: var(--hexfriend-green-background);
 		outline: none;
 	}
 </style>

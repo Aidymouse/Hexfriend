@@ -127,7 +127,7 @@
 		width: 100%;
 		padding: 1em;
 		max-height: 100%;
-		background-color: var(--primary-background);
+		background-color: var(--hexfriend-green-background);
 		display: flex;
 		gap: 1em;
 		flex-direction: column;
@@ -174,7 +174,7 @@
 
 	#maps {
 		width: 100%;
-		background: var(--primary-background);
+		background: var(--hexfriend-green-background);
 
 		position: relative;
 
@@ -207,7 +207,7 @@
 		text-align: center;
 		margin: 0;
 		padding: 0.3125em;
-		background-color: var(--primary-background);
+		background-color: var(--hexfriend-green-background);
 		opacity: 0.75;
 		width: 100%;
 		box-sizing: border-box;

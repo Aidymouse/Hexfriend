@@ -57,7 +57,7 @@
 	}
 
 	.cb.checked {
-		border-color: var(--primary);
+		border-color: var(--hexfriend-green);
 	}
 
 	.cb input {
