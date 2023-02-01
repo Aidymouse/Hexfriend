@@ -115,7 +115,7 @@
 
 				<div class="font-style-option">
 					<CustomValueToggle offValue={'normal'} onValue={'italic'} bind:value={data_text.style.fontStyle}
-						><i style="font-family: Times New Roman">I</i></CustomValueToggle
+						><i style="font-family: 'Roboto Mono'">I</i></CustomValueToggle
 					>
 				</div>
 
@@ -278,7 +278,7 @@
 	/* FONT STYLE */
 	#font-style-options {
 		display: flex;
-		border-radius: 0.5em;
+		border-radius: var(--large-radius);
 		overflow: hidden;
 	}
 

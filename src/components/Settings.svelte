@@ -461,21 +461,21 @@
 		<label for="blankHexColor">Blank Hex Color</label>
 		<div style="display: flex; gap: 0.25em; align-items: center;">
 			<ColorInputPixi
-			bind:value={tfield.blankHexColor}
-			on:change={() => {
-				renderAllHexes();
-			}}
-			id={'blankHexColor'}
-		/>
+				bind:value={tfield.blankHexColor}
+				on:change={() => {
+					renderAllHexes();
+				}}
+				id={'blankHexColor'}
+			/>
 
-		<button
-			style={"height: fit-content;"}
-			on:click={() => {
-				tfield.blankHexColor = 0xf2f2f2;
-			}}>Reset</button
-		>
+			<button
+				style={'height: fit-content;'}
+				on:click={() => {
+					tfield.blankHexColor = 0xf2f2f2;
+				}}>Reset</button
+			>
 		</div>
-		
+
 		<label>Hex Orientation</label>
 		<div style={'height: 100%; display: flex; align-items: center;'}>
 			<SelectGrid
@@ -771,7 +771,7 @@
 		</button>
 	</h2>
 
-	<div class="settings-grid" class:hidden={hidden_settings.overlay} style={"justify-items: start;"}>
+	<div class="settings-grid" class:hidden={hidden_settings.overlay} style={'justify-items: start;'}>
 		<button class="file-input-button">
 			{#if data_overlay.base64 == ''}Load Overlay Image{:else}Replace Overlay Image{/if}
 			<input
@@ -903,7 +903,6 @@
 			<img alt={'Toggle Experimental Settings'} class:rotated={hidden_settings.experimental} src={'/assets/img/ui/arrow.png'} />
 		</button>
 	</h2>
-	
 
 	<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;" class:hidden={hidden_settings.experimental}>
 		<p class="helperText">Not polished and maybe broken.</p>
@@ -999,18 +998,17 @@
 	}
 
 	#export-map-select {
-		border: solid 1px #777777;
-		border-radius: 3px;
-		background-color: #333333;
-		color: white;
-		padding: 5px;
+		border: solid 1px var(--lighter-background);
+		border-radius: var(--small-radius);
+		background-color: var(--hexfriend-green-background);
+		padding: 0.3125em;
 		transition-duration: 0.2s;
 
 		text-align: center;
 	}
 
 	#export-map-select:hover {
-		background-color: #555555;
+		background-color: var(--light-background);
 	}
 
 	#iconsets {
@@ -1037,9 +1035,9 @@
 	}
 
 	.loaded-tileset {
-		background-color: #555555;
+		background-color: var(--light-background);
 		padding: 5px;
-		border-radius: 4px;
+		border-radius: var(--small-radius);
 		position: relative;
 	}
 
@@ -1058,7 +1056,7 @@
 		border: none;
 		border-top-left-radius: 0px;
 		border-bottom-left-radius: 0px;
-		border: solid 1px #555555;
+		border: solid 1px var(--light-background);
 	}
 
 	.loaded-tileset button img {
@@ -1152,7 +1150,7 @@
 		left: -19em;
 		width: 19em;
 		height: 100%;
-		background: #333333;
+		background: var(--hexfriend-green-background);
 		box-sizing: border-box;
 
 		padding: 1em;
@@ -1174,10 +1172,10 @@
 		width: 2.5em;
 		height: 8em;
 		border-radius: 0em;
-		border-top-right-radius: 0.5em;
-		border-bottom-right-radius: 0.5em;
+		border-top-right-radius: var(--large-radius);
+		border-bottom-right-radius: var(--large-radius);
 		border: none;
-		background: #333333;
+		background: var(--hexfriend-green-background);
 		transition-duration: 0.2s;
 		transition-timing-function: ease;
 		padding: 0.5em;

@@ -846,6 +846,18 @@ hexfiend red: #FF6666
 			>
 			<button
 				on:click={() => {
+					var theme = document.documentElement.getAttribute('data-theme');
+					if (theme == 'dark') {
+						theme = 'light';
+					} else {
+						theme = 'dark';
+					}
+					document.documentElement.setAttribute('data-theme', theme);
+				}}
+				title={'Toggle theme'}><img src="assets/img/tools/moon-sun.svg" alt="Theme" /></button
+			>
+			<button
+				on:click={() => {
 					showSavedMaps = true;
 				}}
 				title={'Maps'}
@@ -916,19 +928,17 @@ hexfiend red: #FF6666
 	:root {
 		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 
-		background-color: #333333;
-		color: white;
+		background-color: var(--hexfriend-green-background);
+		color: var(--text);
 		width: 100%;
 		height: 100%;
 		overflow: hidden;
-
-		--hexfriend-green: #8cc63f;
 	}
 
 	:global(h2) {
 		font-family: 'Segoe UI';
 		font-weight: normal;
-		border-bottom: solid 2px #555555;
+		border-bottom: solid 0.125em var(--light-background);
 	}
 
 	:global(html) {
@@ -1014,7 +1024,7 @@ hexfiend red: #FF6666
 		text-align: center;
 		padding: 1em;
 		margin: 0 auto;
-		background-color: black;
+		background-color: var(--world-background);
 		height: 100%;
 		width: 100%;
 		box-sizing: border-box;
@@ -1037,7 +1047,7 @@ hexfiend red: #FF6666
 		display: flex;
 		padding: 0.5em;
 		flex-direction: row;
-		background-color: #000000;
+		background-color: var(--world-background);
 		border-bottom-right-radius: 0.5em;
 		opacity: 0.5;
 		gap: 0.25em;
