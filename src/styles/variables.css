@@ -15,9 +15,9 @@
     --world-background: grey;
     --dark-background: #EEEEEE;
     --hexfriend-green-background: #DDDDDD;
-    --light-background: #BBBBBB;
-    --lighter-background: #999999;
-    --lightest-background: #777777;
+    --light-background: #CCCCCC;
+    --lighter-background: #BBBBBB;
+    --lightest-background: #AAAAAA;
 }
 
 [data-theme="dark"] {
