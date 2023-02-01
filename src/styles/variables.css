@@ -1,4 +1,26 @@
 :root {
+    --small-radius: 0.25em;
+    --large-radius: 0.5em;
+}
+
+[data-theme="light"] {
+    --secondary: #FF6666;
+    --dark-red: #992222;
+
+    --dark-primary: #648D2E;
+    --hexfriend-green: #8CC63F;
+
+    --text: #0D0D0D;
+
+    --world-background: grey;
+    --dark-background: #EEEEEE;
+    --hexfriend-green-background: #DDDDDD;
+    --light-background: #BBBBBB;
+    --lighter-background: #999999;
+    --lightest-background: #777777;
+}
+
+[data-theme="dark"] {
     --secondary: #FF6666;
     --dark-red: #992222;
 
@@ -7,13 +29,10 @@
 
     --text: #F2F2F2;
 
+    --world-background: #000000;
     --dark-background: #222222;
     --hexfriend-green-background: #333333;
     --light-background: #555555;
     --lighter-background: #777777;
     --lightest-background: #999999;
-
-
-    --small-radius: 0.25em;
-    --large-radius: 0.5em;
 }
