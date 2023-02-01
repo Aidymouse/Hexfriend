@@ -50,6 +50,7 @@
 	</button>
 
 	<div id="maps-container" class="shown">
+		<h1 class="title">Saved Maps</h1>
 		<div
 			id="new-map-button"
 			on:click={() => {
@@ -137,6 +138,10 @@
 
 	#maps-container.shown {
 		left: 0em;
+	}
+
+	.title {
+		margin: 0;
 	}
 
 	#new-map-button {
@@ -249,7 +254,7 @@
 		border-top-right-radius: 0.5em;
 		border-bottom-right-radius: 0.5em;
 		border: none;
-		background: #333333;
+		background: var(--hexfriend-green-background);
 		transition-duration: 0.2s;
 		transition-timing-function: ease;
 		padding: 0.5em;
@@ -294,8 +299,8 @@
 	}
 
 	.map-save:hover {
-		background-color: #555555;
-		outline: #8cc63f solid 2px;
+		background-color: var(--light-background);
+		outline: solid 0.125em var(--hexfriend-green);
 	}
 
 	.image-container {
