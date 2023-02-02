@@ -133,7 +133,7 @@
 		gap: 1em;
 		flex-direction: column;
 		box-sizing: border-box;
-		overflow: scroll;
+		overflow-y: scroll;
 	}
 
 	#maps-container.shown {
