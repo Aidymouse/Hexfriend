@@ -52,13 +52,12 @@
 	<div id="maps-container" class="shown">
 		<h1 class="title">Saved Maps</h1>
 		<div
-			id="new-map-button"
+			id="save-map-button"
 			on:click={() => {
-				createNewMap();
-				showSavedMaps = false;
+				// saveInit();
 			}}
 		>
-			<img src="/assets/img/ui/plus.png" alt={'Create New Map'} />
+			<img src="/assets/img/tools/save.png" alt={'Save Map'} />
 		</div>
 		<div id="maps">
 			{#if $saves}
@@ -144,16 +143,15 @@
 		margin: 0;
 	}
 
-	#new-map-button {
+	#save-map-button {
 		box-sizing: border-box;
 		display: flex;
 		width: 100%;
-		height: 1em;
+		height: 3em;
 		justify-content: center;
 		align-items: center;
 		border-radius: var(--small-radius);
 
-		font-size: 30pt;
 		margin: 0;
 		padding: 0;
 		transition-duration: 0.1s;
@@ -163,17 +161,17 @@
 		padding: 0.25em;
 	}
 
-	#new-map-button:hover {
+	#save-map-button:hover {
 		transition-duration: 0.1s;
 		transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
 		background-color: var(--light-background);
 	}
 
-	#new-map-button:active {
+	#save-map-button:active {
 		background-color: var(--lighter-background);
 	}
 
-	#new-map-button img {
+	#save-map-button img {
 		height: 100%;
 	}
 
