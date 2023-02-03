@@ -931,7 +931,7 @@ hexfiend red: #FF6666
 
 <style>
 	:root {
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+		font-family: var(--font);
 
 		background-color: var(--hexfriend-green-background);
 		color: var(--text);
@@ -941,7 +941,6 @@ hexfiend red: #FF6666
 	}
 
 	:global(h2) {
-		font-family: 'Segoe UI';
 		font-weight: normal;
 		border-bottom: solid 0.125em var(--light-background);
 	}
