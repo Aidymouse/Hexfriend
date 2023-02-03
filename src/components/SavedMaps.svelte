@@ -50,14 +50,14 @@
 	</button>
 
 	<div id="maps-container" class="shown">
+		<h1 class="title">Saved Maps</h1>
 		<div
-			id="new-map-button"
+			id="save-map-button"
 			on:click={() => {
-				createNewMap();
-				showSavedMaps = false;
+				// saveInit();
 			}}
 		>
-			<img src="/assets/img/ui/plus.png" alt={'Create New Map'} />
+			<img src="/assets/img/tools/save.png" alt={'Save Map'} />
 		</div>
 		<div id="maps">
 			{#if $saves}
@@ -132,23 +132,26 @@
 		gap: 1em;
 		flex-direction: column;
 		box-sizing: border-box;
-		overflow: scroll;
+		overflow-y: scroll;
 	}
 
 	#maps-container.shown {
 		left: 0em;
 	}
 
-	#new-map-button {
+	.title {
+		margin: 0;
+	}
+
+	#save-map-button {
 		box-sizing: border-box;
 		display: flex;
 		width: 100%;
-		height: 1em;
+		height: 3em;
 		justify-content: center;
 		align-items: center;
 		border-radius: var(--small-radius);
 
-		font-size: 30pt;
 		margin: 0;
 		padding: 0;
 		transition-duration: 0.1s;
@@ -158,17 +161,17 @@
 		padding: 0.25em;
 	}
 
-	#new-map-button:hover {
+	#save-map-button:hover {
 		transition-duration: 0.1s;
 		transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
 		background-color: var(--light-background);
 	}
 
-	#new-map-button:active {
+	#save-map-button:active {
 		background-color: var(--lighter-background);
 	}
 
-	#new-map-button img {
+	#save-map-button img {
 		height: 100%;
 	}
 
@@ -249,7 +252,7 @@
 		border-top-right-radius: 0.5em;
 		border-bottom-right-radius: 0.5em;
 		border: none;
-		background: #333333;
+		background: var(--hexfriend-green-background);
 		transition-duration: 0.2s;
 		transition-timing-function: ease;
 		padding: 0.5em;
@@ -294,8 +297,8 @@
 	}
 
 	.map-save:hover {
-		background-color: #555555;
-		outline: #8cc63f solid 2px;
+		background-color: var(--light-background);
+		outline: solid 0.125em var(--hexfriend-green);
 	}
 
 	.image-container {

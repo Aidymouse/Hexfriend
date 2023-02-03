@@ -853,6 +853,7 @@ hexfiend red: #FF6666
 						theme = 'dark';
 					}
 					document.documentElement.setAttribute('data-theme', theme);
+					document.querySelector('meta[name="color-scheme"]').setAttribute("content", theme);
 				}}
 				title={'Toggle theme'}><img src="assets/img/tools/moon-sun.svg" alt="Theme" /></button
 			>
@@ -864,8 +865,13 @@ hexfiend red: #FF6666
 			>
 				<img src="assets/img/tools/maps.png" alt="Maps" />
 			</button>
-			<div id="save-buttons">
-				<button on:click={saveInit} title={'Save'}> <img src="assets/img/tools/save.png" alt="Save" /> </button>
+			<div>
+				<button
+				on:click={() => {
+					createNewMap();
+					showSavedMaps = false;
+				}}
+				title={'New'}> <img src="assets/img/ui/plus.png" alt="New map" /> </button>
 			</div>
 		</div>
 
@@ -926,7 +932,7 @@ hexfiend red: #FF6666
 
 <style>
 	:root {
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+		font-family: var(--font);
 
 		background-color: var(--hexfriend-green-background);
 		color: var(--text);
@@ -936,7 +942,6 @@ hexfiend red: #FF6666
 	}
 
 	:global(h2) {
-		font-family: 'Segoe UI';
 		font-weight: normal;
 		border-bottom: solid 0.125em var(--light-background);
 	}
