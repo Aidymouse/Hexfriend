@@ -866,12 +866,7 @@ hexfiend red: #FF6666
 				<img src="assets/img/tools/maps.png" alt="Maps" />
 			</button>
 			<div>
-				<button
-				on:click={() => {
-					createNewMap();
-					showSavedMaps = false;
-				}}
-				title={'New'}> <img src="assets/img/ui/plus.png" alt="New map" /> </button>
+				<button on:click={saveInit} title={'Save'}> <img src="assets/img/tools/save.png" alt="Save" /> </button>
 			</div>
 		</div>
 

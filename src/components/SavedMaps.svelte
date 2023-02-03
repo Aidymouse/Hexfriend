@@ -54,10 +54,12 @@
 		<div
 			id="save-map-button"
 			on:click={() => {
-				// saveInit();
+				createNewMap();
+					showSavedMaps = false;
 			}}
 		>
-			<img src="/assets/img/tools/save.png" alt={'Save Map'} />
+			<img src="/assets/img/ui/new.svg" alt={'New Map'} />
+			<span>New map</span>
 		</div>
 		<div id="maps">
 			{#if $saves}
