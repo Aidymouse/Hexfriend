@@ -853,6 +853,7 @@ hexfiend red: #FF6666
 						theme = 'dark';
 					}
 					document.documentElement.setAttribute('data-theme', theme);
+					document.querySelector('meta[name="color-scheme"]').setAttribute("content", theme);
 				}}
 				title={'Toggle theme'}><img src="assets/img/tools/moon-sun.svg" alt="Theme" /></button
 			>
