@@ -177,6 +177,10 @@
 		height: 100%;
 	}
 
+	#save-map-button span {
+		opacity: 0.6;
+	}
+
 	#maps {
 		width: 100%;
 		background: var(--hexfriend-green-background);
