@@ -9,6 +9,7 @@
 	import type { hex_id } from '../types/toolData';
 	import * as PIXI from 'pixi.js';
 	import { onMount } from 'svelte';
+	import { map_shape } from '../types/settings';
 
 	interface coordText {
 		pixiText: PIXI.Text;
@@ -55,6 +56,10 @@
 		Object.keys(tfield.hexes).forEach((hexId: hex_id) => {
 			if (!coordTextExists(hexId)) generateNewCoord(hexId);
 		});
+
+		if (tfield.mapShape == map_shape.FLOWER && data_coordinates.system == coord_system.LETTERNUMBER) {
+			updateAllCoordsText();
+		}
 	}
 
 	export function generateNewCoord(hexId: hex_id, system: coord_system = data_coordinates.system) {
@@ -79,6 +84,10 @@
 		Object.keys(coordTexts).forEach((hexId: hex_id) => {
 			updateCoordPosition(hexId);
 		});
+
+		if (data_coordinates.system == coord_system.LETTERNUMBER) {
+			updateAllCoordsText();
+		}
 	}
 
 	function updateCoordPosition(hexId: hex_id) {
@@ -98,6 +107,10 @@
 	}
 
 	function generateCoordTextAndParts(hexId: hex_id, system: coord_system = data_coordinates.system): { parts: number[]; text: string } {
+
+		let row_offset = 0
+		let col_offset = 0
+
 		switch (system) {
 			case coord_system.CUBE: {
 				let idParts = breakDownHexID(hexId);
@@ -137,14 +150,22 @@
 			}
 
 			case coord_system.LETTERNUMBER: {
+		
+				if (tfield.mapShape == map_shape.FLOWER) {
+					row_offset = tfield.hexesOut
+					col_offset = tfield.hexesOut
+				}
+
 				let cube = breakDownHexID(hexId);
 
 				let idParts = tfield.orientation == 'flatTop'
 						? coords_cubeToq(tfield.raised, cube.q, cube.r, cube.s)
 						: coords_cubeTor(tfield.raised, cube.q, cube.r, cube.s);
 				
+				
+
 				// Convert column to letter
-				let parts = [ num_to_alphabet(idParts.col+1), idParts.row ];
+				let parts = [ num_to_alphabet(idParts.col+col_offset+1), idParts.row+row_offset+1 ];
 
 				return {
 					parts: parts,
@@ -180,7 +201,7 @@
 	}
 
 	export function updateCoordText(hexId: hex_id) {
-		let generated = generateCoordTextAndParts(hexId);
+		let generated = generateCoordTextAndParts(hexId, data_coordinates.system);
 		coordTexts[hexId].parts = [...generated.parts];
 		coordTexts[hexId].pixiText.text = generated.text;
 	}
@@ -191,6 +212,10 @@
 				eliminateCoord(hexId);
 			}
 		});
+
+		if (tfield.mapShape == map_shape.FLOWER && data_coordinates.system == coord_system.LETTERNUMBER) {
+			updateAllCoordsText();
+		}
 	}
 
 	onMount(() => {
