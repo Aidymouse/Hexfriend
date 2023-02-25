@@ -723,6 +723,7 @@
 				<option value={coord_system.ROWCOL}>Column, Row</option>
 				<option value={coord_system.AXIAL}>Axial</option>
 				<option value={coord_system.CUBE}>Cube</option>
+				<option value={coord_system.LETTERNUMBER}>Letter Number</option>
 			</select>
 
 			<label for="coordsFill">Color</label>

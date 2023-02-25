@@ -121,7 +121,7 @@
 
 				return {
 					parts: [idParts.col, idParts.row],
-					text: `${parts[0] < 10 ? 0 : ''}${parts[0]}${data_coordinates.seperator}${parts[1] < 10 ? 0 : ''}${parts[1]}`,
+					text: `${ (parts[0] < 10 && parts[0] >= 0) ? 0 : ''}${parts[0]}${data_coordinates.seperator}${(parts[1] < 10 && parts[1] >= 0) ? 0 : ''}${parts[1]}`,
 				};
 			}
 
@@ -135,7 +135,42 @@
 					text: `${parts[0]}${data_coordinates.seperator}${parts[1]}`,
 				};
 			}
+
+			case coord_system.LETTERNUMBER: {
+				let cube = breakDownHexID(hexId);
+
+				let idParts = tfield.orientation == 'flatTop'
+						? coords_cubeToq(tfield.raised, cube.q, cube.r, cube.s)
+						: coords_cubeTor(tfield.raised, cube.q, cube.r, cube.s);
+				
+				// Convert column to letter
+				let parts = [ num_to_alphabet(idParts.col+1), idParts.row ];
+
+				return {
+					parts: parts,
+					text: `${parts[0]}${data_coordinates.seperator}${parts[1]}`
+				}
+				
+			}
 		}
+	}
+
+	function num_to_alphabet(num) {
+		let n = num
+		let col_name = "";
+		let alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I","J","K", "L", "M", "N", "O", "P","Q", "R", "S", "T","U", "V", "W", "X", "Y", "Z"];
+
+		while (n > 0) {
+			let mod = (n-1) % 26;
+			col_name = alphabet[mod] + col_name;
+			n = Math.round((n - mod) / 26);
+			console.log(n)
+		}
+
+
+		return col_name;
+
+
 	}
 
 	export function updateAllCoordsText() {

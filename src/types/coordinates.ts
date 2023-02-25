@@ -2,6 +2,7 @@ export enum coord_system {
 	CUBE,
 	ROWCOL,
 	AXIAL,
+	LETTERNUMBER
 }
 
 export interface cube_coords {
