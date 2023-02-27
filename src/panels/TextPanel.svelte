@@ -145,6 +145,11 @@
 			<ColorInput bind:value={data_text.style.stroke} name="textStroke" />
 			<input type="number" bind:value={data_text.style.strokeThickness} />
 		</section>
+
+		<section>
+			<label>Opacity</label>
+			<input type="range" max="1" min="0.05" step="0.05" bind:value={data_text.alpha}>
+		</section>
 	</div>
 
 	{#if data_text.selectedText}

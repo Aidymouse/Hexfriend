@@ -32,6 +32,7 @@ export interface coordinates_data {
 export interface text_data {
 	style: PIXI.Text['style'];
 	selectedText?: text_layer_text;
+	alpha: number;
 	editorRef: any;
 	usingTextTool: boolean;
 	contextStyleId?: number;

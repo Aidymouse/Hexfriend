@@ -17,12 +17,14 @@ export interface text_layer_text {
 	id: number;
 	text: string;
 	style: PIXI.Text['style'];
+	alpha: number;
 	x: number;
 	y: number;
 }
 
 export interface listed_text_style {
 	display: string;
+	alpha: number;
 	style: PIXI.Text['style'];
 	id: number;
 }

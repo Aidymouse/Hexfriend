@@ -33,7 +33,10 @@
 	textId++;
 
 	$: {
-		if (data_text.selectedText) data_text.selectedText.style = { ...data_text.style };
+		if (data_text.selectedText) {
+			data_text.selectedText.style = { ...data_text.style }
+			data_text.selectedText.alpha = data_text.alpha;
+		};
 		texts = texts;
 		hoveredText = hoveredText;
 	}
@@ -79,7 +82,14 @@
 	}
 
 	function newText() {
-		texts.push({ id: textId, text: '', style: { ...data_text.style }, x: store_panning.curWorldX(), y: store_panning.curWorldY() });
+		texts.push({ 
+			id: textId,
+			text: '',
+			alpha: data_text.alpha,
+			style: { ...data_text.style },
+			x: store_panning.curWorldX(),
+			y: store_panning.curWorldY()
+		});
 		textId++;
 		texts = texts;
 		data_text.selectedText = texts[texts.length - 1];
@@ -163,6 +173,7 @@
 			pixi_text.style = text.style
 			pixi_text.anchor = alignMap[text.style.align]
 			pixi_text.marked_for_death = false
+			pixi_text.alpha = text.alpha ? text.alpha : 1
 		}
 
 		for (const [text_id, pixi_text] of Object.entries(pixi_texts)) {

@@ -221,6 +221,7 @@ hexfiend red: #FF6666
 			fontStyle: 'normal',
 			fontWeight: 'normal',
 		},
+		alpha: 1,
 		selectedText: null,
 		editorRef: null,
 		usingTextTool: false,
