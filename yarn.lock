@@ -293,6 +293,24 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@pixi-essentials/bounds@~2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@pixi-essentials/bounds/-/bounds-2.1.1.tgz#8860bb109f68600ac09c3b36bc78eb48b73619b5"
+  integrity sha512-i/rhUHrC9wxBrpsxhN0HpvgtkKDnjJ2VYn4HaSjyN+X8QWXTPK6pla+rqRFcMiJTVAkE8rHjdd0nPdpxTE4ypQ==
+
+"@pixi-essentials/object-pool@~0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@pixi-essentials/object-pool/-/object-pool-0.1.0.tgz#e612a3a57b13fa1c92061a9a8e80cd5cd0bbc707"
+  integrity sha512-TAppOWSKBbONgphgx5W9Kw06dvoPRChcDLLB5O/+/pUBbx13fDk6Ra+azqLXqOvwzBEZ5pG3AGFIxRn2twJbOg==
+
+"@pixi-essentials/transformer@^2.5.6":
+  version "2.5.6"
+  resolved "https://registry.yarnpkg.com/@pixi-essentials/transformer/-/transformer-2.5.6.tgz#2b165144229bd3b5371269cba708447b07e6fc1b"
+  integrity sha512-1weGPdf/MkFJiq7HeOxMybXVPH3Zdc+jQSRwMQ4upxWkAKdB2pvnTjjR+CETNLTjyr7MMbF1wjYRRof+nkYt4w==
+  dependencies:
+    "@pixi-essentials/bounds" "~2.1.1"
+    "@pixi-essentials/object-pool" "~0.1.0"
+
 "@pixi/accessibility@7.0.5":
   version "7.0.5"
   resolved "https://registry.yarnpkg.com/@pixi/accessibility/-/accessibility-7.0.5.tgz#a3978d87e936dc178510a03dfebd6a7e66090bfd"
@@ -393,6 +411,11 @@
   version "7.0.5"
   resolved "https://registry.yarnpkg.com/@pixi/graphics/-/graphics-7.0.5.tgz#3a5558fdceaef316bb0044cf84a7f1856777b9f6"
   integrity sha512-I5Y6IpntiEoJB0HOZ7nSw8r3ZHMyyeE8RMCc3Aud6j5B6CtBkpqCHyxOFNmDod2Ymznj/hWBhLl4ee8SJjRdWg==
+
+"@pixi/interaction@^6.5.9":
+  version "6.5.9"
+  resolved "https://registry.yarnpkg.com/@pixi/interaction/-/interaction-6.5.9.tgz#033ddfc8963a18c5384b4d01c032483651c7a27d"
+  integrity sha512-PXWPPpOBwZdf/VtrstYaKqtUfJcJR57oRGdSXZ0mtvN8jEhsWUe0GlmlHEp6PxTwtn5ECKDy8+i9V0CcqLKgug==
 
 "@pixi/math@7.0.5":
   version "7.0.5"

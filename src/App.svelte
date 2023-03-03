@@ -358,7 +358,7 @@ hexfiend red: #FF6666
 				break;
 
 			case tools.TEXT:
-				comp_textLayer.pointermove();
+				//comp_textLayer.pointermove();
 				break;
 
 			case tools.ERASER:

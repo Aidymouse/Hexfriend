@@ -5,7 +5,7 @@
 	import type TextLayer from '../layers/TextLayer.svelte';
 	import type { text_data } from '../types/data';
 	import type { listed_text_style } from '../types/text';
-	import type * as PIXI from 'pixi.js';
+	import * as PIXI from 'pixi.js';
 	import { text } from 'svelte/internal';
 
 	export let data_text: text_data;
@@ -17,6 +17,7 @@
 			node.focus();
 		}, 10);
 	}
+
 
 	let fonts = ['Arial', 'Comic Sans MS', 'Segoe UI', 'Times New Roman', 'Trebuchet MS'];
 

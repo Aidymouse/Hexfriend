@@ -20,6 +20,7 @@ export interface text_layer_text {
 	alpha: number;
 	x: number;
 	y: number;
+	rotation: number;
 }
 
 export interface listed_text_style {
