@@ -19,7 +19,7 @@
 	}
 
 
-	let fonts = ['Arial', 'Comic Sans MS', 'Segoe UI', 'Times New Roman', 'Trebuchet MS'];
+	let fonts = ['Arial', 'Comic Sans MS', 'Segoe UI', 'Times New Roman', 'Trebuchet MS', 'Lora', 'Tilt Neon', 'Shantell Sans', 'Smokum', 'Merriweather'];
 
 	export let textStyles: listed_text_style[];
 	let styleId = 0;
