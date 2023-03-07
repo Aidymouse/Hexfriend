@@ -44,15 +44,7 @@
 	trsfm_text.scaleEnabled = false
 	trsfm_text.translateEnabled = false
 
-	trsfm_text.on("transformchange", () => {
-		console.log("Huzaba?")
-		data_text.selectedText.x = trsfm_text.group[0].x
-		data_text.selectedText.y = trsfm_text.group[0].y
-		data_text.selectedText.rotation = trsfm_text.group[0].rotation
-	})
-
 	function rotate_handler() {
-		console.log("Wowza!")
 	}
 
 	function rotate_end() {
@@ -82,7 +74,7 @@
 				data_text.editorRef.focus();
 			}, 10); /* I wish I didn't have to do this, and I'm sure it's terrible, but it doesnt work without it :/ */
 		} else if (data_text.selectedText) {
-			//deselectText();
+			deselectText();
 		} else if (hoveredText) {
 			selectText();
 		} else {
@@ -98,7 +90,7 @@
 		dragX = store_panning.curWorldX() - hoveredText.x;
 		dragY = store_panning.curWorldY() - hoveredText.y;
 
-		trsfm_text.group[0] = (pixi_texts[data_text.selectedText.id])
+		//trsfm_text.group[0] = (pixi_texts[data_text.selectedText.id])
 
 	}
 
@@ -108,7 +100,7 @@
 		if (data_text.selectedText.text == '') deleteText(data_text.selectedText);
 		data_text.selectedText = null
 
-		trsfm_text.group = []
+		//trsfm_text.group = []
 	}
 
 	export function pointerup() {
@@ -207,7 +199,7 @@
 			if (!pixi_texts[text.id]) {
 				let new_text = new PIXI.Text()
 				new_text.interactive = true
-				new_text.on("pointerover", (e) => { hoveredText = text; console.log("Hovered!")} )
+				new_text.on("pointerover", (e) => { hoveredText = text; } )
 				new_text.on("pointerout", (e) => { hoveredText = null} )
 
 				pixi_texts[text.id] = new_text
@@ -237,7 +229,7 @@
 		grph_selector.clear();
 		if (!data_text.usingTextTool) return;
 
-		/*
+		
 		if (data_text.selectedText) {
 			let tW = getTextWidth(data_text.selectedText);
 			let tH = getTextHeight(data_text.selectedText);
@@ -250,7 +242,7 @@
 				tH + 10
 			);
 
-		}*/
+		}
 
 		if (hoveredText && hoveredText != data_text.selectedText) {
 			let tW = getTextWidth(hoveredText);
@@ -265,7 +257,7 @@
 
 	onMount(() => {
 		cont_all_text.removeChildren(0)
-		cont_all_text.addChild(trsfm_text)
+		//cont_all_text.addChild(trsfm_text)
 		cont_pixi_text = new PIXI.Container()
 		cont_all_text.addChild(cont_pixi_text)
 		cont_all_text.addChild(grph_selector)

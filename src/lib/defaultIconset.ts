@@ -7,7 +7,7 @@ const DEFAULTICONSET = {
   "icons": [
     {
       "display": "Fort",
-      "texId": "new-iconset_fort",
+      "texId": "default_fort",
       "id": "default_fort",
       "color": 0,
       "pHex": 80,
@@ -18,7 +18,7 @@ const DEFAULTICONSET = {
     },
     {
       "display": "Keep",
-      "texId": "new-iconset_keep",
+      "texId": "default_keep",
       "id": "default_keep",
       "color": 0,
       "pHex": 80,
@@ -28,8 +28,19 @@ const DEFAULTICONSET = {
       "texHeight": 100
     },
     {
+      "display": "Tower",
+      "texId": "default_tower",
+      "id": "default_tower",
+      "color": 0,
+      "pHex": 90,
+      "base64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsSAAALEgHS3X78AAAC2ElEQVR4nO2d3W3CMBRGL1XfoRO0G7QblBWYoLAJIzACbNAR6AaM0BG6ARVSIhEEiQHj70C+I/mlpI7Jwde/mMF2uw3D4ckuWFgIDAuBYSEwLASGhcCwEBgWAsNCYFgIDAuBYSEwngXFeatSG5uI+Lsyj98qnWIUER9X5pGf3Wxv4TTfdjPuKFNKHvOOPMYZ8sieHLJgWAgMC4FhITAsBIaFwLAQGIqBYQrTiBi3XNf22v4185bXuwaWEqhCvjLk8Vmlu8IhC4aFwLAQGBYCw0JgWAgMC4GhELJBP5EmxcuqEPIdEbNMef1ExCQiXqo0qf6Wg1lV1rIIlnDrNE1YQm1j2ZL38sq8F6rnohSSujZ+jHVC3usbiH74NfXd5N/qgv9bZLrmkFU1sSmD8h3D5ZkTioPE6855c3IZAer2Ti+sKblAyAjYOEQlBSMjgAPD0lJQMgI6Ul8+6L2SIAopubSKW8YlCunaAH2v90rCQmAQzzrZfQ1h2HFNznFIal5FoNWQUYKM3KDaEZoQRQhBhS2akJQNcLmxkBYU4QMlhLZzMfXh5OyJoITQelmqwmB6WqSQpfykKtquo5CEKLufmLDlGqK/dwOSEGXYwAwOSY367sSEV+H9EQ07pYaMxDKC0o5QhBAeBiJsWQirDBghhE8nYiziGsIqA6aXRenqvXSc03VzCDWEtEAkryUEIaTZVnk7YiFN5LXVQpo4ZMHakHd1AQhC5A/hAGktUQvBLAzt0WshxCOSei0Et5XTQnhYCIyhMpQqhSj28abSSyHE2lEj6/0phRC7vDWyD4tSCPJU0IpehiyyENnsgVII/QhXSUhVCSE36DWSMqqEkMNVjaSMriGn6VUNIXd5ayRtnENWO8XLqRKi3sebSvGwpRByD+GqprgQxUa5lB90pFD8hyWJR2v0Gp9sDcNCYFgIDAuBYSEwLASGhcCwEBgWAsNCYFgIDAshERH/exkkRUSbgOcAAAAASUVORK5CYII=",
+      "preview": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAEuklEQVR4Xu2djW3UQBCFkwqACrhUAFTAUQFQAZcKgAq4VABUQFIBUAGmAqACjgqACmBG2BKyYs8773rfQ4wlKyienZ19n/fH43U4PclDSoFTqWgymJMEInYTJJAEIqaAWDjZQxKImAJi4WQPSSBiCoiFkz0kgYgpIBZO9pAEIqaAWDiMHrIxDfycOz7bxR8zBoiPg5X3c+q4aRfuBnFEPqrjZADZWyteBC15YNe7GRvEx4WVd7upY2sXPgRxRD4SSK9AAql4KyBiZg+pKHjkKoHMKJRzyPztk3NIr08OWdE4U/F6Dlk5ZF2rQC57j1iyXpntIXiGuB/02o92vZux2di1J/kc8udhLXowrDhCFrnKSb1IvvqFE0h9TYs8JpAi+eoXTiD1NS3ymECK5KtfOIHU17TIYwIpkq9+4f8CyCPT7W197Vbx+Ni8vlvF84RTRrbXQ9nZ+aZCQ/1p/JWdXe9raz+f2Rk9xSNVn5vRJWJY04YFpAYUT6842OsOFzJKi8zp+LoHW1NryBcTiAe4t3NJGsV7hveGuaNb2FPmQEOilhixgXjsS+5mZGxfMldRYbgYCkCWQEHj/nXE3UqHoQTkWCi1gUjAUANyDJSaQGRgKAJBodQCIgVDFYivnqIdhbWARJspjpiC6piiDatTG+ZlZ2bRQyMadzSpUx7+5mRAG4ZJWcfKn7yfBq7QuCMgtAfAqfahDasjNealM7Mo9YHGHQFBHjCxqCtZoQ2rVB3kxj9DuNGoh8jNo2pA/JuN7wA2NO6oh3hVZ3YegDqbmKANaxKMVbK1M1phHXNXI0CQNEyr9sukToYG7+0fSLIRvZEQIBdWp9crcaANaxXspVWEpM3RuBEg761OT0RKHGjDWgXr3xbeaVVZX883+7lpXOdkdWpAkDt6De1kdJAJxFT2L2I/raE24FMmhaIEZMkLJUBryOS5WXmGgH4oAdmbGsgKaw3RZLK+SkA6UzpKmawBw33KpFCUgBxMmNtrKQ74ldBCIggTC02ZALouNrlnJX3ZTT1UgGxNBSRlsqZYEikUFSC+2/DlmmoDviVSKCpAkJdSgKZFJhITuwoQ5gproPizn8uKqJYWVgHCSpmM9btlv5j7O12leoflFYBsLMqvYaRtDOgpFAUgzJTJGDN9YlcAsjdVWCmTMRB6CkUBiH+h9LDNiBTW8sUsor/DGDopMVAAwngpNacZVRNq5b0qKiusARI1hcIGsjUV2CmTcW85t19clgw7JWXZQHYWfLSPt6R9S8pSt5eygSikTMbQqCkUNpDO1GC9lJrqPdQUChsIso93ybBTWubMHBxKnSwpzwSi8FJqSjNaCoUJRHGFNQCipVCYQPbWepWUybin0LaXMoH4Wh/Zx7tkKC4tQ0uhMIEorrD+BknRhlJp32q1lMm4V1EmdhYQ5j5edDijbC9lAVF6KTUFiJJCYQFRXmENgCgpFBYQ9Ql9gNJcn+YV9i31tARzHy86jzRPobCAqK+wBmDNt5cygCinTMY9p3kKhQEE+Q8d0SFlbTsfWv1sdjCANGvcv1hRAhGjlkASiJgCYuFkD0kgYgqIhZM9JIGIKSAWTvaQBCKmgFg42UMSiJgCYuFkDxED8hszVsxlLEItCQAAAABJRU5ErkJggg==",
+      "texWidth": 100,
+      "texHeight": 100
+    },
+    {
       "display": "Palace",
-      "texId": "new-iconset_palace",
+      "texId": "default_palace",
       "id": "default_palace",
       "color": 0,
       "pHex": 80,
@@ -40,7 +51,7 @@ const DEFAULTICONSET = {
     },
     {
       "display": "Castle",
-      "texId": "new-iconset_castle",
+      "texId": "default_castle",
       "id": "default_castle",
       "color": 0,
       "pHex": 80,
@@ -51,7 +62,7 @@ const DEFAULTICONSET = {
     },
     {
       "display": "Village",
-      "texId": "new-iconset_village",
+      "texId": "default_village",
       "id": "default_village1",
       "color": 0,
       "pHex": 80,
@@ -62,7 +73,7 @@ const DEFAULTICONSET = {
     },
     {
       "display": "Town",
-      "texId": "new-iconset_town",
+      "texId": "default_town",
       "id": "default_town",
       "color": 0,
       "pHex": 80,
@@ -73,7 +84,7 @@ const DEFAULTICONSET = {
     },
     {
       "display": "City",
-      "texId": "new-iconset_city",
+      "texId": "default_city",
       "id": "default_city",
       "color": 0,
       "pHex": 80,
@@ -106,7 +117,7 @@ const DEFAULTICONSET = {
     },
     {
       "display": "Campfire",
-      "texId": "new-iconset_campfire",
+      "texId": "default_campfire",
       "id": "default_campfire1",
       "color": 16359979,
       "pHex": 80,
@@ -128,7 +139,7 @@ const DEFAULTICONSET = {
     },
     {
       "display": "Ruined Keep",
-      "texId": "new-iconset_ruined-keep",
+      "texId": "default_ruined-keep",
       "id": "default_ruined-keep1",
       "color": 0,
       "pHex": 80,
@@ -161,7 +172,7 @@ const DEFAULTICONSET = {
     },
     {
       "display": "Hole",
-      "texId": "new-iconset_hole",
+      "texId": "default_hole",
       "id": "default_hole1",
       "color": 0,
       "pHex": 80,
@@ -172,7 +183,7 @@ const DEFAULTICONSET = {
     },
     {
       "display": "Cavern",
-      "texId": "new-iconset_cavern",
+      "texId": "default_cavern",
       "id": "default_cavern",
       "color": 0,
       "pHex": 80,
@@ -183,7 +194,7 @@ const DEFAULTICONSET = {
     },
     {
       "display": "Dungeon",
-      "texId": "new-iconset_dungeon",
+      "texId": "default_dungeon",
       "id": "default_dungeon",
       "color": 0,
       "pHex": 80,
@@ -194,7 +205,7 @@ const DEFAULTICONSET = {
     },
     {
       "display": "Obelisk",
-      "texId": "new-iconset_obelisk",
+      "texId": "default_obelisk",
       "id": "default_obelisk1",
       "color": 0,
       "pHex": 80,
@@ -205,7 +216,7 @@ const DEFAULTICONSET = {
     },
     {
       "display": "Pyramid",
-      "texId": "new-iconset_pyramid",
+      "texId": "default_pyramid",
       "id": "default_pyramid1",
       "color": 0,
       "pHex": 80,

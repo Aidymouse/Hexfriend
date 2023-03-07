@@ -920,7 +920,7 @@
 
 	<h2>About</h2>
 	<p class="helperText">
-		Hexfriend version 1.6.3 - "Looking snazzy, Hexfriend!"
+		Hexfriend version 1.6.4 - "Looking snazzy, Hexfriend!"
 		<br />
 		By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
 	</p>
