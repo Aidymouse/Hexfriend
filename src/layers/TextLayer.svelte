@@ -13,13 +13,16 @@
 	import * as PIXI from 'pixi.js';
 	import { afterUpdate, onMount } from 'svelte';
 
-	import { Transformer, TransformerHandle } from "@pixi-essentials/transformer"
+	//import { Transformer, TransformerHandle } from "@pixi-essentials/transformer"
+
+	/*
 
 	class TextTransformer extends Transformer {
 		onPointerDown(e) {
 			super.onPointerDown(e)
 		}
 	}
+	*/
 
 	let pan: pan_state;
 	store_panning.store.subscribe((newPan) => {
@@ -39,10 +42,10 @@
 		// {text: string, style: object }
 	];
 
-	let trsfm_text = new TextTransformer();
-	trsfm_text.skewEnabled = false
-	trsfm_text.scaleEnabled = false
-	trsfm_text.translateEnabled = false
+	//let trsfm_text = new TextTransformer();
+	//trsfm_text.skewEnabled = false
+	//trsfm_text.scaleEnabled = false
+	//trsfm_text.translateEnabled = false
 
 	function rotate_handler() {
 	}
@@ -191,6 +194,8 @@
 	
 
 	afterUpdate(() => {
+		console.log()
+
 		for (const [text_id, pixi_text] of Object.entries(pixi_texts)) {
 			pixi_text.marked_for_death = true
 		}
@@ -214,7 +219,7 @@
 			pixi_text.anchor = alignMap[text.style.align]
 			pixi_text.marked_for_death = false
 			pixi_text.alpha = text.alpha ? text.alpha : 1
-			pixi_text.rotation = text.rotation
+			pixi_text.rotation = text.rotation ? text.rotation : 0
 		}
 
 		for (const [text_id, pixi_text] of Object.entries(pixi_texts)) {
