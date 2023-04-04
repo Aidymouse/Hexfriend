@@ -23,12 +23,14 @@
 	import { hex_orientation, hex_raised, TerrainHex, terrain_field } from '../types/terrain';
 	import type { Tile } from '../types/tilesets';
 	import type { TileSymbol } from '../types/tilesets';
-	import type { hex_id } from '../types/toolData';
+	import { hex_id, tools } from '../types/toolData';
 	import type CoordsLayer from './CoordsLayer.svelte';
 	import * as PIXI from 'pixi.js';
 	import { onMount } from 'svelte';
 
 	export let cont_terrain: PIXI.Container;
+
+	export let changeTool: Function;
 
 	let terrainGraphics = new PIXI.Graphics();
 	let symbolsContainer = new PIXI.Container();
@@ -796,6 +798,12 @@
 			if (!hexExists(clickedId)) return;
 
 			let cHex = tfield.hexes[clickedId];
+			
+			if (cHex.tile == null) {
+				changeTool(tools.ERASER)
+				data_terrain.usingEyedropper = false;
+				return
+			}
 
 			// HACKY!!!! Needs changing
 			data_terrain.tile = cHex.tile ? { ...cHex.tile, symbol: cHex.tile.symbol ? { ...cHex.tile.symbol } : null } : generateBlankTile();
@@ -933,6 +941,7 @@
 	// KEYBOARD EVENTS
 	export function keydown(e: KeyboardEvent) {
 		switch (e.key) {
+
 			case 'Alt': {
 				data_terrain.usingEyedropper = true;
 				break;

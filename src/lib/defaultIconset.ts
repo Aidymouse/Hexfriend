@@ -1,6 +1,6 @@
 const DEFAULTICONSET = {
   "name": "Default",
-  "id": "default_v5",
+  "id": "default",
   "author": "Aidymouse",
   "version": 5,
   "icons": [

@@ -349,6 +349,7 @@
 		switch (shortcutData.function) {
 			case 'toggleSnap': {
 				data_icon.snapToHex = !data_icon.snapToHex;
+				pointermove()
 				break;
 			}
 

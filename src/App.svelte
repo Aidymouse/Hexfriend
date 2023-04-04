@@ -485,6 +485,11 @@ hexfiend red: #FF6666
 			return;
 		}
 
+		// Hardcoded alt code to stop alt tools getting stuck
+		if (e.altKey && e.key == "tab") {
+			
+		}
+
 		if (comp_shortcutList && e.key != 'Escape' && !(e.key == 'k' && e.ctrlKey)) {
 			e.preventDefault();
 			comp_shortcutList.keydown(e);
@@ -556,6 +561,10 @@ hexfiend red: #FF6666
 				break;
 			}
 		}
+	}
+
+	function blur() {
+		data_terrain.usingEyedropper = false;
 	}
 
 	function createNewMap() {
@@ -770,7 +779,7 @@ hexfiend red: #FF6666
 	onMount(() => {});
 </script>
 
-<svelte:window on:keydown={keyDown} on:keyup|preventDefault={keyUp} />
+<svelte:window on:keydown={keyDown} on:keyup|preventDefault={keyUp} on:blur={blur}/>
 
 {#if appState == app_state.NORMAL}
 	<main id="content-arranger">
@@ -812,7 +821,7 @@ hexfiend red: #FF6666
 		>
 			<CanvasHolder {app} />
 
-			<TerrainLayer bind:cont_terrain bind:this={comp_terrainLayer} bind:data_terrain {controls} {comp_coordsLayer} />
+			<TerrainLayer bind:cont_terrain bind:this={comp_terrainLayer} {changeTool} bind:data_terrain {controls} {comp_coordsLayer} />
 			<PathLayer bind:this={comp_pathLayer} bind:cont_all_paths bind:paths={loadedSave.paths} bind:data_path {controls} />
 			<IconLayer bind:this={comp_iconLayer} bind:icons={loadedSave.icons} bind:data_icon bind:cont_icon {data_eraser} {controls} />
 			<CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} bind:data_coordinates />

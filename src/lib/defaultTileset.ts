@@ -1,6 +1,6 @@
 const DEFAULTTILESET = {
   "name": "Default",
-  "id": "default_v4",
+  "id": "default",
   "author": "Aidymouse",
   "tiles": [
     {

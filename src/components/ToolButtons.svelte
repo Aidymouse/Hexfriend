@@ -23,6 +23,15 @@
 
 			miniButtons: [
 				{
+					display: 'Hex Paintbucket',
+					action: function () {
+						data_terrain.usingPaintbucket = !data_terrain.usingPaintbucket;
+					},
+					image: '/assets/img/tools/paintbucket.svg',
+					obj: data_terrain,
+					field: 'usingPaintbucket',
+				},
+				{
 					display: 'Hex Eraser',
 					action: function () {
 						data_terrain.usingEraser = !data_terrain.usingEraser;
@@ -42,15 +51,6 @@
 					field: 'usingEyedropper',
 				},
 
-				{
-					display: 'Hex Paintbucket',
-					action: function () {
-						data_terrain.usingPaintbucket = !data_terrain.usingPaintbucket;
-					},
-					image: '/assets/img/tools/paintbucket.svg',
-					obj: data_terrain,
-					field: 'usingPaintbucket',
-				},
 			],
 		},
 
@@ -59,16 +59,6 @@
 			toolCode: tools.ICON,
 			miniButtons: [
 				{
-					display: 'Icon Eraser',
-					action: function () {
-						data_icon.usingEraser = !data_icon.usingEraser;
-					},
-					image: '/assets/img/tools/mini_eraser.svg',
-					obj: data_icon,
-					field: 'usingEraser',
-				},
-
-				{
 					display: 'Drag Icons',
 					action: function () {
 						data_icon.dragMode = !data_icon.dragMode;
@@ -76,6 +66,16 @@
 					image: '/assets/img/tools/drag.svg',
 					obj: data_icon,
 					field: 'dragMode',
+				},
+
+				{
+					display: 'Icon Eraser',
+					action: function () {
+						data_icon.usingEraser = !data_icon.usingEraser;
+					},
+					image: '/assets/img/tools/mini_eraser.svg',
+					obj: data_icon,
+					field: 'usingEraser',
 				},
 
 				{
