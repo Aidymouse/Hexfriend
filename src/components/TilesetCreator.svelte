@@ -158,6 +158,7 @@
 	function exportTileset() {
 		workingTileset.id = `${IDify(workingTileset.name)}_v${workingTileset.version}`;
 
+		console.log(workingTileset)
 		download(JSON.stringify(workingTileset), workingTileset.name + '.hfts', 'application/json');
 	}
 

@@ -79,7 +79,7 @@ hexfiend red: #FF6666
 	import type { pan_state } from './types/panning';
 	import type { save_data } from './types/savedata';
 	// Constants
-	import { LATESTSAVEDATAVERSION } from './types/savedata';
+	import { LATESTSAVEDATAVERSION, LATESTDEFAULTTILESVERSION, LATESTDEFAULTICONSVERSION } from './types/savedata';
 	import { map_shape } from './types/settings';
 	import type { terrain_field } from './types/terrain';
 	import type { Tileset } from './types/tilesets';
@@ -286,6 +286,8 @@ hexfiend red: #FF6666
 		// A list of stuff that needs to happen every tool change
 		data_path.contextPathId = null;
 		data_text.contextStyleId = null;
+
+		data_path.selectedPath = null;
 
 		store_selected_tool.update((n) => newTool);
 	}
@@ -652,6 +654,14 @@ hexfiend red: #FF6666
 	async function loadSave(data: save_data, id: number | null) {
 		loadedTilesets = data.tilesets;
 		loadedIconsets = data.iconsets;
+
+		// Check if default tile or iconset need updating
+		let loaded_default = data.tilesets.find(ts => ts.id.split("_")[0] == "default")
+		if (loaded_default.version != LATESTDEFAULTTILESVERSION) {
+			//data.tilesets.pop(loaded_default)
+		}
+
+		let loaded_iconset = data.iconsets.find(ts => ts.id.split("_")[0] == "default")
 
 		// Load Textures
 		for (const tileset of loadedTilesets) {

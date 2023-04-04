@@ -111,7 +111,7 @@
 
 	<div id="buttons" class="scroll-container">
 		{#each loadedIconsets as iconset (iconset.id)}
-			{#if iconset.id != 'default' || loadedIconsets.length > 1 || iconset.collapsed}
+			{#if loadedIconsets.length > 1 || iconset.collapsed}
 				<h2 class="iconset-heading">
 					{iconset.name}
 					<button

@@ -4,6 +4,8 @@ import type { terrain_field } from './terrain';
 import type { Tileset } from './tilesets';
 
 export const LATESTSAVEDATAVERSION = 5;
+export const LATESTDEFAULTTILESVERSION = 4;
+export const LATESTDEFAULTICONSVERSION = 5;
 
 export interface save_data {
 	saveVersion: number;

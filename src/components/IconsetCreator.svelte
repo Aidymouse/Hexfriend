@@ -156,7 +156,8 @@
 
 	function exportIconset() {
 		workingIconset.id = `${IDify(workingIconset.name)}_v${workingIconset.version}`;
-
+		
+		console.log(workingIconset)
 		download(JSON.stringify(workingIconset), workingIconset.name + '.hfis');
 	}
 

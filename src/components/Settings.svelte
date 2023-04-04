@@ -807,7 +807,7 @@
 			>
 				{tileset.name}
 
-				{#if tileset.id != 'default'}
+				{#if tileset.id.split("_")[0] != 'default'}
 					<button
 						on:click={() => {
 							removeTileset(tileset.id);
@@ -862,7 +862,7 @@
 			>
 				{iconset.name}
 
-				{#if iconset.id != 'default'}
+				{#if iconset.id.split("_")[0] != 'default'}
 					<button
 						on:click={() => {
 							removeIconset(iconset.id);

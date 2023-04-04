@@ -8,6 +8,7 @@
 	import type { Tile, TileSymbol, Tileset } from '../types/tilesets';
 	import * as PIXI from 'pixi.js';
 	import { afterUpdate, onMount } from 'svelte';
+	import { LATESTDEFAULTTILESVERSION } from '../types/savedata';
 
 	export let loadedTilesets: Tileset[];
 	export let data_terrain: terrain_data;
@@ -141,7 +142,7 @@
 
 	<div id="buttons" class="scroll-container">
 		{#each loadedTilesets as tileset (tileset.id)}
-			{#if tileset.id != 'default' || loadedTilesets.length > 1 || tileset.collapsed}
+			{#if loadedTilesets.length > 1 || tileset.collapsed}
 				<h2 class="tileset-heading">
 					{tileset.name}
 					<button
