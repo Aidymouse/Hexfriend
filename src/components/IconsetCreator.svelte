@@ -155,8 +155,12 @@
 	const DEFAULTBLANKHEXCOLOR = 0xf2f2f2;
 
 	function exportIconset() {
-		workingIconset.id = `${IDify(workingIconset.name)}`;
+		workingIconset.id = IDify(`${workingIconset.name}:v${workingIconset.version}`);
 		
+		workingIconset.icons.forEach(icon => {
+			icon.id = findID(icon.display)
+		})
+
 		console.log(workingIconset)
 		download(JSON.stringify(workingIconset), workingIconset.name + `_v${workingIconset.version}` + '.hfis');
 	}

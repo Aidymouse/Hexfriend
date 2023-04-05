@@ -14,7 +14,7 @@
 	import { coord_system } from '../types/coordinates';
 	import type { coordinates_data, overlay_data, terrain_data, trace_data } from '../types/data';
 	import type { Iconset } from '../types/icon';
-	import type { save_data } from '../types/savedata';
+	import { LATESTDEFAULTICONSVERSION, save_data } from '../types/savedata';
 	import { LATESTDEFAULTTILESVERSION } from '../types/savedata';
 	import { map_shape } from '../types/settings';
 	import { hex_orientation, terrain_field } from '../types/terrain';
@@ -106,25 +106,14 @@
 			/* Read the file */
 			let setToImport = JSON.parse(eb.target.result as string);
 
-			let set_already_imported = loadedTilesets.find((ts: Tileset) => ts.id == setToImport.id && ts.version == setToImport.version)
+			let set_already_imported = loadedTilesets.find((ts: Tileset) => ts.id == setToImport.id)
 
 			/* Check that set hasn't already been imported */
-			if (set_already_imported != null && set_already_imported.version == setToImport.version) {
+			if (set_already_imported != null) {
 
-				if (set_already_imported.version < setToImport.version) {
-
-					alert("You already have a newer version of this tileset added. Add anyway?")
-
-				} else if ( set_already_imported.version > setToImport.version ) {
-
-					// Remove the old set, the new one will be added right now
-					loadedTilesets = loadedTilesets.filter((ts: Tileset) => ts.id != set_already_imported.id);
-
-				} else {
-					alert("You've already imported this tileset :)");
-					return;
-				}
-
+				alert("You've already imported this tileset :)");
+				return;
+				
 			} 
 
 			loadedTilesets.push(setToImport);
@@ -826,7 +815,7 @@
 			>
 				{tileset.name}
 
-				{#if tileset.id != 'default'}
+				{#if tileset.id.split(":")[0] != 'default' && tileset.version != LATESTDEFAULTTILESVERSION}
 					<button
 						on:click={() => {
 							removeTileset(tileset.id);
@@ -836,12 +825,6 @@
 					</button>
 				{/if}
 
-				{#if tileset.id == 'default' && tileset.version != LATESTDEFAULTTILESVERSION}
-					<button>
-						^
-					</button>
-
-				{/if}
 			</div>
 		{/each}
 
@@ -888,7 +871,7 @@
 			>
 				{iconset.name}
 
-				{#if iconset.id.split("_")[0] != 'default'}
+				{#if iconset.id.split(":")[0] != 'default' && iconset.version != LATESTDEFAULTICONSVERSION}
 					<button
 						on:click={() => {
 							removeIconset(iconset.id);
