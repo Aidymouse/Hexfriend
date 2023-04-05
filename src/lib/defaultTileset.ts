@@ -1,19 +1,19 @@
 const DEFAULTTILESET = {
   "name": "Default",
-  "id": "default",
+  "id": "default:v4",
   "author": "Aidymouse",
   "tiles": [
     {
       "display": "Plains",
       "bgColor": 11462236,
-      "id": "default_plains",
+      "id": "default:v4_Plains",
       "symbol": null,
       "preview": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAArCAYAAAA65tviAAAA80lEQVRoQ+XZQQ6CMBCFYXsNj8Xa47n2WF5DUpMaxLYzz0U775U1EP58hcCQLuD2eN5e4CF/7b5d7wk5ENo5n1giZFREkUBU3CKjI9CYtUJmaSAqLhGJkNkRXhVTRCIkSoRHpSkSLcKK0Q6JqtFTqYpIhESPaKn8iEiEsETUVD4ibBHnGK0QVo2jyltEIoQ9oqgkmRCZpVVoWGXKpEXr8cuqcpx7fb1rsS2vZgjTjX+eQup+jzCo1GbC2t/skVVaE/rugC7aU6z3m2GNkEhLzPrpY85+I8RYEfka1wqZqeLRcItIhcyI8WpAIlIhI2MQjXxdOyTnqgqus9miAAAAAElFTkSuQmCC"
     },
     {
       "display": "Farmland",
       "bgColor": 11462236,
-      "id": "default_farmland",
+      "id": "default:v4_Farmland",
       "symbol": {
         "color": 12227131,
         "texWidth": 100,
@@ -27,7 +27,7 @@ const DEFAULTTILESET = {
     {
       "display": "Grassland",
       "bgColor": 13958805,
-      "id": "default_grassland",
+      "id": "default:v4_Grassland",
       "symbol": {
         "color": 5336859,
         "texWidth": 100,
@@ -41,7 +41,7 @@ const DEFAULTTILESET = {
     {
       "display": "Scrubland",
       "bgColor": 15400853,
-      "id": "default_copy-of grassland",
+      "id": "default:v4_Scrubland",
       "symbol": {
         "color": 6725393,
         "texWidth": 100,
@@ -54,7 +54,7 @@ const DEFAULTTILESET = {
     {
       "display": "Tree",
       "bgColor": 9226047,
-      "id": "default_tree",
+      "id": "default:v4_Tree",
       "symbol": {
         "texId": "default_Tree",
         "color": 4029989,
@@ -68,7 +68,7 @@ const DEFAULTTILESET = {
     {
       "display": "Forest",
       "bgColor": 9226047,
-      "id": "default_forest",
+      "id": "default:v4_Forest",
       "symbol": {
         "color": 4029989,
         "texWidth": 100,
@@ -82,14 +82,14 @@ const DEFAULTTILESET = {
     {
       "display": "Beach",
       "bgColor": 16318111,
-      "id": "default_beach",
+      "id": "default:v4_Beach",
       "symbol": null,
       "preview": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAArCAYAAAA65tviAAAA8ElEQVRoQ+XZwQ6CMBCEYeuJ1/TJfE1PSmpSg9h2dzy0O1POQPjzFQJLuoDb43l/gYf8tft2vSXkQGjnfGKJkFERRQJRcYuMjkBj1gqZpYGouEQkQmZHeFVMEYmQKBEelaZItAgrRjskqkZPpSoiERI9oqXyIyIRwhJRU/mIsEWcY7RCWDWOKm8RiRD2iKKSZEJkllahYZUpkxatxy+rynHu9fWuxba8miFMN/55Cqn7PcKgUpsJa3+zR1ZpTei7A7poT7Heb4Y1QiItMeunjzn7jRBjReRrXCtkpopHwy0iFTIjxqsBiUiFjIxBNPJ17TDTq1RdCdZBAAAAAElFTkSuQmCC"
     },
     {
       "display": "Palm Tree",
       "bgColor": 16318111,
-      "id": "default_palm-tree",
+      "id": "default:v4_Palm Tree",
       "symbol": {
         "color": 8507168,
         "texWidth": 100,
@@ -103,21 +103,21 @@ const DEFAULTTILESET = {
     {
       "display": "Water",
       "bgColor": 10742015,
-      "id": "default_water",
+      "id": "default:v4_Water",
       "symbol": null,
       "preview": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAArCAYAAAA65tviAAAA8ElEQVRoQ+XZUQ6DIBCE4XKLXq6n6+V6CxtMaKwCu+MD7Aw+q/HPh0bX9AC392fbwENu7f56poQcCO2cTywRMiqiSCAqbpHREWjMWiGzNBAVl4hEyOwIr4opIhESJcKj0hSJFmHFaIdE1eipVEUkQqJHtFQuIhIhLBE1lZ8IW8Q5RiuEVeOosotIhLBHFJUkEyKztAoNq0yZtGg9fllVjnOvv3cttuXVDGG68c9TSN3vEQaV2kxY+5s9skprQt8d0EV7ivV+M6wREmmJWT99zNlvhBgrIl/jWiEzVTwabhGpkBkxXg1IRCpkZAyika/rC7cfqz6ADd9HAAAAAElFTkSuQmCC"
     },
     {
       "display": "Deep Water",
       "bgColor": 2197434,
-      "id": "default_deep-water",
+      "id": "default:v4_Deep Water",
       "symbol": null,
       "preview": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAArCAYAAAA65tviAAAA9ElEQVRoQ+XZ0RGCMBCEYVOKzdCTFdiTzViKTJyJg5jkbn1Ibjc8A8M/X2DgSBdwu94fL/CQv3Z/3raEHAjtnE8sETIqokggKm6R0RFozFohszQQFZeIRMjsCK+KKSIREiXCo9IUiRZhxWiHRNXoqVRFJEKiR7RUfkQkQlgiaiofEbaIc4xWCKvGUeUtIhHCHlFUkkyIzNIqNKwyZdKi9fhlVTnOvb7etdiWVzOE6cY/TyF1v0cYVGozYe1v9sgqrQl9d0AX7SnW+82wRkikJWb99DFnvxFirIh8jWuFzFTxaLhFpEJmxHg1IBGpkJExiEa+rh1BL6juWjrYZgAAAABJRU5ErkJggg=="
     },
     {
       "display": "Hills",
       "bgColor": 16706182,
-      "id": "default_hills",
+      "id": "default:v4_Hills",
       "symbol": {
         "color": 10053888,
         "texWidth": 100,
@@ -131,7 +131,7 @@ const DEFAULTTILESET = {
     {
       "display": "Mountain",
       "bgColor": 11759872,
-      "id": "default_mountain",
+      "id": "default:v4_Mountain",
       "symbol": {
         "texId": "default_Mountain",
         "color": 4333568,
@@ -145,7 +145,7 @@ const DEFAULTTILESET = {
     {
       "display": "Mountains",
       "bgColor": 11759872,
-      "id": "default_mountains",
+      "id": "default:v4_Mountains",
       "symbol": {
         "color": 4333568,
         "texWidth": 100,
@@ -159,7 +159,7 @@ const DEFAULTTILESET = {
     {
       "display": "Volcano",
       "bgColor": 16096000,
-      "id": "default_volcano",
+      "id": "default:v4_Volcano",
       "symbol": {
         "color": 15737892,
         "texWidth": 100,
@@ -173,7 +173,7 @@ const DEFAULTTILESET = {
     {
       "display": "Badlands",
       "bgColor": 13601559,
-      "id": "default_badlands",
+      "id": "default:v4_Badlands",
       "symbol": {
         "color": 6697216,
         "texWidth": 100,
@@ -187,7 +187,7 @@ const DEFAULTTILESET = {
     {
       "display": "Desert",
       "bgColor": 16318111,
-      "id": "default_desert",
+      "id": "default:v4_Desert",
       "symbol": {
         "color": 16771978,
         "texWidth": 100,
@@ -201,7 +201,7 @@ const DEFAULTTILESET = {
     {
       "display": "Grassy Hills",
       "bgColor": 11462236,
-      "id": "default_grassy-hills",
+      "id": "default:v4_Grassy Hills",
       "symbol": {
         "color": 4029989,
         "texWidth": 100,
@@ -215,7 +215,7 @@ const DEFAULTTILESET = {
     {
       "display": "Forest Hills",
       "bgColor": 9226047,
-      "id": "default_forest-hills",
+      "id": "default:v4_Forest Hills",
       "symbol": {
         "color": 4029989,
         "texWidth": 100,
@@ -229,7 +229,7 @@ const DEFAULTTILESET = {
     {
       "display": "Forest Mountain",
       "bgColor": 7380786,
-      "id": "default_forest-mountain",
+      "id": "default:v4_Forest Mountain",
       "symbol": {
         "color": 1726723,
         "texWidth": 100,
@@ -243,7 +243,7 @@ const DEFAULTTILESET = {
     {
       "display": "Pine Tree",
       "bgColor": 7380786,
-      "id": "prototype_pine-tree",
+      "id": "default:v4_Pine Tree",
       "symbol": {
         "color": 1726723,
         "texWidth": 100,
@@ -257,7 +257,7 @@ const DEFAULTTILESET = {
     {
       "display": "Pine Forest",
       "bgColor": 7380786,
-      "id": "default_pine-forest",
+      "id": "default:v4_Pine Forest",
       "symbol": {
         "color": 1726723,
         "texWidth": 100,
@@ -270,7 +270,7 @@ const DEFAULTTILESET = {
     {
       "display": "Pine Hills",
       "bgColor": 7380786,
-      "id": "default_pine-hills",
+      "id": "default:v4_Pine Hills",
       "symbol": {
         "color": 1726723,
         "texWidth": 100,
@@ -284,7 +284,7 @@ const DEFAULTTILESET = {
     {
       "display": "Pine Mountains",
       "bgColor": 5341458,
-      "id": "default_pine-mountains",
+      "id": "default:v4_Pine Mountains",
       "symbol": {
         "color": 1460229,
         "texWidth": 100,
@@ -298,7 +298,7 @@ const DEFAULTTILESET = {
     {
       "display": "Icy",
       "bgColor": 15921906,
-      "id": "default_icy",
+      "id": "default:v4_Icy",
       "symbol": {
         "color": 13554644,
         "texWidth": 100,
@@ -312,7 +312,7 @@ const DEFAULTTILESET = {
     {
       "display": "Ice Tree",
       "bgColor": 15921906,
-      "id": "default_ice-tree",
+      "id": "default:v4_Ice Tree",
       "symbol": {
         "color": 8224125,
         "texWidth": 100,
@@ -326,7 +326,7 @@ const DEFAULTTILESET = {
     {
       "display": "Ice Hills",
       "bgColor": 15921906,
-      "id": "default_ice-hills",
+      "id": "default:v4_Ice Hills",
       "symbol": {
         "color": 8224125,
         "texWidth": 100,
@@ -340,7 +340,7 @@ const DEFAULTTILESET = {
     {
       "display": "Ice Mountain",
       "bgColor": 15921906,
-      "id": "default_ice-mountain",
+      "id": "default:v4_Ice Mountain",
       "symbol": {
         "texId": "default_Mountain",
         "color": 8224125,
@@ -354,7 +354,7 @@ const DEFAULTTILESET = {
     {
       "display": "Ice Pine Mountains",
       "bgColor": 15921906,
-      "id": "default_ice-pine mountains",
+      "id": "default:v4_Ice Pine Mountains",
       "symbol": {
         "color": 8224125,
         "texWidth": 100,
@@ -368,7 +368,7 @@ const DEFAULTTILESET = {
     {
       "display": "Ice Mountains",
       "bgColor": 15921906,
-      "id": "default_ice-mountains",
+      "id": "default:v4_Ice Mountains",
       "symbol": {
         "color": 8224125,
         "texWidth": 100,
@@ -382,7 +382,7 @@ const DEFAULTTILESET = {
     {
       "display": "Marsh",
       "bgColor": 9365172,
-      "id": "prototype_marsh",
+      "id": "default:v4_Marsh",
       "symbol": {
         "color": 2916693,
         "texWidth": 100,
@@ -396,7 +396,7 @@ const DEFAULTTILESET = {
     {
       "display": "Swamp",
       "bgColor": 9365172,
-      "id": "default_swamp",
+      "id": "default:v4_Swamp",
       "symbol": {
         "color": 2916693,
         "texWidth": 100,
@@ -410,7 +410,7 @@ const DEFAULTTILESET = {
     {
       "display": "Dead Tree",
       "bgColor": 10921638,
-      "id": "default_dead-tree1",
+      "id": "default:v4_Dead Tree",
       "symbol": {
         "color": 3355443,
         "texWidth": 100,
@@ -424,7 +424,7 @@ const DEFAULTTILESET = {
     {
       "display": "Dead Tree Hills",
       "bgColor": 10921638,
-      "id": "default_dead-tree hills1",
+      "id": "default:v4_Dead Tree Hills",
       "symbol": {
         "color": 3355443,
         "texWidth": 100,
@@ -437,7 +437,7 @@ const DEFAULTTILESET = {
     {
       "display": "Dead Tree Mountains",
       "bgColor": 10921638,
-      "id": "prototype_dead-tree mountains",
+      "id": "default:v4_Dead Tree Mountains",
       "symbol": {
         "color": 3355443,
         "texWidth": 100,
@@ -449,7 +449,7 @@ const DEFAULTTILESET = {
     },
     {
       "display": "Jungle Tree",
-      "id": "prototype_jungle-tree1",
+      "id": "default:v4_Jungle Tree",
       "symbol": {
         "color": 5671445,
         "texWidth": 100,
@@ -462,7 +462,7 @@ const DEFAULTTILESET = {
     },
     {
       "display": "Dense Jungle",
-      "id": "prototype_dense-jungle1",
+      "id": "default:v4_Dense Jungle",
       "symbol": {
         "color": 5671445,
         "texWidth": 100,
@@ -475,7 +475,7 @@ const DEFAULTTILESET = {
     },
     {
       "display": "Jungle Hills",
-      "id": "prototype_jungle-hills1",
+      "id": "default:v4_Jungle Hills",
       "symbol": {
         "color": 5671445,
         "texWidth": 100,
@@ -488,7 +488,7 @@ const DEFAULTTILESET = {
     },
     {
       "display": "Jungle Mountains",
-      "id": "prototype_jungle-mountains1",
+      "id": "default:v4_Jungle Mountains",
       "symbol": {
         "color": 3171345,
         "texWidth": 100,

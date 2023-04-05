@@ -35,13 +35,13 @@
 	let previewContainer = new PIXI.Container();
 	previewContainer.addChild(previewGraphics, previewSprite);
 
-	function findID(baseId: string): string {
+	function findID(baseId: string): TileID {
 		let counter = 0;
-		let proposedId = `${IDify(workingTileset.name)}_${baseId}${counter == 0 ? '' : counter}`;
+		let proposedId = `${IDify(workingTileset.id)}_${baseId}${counter == 0 ? '' : counter}`;
 
 		while (workingTileset.tiles.find((tile: Tile) => tile.id == proposedId) != null) {
 			counter++;
-			proposedId = `${IDify(workingTileset.name)}_${baseId}${counter == 0 ? '' : counter}`;
+			proposedId = `${IDify(workingTileset.id)}_${baseId}${counter == 0 ? '' : counter}`;
 		}
 
 		return proposedId;
@@ -156,10 +156,15 @@
 	const DEFAULTBLANKHEXCOLOR = 0xf2f2f2;
 
 	function exportTileset() {
-		workingTileset.id = `${IDify(workingTileset.name)}_v${workingTileset.version}`;
+		workingTileset.id = `${IDify(workingTileset.name)}:v${workingTileset.version}`;
+		
+		workingTileset.tiles.forEach(tile => {
+			tile.id = findID(tile.display)
+		})
+
 
 		console.log(workingTileset)
-		download(JSON.stringify(workingTileset), workingTileset.name + '.hfts', 'application/json');
+		download(JSON.stringify(workingTileset), workingTileset.name + `:v${workingTileset.version}` + '.hfts', 'application/json');
 	}
 
 	let importFiles = [];
@@ -173,7 +178,7 @@
 		r.readAsText(importFile);
 		r.onload = async (eb) => {
 			/* Read the file */
-			let setToImport = JSON.parse(eb.target.result);
+			let setToImport = JSON.parse(eb.target.result as string);
 
 			//console.log(setToImport)
 

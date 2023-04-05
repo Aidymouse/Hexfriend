@@ -15,6 +15,7 @@
 	import type { coordinates_data, overlay_data, terrain_data, trace_data } from '../types/data';
 	import type { Iconset } from '../types/icon';
 	import type { save_data } from '../types/savedata';
+	import { LATESTDEFAULTTILESVERSION } from '../types/savedata';
 	import { map_shape } from '../types/settings';
 	import { hex_orientation, terrain_field } from '../types/terrain';
 	import { hex_raised } from '../types/terrain';
@@ -103,13 +104,28 @@
 		r.readAsText(importFile);
 		r.onload = (eb) => {
 			/* Read the file */
-			let setToImport = JSON.parse(eb.target.result);
+			let setToImport = JSON.parse(eb.target.result as string);
+
+			let set_already_imported = loadedTilesets.find((ts: Tileset) => ts.id == setToImport.id && ts.version == setToImport.version)
 
 			/* Check that set hasn't already been imported */
-			if (loadedTilesets.find((ts: Tileset) => ts.id == setToImport.id) != null) {
-				alert("You've already imported this tileset :)");
-				return;
-			}
+			if (set_already_imported != null && set_already_imported.version == setToImport.version) {
+
+				if (set_already_imported.version < setToImport.version) {
+
+					alert("You already have a newer version of this tileset added. Add anyway?")
+
+				} else if ( set_already_imported.version > setToImport.version ) {
+
+					// Remove the old set, the new one will be added right now
+					loadedTilesets = loadedTilesets.filter((ts: Tileset) => ts.id != set_already_imported.id);
+
+				} else {
+					alert("You've already imported this tileset :)");
+					return;
+				}
+
+			} 
 
 			loadedTilesets.push(setToImport);
 			loadedTilesets = loadedTilesets;
@@ -128,6 +144,9 @@
 
 		loadedTilesets = loadedTilesets.filter((ts: Tileset) => ts.id != setId);
 		loadedSave.tilesets = loadedTilesets;
+
+		// Maybe we should remove tiles here, because otherwise the tiles just... fail to load.
+		// Check if these tiles are being used anywere
 	}
 
 	function removeIconset(setId: string) {
@@ -146,7 +165,7 @@
 		r.readAsText(importFile);
 		r.onload = (eb) => {
 			/* Read the file */
-			let setToImport = JSON.parse(eb.target.result);
+			let setToImport = JSON.parse(eb.target.result as string);
 
 			/* Check that set hasn't already been imported */
 			if (loadedIconsets.find((is: Iconset) => is.id == setToImport.id) != null) {
@@ -807,7 +826,7 @@
 			>
 				{tileset.name}
 
-				{#if tileset.id.split("_")[0] != 'default'}
+				{#if tileset.id != 'default'}
 					<button
 						on:click={() => {
 							removeTileset(tileset.id);
@@ -815,6 +834,13 @@
 					>
 						<img src="/assets/img/tools/trash.png" alt={'Trash'} title={'Remove Tileset'} />
 					</button>
+				{/if}
+
+				{#if tileset.id == 'default' && tileset.version != LATESTDEFAULTTILESVERSION}
+					<button>
+						^
+					</button>
+
 				{/if}
 			</div>
 		{/each}
@@ -928,7 +954,7 @@
 	<p class="helperText">
 		Hexfriend is built with Svelte, Pixi JS and Typescript. Check out the <a href="https://www.github.com/Aidymouse/Hexfriend">Github</a>
 	</p>
-
+  
 	<p class="helperText">
 		You can give away your hard earned money on <a href="https://ko-fi.com/aidymouse">Ko-fi</a>.
 	</p>

@@ -665,12 +665,12 @@ hexfiend red: #FF6666
 		loadedIconsets = data.iconsets;
 
 		// Check if default tile or iconset need updating
-		let loaded_default = data.tilesets.find(ts => ts.id.split("_")[0] == "default")
+		let loaded_default = data.tilesets.find(ts => ts.id.split(":")[0] == "default")
 		if (loaded_default.version != LATESTDEFAULTTILESVERSION) {
 			//data.tilesets.pop(loaded_default)
 		}
 
-		let loaded_iconset = data.iconsets.find(ts => ts.id.split("_")[0] == "default")
+		let loaded_iconset = data.iconsets.find(ts => ts.id.split(":")[0] == "default")
 
 		// Load Textures
 		for (const tileset of loadedTilesets) {

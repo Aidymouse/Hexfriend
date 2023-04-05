@@ -155,10 +155,10 @@
 	const DEFAULTBLANKHEXCOLOR = 0xf2f2f2;
 
 	function exportIconset() {
-		workingIconset.id = `${IDify(workingIconset.name)}_v${workingIconset.version}`;
+		workingIconset.id = `${IDify(workingIconset.name)}`;
 		
 		console.log(workingIconset)
-		download(JSON.stringify(workingIconset), workingIconset.name + '.hfis');
+		download(JSON.stringify(workingIconset), workingIconset.name + `_v${workingIconset.version}` + '.hfis');
 	}
 
 	let importFiles = [];

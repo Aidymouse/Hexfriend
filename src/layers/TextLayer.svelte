@@ -88,6 +88,7 @@
 	function selectText() {
 		data_text.style = { ...hoveredText.style };
 		data_text.selectedText = hoveredText;
+		data_text.alpha = hoveredText.alpha;
 
 		dragText = data_text.selectedText;
 		dragX = store_panning.curWorldX() - hoveredText.x;
