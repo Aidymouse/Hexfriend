@@ -929,7 +929,7 @@
 
 	<h2>About</h2>
 	<p class="helperText">
-		Hexfriend version 1.6.7 - "Looking snazzy, Hexfriend!"
+		Hexfriend version 1.6.8 - "Looking snazzy, Hexfriend!"
 		<br />
 		By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
 	</p>
@@ -939,7 +939,7 @@
 	</p>
   
 	<p class="helperText">
-		You can give away your hard earned money on <a href="https://ko-fi.com/aidymouse">Ko-fi</a>.
+		You can give away your hard earned money on <br><a href="https://ko-fi.com/aidymouse">Ko-fi</a>.
 	</p>
 
 	<p class="helperText" style="text-align: center; font-size: 20pt; font-style: normal">☺</p>
