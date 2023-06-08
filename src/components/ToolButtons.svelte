@@ -227,7 +227,7 @@
 		display: flex;
 		height: 2.5em;
 		padding: 0.5em;
-		background-color: var(--hexfriend-green-background);
+		background-color: var(--primary-background);
 
 		border-radius: 1.75em;
 		gap: 0.5em;
@@ -248,7 +248,7 @@
 		transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1.2);
 	}
 	#bottom-layer .tool-icon {
-		background-color: var(--hexfriend-green-background);
+		background-color: var(--primary-background);
 	}
 
 	.tool-button {
@@ -328,7 +328,7 @@
 	}
 
 	.mini-button.selected span {
-		background-color: var(--hexfriend-green-background);
+		background-color: var(--primary-background);
 		outline: none;
 	}
 </style>

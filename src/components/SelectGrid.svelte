@@ -36,7 +36,7 @@
 
 <style>
 	main {
-		background-color: var(--hexfriend-green-background);
+		background-color: var(--primary-background);
 		flex-direction: row;
 		display: flex;
 		height: 2em;
@@ -51,7 +51,7 @@
 	}
 
 	.svg-bg.selected {
-		background-color: var(--hexfriend-green-background);
+		background-color: var(--primary-background);
 	}
 
 	.option {

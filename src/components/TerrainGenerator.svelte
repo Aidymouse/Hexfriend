@@ -5,7 +5,9 @@ import type { hex_id } from 'src/types/toolData';
 	import { download } from '../lib/download2';
 	import * as store_tfield from '../stores/tfield';
 	import type { TerrainHex, terrain_field } from '../types/terrain';
-	import type { Tile, Tileset } from '../types/tilesets';
+	import type { Tile, Tileset, tile_id } from '../types/tilesets';
+
+	import { one_e_dmg_ruleset } from '../lib/generation_rulesets/one_e_dmg';
 
 	export let loadedTilesets: Tileset[];
 	let tfield: terrain_field;
@@ -17,24 +19,29 @@ import type { hex_id } from 'src/types/toolData';
 
 	let importFiles: FileList;
 
-	let selectedId = '';
+	let selectedId = loadedTilesets[0].tiles[0].id;
 
-	let slowAnimation = false;
+	let gen_config_animate = false;
+	let gen_config_clear = false;
+	let gen_config_overwrite = true;
 
 	interface rule {
-		id: string
+		id: tile_id
 		weight: number
 	}
 
-	type genFunction = {[key: hex_id]: rule[]}
+	type generation_ruleset = {[key: hex_id]: rule[]}
 
-	let genFunction = {};
+	let current_ruleset: generation_ruleset = JSON.parse(JSON.stringify(one_e_dmg_ruleset));
+	let selector_ruleset = one_e_dmg_ruleset;
 	// Populate the gen function
+	/*
 	loadedTilesets.forEach((tileset: Tileset) => {
 		tileset.tiles.forEach((tile: Tile) => {
-			genFunction[tile.id] = [{ id: tile.id, weight: 1 }];
+			current_ruleset[tile.id] = [{ id: tile.id, weight: 1 }];
 		});
 	});
+	*/
 
 	function rand(min: number, max: number): number {
 		min = Math.ceil(min);
@@ -42,230 +49,97 @@ import type { hex_id } from 'src/types/toolData';
 		return Math.floor(Math.random() * (max - min) + min); //The maximum is now inclusive and the minimum is inclusive
 	}
 
-	function validateRuleset(rules) {
-		// Rules are valid if you can't have a space that has to be ignored because the rules forbid all hexes
-	}
-
-	function pickFromWeightDomain(domain): string {
-		//console.log(domain)
-		if (domain.length < 1) {
-			console.log('No domain! WTF!?');
-			return '!!BLANK!!'; // should be something else
-		}
-
-		let cum = 0;
-		let totalWeight = domain.reduce((prevValue, domainPart) => prevValue + domainPart.weight, 0);
-
-		let randTerrain = rand(0, totalWeight);
-		//console.log(randTerrain)
-
-		for (let dI = 0; dI < domain.length; dI++) {
-			if (randTerrain >= cum && randTerrain < cum + domain[dI].weight) {
-				//console.log(domain[dI].id)
-				return domain[dI].id;
-			}
-			cum += domain[dI].weight;
-		}
-
-		//console.log("Something fucked up!")
-		return '!!BLANK!!';
-	}
-
-	function findDomain(hexID) {
-		// The domain of a given hex is the hex ID's 
-	}
-
-	function collapseWaveGen(hexes, rules) {
-		let genHexes = {};
-
-		/* Assemble the default domain */
-		let defaultDomain = [];
-		Object.keys(rules).forEach((terrainId) => {
-			if (rules[terrainId].length < 1) return;
-			defaultDomain.push({ id: terrainId, weight: 1 });
-		});
-
-		// Populate data structure that will hold generated hexes
-		Object.keys(hexes).forEach((hexId) => {
-			genHexes[genHexId(hexes[hexId].q, hexes[hexId].r, -hexes[hexId].q - hexes[hexId].r)] = {
-				q: hexes[hexId].q,
-				r: hexes[hexId].r,
-				s: -hexes[hexId].q - hexes[hexId].r,
-				terrainId: null,
-			};
-		});
-
-		let hexIds = Object.keys(genHexes);
-		let firstHex = null;
-		let paintOrder = [];
-
-		while (hexIds.length > 0) {
-			// Find hex with lowest weight
-			let h = hexIds.pop();
-			let nextHex = genHexes[h];
-
-			let neighbourIds = getNeighbours(nextHex.q, nextHex.r, nextHex.s);
-
-			/* Assign ID randomly from hexes domain */
-			// The domain of the hex must be modified based on surrounding hexes
-
-			// Assemble the domain of this hex based on surrounding hexes
-			let allBlankNeighbours = true;
-
-			// Full domain but with all 0 weights
-			let constructedDomain = [];
-			defaultDomain.forEach((ddp) => {
-				constructedDomain.push({ id: ddp.id, weight: 0 });
-			});
-
-			neighbourIds.forEach((nId) => {
-				let nHex = genHexes[nId];
-				if (!nHex) return;
-				if (nHex.terrainId == null) return;
-				if (nHex.terrainId == '!!BLANK!!') return;
-
-				let neighbourRule = rules[nHex.terrainId]; // gives us a list of terrain ids and weights
-
-				constructedDomain.forEach((cdp) => {
-					// Ignore if this option has already been ruled out
-					if (cdp.weight == -1) return;
-
-					// Try to find the current tile is allowed to connect to this neighbour
-					let pertainingRule = neighbourRule.find((nrp) => nrp.id == cdp.id);
-					//console.log(pertainingRule)
-
-					if (!pertainingRule) {
-						// If it isnt, mark the tile as ruled out
-						cdp.weight = -1;
-					} else {
-						// If it is, add this tiles weight to the tile in the constructed domain
-						cdp.weight += pertainingRule.weight;
-					}
-				});
-
-				allBlankNeighbours = false;
-			});
-
-			if (allBlankNeighbours) {
-				// Select based on default domain
-				nextHex.terrainId = pickFromWeightDomain(defaultDomain);
-			} else {
-				// Reduce the constructed domain to only what is allowed
-				let whittledDomain = [];
-				constructedDomain.forEach((cdp) => {
-					if (cdp.weight > 0) whittledDomain.push({ id: cdp.id, weight: cdp.weight });
-				});
-
-				nextHex.terrainId = pickFromWeightDomain(whittledDomain);
-			}
-
-			paintOrder.push(h);
-		}
-
-		return { gen: genHexes, order: paintOrder };
-	}
-
-	function getTileFromId(tileId: string) {
+	function getTileFromId(tileId: tile_id) {
 		let setId = tileId.split('_')[0];
-
+		
 		let tileset = loadedTilesets.find((tileset: Tileset) => tileset.id == setId);
 
 		return tileset.tiles.find((tile: Tile) => tile.id == tileId);
 	}
 
-	function standardGen(hexes, rules: genFunction) {
-
-		let visitedIds = [];
-		let seenIds = [ genHexId_tfieldHex(hexes["0:0:0"]) ]
-		// Color first hex (plains as default)
-		comp_terrainLayer.paintFromTile("0:0:0", getTileFromId("default_plains"))
-
-
-
-		while (seenIds.length > 0) {
-			let curId = seenIds.pop();
-			let curHex = hexes[curId];
-
-			// Find sum of weights of all hexes in this hexes domain
-			let curDomain = rules[curHex.tile.id]
-			let totalWeight = 0;
-			curDomain.forEach(rule => {
-				totalWeight += rule.weight
-			});
-
-			// Color each neighbour, mark as seen (if not already seen or visited), then mark self as visited
-			let neighbourIds = getNeighbours(curHex.q, curHex.r, curHex.s)
-			neighbourIds.forEach( (nId: hex_id) => {
-
-				if (!comp_terrainLayer.hexExists(nId)) return;
-
-				if (visitedIds.find(i => nId == i) != null) return;
-				if (seenIds.find(i => nId == i) != null) return;
-
-				let r = rand(0, totalWeight)
-				console.log(r);
-				let total = 0;
-
-				for (let i=0; i<curDomain.length; i++) {
-					let rule = curDomain[i]
-					if (r <= rule.weight + total) {
-
-						comp_terrainLayer.paintFromTile(nId, getTileFromId(rule.id))
-						break
-
-					} else {
-
-						total += rule.weight
-					}
-				}
-
-				seenIds.push(nId);
-
-			});
-
-			visitedIds.push(curId);
-
+	function paint_hex(hex_id, tile, index) {
+		
+		if (gen_config_animate) {
+			setTimeout(() => {comp_terrainLayer.paintFromTile(hex_id, tile)}, index*15)
+		} else {
+			comp_terrainLayer.paintFromTile(hex_id, tile)
 		}
-			
 
 	}
 
+	function pick_from_weighted(weighted_list: {item: any, weight: number}[]) {
+		let total_weight = weighted_list.reduce( (total, cur_item) => total += cur_item.weight, 0 )
+		let pick_value = rand(1, total_weight)
+
+		let check_total = 0;
+		for (const obj_index in weighted_list) {
+			let obj = weighted_list[obj_index];
+			check_total += obj.weight
+			if (pick_value <= check_total) return obj.item; 
+		}
+	}
+
+	// Wrapper for generation methods
 	function generate() {
-		standardGen(tfield.hexes, genFunction)
+		let total_weights = 0
+		Object.keys(current_ruleset).forEach(tile_id => {
+			current_ruleset[tile_id].forEach(rule_part => {
+				total_weights += rule_part.weight
+			})
+		})
+
+		if (total_weights == 0) {
+			console.log("Random!")
+			gen_completely_random(tfield.hexes)
+			return;
+		}
+
+		//standardGen(tfield.hexes, current_ruleset)
+		gen_old_school_generate(tfield.hexes, current_ruleset);
 		//comp_terrainLayer.renderAllHexes()
 	}
 
-	function generate2() {
-		let g = collapseWaveGen(tfield.hexes, genFunction);
-		let generatedTerrain = g.gen;
-		let o = g.order;
+	function gen_old_school_generate(hexes, ruleset: generation_ruleset) {
 
-		//console.log(generatedTerrain)
+		// Get random hex that actually has a rule
+		let valid_rule_ids: tile_id[] = Object.keys(ruleset).filter(tile_id => ruleset[tile_id].length > 0)
+		let rand_tile_id = valid_rule_ids[rand(0, valid_rule_ids.length-1)]
+		let rand_tile = getTileFromId(rand_tile_id)
 
-		let c = 0;
-		o.forEach((hexId) => {
-			if (generatedTerrain[hexId].terrainId == '!!BLANK!!') {
-				comp_terrainLayer.eraseHex(hexId);
-				return;
-			}
+		// Needs: random walks
+		let prev_tile = rand_tile
+		Object.keys(hexes).forEach( (hex_id, i) => {
 
-			let tileToPaint = getTileFromId(generatedTerrain[hexId].terrainId); //loadedTilesets['default'].find(tile => tile.id == generatedTerrain[hexId].terrainId)
+			let rule = ruleset[prev_tile.id]
+			let selected_id = pick_from_weighted(rule.map( rp => { return {item: rp.id, weight: rp.weight} }))
+			let selected_tile = getTileFromId(selected_id)
 
-			if (!tileToPaint) console.log(generatedTerrain[hexId].terrainId); // shouldnt happen
+			paint_hex(hex_id, selected_tile, i);
 
-			if (slowAnimation) {
-				setTimeout(() => {
-					comp_terrainLayer.paintFromTile(hexId, tileToPaint);
-				}, c * 5);
-				c++;
-			} else {
-				comp_terrainLayer.paintFromTile(hexId, tileToPaint);
-			}
-		});
+			prev_tile = selected_tile
+
+		})
+
 	}
 
+	function gen_completely_random(hexes) {
+		Object.keys(hexes).forEach( (hex_id, i) => {
+
+			let rand_tileset = pick_from_weighted( loadedTilesets.map( ts => { return {item: ts, weight: Object.keys(ts.tiles).length} } ) );
+
+			let ids = Object.keys(rand_tileset.tiles);
+			let rand_tile = rand_tileset.tiles[rand(0, ids.length-1)];
+
+			paint_hex(hex_id, rand_tile, i);
+		})
+	}
+
+	/* Export Import */
 	function exportGenFunction() {
-		download(JSON.stringify(genFunction), 'genFunction.hfgf', 'hexfriendgenfunction');
+		let name = prompt("What would you like to call this ruleset?")
+		if (!name) return;
+
+		download(JSON.stringify(current_ruleset), `${name}.hfgrs`, 'hexfriendgeneratorruleset');
 	}
 
 	function importGenFunction() {
@@ -273,38 +147,60 @@ import type { hex_id } from 'src/types/toolData';
 
 		let r = new FileReader();
 		r.onload = (eb) => {
-			genFunction = { ...JSON.parse(r.result as string) };
+			current_ruleset = { ...JSON.parse(r.result as string) };
 		};
 
 		r.readAsText(importFiles[0]);
 	}
 
-	function removeTileFromFunction(tileId, IdToRemove) {
-		let terrain = genFunction[tileId].find((rulePart) => rulePart.id == IdToRemove);
+	/* Modifying the ruleset */
+	function removeTileFromFunction(tile_id: tile_id, id_to_remove: tile_id) {
+		selector_ruleset = null
+		
+		let terrain = current_ruleset[tile_id].find((rule_part) => rule_part.id == id_to_remove);
 		terrain.weight -= 1;
 
-		if (terrain.weight < 1) genFunction[tileId].splice(genFunction[tileId].indexOf(terrain), 1);
-
-		genFunction[tileId] = genFunction[tileId];
+		if (terrain.weight < 1) current_ruleset[tile_id].splice(current_ruleset[tile_id].indexOf(terrain), 1);
+		
+		current_ruleset[tile_id] = current_ruleset[tile_id];
 	}
 
-	function addTileToFunction(tileId, IdToAdd) {
-		let rule = genFunction[tileId];
+	function addTileToFunction(tile_id: tile_id, id_to_add: tile_id) {
+		selector_ruleset = null
 
-		let rulePart = rule.find((rp) => rp.id == IdToAdd);
-		if (!rulePart) {
-			rule.push({ id: IdToAdd, weight: 0 });
-			rulePart = rule.find((rp) => rp.id == IdToAdd);
+		let rule = current_ruleset[tile_id];
+
+		let rule_part = rule.find((rp) => rp.id == id_to_add);
+		if (!rule_part) {
+			rule_part = { id: id_to_add, weight: 0 }
+			rule.push(rule_part);
 		}
-		rulePart.weight += 1;
+		rule_part.weight += 1;
 
-		genFunction = genFunction;
+		current_ruleset = current_ruleset;
+	}
+
+	function selector_ruleset_change() {
+		console.log(selector_ruleset)
+		if (selector_ruleset != null) current_ruleset = JSON.parse(JSON.stringify(selector_ruleset));
+		current_ruleset = current_ruleset;
+	}
+
+	function clear_ruleset() {
+		if (!confirm("Are you sure?")) return;
+
+		Object.keys(current_ruleset).forEach(tile_id => {
+			current_ruleset[tile_id] = []
+		})
+
+		current_ruleset = current_ruleset
 	}
 </script>
 
-<main>
+<main class="panel">
+
 	<div id="buttons">
-		{#each Object.keys(genFunction) as tileId}
+		{#each Object.keys(current_ruleset) as tileId}
 			<div class="terrain-category">
 				<button
 					on:click={() => {
@@ -316,7 +212,7 @@ import type { hex_id } from 'src/types/toolData';
 				>
 
 				<div class="added-ids">
-					{#each genFunction[tileId] as allowedData}
+					{#each current_ruleset[tileId] as allowedData}
 						<div
 							class="added-tile"
 							on:click={() => {
@@ -324,7 +220,7 @@ import type { hex_id } from 'src/types/toolData';
 							}}
 						>
 							<img src={getTileFromId(allowedData.id).preview} alt={allowedData.id} />
-							<div class="weight-container"><p>{allowedData.weight}</p></div>
+							<p class="weight-container">{allowedData.weight}</p>
 							<!-- Weight has to absolute but also float in middle, hence the container -->
 						</div>
 					{/each}
@@ -375,7 +271,14 @@ import type { hex_id } from 'src/types/toolData';
 				showTerrainGenerator = false;
 			}}>Close Generator</button
 		>
-		<div><input type="checkbox" bind:checked={slowAnimation} /> Animate Generator</div>
+		<button on:click={clear_ruleset}>Clear Ruleset</button>
+		<div><input type="checkbox" bind:checked={gen_config_animate} /> Animate Generator</div>
+		<div><input type="checkbox" bind:checked={gen_config_clear} /> Clear Before Generation</div>
+		<div><input type="checkbox" bind:checked={gen_config_overwrite} /> Overwrite Filled Hexes</div>
+		<div> <select bind:value={selector_ruleset} on:change={selector_ruleset_change}>
+			<option value={one_e_dmg_ruleset}>AD&D 1e DMG</option>
+			<option value={null}>Custom</option>
+		</select> </div>
 	</div>
 </main>
 
@@ -384,22 +287,22 @@ import type { hex_id } from 'src/types/toolData';
 		width: 600px;
 		height: 80%;
 		position: absolute;
-		top: 10px;
-		right: 10px;
-		padding: 10px;
+		top: 1em;
+		right: 1em;
+		padding: 1em;
 
 		display: grid;
 		gap: 5px;
-		grid-template-columns: 1fr 115px;
+		grid-template-columns: 1fr 11em;
 		grid-template-rows: 1fr auto;
 		box-sizing: border-box;
-		background-color: #333333;
+		background-color: var(--primary-background);
 	}
 
 	#buttons {
 		display: flex;
 		flex-direction: column;
-		gap: 5px;
+		gap: 0.25em;
 
 		overflow-y: scroll;
 		height: 100%;
@@ -407,77 +310,106 @@ import type { hex_id } from 'src/types/toolData';
 
 	#add-tiles {
 		display: grid;
-		grid-template-columns: 50px 50px;
-		grid-template-rows: 50px;
-		grid-auto-rows: 50px;
-		gap: 5px;
-		padding: 5px;
-		background-color: #555555;
+		grid-template-columns: 1fr 1fr 1fr;
+		grid-auto-rows: auto;
+		gap: 0.25em;
+		padding: 0.25em;
+		background-color: var(--light-background);
+		border-radius: var(--small-radius);
 		overflow: scroll;
 	}
 
 	#add-tiles button {
-		width: 50px;
-		height: 50px;
+		aspect-ratio: 1/1;
+		width: 100%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 	}
 
 	#add-tiles button img {
-		width: 100%;
+		width: 90%;
 	}
 
+
+
+	/* Big Rows */
+	.terrain-category {
+		display: flex;
+		gap: 0.5em;
+		background-color: var(--light-background);
+		border-radius: var(--small-radius);
+	}
+
+	.terrain-category button {
+		background-color: transparent;
+	}
+
+	.terrain-category button:hover {
+		background-color: var(--lighter-background);
+	}
+
+	.terrain-category button.selected {
+		background-color: var(--lighter-background);
+		outline: none;
+		box-sizing:content-box;
+	}
+
+
+
+	/* Added IDs */
 	.added-ids {
 		display: flex;
 		flex-wrap: wrap;
-		font-size: 10pt;
 		box-sizing: border-box;
-		gap: 5px;
+		gap: 0.25em;
 	}
 
 	.added-ids img {
-		height: 25px;
+		height: 2em;
 	}
 
+
+
+	/* Added Tile in the ;ost */
 	.added-ids .added-tile {
 		position: relative;
-		width: 30px;
-		height: 30px;
+		width: 3em;
+		height: 3em;
+		
 		display: flex;
-		justify-content: center;
 		align-items: center;
-	}
-
-	.added-tile .weight-container {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		top: 0;
-		left: 0;
-
-		display: flex;
 		justify-content: center;
-		align-items: center;
+
 	}
 
 	.added-tile:hover {
-		outline: #8cc63f solid 2px;
-		border-radius: 4px;
-		transition-duration: 0.2s;
-		transition-property: outline-color;
+		outline: var(--secondary) solid 2px;
+		border-radius: var(--small-radius);
 	}
-
-	.terrain-category {
+	
+	.added-tile p {
+		
+		position: absolute;
+		right: 0px;
+		bottom: 0px;
+		height: 40%;
+		width: 40%;
 		display: flex;
-		gap: 5px;
+		justify-content: center;
+		align-items: center;
+		background-color: var(--primary-background);
+		border-radius: 50%;
+		padding: 0px;
+		margin: 0px;
+		opacity: 0.8;
+		user-select: none;
+
 	}
 
-	.selected {
-		border: solid 1px #8cc63f;
-		outline: #8cc63f solid 1px;
-	}
+	
 
+	/* Controls */
 	#import-button {
 		position: relative;
 	}
@@ -489,5 +421,16 @@ import type { hex_id } from 'src/types/toolData';
 		left: 0;
 		width: 100%;
 		height: 100%;
+	}
+
+
+
+	/* Help */
+	#help-button {
+		position: absolute;
+		left: -2em;
+		width: 2em;
+		height: 2em;
+		background-color: var(--primary-background);
 	}
 </style>

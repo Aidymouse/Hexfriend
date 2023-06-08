@@ -443,7 +443,7 @@
 
 	#set-controls {
 		padding: 0.625em;
-		background-color: var(--hexfriend-green-background);
+		background-color: var(--primary-background);
 		box-sizing: border-box;
 	}
 

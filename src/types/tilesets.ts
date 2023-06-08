@@ -28,4 +28,4 @@ interface Tileset {
 	tiles: Tile[];
 }
 
-export type { Tile, TileSymbol, Tileset };
+export type { Tile, TileSymbol, Tileset, tile_id };

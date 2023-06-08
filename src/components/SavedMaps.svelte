@@ -129,7 +129,7 @@
 		width: 100%;
 		padding: 1em;
 		max-height: 100%;
-		background-color: var(--hexfriend-green-background);
+		background-color: var(--primary-background);
 		display: flex;
 		gap: 1em;
 		flex-direction: column;
@@ -185,7 +185,7 @@
 
 	#maps {
 		width: 100%;
-		background: var(--hexfriend-green-background);
+		background: var(--primary-background);
 
 		position: relative;
 
@@ -218,7 +218,7 @@
 		text-align: center;
 		margin: 0;
 		padding: 0.3125em;
-		background-color: var(--hexfriend-green-background);
+		background-color: var(--primary-background);
 		opacity: 0.75;
 		width: 100%;
 		box-sizing: border-box;
@@ -260,7 +260,7 @@
 		border-top-right-radius: 0.5em;
 		border-bottom-right-radius: 0.5em;
 		border: none;
-		background: var(--hexfriend-green-background);
+		background: var(--primary-background);
 		transition-duration: 0.2s;
 		transition-timing-function: ease;
 		padding: 0.5em;

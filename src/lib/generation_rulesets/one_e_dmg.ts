@@ -1,0 +1,123 @@
+let one_e_dmg_ruleset = {
+  "default:v4_Plains":[],
+  "default:v4_Farmland":[],
+  "default:v4_Grassland":[
+    {"id":"default:v4_Grassland","weight":11},
+    {"id":"default:v4_Scrubland","weight":1},
+    {"id":"default:v4_Forest","weight":1},
+    {"id":"default:v4_Badlands","weight":1},
+    {"id":"default:v4_Desert","weight":1},
+    {"id":"default:v4_Hills","weight":1},
+    {"id":"default:v4_Mountains","weight":1},
+    {"id":"default:v4_Marsh","weight":1},
+    {"id":"default:v4_Water","weight":1}
+  ],
+  "default:v4_Scrubland":[
+    {"id":"default:v4_Grassland","weight":3},
+    {"id":"default:v4_Scrubland","weight":8},
+    {"id":"default:v4_Forest","weight":2},
+    {"id":"default:v4_Badlands","weight":1},
+    {"id":"default:v4_Desert","weight":1},
+    {"id":"default:v4_Hills","weight":1},
+    {"id":"default:v4_Mountains","weight":1},
+    {"id":"default:v4_Marsh","weight":1},
+    {"id":"default:v4_Water","weight":1}
+  ],
+  "default:v4_Tree":[],
+  "default:v4_Forest":[
+    {"id":"default:v4_Grassland","weight":1},
+    {"id":"default:v4_Scrubland","weight":3},
+    {"id":"default:v4_Forest","weight":10},
+    {"id":"default:v4_Badlands","weight":1},
+    {"id":"default:v4_Hills","weight":1},
+    {"id":"default:v4_Mountains","weight":1},
+    {"id":"default:v4_Marsh","weight":1},
+    {"id":"default:v4_Water","weight":1}
+  ],
+  "default:v4_Beach":[],
+  "default:v4_Palm Tree":[],
+  "default:v4_Water":[
+    {"id":"default:v4_Water","weight":1},
+    {"id":"default:v4_Marsh","weight":1},
+    {"id":"default:v4_Grassland","weight":1},
+    {"id":"default:v4_Hills","weight":1},
+    {"id":"default:v4_Mountains","weight":1}
+  ],
+  "default:v4_Deep Water":[],
+  "default:v4_Hills":[
+    {"id":"default:v4_Grassland","weight":1},
+    {"id":"default:v4_Scrubland","weight":2},
+    {"id":"default:v4_Forest","weight":2},
+    {"id":"default:v4_Badlands","weight":2},
+    {"id":"default:v4_Desert","weight":1},
+    {"id":"default:v4_Hills","weight":6},
+    {"id":"default:v4_Mountains","weight":2},
+    {"id":"default:v4_Marsh","weight":1},
+    {"id":"default:v4_Water","weight":2}
+  ],
+  "default:v4_Mountain":[],
+  "default:v4_Mountains":[
+    {"id":"default:v4_Grassland","weight":1},
+    {"id":"default:v4_Scrubland","weight":1},
+    {"id":"default:v4_Forest","weight":1},
+    {"id":"default:v4_Badlands","weight":2},
+    {"id":"default:v4_Desert","weight":1},
+    {"id":"default:v4_Hills","weight":4},
+    {"id":"default:v4_Mountains","weight":8},
+    {"id":"default:v4_Water","weight":1}
+  ],
+  "default:v4_Volcano":[],
+  "default:v4_Badlands":[
+    {"id":"default:v4_Grassland","weight":2},
+    {"id":"default:v4_Scrubland","weight":2},
+    {"id":"default:v4_Forest","weight":1},
+    {"id":"default:v4_Badlands","weight":3},
+    {"id":"default:v4_Desert","weight":2},
+    {"id":"default:v4_Hills","weight":5},
+    {"id":"default:v4_Mountains","weight":2},
+    {"id":"default:v4_Marsh","weight":1},
+    {"id":"default:v4_Water","weight":1}
+  ],
+  "default:v4_Desert":[
+    {"id":"default:v4_Grassland","weight":3},
+    {"id":"default:v4_Scrubland","weight":2},
+    {"id":"default:v4_Badlands","weight":3},
+    {"id":"default:v4_Desert","weight":6},
+    {"id":"default:v4_Hills","weight":1},
+    {"id":"default:v4_Mountains","weight":2},
+    {"id":"default:v4_Marsh","weight":1},
+    {"id":"default:v4_Water","weight":1}
+  ],
+  "default:v4_Grassy Hills":[],
+  "default:v4_Forest Hills":[],
+  "default:v4_Forest Mountain":[],
+  "default:v4_Pine Tree":[],
+  "default:v4_Pine Forest":[],
+  "default:v4_Pine Hills":[],
+  "default:v4_Pine Mountains":[],
+  "default:v4_Icy":[],
+  "default:v4_Ice Tree":[],
+  "default:v4_Ice Hills":[],
+  "default:v4_Ice Mountain":[],
+  "default:v4_Ice Pine Mountains":[],
+  "default:v4_Ice Mountains":[],
+  "default:v4_Marsh":[
+    {"id":"default:v4_Grassland","weight":2},
+    {"id":"default:v4_Scrubland","weight":2},
+    {"id":"default:v4_Forest","weight":2},
+    {"id":"default:v4_Badlands","weight":1},
+    {"id":"default:v4_Hills","weight":1},
+    {"id":"default:v4_Marsh","weight":7},
+    {"id":"default:v4_Water","weight":4}
+  ],
+  "default:v4_Swamp":[],
+  "default:v4_Dead Tree":[],
+  "default:v4_Dead Tree Hills":[],
+  "default:v4_Dead Tree Mountains":[],
+  "default:v4_Jungle Tree":[],
+  "default:v4_Dense Jungle":[],
+  "default:v4_Jungle Hills":[],
+  "default:v4_Jungle Mountains":[]
+}
+
+export { one_e_dmg_ruleset }

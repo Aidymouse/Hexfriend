@@ -25,7 +25,7 @@
 
     --world-background: grey;
     --dark-background: #EEEEEE;
-    --hexfriend-green-background: #DDDDDD;
+    --primary-background: #DDDDDD;
     --light-background: #CCCCCC;
     --lighter-background: #BBBBBB;
     --lightest-background: #AAAAAA;
@@ -42,7 +42,7 @@
 
     --world-background: #000000;
     --dark-background: #222222;
-    --hexfriend-green-background: #333333;
+    --primary-background: #333333;
     --light-background: #555555;
     --lighter-background: #777777;
     --lightest-background: #999999;

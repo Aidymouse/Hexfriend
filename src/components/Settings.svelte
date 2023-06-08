@@ -1014,7 +1014,7 @@
 	#export-map-select {
 		border: solid 1px var(--lighter-background);
 		border-radius: var(--small-radius);
-		background-color: var(--hexfriend-green-background);
+		background-color: var(--primary-background);
 		padding: 0.3125em;
 		transition-duration: 0.2s;
 
@@ -1164,7 +1164,7 @@
 		left: -19em;
 		width: 19em;
 		height: 100%;
-		background: var(--hexfriend-green-background);
+		background: var(--primary-background);
 		box-sizing: border-box;
 
 		padding: 1em;
@@ -1189,7 +1189,7 @@
 		border-top-right-radius: var(--large-radius);
 		border-bottom-right-radius: var(--large-radius);
 		border: none;
-		background: var(--hexfriend-green-background);
+		background: var(--primary-background);
 		transition-duration: 0.2s;
 		transition-timing-function: ease;
 		padding: 0.5em;

@@ -949,7 +949,7 @@ hexfiend red: #FF6666
 	:root {
 		font-family: var(--font);
 
-		background-color: var(--hexfriend-green-background);
+		background-color: var(--primary-background);
 		color: var(--text);
 		width: 100%;
 		height: 100%;

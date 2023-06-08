@@ -4,7 +4,7 @@
 button {
 	border: none;
 	border-radius: var(--small-radius);
-	background-color: var(--hexfriend-green-background);
+	background-color: var(--primary-background);
 	color: var(--text);
 	padding: 0.3125em;
 	transition-duration: 0.1s;
@@ -74,7 +74,7 @@ input:focus {
 textarea {
 	outline: none;
 	color: var(--text);
-	background-color: var(--hexfriend-green-background);
+	background-color: var(--primary-background);
 	border-radius: var(--small-radius);
 }
 

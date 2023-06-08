@@ -82,7 +82,7 @@
 	#maps {
 		width: 50%;
 		height: 75%;
-		background: var(--hexfriend-green-background);
+		background: var(--primary-background);
 		border-radius: var(--large-radius);
 
 		position: relative;

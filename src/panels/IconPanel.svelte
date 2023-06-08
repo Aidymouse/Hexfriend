@@ -157,7 +157,7 @@
 		position: relative;
 		align-items: center;
 
-		border-color: var(--hexfriend-green-background);
+		border-color: var(--primary-background);
 		margin-bottom: 0.25em;
 		margin-top: 0.25em;
 	}
@@ -176,7 +176,7 @@
 	}
 
 	.iconset-heading button:hover {
-		background-color: var(--hexfriend-green-background);
+		background-color: var(--primary-background);
 	}
 
 	.iconset-heading button img {
@@ -216,7 +216,7 @@
 		grid-template-columns: 4em 1fr;
 		grid-template-rows: 2em 2em;
 		gap: 0.5em;
-		background-color: var(--hexfriend-green-background);
+		background-color: var(--primary-background);
 		padding: 1em;
 	}
 
