@@ -129,7 +129,7 @@ function cube_add(c1: cube_coords, c2: cube_coords): cube_coords {
 	return { q: c1.q + c2.q, r: c1.r + c2.r, s: c1.s + c2.s };
 }
 
-export function getNeighbours(q: number, r: number, s: number): string[] {
+export function getNeighbours(q: number, r: number, s: number): hex_id[] {
 	return [
 		genHexId(q + 1, r, s - 1),
 		genHexId(q + 1, r - 1, s),

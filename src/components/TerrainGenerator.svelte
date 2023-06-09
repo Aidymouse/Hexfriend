@@ -3,7 +3,7 @@
 	import { genHexId, genHexId_tfieldHex, getNeighbours } from '../helpers/hexHelpers';
 	import { download } from '../lib/download2';
 	import * as store_tfield from '../stores/tfield';
-	import { rand, pick_from_weighted } from '../helpers/random';
+	import { rand, pick_from_weighted, random_choice } from '../helpers/random';
 	import Checkbox from '../components/Checkbox.svelte';
 	
 	import type { hex_id } from 'src/types/toolData';
@@ -28,7 +28,6 @@
 
 	let gen_config_animate = false;
 	let gen_config_clear = false;
-	let gen_config_overwrite = true;
 
 	interface rule {
 		id: tile_id
@@ -58,21 +57,30 @@
 
 	function paint_hex(hex_id, tile, index) {
 		
+		comp_terrainLayer.paintFromTile(hex_id, tile, !gen_config_animate)
 		if (gen_config_animate) {
-			setTimeout(() => {comp_terrainLayer.paintFromTile(hex_id, tile)}, index*15)
-		} else {
-			comp_terrainLayer.paintFromTile(hex_id, tile)
+			setTimeout(() => {comp_terrainLayer.renderHex(hex_id)}, index*15)
 		}
 
-	}
-
-	function get_all_blank_hexes() {
-		return Object.keys(tfield.hexes).filter(hex_id => { if (tfield.hexes[hex_id].tile != null) return tfield.hexes[hex_id]  })
 	}
 
 	// Wrapper for generation methods
 	function generate() {
 		console.log(current_ruleset)
+
+		// Get length of empty hexes
+		let blank_hexes = Object.keys(tfield.hexes).filter(hex_id => tfield.hexes[hex_id].tile == null)
+		let clear_override = false
+		if (blank_hexes.length == 0 && !gen_config_clear) {
+			clear_override = confirm("No blank hexes to generate in. Would you like to clear all hexes before generation?")
+			if (!clear_override) return
+		}
+
+		if (gen_config_clear || clear_override) {
+			Object.keys(tfield.hexes).forEach(hex_id => {
+				comp_terrainLayer.eraseHex(hex_id);
+			})
+		}
 
 		let total_weights = 0
 		Object.keys(current_ruleset).forEach(tile_id => {
@@ -93,34 +101,80 @@
 	}
 
 	function gen_old_school_generate(hexes, ruleset: generation_ruleset) {
+		// Meanders through hexes on random walks
 
 		// Get random hex that actually has a rule
 		let valid_rule_ids: tile_id[] = Object.keys(ruleset).filter(tile_id => ruleset[tile_id].length > 0)
 		let rand_tile_id = valid_rule_ids[rand(0, valid_rule_ids.length-1)]
 		let rand_tile = getTileFromId(rand_tile_id)
+		
+		let prev_tile = rand_tile
+
+		let hexes_to_visit = Object.keys(hexes)
+		hexes_to_visit = hexes_to_visit.filter(hex_id => tfield.hexes[hex_id].tile == null)
+		let visited = []
+		let visit_hex_id = random_choice(hexes_to_visit) 
+
+		let painted_count = 0
+		let latest_length = -1
 
 		// Needs: random walks
-		let prev_tile = rand_tile
-		Object.keys(hexes).forEach( (hex_id, i) => {
-
-			if (!gen_config_overwrite && hexes[hex_id].tile != null) return;
-
+		while (hexes_to_visit.length > 0) {
+			
+			// Paint the current hex
+			//console.log(visit_hex_id);
+			let visit_hex = hexes[visit_hex_id]
+			
 			let rule = ruleset[prev_tile.id]
+			if (rule.length == 0) return;
 			let selected_id = pick_from_weighted(rule.map( rp => { return {item: rp.id, weight: rp.weight} }))
 			let selected_tile = getTileFromId(selected_id)
+			
+			paint_hex(visit_hex_id, selected_tile, painted_count);
+			painted_count += 1
+			
+			// Remove it's ID from the list
+			hexes_to_visit = hexes_to_visit.filter(id => id != visit_hex_id)
 
-			paint_hex(hex_id, selected_tile, i);
+			if (latest_length == hexes_to_visit.length) return // Fail safe in case loop screws up
+			latest_length = hexes_to_visit.length
+			
+			// Choose random neighbour (random blank neighbour if not overwriting)
+			let neighbours = comp_terrainLayer.get_existant_neighbours(visit_hex_id)
+			neighbours = neighbours.filter(n_hex => hexes_to_visit.find(id => genHexId_tfieldHex(n_hex) == id)) // Remove hexes that have already been visited
+			visited.push(visit_hex_id)
+			//if (!gen_config_overwrite) neighbours = neighbours.filter(n_hex => n_hex.tile == null) // Get rid of any hexes that are already filled
 
+			if (hexes_to_visit.length < 1) break;
+			
 			prev_tile = selected_tile
 
-		})
+			if (neighbours.length == 0) {
+				visit_hex_id = random_choice(hexes_to_visit)
+				// Choose a random filled in and visited neighbour, if any, to be the previous tile
+				let next_neighbours = comp_terrainLayer.get_existant_neighbours(visit_hex_id)
+				next_neighbours = next_neighbours.filter(n_hex => n_hex.tile != null && visited.find(id => id == genHexId_tfieldHex(n_hex)))
+
+				
+				if (next_neighbours.length != 0) prev_tile = random_choice(next_neighbours).tile
+				
+				console.log("== Got Stuck ==")
+				console.log(next_neighbours)
+				console.log(prev_tile)
+
+			} else {
+				visit_hex_id = genHexId_tfieldHex(random_choice(neighbours))
+			}
+			
+			
+		}
 
 	}
 
 	function gen_completely_random(hexes) {
 		Object.keys(hexes).forEach( (hex_id, i) => {
 
-			if (!gen_config_overwrite && hexes[hex_id].tile != null) return;
+			if (hexes[hex_id].tile != null) return;
 
 			let rand_tileset = pick_from_weighted( loadedTilesets.map( ts => { return {item: ts, weight: Object.keys(ts.tiles).length} } ) );
 
@@ -252,7 +306,6 @@
 		<span style="margin-top: 0.25em;">
 			<span><Checkbox bind:checked={gen_config_animate} /> Animate </span>
 			<span style="margin-left: 0.25em;"><Checkbox bind:checked={gen_config_clear} /> Clear Before Generation</span>
-			<span style="margin-left: 0.25em;"><Checkbox bind:checked={gen_config_overwrite} /> Overwrite Filled Hexes</span>
 		</span>
 
 		<div style="margin-top: 0.25em"> Generator Preset <select bind:value={selector_ruleset} on:change={selector_ruleset_change}>

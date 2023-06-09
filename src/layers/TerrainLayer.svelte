@@ -11,6 +11,7 @@
 		getHexPath,
 		getNeighbours,
 		getRing,
+		id_to_coords,
 	} from '../helpers/hexHelpers';
 	import * as store_panning from '../stores/panning';
 	import * as store_tfield from '../stores/tfield';
@@ -643,7 +644,7 @@
 		renderGrid();
 	}
 
-	function renderHex(hexId: hex_id) {
+	export function renderHex(hexId: hex_id) {
 		let hex = tfield.hexes[hexId];
 		let hexWorldCoords = coords_cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
 
@@ -699,14 +700,16 @@
 		}
 	}
 
+
+
 	/* PAINT */
-	export function paintFromTile(hexId: hex_id, tile: Tile) {
+	export function paintFromTile(hexId: hex_id, tile: Tile, render: boolean = true) {
 		if (!hexExists(hexId)) return;
 
 		if (tilesMatch(tfield.hexes[hexId].tile, tile)) return;
 
 		tfield.hexes[hexId].tile = tile ? { ...tile, symbol: tile.symbol ? { ...tile.symbol } : null } : null;
-		renderHex(hexId);
+		if (render) renderHex(hexId);
 	}
 
 	export function placeTerrain() {
@@ -728,6 +731,8 @@
 
 		paintFromTile(hexId, data_terrain.tile);
 	}
+
+
 
 	/* CHECKS */
 	export function areAllHexesBlank(): boolean {
@@ -774,6 +779,8 @@
 
 		return tilesMatch(hex.tile, data_terrain.tile);
 	}
+
+
 
 	/* USER ACTIONS */
 	export function removeAllTilesOfSet(setId: string) {
@@ -876,6 +883,8 @@
 		comp_coordsLayer.eliminateCoord(hexId);
 	}
 
+
+
 	/* UNCATEGORIZED */
 	function generateBlankTile(): Tile {
 		return {
@@ -885,6 +894,23 @@
 			symbol: null,
 			preview: '',
 		};
+	}
+
+	export function get_existant_neighbours(hex_id: hex_id): TerrainHex[] {
+		let coords = id_to_coords(hex_id)
+
+		let neighbourIds = getNeighbours(coords.q, coords.r, coords.s)
+
+		let valid_neighbour_ids = neighbourIds.filter(id => hexExists(id))
+
+
+		return valid_neighbour_ids.map(id => get_hex(id)) 
+	}
+
+	function get_hex(hex_id: hex_id): TerrainHex {
+		if (hexExists(hex_id)) return tfield.hexes[hex_id];
+
+		return null
 	}
 
 	function getContiguousHexIdsOfSameType(hexId: hex_id): hex_id[] {

@@ -16,4 +16,8 @@ function pick_from_weighted(weighted_list: {item: any, weight: number}[]) {
 		}
 	}
 
-export { rand, pick_from_weighted }
+function random_choice(array: any[]) {
+    return array[rand(0, array.length-1)]
+}
+
+export { rand, pick_from_weighted, random_choice }
