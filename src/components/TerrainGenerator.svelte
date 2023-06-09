@@ -1,13 +1,18 @@
 <script lang="ts">
-import type { hex_id } from 'src/types/toolData';
-
+	
 	import { genHexId, genHexId_tfieldHex, getNeighbours } from '../helpers/hexHelpers';
 	import { download } from '../lib/download2';
 	import * as store_tfield from '../stores/tfield';
+	import { rand, pick_from_weighted } from '../helpers/random';
+	import Checkbox from '../components/Checkbox.svelte';
+	
+	import type { hex_id } from 'src/types/toolData';
 	import type { TerrainHex, terrain_field } from '../types/terrain';
 	import type { Tile, Tileset, tile_id } from '../types/tilesets';
-
+	
 	import { one_e_dmg_ruleset } from '../lib/generation_rulesets/one_e_dmg';
+	import { icy } from '../lib/generation_rulesets/icy';
+	import { jungle } from '../lib/generation_rulesets/jungle';
 
 	export let loadedTilesets: Tileset[];
 	let tfield: terrain_field;
@@ -43,12 +48,6 @@ import type { hex_id } from 'src/types/toolData';
 	});
 	*/
 
-	function rand(min: number, max: number): number {
-		min = Math.ceil(min);
-		max = Math.floor(max)+1;
-		return Math.floor(Math.random() * (max - min) + min); //The maximum is now inclusive and the minimum is inclusive
-	}
-
 	function getTileFromId(tileId: tile_id) {
 		let setId = tileId.split('_')[0];
 		
@@ -67,20 +66,14 @@ import type { hex_id } from 'src/types/toolData';
 
 	}
 
-	function pick_from_weighted(weighted_list: {item: any, weight: number}[]) {
-		let total_weight = weighted_list.reduce( (total, cur_item) => total += cur_item.weight, 0 )
-		let pick_value = rand(1, total_weight)
-
-		let check_total = 0;
-		for (const obj_index in weighted_list) {
-			let obj = weighted_list[obj_index];
-			check_total += obj.weight
-			if (pick_value <= check_total) return obj.item; 
-		}
+	function get_all_blank_hexes() {
+		return Object.keys(tfield.hexes).filter(hex_id => { if (tfield.hexes[hex_id].tile != null) return tfield.hexes[hex_id]  })
 	}
 
 	// Wrapper for generation methods
 	function generate() {
+		console.log(current_ruleset)
+
 		let total_weights = 0
 		Object.keys(current_ruleset).forEach(tile_id => {
 			current_ruleset[tile_id].forEach(rule_part => {
@@ -110,6 +103,8 @@ import type { hex_id } from 'src/types/toolData';
 		let prev_tile = rand_tile
 		Object.keys(hexes).forEach( (hex_id, i) => {
 
+			if (!gen_config_overwrite && hexes[hex_id].tile != null) return;
+
 			let rule = ruleset[prev_tile.id]
 			let selected_id = pick_from_weighted(rule.map( rp => { return {item: rp.id, weight: rp.weight} }))
 			let selected_tile = getTileFromId(selected_id)
@@ -124,6 +119,8 @@ import type { hex_id } from 'src/types/toolData';
 
 	function gen_completely_random(hexes) {
 		Object.keys(hexes).forEach( (hex_id, i) => {
+
+			if (!gen_config_overwrite && hexes[hex_id].tile != null) return;
 
 			let rand_tileset = pick_from_weighted( loadedTilesets.map( ts => { return {item: ts, weight: Object.keys(ts.tiles).length} } ) );
 
@@ -246,39 +243,26 @@ import type { hex_id } from 'src/types/toolData';
 	</div>
 
 	<div id="generator-controls">
-		<button
-			id="generate-button"
-			on:click={() => {
-				generate();
-			}}>Generate!</button
-		>
-		<button
-			on:click={() => {
-				exportGenFunction();
-			}}>Export</button
-		>
-		<button id="import-button"
-			><input
-				type="file"
-				bind:files={importFiles}
-				on:change={() => {
-					importGenFunction();
-				}}
-			/>Import</button
-		>
-		<button
-			on:click={() => {
-				showTerrainGenerator = false;
-			}}>Close Generator</button
-		>
-		<button on:click={clear_ruleset}>Clear Ruleset</button>
-		<div><input type="checkbox" bind:checked={gen_config_animate} /> Animate Generator</div>
-		<div><input type="checkbox" bind:checked={gen_config_clear} /> Clear Before Generation</div>
-		<div><input type="checkbox" bind:checked={gen_config_overwrite} /> Overwrite Filled Hexes</div>
-		<div> <select bind:value={selector_ruleset} on:change={selector_ruleset_change}>
+		<button id="generate-button" class="green-button" on:click={() => { generate() }}>Generate Terrain</button>
+		<button class="outline-button" on:click={clear_ruleset}>Clear Generator</button>
+		<button class="outline-button" on:click={() => { exportGenFunction() }}>Export</button>
+		<button class="outline-button" id="import-button"><input type="file" bind:files={importFiles} on:change={() => { importGenFunction() }} />Import</button>
+		<button class="evil" on:click={() => { showTerrainGenerator = false }}>Close</button>
+		
+		<span style="margin-top: 0.25em;">
+			<span><Checkbox bind:checked={gen_config_animate} /> Animate </span>
+			<span style="margin-left: 0.25em;"><Checkbox bind:checked={gen_config_clear} /> Clear Before Generation</span>
+			<span style="margin-left: 0.25em;"><Checkbox bind:checked={gen_config_overwrite} /> Overwrite Filled Hexes</span>
+		</span>
+
+		<div style="margin-top: 0.25em"> Generator Preset <select bind:value={selector_ruleset} on:change={selector_ruleset_change}>
 			<option value={one_e_dmg_ruleset}>AD&D 1e DMG</option>
+			<option value={icy}>Icy Landscape</option>
+			<option value={jungle}>Jungle</option>
 			<option value={null}>Custom</option>
 		</select> </div>
+
+
 	</div>
 </main>
 
@@ -297,6 +281,11 @@ import type { hex_id } from 'src/types/toolData';
 		grid-template-rows: 1fr auto;
 		box-sizing: border-box;
 		background-color: var(--primary-background);
+	}
+
+	span {
+		display: flex;
+		gap: 0.25em;
 	}
 
 	#buttons {
@@ -421,6 +410,10 @@ import type { hex_id } from 'src/types/toolData';
 		left: 0;
 		width: 100%;
 		height: 100%;
+	}
+
+	#generator-controls {
+		grid-column: 1/3;
 	}
 
 

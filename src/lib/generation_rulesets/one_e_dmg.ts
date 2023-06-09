@@ -1,4 +1,4 @@
-let one_e_dmg_ruleset = {
+const one_e_dmg_ruleset = {
   "default:v4_Plains":[],
   "default:v4_Farmland":[],
   "default:v4_Grassland":[

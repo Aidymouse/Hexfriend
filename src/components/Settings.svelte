@@ -31,6 +31,7 @@
 	export let showSettings: boolean;
 	export let appState;
 	export let showTerrainGenerator: boolean;
+	export let show_icon_generator: boolean;
 
 	export let exportMap: Function;
 
@@ -904,26 +905,37 @@
 	</div>
 
 	<h2 class="setting-heading">
-		Experimental
+		Generators
 		<button
 			on:click={() => {
 				hidden_settings.experimental = !hidden_settings.experimental;
 			}}
 		>
-			<img alt={'Toggle Experimental Settings'} class:rotated={hidden_settings.experimental} src={'/assets/img/ui/arrow.png'} />
+			<img alt={'Toggle Generator Menu'} class:rotated={hidden_settings.experimental} src={'/assets/img/ui/arrow.png'} />
 		</button>
 	</h2>
 
 	<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;" class:hidden={hidden_settings.experimental}>
-		<p class="helperText">Not polished and maybe broken.</p>
 		<button
 			on:click={() => {
 				showTerrainGenerator = true;
+				show_icon_generator = false;
 				showSettings = false;
 			}}
-			title={'Coming soon!'}
+			title={'Terrain Generator'}
+			>
+			Terrain Generator
+		</button>
+		
+		<button
+		on:click={() => {
+			show_icon_generator = true;
+			showTerrainGenerator = false;
+				showSettings = false;
+			}}
+			title={'Icon Generator'}
 		>
-			Generate Terrain
+			Icon Generator
 		</button>
 	</div>
 

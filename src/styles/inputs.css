@@ -118,6 +118,10 @@ select {
 	background-color: var(--dark-primary);
 }
 
+.outline-button {
+	border: solid 1px var(--lighter-background)
+}
+
 /* RANGE */
 input[type='range'] {
 	-webkit-appearance: none;

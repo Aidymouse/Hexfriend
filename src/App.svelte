@@ -30,6 +30,7 @@ hexfiend red: #FF6666
 */
 	// Components
 	import CanvasHolder from './components/CanvasHolder.svelte';
+	import IconGenerator from './components/IconGenerator.svelte';
 	import IconsetCreator from './components/IconsetCreator.svelte';
 	import SavedMaps from './components/SavedMaps.svelte';
 	import MapSettings from './components/Settings.svelte';
@@ -109,6 +110,7 @@ hexfiend red: #FF6666
 
 	let showSettings = false;
 	let showTerrainGenerator = false;
+	let show_icon_generator = false;
 	let showLoader: boolean = false;
 	let showKeyboardShortcuts: boolean = false;
 	let showControls: boolean = true;
@@ -833,6 +835,8 @@ hexfiend red: #FF6666
 		<!-- Panels -->
 		{#if showTerrainGenerator}
 			<TerrainGenerator {loadedTilesets} {comp_terrainLayer} bind:showTerrainGenerator />
+		{:else if show_icon_generator}
+			<IconGenerator {loadedIconsets} {comp_iconLayer} bind:show_icon_generator />
 		{:else if selectedTool == 'terrain'}
 			<TerrainPanel {loadedTilesets} {app} bind:data_terrain />
 		{:else if selectedTool == 'icon'}
@@ -901,6 +905,7 @@ hexfiend red: #FF6666
 			bind:showSettings
 			bind:appState
 			bind:showTerrainGenerator
+			bind:show_icon_generator
 			bind:data_coordinates
 			bind:data_overlay
 			bind:loadedTilesets

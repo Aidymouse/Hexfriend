@@ -11,18 +11,19 @@
 	import * as store_panning from '../stores/panning';
 	import * as store_tfield from '../stores/tfield';
 	import { store_selected_tool } from '../stores/tools';
-	import type { eraser_data, icon_data } from '../types/data';
-	import type { IconLayerIcon } from '../types/icon';
-	import type { shortcut_data } from '../types/inputs';
-	import type { pan_state } from '../types/panning';
 	import { tools } from '../types/toolData';
 	import { map_shape } from '../types/settings';
-	import type { terrain_field } from '../types/terrain';
 	import * as PIXI from 'pixi.js';
-
+	
 	import { get_icon_texture } from '../lib/texture_loader'
-
 	import { afterUpdate, onMount } from 'svelte';
+	
+	import type { eraser_data, icon_data } from '../types/data';
+	import type { IconLayerIcon, Icon } from '../types/icon';
+	import type { shortcut_data } from '../types/inputs';
+	import type { pan_state } from '../types/panning';
+	import type { terrain_field } from '../types/terrain';
+	import type { cube_coords } from '../types/coordinates';
 
 
 	export let icons: IconLayerIcon[] = [];
@@ -115,6 +116,14 @@
 		}
 
 		icons.push({ x: iconX, y: iconY, color: data_icon.color, scale: getIconScale(), id: iconId, texId: data_icon.texId });
+		iconId++;
+		icons = icons;
+	}
+
+	export function place_icon(icon: Icon, position: cube_coords) {
+		let icon_pos = coords_cubeToWorld(position.q, position.r, position.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+
+		icons.push({ x: icon_pos.x, y: icon_pos.y, color: icon.color, scale: getIconScale(), id: iconId, texId: icon.texId });
 		iconId++;
 		icons = icons;
 	}
