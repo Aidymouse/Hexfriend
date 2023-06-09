@@ -142,13 +142,19 @@ import type { hex_id } from 'src/types/toolData';
 
 		current_ruleset.icon_chances = [];
 	}
+
+	$: {
+		current_ruleset.chance_for_icon = Math.min(current_ruleset.chance_for_icon, current_ruleset.chance_for_icon_high)
+	}
 </script>
 
 <main class="panel">
 
 	<section id="chance-config">
 		Chance to generate icon: 
-		<input type="number" bind:value={current_ruleset.chance_for_icon}> in <input type="number" bind:value={current_ruleset.chance_for_icon_high}>
+		<input type="number" min={1} max={current_ruleset.chance_for_icon_high} bind:value={current_ruleset.chance_for_icon}> 
+		in
+		<input type="number" min={1} bind:value={current_ruleset.chance_for_icon_high}>
 	</section>
 
 	<section id="generator-controls">
