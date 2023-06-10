@@ -250,7 +250,7 @@
 
 <main class="panel">
 
-	<div id="buttons">
+	<div id="terrain-categories">
 		{#each Object.keys(current_ruleset) as tileId}
 			<div class="terrain-category">
 				<button
@@ -280,7 +280,7 @@
 		{/each}
 	</div>
 
-	<div id="add-tiles">
+	<div id="tile-list">
 		{#if selectedId != ''}
 			{#each loadedTilesets as tileset}
 				{#each tileset.tiles as tile (tile.id)}
@@ -296,72 +296,75 @@
 		{/if}
 	</div>
 
-	<div id="generator-controls">
-		<button id="generate-button" class="green-button" on:click={() => { generate() }}>Generate Terrain</button>
-		<button class="outline-button" on:click={clear_ruleset}>Clear Generator</button>
-		<button class="outline-button" on:click={() => { exportGenFunction() }}>Export</button>
-		<button class="outline-button" id="import-button"><input type="file" bind:files={importFiles} on:change={() => { importGenFunction() }} />Import</button>
-		<button class="evil" on:click={() => { showTerrainGenerator = false }}>Close</button>
-		
-		<span style="margin-top: 0.25em;">
-			<span><Checkbox bind:checked={gen_config_animate} /> Animate </span>
-			<span style="margin-left: 0.25em;"><Checkbox bind:checked={gen_config_clear} /> Clear Before Generation</span>
-		</span>
-
-		<div style="margin-top: 0.25em"> Generator Preset <select bind:value={selector_ruleset} on:change={selector_ruleset_change}>
-			<option value={one_e_dmg_ruleset}>AD&D 1e DMG</option>
-			<option value={icy}>Icy Landscape</option>
-			<option value={jungle}>Jungle</option>
-			<option value={null}>Custom</option>
-		</select> </div>
-
-
+	<div id="buttons">
+		<div id="left-side">
+			<div id="preset">
+				Preset
+					<select bind:value={selector_ruleset} on:change={selector_ruleset_change}>
+					<option value={one_e_dmg_ruleset}>AD&D 1e DMG</option>
+					<option value={icy}>Icy Landscape</option>
+					<option value={jungle}>Jungle</option>
+					<option value={null}>Custom</option>
+				</select>
+			</div>
+			<div id="preset-buttons">
+				<button class="outline-button" on:click={clear_ruleset}>Clear</button>
+				<button class="outline-button" on:click={() => { exportGenFunction() }}>Export</button>
+				<button class="outline-button" id="import-button"><input type="file" bind:files={importFiles} on:change={() => { importGenFunction() }} />Import</button>
+			</div>
+		</div>
+		<div id="right-side">
+			<div id="generate-buttons">
+				<span><Checkbox bind:checked={gen_config_animate} /> Animate </span>
+				<span style="margin-left: 0.25em;"><Checkbox bind:checked={gen_config_clear} /> Clear Before Generation</span>
+			</div>
+			<div id="generate">
+				<button class="evil" on:click={() => { showTerrainGenerator = false }}>Close</button>
+				<button id="generate-button" class="green-button" on:click={() => { generate() }}>Generate!</button>
+			</div>
+		</div>
 	</div>
 </main>
 
 <style>
 	main {
-		width: 600px;
+		width: 38em;
 		height: 80%;
 		position: absolute;
 		top: 1em;
 		right: 1em;
-		padding: 1em;
 
 		display: grid;
-		gap: 5px;
+		gap: 0.4em;
 		grid-template-columns: 1fr 11em;
 		grid-template-rows: 1fr auto;
 		box-sizing: border-box;
 		background-color: var(--primary-background);
 	}
 
-	span {
-		display: flex;
-		gap: 0.25em;
-	}
-
-	#buttons {
+	#terrain-categories {
 		display: flex;
 		flex-direction: column;
 		gap: 0.25em;
-
+		margin: 1em 0 0 1em;
+		background-color: var(--primary-background);
+		border-radius: var(--small-radius);
 		overflow-y: scroll;
-		height: 100%;
 	}
 
-	#add-tiles {
+	#tile-list {
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
 		grid-auto-rows: auto;
 		gap: 0.25em;
 		padding: 0.25em;
+		margin: 1em 1em 0 0;
 		background-color: var(--light-background);
 		border-radius: var(--small-radius);
-		overflow: scroll;
+		overflow-y: scroll;
 	}
 
-	#add-tiles button {
+	#tile-list button {
 		aspect-ratio: 1/1;
 		width: 100%;
 		display: flex;
@@ -369,35 +372,30 @@
 		justify-content: center;
 	}
 
-	#add-tiles button img {
+	#tile-list button img {
 		width: 90%;
 	}
-
-
 
 	/* Big Rows */
 	.terrain-category {
 		display: flex;
-		gap: 0.5em;
 		background-color: var(--light-background);
 		border-radius: var(--small-radius);
 	}
 
 	.terrain-category button {
-		background-color: transparent;
+		background-color: var(--lighter-background);
 	}
 
 	.terrain-category button:hover {
-		background-color: var(--lighter-background);
+		background-color: var(--lightest-background);
 	}
 
 	.terrain-category button.selected {
-		background-color: var(--lighter-background);
+		background-color: var(--dark-primary);
 		outline: none;
-		box-sizing:content-box;
+		box-sizing: content-box;
 	}
-
-
 
 	/* Added IDs */
 	.added-ids {
@@ -411,9 +409,7 @@
 		height: 2em;
 	}
 
-
-
-	/* Added Tile in the ;ost */
+	/* Added Tile in the cost */
 	.added-ids .added-tile {
 		position: relative;
 		width: 3em;
@@ -422,19 +418,23 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-
 	}
 
 	.added-tile:hover {
-		outline: var(--secondary) solid 2px;
+		outline: var(--secondary) solid 0.15em;
+		outline-offset: -0.15em;
 		border-radius: var(--small-radius);
+	}
+
+	.added-tile:active {
+		outline: var(--secondary) solid 0.25em;
+		outline-offset: -0.25em;
 	}
 	
 	.added-tile p {
-		
 		position: absolute;
-		right: 0px;
-		bottom: 0px;
+		right: 0;
+		bottom: 0;
 		height: 40%;
 		width: 40%;
 		display: flex;
@@ -442,15 +442,13 @@
 		align-items: center;
 		background-color: var(--primary-background);
 		border-radius: 50%;
-		padding: 0px;
-		margin: 0px;
+		padding: 0;
+		margin: 0;
 		opacity: 0.8;
 		user-select: none;
-
+		font-size: 90%;
 	}
-
 	
-
 	/* Controls */
 	#import-button {
 		position: relative;
@@ -465,18 +463,53 @@
 		height: 100%;
 	}
 
-	#generator-controls {
+	#buttons {
 		grid-column: 1/3;
+		background-color: var(--light-background);
+		padding: 0.625em;
+
+		display: flex;
+		justify-content: space-between;
+		gap: 0.5em;
 	}
 
-
-
-	/* Help */
-	#help-button {
-		position: absolute;
-		left: -2em;
-		width: 2em;
-		height: 2em;
-		background-color: var(--primary-background);
+	#left-side {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5em;
 	}
+
+	#preset {
+		display: flex;
+		gap: 0.5em;
+	}
+
+	#preset-buttons {
+		display: flex;
+		gap: 0.5em;
+	}
+
+	#right-side {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5em;
+	}
+
+	#generate-buttons {
+		display: flex;
+		gap: 0.5em;
+		justify-content: space-between;
+	}
+
+	#generate-buttons span {
+		display: flex;
+		gap: 0.25em;
+	}
+
+	#generate {
+		display: flex;
+		gap: 0.5em;
+		justify-content: flex-end;
+	}
+
 </style>
