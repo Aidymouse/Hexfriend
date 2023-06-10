@@ -150,116 +150,89 @@ import type { hex_id } from 'src/types/toolData';
 
 <main class="panel">
 
-	<section id="chance-config">
-		Chance to generate icon: 
-		<input type="number" min={1} max={current_ruleset.chance_for_icon_high} bind:value={current_ruleset.chance_for_icon}> 
-		in
-		<input type="number" min={1} bind:value={current_ruleset.chance_for_icon_high}>
-	</section>
-
-	<section id="generator-controls">
-
-		<div id="icon-buttons">
-			{#each loadedIconsets as iconset}
-
-				{#each iconset.icons as icon (icon.id)}
-
-					<button on:click={() => { add_to_ruleset(icon) }} title={`Add ${icon.display} to generator`}>
-						<img src={icon.preview} alt={`${icon.display}`}>
-					</button>
-
-				{/each}
-
+	<div id="icon-bag">
+		<div id="icon-bag-grid">
+			{#each current_ruleset.icon_chances as icon_chance (icon_chance.item)}
+				<div class="icon-chance" on:click={ () => { remove_from_ruleset(icon_chance) } }>
+					<img src={icon_chance.item.preview} alt={`${icon_chance.item.display}`}>
+					<p>{icon_chance.weight}</p>
+				</div>
 			{/each}
 		</div>
+	</div>
 
-		<div id="icon-bag">
-			<div id="icon-bag-grid">
-				{#each current_ruleset.icon_chances as icon_chance (icon_chance.item)}
-					<div class="icon-chance" on:click={ () => { remove_from_ruleset(icon_chance) } }>
-						<img src={icon_chance.item.preview} alt={`${icon_chance.item.display}`}>
-						<p>{icon_chance.weight}</p>
-					</div>
-				{/each}
+	<div id="icon-buttons">
+		{#each loadedIconsets as iconset}
+
+			{#each iconset.icons as icon (icon.id)}
+
+				<button on:click={() => { add_to_ruleset(icon) }} title={`Add ${icon.display} to generator`}>
+					<img src={icon.preview} alt={`${icon.display}`}>
+				</button>
+
+			{/each}
+
+		{/each}
+	</div>
+	
+	<div id="buttons">
+		<div id="left-side">
+			<div id="chance">
+				Generation Chance 
+				<input type="number" min={1} max={current_ruleset.chance_for_icon_high} bind:value={current_ruleset.chance_for_icon}> 
+				in
+				<input type="number" min={1} bind:value={current_ruleset.chance_for_icon_high}>
+			</div>
+			<div id="clear">
+				<button class="outline-button" on:click={clear_ruleset}>Clear</button>
 			</div>
 		</div>
-
-	</section>
-	
-	<section id="generator-config">
-		<button class="green-button" on:click={generate}>Generate Icons</button>
-		<button class="outline-button" on:click={clear_ruleset}>Clear Generator</button>
-		<button class="evil" on:click={() => { show_icon_generator = false }}>Close</button>
-		<span>
-			<span style="margin-right: 0.5em"><Checkbox bind:checked = {gen_config_center} id="config-snap" /> <label for="config-snap">Place Icons in Hex Center</label></span>
-			<span><Checkbox bind:checked = {gen_config_animate} id="config-animate" /> <label for="config-animate">Animate</label></span>
-		</span>
-	</section>
+		
+		<div id="right-side">
+			<div id="generate-buttons">
+				<span><Checkbox bind:checked = {gen_config_animate} id="config-animate" /> <label for="config-animate">Animate</label></span>
+				<span style="margin-right: 0.5em"><Checkbox bind:checked = {gen_config_center} id="config-snap" /> <label for="config-snap">Place In Hex Center</label></span>
+			</div>
+			<div id="generate">
+				<button class="evil" on:click={() => { show_icon_generator = false }}>Close</button>
+				<button class="green-button" on:click={generate}>Generate!</button>
+			</div>
+		</div>
+	</div>
 	
 </main>
 
 <style>
 	main {
-		width: 600px;
-		height: 80%;
+		width: 38em;
+		height: 70%;
 		position: absolute;
 		top: 1em;
 		right: 1em;
-		padding: 1em;
 
 		display: grid;
-		gap: 0.25em;
-		grid-template-columns:  1fr;
-		grid-template-rows: auto 1fr auto;
-		box-sizing: border-box;
+		grid-template-columns: 1fr 11em;
+		grid-template-rows: 1fr auto;
+		gap: 0.4em;
 		background-color: var(--primary-background);
-	}
-
-	section {
-		width: 100%;
-		height: 100%;
-
-		border-radius: var(--small-radius);
-	}
-	
-	div {
-		border-radius: var(--small-radius);
 	}
 
 	span {
 		display: flex;
 		gap: 0.25em;
-		margin-top: 0.25em;
 	}
 
-	/* Chance Input */
-	#chance-config {
-		background-color: var(--light-background);
-		padding: 0.25em;
-		box-sizing: border-box;
-	}
-	
 	/* Main Controls */
-	section#generator-controls {
-		display: grid;
-		grid-template-rows: 1fr;
-		grid-template-columns: 1fr 2fr;
-		gap: 0.25em;
-		max-height: 100%;
-		overflow: hidden;
-	}
-	
 	#icon-buttons {
+		border-radius: var(--small-radius);
 		background-color: var(--light-background);
 		display: grid;
-		grid-template-columns: 1fr 1fr 1fr;
-		grid-template-rows: auto;
+		grid-template-columns: repeat(3, 1fr);
 		grid-auto-rows: auto;
 		gap: 0.25em;
+		margin: 1em 1em 0 0;
 		padding: 0.25em;
-		
-		max-height: 100%;
-		overflow: scroll;
+		overflow-y: auto;
 	}
 	
 	#icon-buttons button {
@@ -275,22 +248,18 @@ import type { hex_id } from 'src/types/toolData';
 		width: 90%;
 	}
 	
-	
 	#icon-bag {
-		overflow-y: scroll;
+		border-radius: var(--small-radius);
+		margin: 1em 0 0 1em;
+		overflow-y: auto;
 		background-color: var(--light-background);
-
 	}
 
 	#icon-bag-grid {
-
 		display: grid;
-		grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr; 
-		grid-template-rows: auto;
-		width: 100%;
+		grid-template-columns: repeat(6, 1fr); 
 		padding: 0.25em;
 		box-sizing: border-box;
-
 	}
 
 	/* Individual Chance Items */
@@ -311,8 +280,8 @@ import type { hex_id } from 'src/types/toolData';
 
 	.icon-chance p {
 		position: absolute;
-		right: 0px;
-		bottom: 0px;
+		right: 0;
+		bottom: 0;
 		height: 40%;
 		width: 40%;
 		display: flex;
@@ -320,20 +289,63 @@ import type { hex_id } from 'src/types/toolData';
 		align-items: center;
 		background-color: var(--primary-background);
 		border-radius: 50%;
-		padding: 0px;
-		margin: 0px;
+		padding: 0;
+		margin: 0;
 		opacity: 0.8;
 		user-select: none;
+		font-size: 90%;
 	}
 
 	.icon-chance:hover {
-		outline: var(--secondary) solid 2px;
+		outline: var(--secondary) solid 0.15em;
+		outline-offset: -0.15em;
+		border-radius: var(--small-radius);
+	}
+
+	.icon-chance:active {
+		outline: var(--secondary) solid 0.25em;
+		outline-offset: -0.25em;
 	}
 	
 	/* Config */
-	#generator-config {
-		padding: 0.25em;
-		box-sizing: border-box;
+	#buttons {
+		grid-column: 1/3;
+		background-color: var(--light-background);
+		padding: 0.625em;
+
+		display: flex;
+		justify-content: space-between;
+		gap: 0.5em;
+	}
+
+	#chance input {
+		width: 3em;
+	}
+
+	#left-side {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5em;
+		justify-content: space-between;
+	}
+
+	#right-side {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5em;
+		justify-content: space-between;
+	}
+
+	#generate-buttons {
+		display: flex;
+		gap: 0.5em;
+		justify-content: flex-end;
+	}
+
+	#generate {
+		display: flex;
+		gap: 0.5em;
+		justify-content: flex-end;
 	}
 
 </style>

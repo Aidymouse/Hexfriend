@@ -349,7 +349,7 @@
 		margin: 1em 0 0 1em;
 		background-color: var(--primary-background);
 		border-radius: var(--small-radius);
-		overflow-y: scroll;
+		overflow-y: auto;
 	}
 
 	#tile-list {
@@ -361,7 +361,7 @@
 		margin: 1em 1em 0 0;
 		background-color: var(--light-background);
 		border-radius: var(--small-radius);
-		overflow-y: scroll;
+		overflow-y: auto;
 	}
 
 	#tile-list button {
