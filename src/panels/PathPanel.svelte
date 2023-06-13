@@ -8,6 +8,8 @@
 	import * as PIXI from 'pixi.js';
 	import { onMount } from 'svelte';
 
+	import { store_has_unsaved_changes } from '../stores/flags';
+
 	export let data_path: path_data;
 	export let comp_pathLayer: PathLayer;
 
@@ -42,6 +44,8 @@
 
 		pathStyles = [...pathStyles, { display: name, style: { ...data_path.style }, id: pathID }];
 		pathID += 1;
+
+		$store_has_unsaved_changes = true;
 	}
 
 	let menuX = 0;
@@ -66,6 +70,8 @@
 		pathStyles = pathStyles.filter((ps) => ps.id != data_path.contextPathId);
 
 		data_path.contextPathId = null;
+
+		$store_has_unsaved_changes = true;
 	}
 
 	function renameStyle() {
@@ -79,6 +85,8 @@
 
 		styleToEdit.display = styleName;
 		pathStyles = pathStyles;
+
+		$store_has_unsaved_changes = true;
 	}
 
 	// Path Controls
@@ -94,6 +102,8 @@
 		pathStyles = [...pathStyles, { display: contextPathStyle.display, style: { ...contextPathStyle.style }, id: pathID }];
 
 		data_path.contextPathId = null;
+
+		$store_has_unsaved_changes = true;
 	}
 
 </script>

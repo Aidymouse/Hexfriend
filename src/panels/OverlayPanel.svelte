@@ -2,6 +2,8 @@
 	import Checkbox from "../components/Checkbox.svelte";
     import { store_selected_tool } from "../stores/tools";
     
+    import { store_has_unsaved_changes } from '../stores/flags';
+
     import type { overlay_data } from "../types/data";
 	import { tools } from "../types/toolData";
 
@@ -12,6 +14,7 @@
         if (confirm("Remove overlay?")) {
             data_overlay.base64 = ""
             store_selected_tool.update(n => tools.TERRAIN)
+            $store_has_unsaved_changes = true
         }
 
     }
@@ -19,11 +22,13 @@
     function reset_scale() {
         data_overlay.scale.x = 1
         data_overlay.scale.y = 1
+        $store_has_unsaved_changes = true;
     }
 
     function reset_positon() {
         data_overlay.x = 0
         data_overlay.y = 0
+        $store_has_unsaved_changes = true;
     }
 
 </script>

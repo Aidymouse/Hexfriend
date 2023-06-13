@@ -3,6 +3,7 @@
 	import { coords_cubeToWorld, genHexId } from '../helpers/hexHelpers';
 	import { coords_cubeToq, coords_cubeTor } from '../helpers/hexHelpers';
 	import * as store_tfield from '../stores/tfield';
+	import { store_has_unsaved_changes } from '../stores/flags';
 	import { coord_system } from '../types/coordinates';
 	import type { coordinates_data } from '../types/data';
 	import type { TerrainHex, terrain_field } from '../types/terrain';
@@ -50,6 +51,7 @@
 		Object.keys(tfield.hexes).forEach((hexId: hex_id) => {
 			generateNewCoord(hexId, system);
 		});
+		$store_has_unsaved_changes = true;
 	}
 
 	export function populateBlankHexes() {
@@ -60,6 +62,7 @@
 		if (tfield.mapShape == map_shape.FLOWER && data_coordinates.system == coord_system.LETTERNUMBER) {
 			updateAllCoordsText();
 		}
+		$store_has_unsaved_changes = true;
 	}
 
 	export function generateNewCoord(hexId: hex_id, system: coord_system = data_coordinates.system) {
@@ -78,6 +81,7 @@
 		coordTexts[hexId].parts = [...generated.parts];
 
 		updateCoordPosition(hexId);
+		$store_has_unsaved_changes = true;
 	}
 
 	export function updateAllCoordPositions() {
@@ -88,6 +92,8 @@
 		if (data_coordinates.system == coord_system.LETTERNUMBER) {
 			updateAllCoordsText();
 		}
+
+		$store_has_unsaved_changes = true;
 	}
 
 	function updateCoordPosition(hexId: hex_id) {
@@ -104,6 +110,8 @@
 		cont_textContainer.removeChild(coordTexts[hexId].pixiText);
 		coordTexts[hexId].pixiText.destroy();
 		delete coordTexts[hexId];
+
+		$store_has_unsaved_changes = true;
 	}
 
 	function generateCoordTextAndParts(hexId: hex_id, system: coord_system = data_coordinates.system): { parts: number[]; text: string } {
@@ -174,6 +182,8 @@
 				
 			}
 		}
+
+		$store_has_unsaved_changes = true;
 	}
 
 	function num_to_alphabet(num) {
@@ -198,12 +208,14 @@
 		Object.keys(coordTexts).forEach((hexId: hex_id) => {
 			updateCoordText(hexId);
 		});
+		$store_has_unsaved_changes = true;
 	}
 
 	export function updateCoordText(hexId: hex_id) {
 		let generated = generateCoordTextAndParts(hexId, data_coordinates.system);
 		coordTexts[hexId].parts = [...generated.parts];
 		coordTexts[hexId].pixiText.text = generated.text;
+		$store_has_unsaved_changes = true;
 	}
 
 	export function cullUnusedCoordinates() {
@@ -216,6 +228,8 @@
 		if (tfield.mapShape == map_shape.FLOWER && data_coordinates.system == coord_system.LETTERNUMBER) {
 			updateAllCoordsText();
 		}
+
+		$store_has_unsaved_changes = true;
 	}
 
 	onMount(() => {

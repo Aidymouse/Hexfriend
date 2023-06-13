@@ -6,6 +6,8 @@
 	import { rand, pick_from_weighted, random_choice } from '../helpers/random';
 	import Checkbox from '../components/Checkbox.svelte';
 	
+	import { store_has_unsaved_changes } from '../stores/flags';
+
 	import type { hex_id } from 'src/types/toolData';
 	import type { TerrainHex, terrain_field } from '../types/terrain';
 	import type { Tile, Tileset, tile_id } from '../types/tilesets';
@@ -67,6 +69,8 @@
 	// Wrapper for generation methods
 	function generate() {
 		console.log(current_ruleset)
+
+		$store_has_unsaved_changes = true
 
 		// Get length of empty hexes
 		let blank_hexes = Object.keys(tfield.hexes).filter(hex_id => tfield.hexes[hex_id].tile == null)

@@ -14,6 +14,8 @@
 	import { tools } from '../types/toolData';
 	import { map_shape } from '../types/settings';
 	import * as PIXI from 'pixi.js';
+
+	import { store_has_unsaved_changes } from '../stores/flags';
 	
 	import { get_icon_texture } from '../lib/texture_loader'
 	import { afterUpdate, onMount } from 'svelte';
@@ -118,6 +120,8 @@
 		icons.push({ x: iconX, y: iconY, color: data_icon.color, scale: getIconScale(), id: iconId, texId: data_icon.texId });
 		iconId++;
 		icons = icons;
+
+		$store_has_unsaved_changes = true;
 	}
 
 	export function place_icon(icon: Icon, position: cube_coords) {
@@ -126,12 +130,16 @@
 		icons.push({ x: icon_pos.x, y: icon_pos.y, color: icon.color, scale: getIconScale(), id: iconId, texId: icon.texId });
 		iconId++;
 		icons = icons;
+
+		$store_has_unsaved_changes = true;
 	}
 
 	function deleteIcon(icon: IconLayerIcon) {
 		let iconIndex = icons.indexOf(icon);
 		icons.splice(iconIndex, 1);
 		icons = icons;
+
+		$store_has_unsaved_changes = true;
 	}
 
 	export function pointerdown() {
@@ -231,6 +239,7 @@
 		});
 
 		icons = icons;
+		
 	}
 
 	let oldHexWidth: number;
@@ -407,6 +416,8 @@
 	function icon_pointerdown(e: PointerEvent, icon: IconLayerIcon) {
 		if (shouldEraseIcons()) {
 			deleteIcon(icon)
+			$store_has_unsaved_changes = true;
+
 		} else if ( data_icon.dragMode && draggedIcon == null ) {
 			draggedIcon = icon
 			dragOffsetX = store_panning.curWorldX() - icon.x
@@ -445,6 +456,7 @@
 		}
 
 		icons = icons
+		$store_has_unsaved_changes = true;
 
 	}
 	

@@ -5,6 +5,7 @@
 	import type TextLayer from '../layers/TextLayer.svelte';
 	import type { text_data } from '../types/data';
 	import type { listed_text_style } from '../types/text';
+	import { store_has_unsaved_changes } from '../stores/flags';
 	import * as PIXI from 'pixi.js';
 	import { text } from 'svelte/internal';
 
@@ -41,6 +42,7 @@
 		data_text.style = { ...style };
 		//data_text = data_text
 		textStyles = textStyles; /* Updates the selected button */
+		$store_has_unsaved_changes = true;
 	}
 
 	function newTextStyle() {
@@ -49,6 +51,7 @@
 
 		styleId += 1;
 		textStyles = [...textStyles, { display: name, style: { ...data_text.style }, id: styleId }];
+		$store_has_unsaved_changes = true;
 	}
 
 	let menuX = 0;
@@ -62,6 +65,7 @@
 
 		textStyles = textStyles;
 		data_text.contextStyleId = null;
+		$store_has_unsaved_changes = true;
 	}
 
 	function renameStyle() {
@@ -75,6 +79,7 @@
 
 		styleToEdit.display = styleName;
 		textStyles = textStyles;
+		$store_has_unsaved_changes = true;
 	}
 
 	function duplicateStyle() {
@@ -85,12 +90,14 @@
 		textStyles = [...textStyles, { display: styleToDupe.display, style: { ...styleToDupe.style }, id: styleId }];
 
 		data_text.contextStyleId = null;
+		$store_has_unsaved_changes = true;
 	}
 
 	function deleteStyle() {
 		if (!confirm('Are you sure you would like to delete this text style?')) return;
 		textStyles = textStyles.filter((ts) => ts.id != data_text.contextStyleId);
 		data_text.contextStyleId = null;
+		$store_has_unsaved_changes = true;
 	}
 </script>
 
@@ -156,7 +163,7 @@
 	{#if data_text.selectedText}
 		<div id="selected-text-controls">
 			<div id="text-area-wrapper">
-				<textarea bind:value={data_text.selectedText.text} use:focus bind:this={data_text.editorRef} />
+				<textarea bind:value={data_text.selectedText.text} use:focus bind:this={data_text.editorRef} on:change={() => { $store_has_unsaved_changes = true; }}/>
 				<!-- The editor ref is literally jsut used to let us focus the text area by clicking on the text. -->
 				<button
 				on:click={() => {

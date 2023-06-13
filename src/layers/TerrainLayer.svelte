@@ -15,6 +15,7 @@
 	} from '../helpers/hexHelpers';
 	import * as store_panning from '../stores/panning';
 	import * as store_tfield from '../stores/tfield';
+	import { store_has_unsaved_changes } from '../stores/flags';
 	//import { collapseWaveGen } from '../lib/terrainGenerator';
 	import type { cube_coords } from '../types/coordinates';
 	import type { terrain_data } from '../types/data';
@@ -28,6 +29,7 @@
 	import type CoordsLayer from './CoordsLayer.svelte';
 	import * as PIXI from 'pixi.js';
 	import { onMount } from 'svelte';
+
 
 	export let cont_terrain: PIXI.Container;
 
@@ -205,7 +207,10 @@
 	}
 
 	export function square_expandMapDimension(direction: 'left' | 'right' | 'top' | 'bottom', amount: number) {
+		$store_has_unsaved_changes = true
+		
 		// Will come back here later...
+		// Why??
 		switch (direction) {
 			case 'right':
 				square_expandRight(amount);
@@ -337,6 +342,8 @@
 	}
 
 	export function square_reduceMapDimension(direction: 'left' | 'right' | 'top' | 'bottom', amount: number) {
+		$store_has_unsaved_changes = true
+
 		switch (direction) {
 			case 'right':
 				if (amount >= tfield.columns) amount = tfield.columns - 1;
@@ -479,6 +486,8 @@
 
 	/* FLOWER SHAPED MAPS */
 	export function flower_expandHexesOut(amount: number) {
+		$store_has_unsaved_changes = true
+		
 		for (let curRing = 0; curRing < amount; curRing++) {
 			tfield.hexesOut += 1;
 
@@ -499,6 +508,8 @@
 	}
 
 	export function flower_reduceHexesOut(amount) {
+		$store_has_unsaved_changes = true
+		
 		if (tfield.hexesOut == 0) return;
 
 		for (let curRing = 0; curRing < amount; curRing++) {
@@ -526,6 +537,8 @@
 	}
 
 	export function changeOrientation() {
+		$store_has_unsaved_changes = true
+		
 		switch (tfield.mapShape) {
 			case map_shape.SQUARE:
 				square_changeOrientation();
@@ -542,6 +555,8 @@
 	}
 
 	export function changeMapShape(newMapShape: map_shape) {
+		$store_has_unsaved_changes = true
+		
 		switch (newMapShape) {
 			case map_shape.SQUARE:
 				square_generateBlankMap();
@@ -704,6 +719,7 @@
 
 	/* PAINT */
 	export function paintFromTile(hexId: hex_id, tile: Tile, render: boolean = true) {
+		
 		if (!hexExists(hexId)) return;
 
 		if (tilesMatch(tfield.hexes[hexId].tile, tile)) return;
@@ -713,6 +729,8 @@
 	}
 
 	export function placeTerrain() {
+		$store_has_unsaved_changes = true
+		
 		//data_terrain = data_terrain
 		// Needs checking if terrain matches what we're trying to place already
 		if (controls.mouseDown[0]) {
@@ -727,6 +745,8 @@
 	}
 
 	function paintHexFromData(hexId: hex_id) {
+		$store_has_unsaved_changes = true
+		
 		//data_terrain = data_terrain
 
 		paintFromTile(hexId, data_terrain.tile);
@@ -784,6 +804,8 @@
 
 	/* USER ACTIONS */
 	export function removeAllTilesOfSet(setId: string) {
+		$store_has_unsaved_changes = true
+		
 		Object.entries(tfield.hexes).forEach(([hexId, hex]: [hex_id, TerrainHex]) => {
 			if (!hex.tile) return;
 
@@ -820,6 +842,8 @@
 	}
 
 	export function eraseAtMouse() {
+		$store_has_unsaved_changes = true
+		
 		let clickedCoords = coords_worldToCube(
 			store_panning.curWorldX(),
 			store_panning.curWorldY(),
@@ -839,6 +863,8 @@
 	}
 
 	function paintbucket() {
+		$store_has_unsaved_changes = true
+		
 		let x = store_panning.curWorldX();
 		let y = store_panning.curWorldY();
 		let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
@@ -856,6 +882,8 @@
 	}
 
 	function erasePaintbucket() {
+		$store_has_unsaved_changes = true
+		
 		// Find all like hexes, much like a paintbucket, and perform a specific operation on them, passing in hex id as a parameter
 
 		let clickedId = genHexId_coordsObj(

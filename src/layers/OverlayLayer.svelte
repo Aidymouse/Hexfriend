@@ -7,6 +7,8 @@
 	import * as store_panning from '../stores/panning';
 	import * as store_inputs from '../stores/inputs';
 	
+    import { store_has_unsaved_changes } from '../stores/flags';
+
     import type { input_state } from '../types/inputs';
 	import type { overlay_data } from '../types/data';
 	import type { pan_state } from '../types/panning';
@@ -71,6 +73,8 @@
             
             oldX = store_panning.curWorldX()
             oldY = store_panning.curWorldY()
+
+            $store_has_unsaved_changes = true;
         }
 
         if (grabbed_handle) {
@@ -122,6 +126,8 @@
             old_handle_y = store_panning.curWorldY();
             
             data_overlay = data_overlay
+
+            $store_has_unsaved_changes = true;
         } 
 
 

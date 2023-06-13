@@ -13,10 +13,8 @@ hexfiend red: #FF6666
 - find more of a fix for why PIXI objects stick around when a new map is loaded
 // POLISH / ROADMAP
 // not ranked
-- terrain generator
-- terrain generator function validation
-- floating loaders - better feedback
 - save data checking (if loading, making new map, quitting)
+- floating loaders - better feedback
 - export at different sizes
 - dashed line
 - more fonts
@@ -39,6 +37,7 @@ hexfiend red: #FF6666
 	import TilesetCreator from './components/TilesetCreator.svelte';
 	import ToolButtons from './components/ToolButtons.svelte';
 	import ControlTooltips from './components/TooltipsPane.svelte';
+	
 	// Layers
 	import CoordsLayer from './layers/CoordsLayer.svelte';
 	import IconLayer from './layers/IconLayer.svelte';
@@ -48,29 +47,36 @@ hexfiend red: #FF6666
 	import TerrainLayer from './layers/TerrainLayer.svelte';
 	import TextLayer from './layers/TextLayer.svelte';
 	import { db } from './lib/db';
+	
 	// Data
 	import DEFAULTSAVEDATA from './lib/defaultSaveData';
+	
 	// Methods
-	//import { collapseWaveGen } from './lib/terrainGenerator'
 	import { download } from './lib/download2';
 	import { getKeyboardShortcut } from './lib/keyboardShortcuts';
 	import { convertSaveDataToLatest } from './lib/saveDataConverter';
+	
 	// Lib
 	import * as texture_loader from './lib/texture_loader';
+	
 	// Panels
 	import IconPanel from './panels/IconPanel.svelte';
 	import OverlayPanel from './panels/OverlayPanel.svelte';
 	import PathPanel from './panels/PathPanel.svelte';
 	import TerrainPanel from './panels/TerrainPanel.svelte';
 	import TextPanel from './panels/TextPanel.svelte';
+
+	// Stores
 	import * as store_inputs from './stores/inputs';
 	import * as store_panning from './stores/panning';
 	import * as store_tfield from './stores/tfield';
 	import { store_selected_tool } from './stores/tools';
+	import { store_has_unsaved_changes } from './stores/flags';
+	
+	// GLOBAL STYLES
 	import './styles/inputs.css';
 	import './styles/panels.css';
 	import './styles/scrollbar.css';
-	// GLOBAL STYLES
 	import './styles/variables.css';
 	import { coord_system } from './types/coordinates';
 	// TYPES
@@ -124,12 +130,9 @@ hexfiend red: #FF6666
 	let comp_textLayer: TextLayer;
 	let comp_coordsLayer: CoordsLayer;
 	let comp_overlayLayer: OverlayLayer;
-
 	let comp_shortcutList: ShortcutList;
 
-	//offsetContainer.addChild(terrainGraphics);
-
-	/* PIXI CONTAINERS */
+	/* MASTER PIXI CONTAINERS */
 	let cont_icon = new PIXI.Container();
 	let cont_terrain = new PIXI.Container();
 	let cont_all_paths = new PIXI.Container();
@@ -386,6 +389,12 @@ hexfiend red: #FF6666
 		}
 	}
 
+	function before_unload(e: BeforeUnloadEvent) {
+		if ($store_has_unsaved_changes) {
+			e.preventDefault();
+		}
+	}
+
 	/* KEYBOARD EVENTS */
 	function handleShortcuts(e: KeyboardEvent) {
 		// Generate key code
@@ -639,6 +648,8 @@ hexfiend red: #FF6666
 			loadedId = Number(id);
 		}
 
+		$store_has_unsaved_changes = false
+
 		saving = false;
 	}
 
@@ -781,7 +792,7 @@ hexfiend red: #FF6666
 	onMount(() => {});
 </script>
 
-<svelte:window on:keydown={keyDown} on:keyup|preventDefault={keyUp} on:blur={blur}/>
+<svelte:window on:keydown={keyDown} on:keyup|preventDefault={keyUp} on:blur={blur} on:beforeunload={before_unload}/>
 
 {#if appState == app_state.NORMAL}
 	<main id="content-arranger">

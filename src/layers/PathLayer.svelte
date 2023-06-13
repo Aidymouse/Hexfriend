@@ -6,6 +6,8 @@
 	import { store_selected_tool } from '../stores/tools';
 	import * as PIXI from 'pixi.js';
 
+	import { store_has_unsaved_changes } from '../stores/flags';
+
 	import type { path_data } from '../types/data';
 	import type { pan_state } from '../types/panning';
 	import type { path_layer_path } from '../types/path';
@@ -46,6 +48,7 @@
 	function appendPoint(path: path_layer_path, x: number, y: number) {
 		path.points = [...path.points, x, y];
 		paths = paths;
+		$store_has_unsaved_changes = true;
 	}
 
 	export function pointerdown() {
@@ -80,6 +83,8 @@
 		paths = paths;
 
 		if (path.points.length == 0) deletePath(path);
+
+		$store_has_unsaved_changes = true;
 	}
 
 	export function deletePath(path: path_layer_path) {
@@ -89,6 +94,8 @@
 		paths.splice(pathIndex, 1);
 
 		paths = paths;
+
+		$store_has_unsaved_changes = true;
 	}
 
 	function getSnapPoint() {
@@ -134,6 +141,8 @@
 		data_path.selectedPath = paths[paths.length - 1];
 		data_path.hoveredPath = null;
 		//console.log(paths);
+
+		$store_has_unsaved_changes = true;
 	}
 
 	function pathPointsToPoints(path: path_layer_path) {
@@ -309,6 +318,7 @@
 		});
 
 		paths = paths;
+		$store_has_unsaved_changes = true;
 	}
 
 	/* KEYBOARD */

@@ -6,6 +6,9 @@
 	
 
 	import * as store_panning from '../stores/panning';
+
+	import { store_has_unsaved_changes } from '../stores/flags';
+
 	import type { text_data } from '../types/data';
 	import type { shortcut_data } from '../types/inputs';
 	import type { pan_state } from '../types/panning';
@@ -51,7 +54,6 @@
 	}
 
 	function rotate_end() {
-	
 	}
 
 	let textId = 0;
@@ -119,6 +121,7 @@
 			dragText.x = store_panning.curWorldX() - dragX;
 			dragText.y = store_panning.curWorldY() - dragY;
 			texts = texts;
+			$store_has_unsaved_changes = true;
 		}
 	}
 
@@ -135,6 +138,7 @@
 		textId++;
 		texts = texts;
 		data_text.selectedText = texts[texts.length - 1];
+		$store_has_unsaved_changes = true;
 	}
 
 
@@ -143,6 +147,7 @@
 		let i = texts.indexOf(text);
 		texts.splice(i, 1);
 		texts = texts;
+		$store_has_unsaved_changes = true;
 	}
 
 	function getTextWidth(text: text_layer_text): number {
@@ -168,20 +173,24 @@
 		});
 
 		texts = texts;
+		$store_has_unsaved_changes = true;
 	}
 
 	export function handleKeyboardShortcut(shortcutData: shortcut_data) {
 		switch (shortcutData.function) {
 			case 'toggleItalics':
 				data_text.style.fontStyle = data_text.style.fontStyle == 'italic' ? 'normal' : 'italic';
+				$store_has_unsaved_changes = true;
 				break;
 
 			case 'toggleBold':
 				data_text.style.fontWeight = data_text.style.fontWeight == 'bold' ? 'normal' : 'bold';
+				$store_has_unsaved_changes = true;
 				break;
 
 			case 'deleteText':
 				if (data_text.selectedText) deleteText(data_text.selectedText);
+				$store_has_unsaved_changes = true;
 				break;
 		}
 	}
