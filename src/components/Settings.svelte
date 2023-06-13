@@ -961,7 +961,9 @@
 	<h2>About</h2>
 	<p class="helperText">
 		Hexfriend version 1.7.2 - "It's a whole new world, Hexfriend!"
-		<br />
+	</p>
+	
+	<p class="helperText">
 		By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
 	</p>
 
@@ -969,6 +971,10 @@
 		Hexfriend is built with Svelte, Pixi JS and Typescript. Check out the <a href="https://www.github.com/Aidymouse/Hexfriend">Github</a>
 	</p>
   
+	<p class="helperText">
+		Found a bug? Got ideas? Come say hi on the <a href="https://discord.gg/Jvws27VmWR">discord</a>
+	</p>
+
 	<p class="helperText">
 		You can give away your hard earned money on <br><a href="https://ko-fi.com/aidymouse">Ko-fi</a>.
 	</p>
