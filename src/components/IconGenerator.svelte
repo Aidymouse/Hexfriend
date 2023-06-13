@@ -6,6 +6,8 @@ import type { hex_id } from 'src/types/toolData';
 	import * as store_tfield from '../stores/tfield';
 	import { rand, pick_from_weighted } from '../helpers/random';
 	
+	import { store_has_unsaved_changes } from '../stores/flags';
+
 	import type { TerrainHex, terrain_field } from '../types/terrain';
 	import type { Tile, Tileset, tile_id } from '../types/tilesets';
 	import type { coords_cubeToWorld } from '../helpers/hexHelpers';
@@ -94,6 +96,8 @@ import type { hex_id } from 'src/types/toolData';
 
 
 		})
+
+		$store_has_unsaved_changes = true
 
 	}
 

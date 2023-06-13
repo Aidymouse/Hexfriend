@@ -10,6 +10,8 @@
 	// Stores
 	import * as store_tfield from '../stores/tfield';
 	import { store_selected_tool } from '../stores/tools';
+	import { store_has_unsaved_changes } from '../stores/flags';
+
 	// Enums
 	import { coord_system } from '../types/coordinates';
 	import type { coordinates_data, overlay_data, terrain_data, trace_data } from '../types/data';
@@ -89,6 +91,8 @@
 
 		comp_terrainLayer.changeOrientation();
 
+		$store_has_unsaved_changes = true;
+
 		//redrawEntireMap()
 	}
 
@@ -123,6 +127,7 @@
 			/* We also have to load all of these textures */
 			//addTilesetTextures(setToImport, L);
 			texture_loader.load_tileset_textures(setToImport);
+			$store_has_unsaved_changes = true;
 		};
 	}
 
@@ -135,6 +140,8 @@
 		loadedTilesets = loadedTilesets.filter((ts: Tileset) => ts.id != setId);
 		loadedSave.tilesets = loadedTilesets;
 
+		$store_has_unsaved_changes = true;
+
 		// Maybe we should remove tiles here, because otherwise the tiles just... fail to load.
 		// Check if these tiles are being used anywere
 	}
@@ -142,6 +149,8 @@
 	function removeIconset(setId: string) {
 		loadedIconsets = loadedIconsets.filter((is: Iconset) => is.id != setId);
 		loadedSave.iconsets = loadedIconsets;
+
+		$store_has_unsaved_changes = true;
 	}
 
 	let iconsetFiles: FileList;
@@ -169,6 +178,8 @@
 			/* We also have to load all of these textures */
 			//addIconsetTextures(setToImport, L);
 			texture_loader.load_iconset_textures(setToImport);
+
+			$store_has_unsaved_changes = true;
 		};
 	}
 
@@ -212,6 +223,8 @@
 		comp_iconLayer.moveAllIcons(xMod, yMod);
 		comp_pathLayer.moveAllPaths(xMod, yMod);
 		comp_textLayer.moveAllTexts(xMod, yMod);
+
+		$store_has_unsaved_changes = true;
 	}
 
 	function square_reduceMapDimension(direction, amount) {
@@ -263,6 +276,8 @@
 		comp_iconLayer.moveAllIcons(xMod, yMod);
 		comp_pathLayer.moveAllPaths(xMod, yMod);
 		comp_textLayer.moveAllTexts(xMod, yMod);
+
+		$store_has_unsaved_changes = true;
 	}
 
 	function flower_expandHexesOut(amount) {
@@ -285,6 +300,8 @@
 				comp_terrainLayer.changeMapShape(tfield.mapShape);
 			}
 		}
+
+		$store_has_unsaved_changes = true;
 	}
 
 	// Imports
@@ -315,6 +332,8 @@
 			data_overlay.scale.y = 1;
 			showSettings = false;
 			store_selected_tool.update((n) => tools.OVERLAY);
+
+			$store_has_unsaved_changes = true;
 		};
 	}
 
@@ -941,7 +960,7 @@
 
 	<h2>About</h2>
 	<p class="helperText">
-		Hexfriend version 1.7.0 - "It's a whole new world, Hexfriend!"
+		Hexfriend version 1.7.2 - "It's a whole new world, Hexfriend!"
 		<br />
 		By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
 	</p>

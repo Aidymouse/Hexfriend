@@ -389,6 +389,8 @@
 
 	.terrain-category button {
 		background-color: var(--lighter-background);
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
 	}
 
 	.terrain-category button:hover {

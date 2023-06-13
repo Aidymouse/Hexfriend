@@ -464,7 +464,10 @@ hexfiend red: #FF6666
 						break;
 
 					case 'toggle_overlay':
-						if (data_overlay.base64 != '') data_overlay.shown = !data_overlay.shown;
+						if (data_overlay.base64 != '') {
+							data_overlay.shown = !data_overlay.shown;
+							$store_has_unsaved_changes = true;
+						}
 						break;
 				}
 
