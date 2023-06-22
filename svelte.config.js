@@ -1,10 +1,7 @@
-import sveltePreprocess from 'svelte-preprocess';
-
-//import adapter from '@sveltejs/adapter-auto';
-//import { resolve } from 'path';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte'
 
 export default {
-	// Consult https://github.com/sveltejs/svelte-preprocess
-	// for more information about preprocessors
-	preprocess: sveltePreprocess(),
-};
+  // Consult https://svelte.dev/docs#compile-time-svelte-preprocess
+  // for more information about preprocessors
+  preprocess: vitePreprocess(),
+}

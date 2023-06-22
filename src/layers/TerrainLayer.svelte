@@ -1,4 +1,18 @@
 <script lang="ts">
+	import type { cube_coords } from '../types/coordinates';
+	import type { terrain_data } from '../types/data';
+	import type { shortcut_data } from '../types/inputs';
+	import type { pan_state } from '../types/panning';
+	import type { map_shape } from '../types/settings';
+	import type { TerrainHex, terrain_field } from '../types/terrain';
+	import type { Tile } from '../types/tilesets';
+	import type { TileSymbol } from '../types/tilesets';
+	import type { hex_id, tools } from '../types/toolData';
+	import type CoordsLayer from './CoordsLayer.svelte';
+	
+	// Enums
+	import { hex_orientation, hex_raised } from '../types/terrain';
+
 	// There's probably some clean up to do in that different colored hexes can have the same ID...
 	import {
 		coords_cubeToWorld,
@@ -17,16 +31,6 @@
 	import * as store_tfield from '../stores/tfield';
 	import { store_has_unsaved_changes } from '../stores/flags';
 	//import { collapseWaveGen } from '../lib/terrainGenerator';
-	import type { cube_coords } from '../types/coordinates';
-	import type { terrain_data } from '../types/data';
-	import type { shortcut_data } from '../types/inputs';
-	import type { pan_state } from '../types/panning';
-	import { map_shape } from '../types/settings';
-	import { hex_orientation, hex_raised, TerrainHex, terrain_field } from '../types/terrain';
-	import type { Tile } from '../types/tilesets';
-	import type { TileSymbol } from '../types/tilesets';
-	import { hex_id, tools } from '../types/toolData';
-	import type CoordsLayer from './CoordsLayer.svelte';
 	import * as PIXI from 'pixi.js';
 	import { onMount } from 'svelte';
 
@@ -809,7 +813,7 @@
 		Object.entries(tfield.hexes).forEach(([hexId, hex]: [hex_id, TerrainHex]) => {
 			if (!hex.tile) return;
 
-			let hexSetId = hex.tile.id.split('_')[0];
+			let hexSetId = hex.tile.tileset_id;
 			if (setId == hexSetId) {
 				eraseHex(hexId);
 			}

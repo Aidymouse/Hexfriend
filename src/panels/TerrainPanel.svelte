@@ -28,6 +28,10 @@
 
 	let tilePreview: string; //generateTilePreview(data_terrain);
 
+	export function reset_tile() {
+		changeTile(loadedTilesets[0].tiles[0]);
+	}
+
 	async function changeTile(t: Tile) {
 		data_terrain.tile = { ...t, symbol: t.symbol ? { ...t.symbol } : null };
 		tilePreview = await generateTilePreview(data_terrain); // Not entirely sure why we have to await here when we already await in the function, but fuck it, it works

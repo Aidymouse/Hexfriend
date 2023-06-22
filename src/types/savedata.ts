@@ -3,11 +3,11 @@ import type { Iconset } from './icon';
 import type { terrain_field } from './terrain';
 import type { Tileset } from './tilesets';
 
-export const LATESTSAVEDATAVERSION = 5;
-export const LATESTDEFAULTTILESVERSION = 4;
-export const LATESTDEFAULTICONSVERSION = 5;
+const LATESTSAVEDATAVERSION = 6;
+const LATESTDEFAULTTILESVERSION = 4;
+const LATESTDEFAULTICONSVERSION = 5;
 
-export interface save_data {
+interface save_data {
 	saveVersion: number;
 	title: string;
 
@@ -26,3 +26,6 @@ export interface save_data {
 	pathStyles: any[];
 	textStyles: any[];
 }
+
+export type { save_data }
+export { LATESTDEFAULTICONSVERSION, LATESTDEFAULTTILESVERSION, LATESTSAVEDATAVERSION }

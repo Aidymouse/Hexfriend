@@ -1,33 +1,37 @@
 <script lang="ts">
-	// Components
 	// Types
 	import type CoordsLayer from '../layers/CoordsLayer.svelte';
 	import type IconLayer from '../layers/IconLayer.svelte';
 	import type PathLayer from '../layers/PathLayer.svelte';
 	import type TerrainLayer from '../layers/TerrainLayer.svelte';
 	import type TextLayer from '../layers/TextLayer.svelte';
-	import * as texture_loader from '../lib/texture_loader';
+	import type TerrainPanel from '../panels/TerrainPanel.svelte';
+	import type { coordinates_data, overlay_data, terrain_data, trace_data } from '../types/data';
+	import type { Iconset } from '../types/icon';
+	import type { save_data } from '../types/savedata';
+	import type { terrain_field } from '../types/terrain';
+	import type { Tileset } from '../types/tilesets';
+	import type { tools } from '../types/toolData';
+	import type * as PIXI from 'pixi.js';	
+	
+	// Enums
+	import { coord_system } from '../types/coordinates';
+	import { LATESTDEFAULTICONSVERSION, LATESTDEFAULTTILESVERSION } from '../types/savedata';
+	import { hex_raised, hex_orientation } from '../types/terrain';
+	import { map_shape } from '../types/settings';
+	
 	// Stores
 	import * as store_tfield from '../stores/tfield';
 	import { store_selected_tool } from '../stores/tools';
 	import { store_has_unsaved_changes } from '../stores/flags';
-
-	// Enums
-	import { coord_system } from '../types/coordinates';
-	import type { coordinates_data, overlay_data, terrain_data, trace_data } from '../types/data';
-	import type { Iconset } from '../types/icon';
-	import { LATESTDEFAULTICONSVERSION, save_data } from '../types/savedata';
-	import { LATESTDEFAULTTILESVERSION } from '../types/savedata';
-	import { map_shape } from '../types/settings';
-	import { hex_orientation, terrain_field } from '../types/terrain';
-	import { hex_raised } from '../types/terrain';
-	import type { Tileset } from '../types/tilesets';
-	import { tools } from '../types/toolData';
+	
+	// Components
 	import Checkbox from './Checkbox.svelte';
 	import ColorInputPixi from './ColorInputPixi.svelte';
 	import SelectGrid from './SelectGrid.svelte';
+
 	// Lib
-	import type * as PIXI from 'pixi.js';
+	import * as texture_loader from '../lib/texture_loader';
 
 	export let loadedSave: save_data;
 	export let showSettings: boolean;
@@ -74,6 +78,8 @@
 	export let comp_iconLayer: IconLayer;
 	export let comp_pathLayer: PathLayer;
 	export let comp_textLayer: TextLayer;
+
+	export let comp_terrain_panel: TerrainPanel;
 
 	export let load: Function;
 
@@ -132,7 +138,11 @@
 	}
 
 	function removeTileset(setId: string) {
-		//comp_terrainLayer.removeAllTilesOfSet(setId)
+		if (!confirm("This will remove all tiles in use from this set. Continue?")) return;
+
+		comp_terrainLayer.removeAllTilesOfSet(setId)
+		comp_terrain_panel.reset_tile();
+
 
 		// This line will need to change if the default tileset ever gets removeable
 		//data_terrain.tile = {...loadedTilesets[0].tiles[0]}

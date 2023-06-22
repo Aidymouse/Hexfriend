@@ -1,19 +1,21 @@
 <script lang="ts">
-	import { coords_cubeToWorld, coords_worldToCube, cube_round } from '../helpers/hexHelpers';
-	import { Vector } from '../lib/vector2d';
-	import * as store_panning from '../stores/panning';
-	import * as store_tfield from '../stores/tfield';
-	import { store_selected_tool } from '../stores/tools';
-	import * as PIXI from 'pixi.js';
-
-	import { store_has_unsaved_changes } from '../stores/flags';
-
 	import type { path_data } from '../types/data';
 	import type { pan_state } from '../types/panning';
 	import type { path_layer_path } from '../types/path';
-	import { hex_orientation, terrain_field } from '../types/terrain';
-	import type { shortcut_data } from 'src/types/inputs';
-	import type { tools } from 'src/types/toolData';
+	import type { hex_orientation, terrain_field } from '../types/terrain';
+	import type { shortcut_data } from '../types/inputs';
+	import type { tools } from '../types/toolData';
+	
+	import * as store_panning from '../stores/panning';
+	import * as store_tfield from '../stores/tfield';
+	import { store_selected_tool } from '../stores/tools';
+	import { store_has_unsaved_changes } from '../stores/flags';
+	
+	import { coords_cubeToWorld, coords_worldToCube, cube_round } from '../helpers/hexHelpers';
+	import { Vector } from '../lib/vector2d';
+	import * as PIXI from 'pixi.js';
+
+
 	
 	import { afterUpdate, onMount } from 'svelte';
 

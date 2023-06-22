@@ -2,6 +2,19 @@ import { LATESTSAVEDATAVERSION } from '../types/savedata';
 import type { save_data } from '../types/savedata';
 import { hex_raised } from '../types/terrain';
 
+function convert_v5_to_v6(oldData: save_data): save_data {
+	// Changes in this version:
+	//	- tiles got set IDs seperate from their individual ID
+	//  - symbol ID is not the same as tile ID anymore, rather they are sorted out by the tilesetcreator
+	let new_data: save_data = JSON.parse(JSON.stringify(oldData));
+
+	
+	
+	new_data.saveVersion = 6
+	return new_data;
+
+}
+
 export function convertSaveDataToLatest(oldData: save_data): save_data {
 	// Update to latest version
 	let newData: save_data = JSON.parse(JSON.stringify(oldData));
@@ -55,6 +68,9 @@ export function convertSaveDataToLatest(oldData: save_data): save_data {
 		tId++;
 	});
 
-	newData.saveVersion = LATESTSAVEDATAVERSION;
+	newData.saveVersion = 5;
+
+	newData = convert_v5_to_v6(newData);
+
 	return newData;
 }

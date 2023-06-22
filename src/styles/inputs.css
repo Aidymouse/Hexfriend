@@ -102,11 +102,18 @@ select:hover {
 
 /* CLASSES */
 .selected {
+	/*
 	outline-style: solid;
 	outline-width: 2px;
 	outline-color: var(--hexfriend-green);
 	border-color: var(--hexfriend-green);
+	*/
+	background-color: var(--dark-primary);
 	transition-duration: 0s;
+}
+
+.selected:hover {
+	background-color: var(--dark-primary);
 }
 
 .green-button {

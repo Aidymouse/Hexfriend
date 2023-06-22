@@ -31,7 +31,7 @@ hexfiend red: #FF6666
 	import IconGenerator from './components/IconGenerator.svelte';
 	import IconsetCreator from './components/IconsetCreator.svelte';
 	import SavedMaps from './components/SavedMaps.svelte';
-	import MapSettings from './components/Settings.svelte';
+	import Settings from './components/Settings.svelte';
 	import ShortcutList from './components/ShortcutList.svelte';
 	import TerrainGenerator from './components/TerrainGenerator.svelte';
 	import TilesetCreator from './components/TilesetCreator.svelte';
@@ -112,7 +112,7 @@ hexfiend red: #FF6666
 		LOADINGMAP = 'loadingMap',
 	}
 
-	let appState: app_state = app_state.NORMAL;
+	let appState: app_state = app_state.TILESETCREATOR;
 
 	let showSettings = false;
 	let showTerrainGenerator = false;
@@ -131,6 +131,8 @@ hexfiend red: #FF6666
 	let comp_coordsLayer: CoordsLayer;
 	let comp_overlayLayer: OverlayLayer;
 	let comp_shortcutList: ShortcutList;
+
+	let comp_terrain_panel: TerrainPanel;
 
 	/* MASTER PIXI CONTAINERS */
 	let cont_icon = new PIXI.Container();
@@ -183,6 +185,7 @@ hexfiend red: #FF6666
 
 	/* DATA */
 	/* Data is bound to both layer and panel of a particluar tool. It contains all the shared state they need, and is bound to both */
+	/* These should probably be stores huh */
 
 	let data_terrain: terrain_data = {
 		//bgColor: null,
@@ -852,7 +855,7 @@ hexfiend red: #FF6666
 		{:else if show_icon_generator}
 			<IconGenerator {loadedIconsets} {comp_iconLayer} bind:show_icon_generator />
 		{:else if selectedTool == 'terrain'}
-			<TerrainPanel {loadedTilesets} {app} bind:data_terrain />
+			<TerrainPanel bind:this={comp_terrain_panel} {loadedTilesets} {app} bind:data_terrain />
 		{:else if selectedTool == 'icon'}
 			<IconPanel {app} {loadedIconsets} bind:data_icon />
 		{:else if selectedTool == 'path'}
@@ -914,7 +917,7 @@ hexfiend red: #FF6666
 
 		<SavedMaps bind:showSavedMaps {createNewMap} load={loadInit} />
 
-		<MapSettings
+		<Settings
 			{loadedSave}
 			bind:showSettings
 			bind:appState
@@ -929,6 +932,7 @@ hexfiend red: #FF6666
 			{comp_iconLayer}
 			{comp_pathLayer}
 			{comp_textLayer}
+			{comp_terrain_panel}
 			renderAllHexes={() => {
 				comp_terrainLayer.renderAllHexes();
 			}}

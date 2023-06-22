@@ -1,8 +1,10 @@
 <script lang="ts">
-	import type { hexOrientation } from '../helpers/hexHelpers';
+
+	import type { hex_orientation } from '../types/terrain';
+	import type { Icon, Iconset } from '../types/icon';
+
 	import { getHexPathRadius } from '../helpers/hexHelpers';
 	import { download } from '../lib/download2';
-	import type { Icon, Iconset } from '../types/icon';
 	import ColorInputPixi from './ColorInputPixi.svelte';
 	import * as PIXI from 'pixi.js';
 	import { afterUpdate, tick } from 'svelte';
@@ -16,7 +18,7 @@
 
 	export let appState;
 
-	let orientation: hexOrientation = 'flatTop';
+	let orientation: hex_orientation = 'flatTop';
 
 	let workingIconset: Iconset = {
 		name: 'New Iconset',

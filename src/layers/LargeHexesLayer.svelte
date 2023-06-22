@@ -1,4 +1,10 @@
 <script lang="ts">
+	import type { pan_state } from '../types/panning';
+	import type { hex_id } from '../types/toolData';
+	import type { terrain_field } from '../types/terrain';
+
+	import { hex_orientation, hex_raised } from '../types/terrain';
+
 	import * as store_panning from '../stores/panning';
 	import * as store_tfield from '../stores/tfield';
 	
@@ -8,10 +14,7 @@
 
 	import * as hex_helpers from '../helpers/hexHelpers';
 	
-	import type { pan_state } from 'src/types/panning';
-	import { hex_orientation, hex_raised, terrain_field } from '../types/terrain';
 	import { map_shape } from '../types/settings';
-	import type { hex_id } from 'src/types/toolData';
 
 	export let cont_largehexes: PIXI.Container;
 	let grph_largehexes = new PIXI.Graphics();

@@ -1,9 +1,7 @@
 import type { TerrainHex } from '../types/terrain';
 import type { hex_id } from '../types/toolData';
 import type { cube_coords } from '../types/coordinates';
-
-export type hexOrientation = 'flatTop' | 'pointyTop';
-type cubeCoords = { q: number; r: number; s: number };
+import type { hex_orientation } from '../types/terrain';
 
 const hexDirVectors: cube_coords[] = [
 	{ q: 1, r: 0, s: -1 },
@@ -17,7 +15,7 @@ const hexDirVectors: cube_coords[] = [
 export function getHexPath(
 	width: number,
 	height: number,
-	orientation: hexOrientation = 'flatTop',
+	orientation: hex_orientation = 'flatTop',
 	centerX: number = 0,
 	centerY: number = 0
 ): number[] {
@@ -54,7 +52,7 @@ export function getHexPath(
 	}
 }
 
-export function getHexPathRadius(radius: number, orientation: hexOrientation = 'flatTop', centerX: number = 0, centerY: number = 0): number[] {
+export function getHexPathRadius(radius: number, orientation: hex_orientation = 'flatTop', centerX: number = 0, centerY: number = 0): number[] {
 	let w: number, h: number;
 	if (orientation == 'pointyTop') {
 		h = radius * 2;
@@ -66,7 +64,7 @@ export function getHexPathRadius(radius: number, orientation: hexOrientation = '
 	return getHexPath(w, h, orientation, centerX, centerY);
 }
 
-export function id_to_coords(hex_id: hex_id): cubeCoords {
+export function id_to_coords(hex_id: hex_id): cube_coords {
 	let id_parts = hex_id.split(":")
 	return {q: +id_parts[0], r: +id_parts[1], s: +id_parts[2]}
 }
@@ -75,7 +73,7 @@ export function genHexId(q: number, r: number, s: number): hex_id {
 	return `${q}:${r}:${s}`;
 }
 
-export function genHexId_coordsObj(coords: cubeCoords): hex_id {
+export function genHexId_coordsObj(coords: cube_coords): hex_id {
 	let q = coords.q;
 	let r = coords.r;
 	let s = coords.s;
@@ -141,11 +139,11 @@ export function getNeighbours(q: number, r: number, s: number): hex_id[] {
 }
 
 /* COORDS */
-function AxialToCube(q: number, r: number): cubeCoords {
+function AxialToCube(q: number, r: number): cube_coords {
 	return { q: q, r: r, s: -q - r };
 }
 
-export function cube_round(frac: cubeCoords): cubeCoords {
+export function cube_round(frac: cube_coords): cube_coords {
 	let q = Math.round(frac.q);
 	let r = Math.round(frac.r);
 	let s = Math.round(frac.s);
@@ -165,8 +163,8 @@ export function cube_round(frac: cubeCoords): cubeCoords {
 	return { q: q, r: r, s: s };
 }
 
-export function coords_worldToCube(worldX: number, worldY: number, hexOrientation: hexOrientation, hexWidth: number, hexHeight: number): cubeCoords {
-	if (hexOrientation == 'flatTop') {
+export function coords_worldToCube(worldX: number, worldY: number, hex_orientation: hex_orientation, hexWidth: number, hexHeight: number): cube_coords {
+	if (hex_orientation == 'flatTop') {
 		// This is the inversion of the axialToWorld
 		// Of course, substituting -q-r in as S
 
@@ -176,7 +174,7 @@ export function coords_worldToCube(worldX: number, worldY: number, hexOrientatio
 		let roundedCoords = cube_round(AxialToCube(q, r));
 
 		return roundedCoords;
-	} else if (hexOrientation == 'pointyTop') {
+	} else if (hex_orientation == 'pointyTop') {
 		let r = worldY / (hexHeight * 0.75);
 		let q = ((2 * worldX) / hexWidth - r) / 2;
 
@@ -190,11 +188,11 @@ export function coords_cubeToWorld(
 	q: number,
 	r: number,
 	s: number,
-	hexOrientation: hexOrientation,
+	hex_orientation: hex_orientation,
 	hexWidth: number,
 	hexHeight: number
 ): { x: number; y: number } {
-	if (hexOrientation == 'flatTop') {
+	if (hex_orientation == 'flatTop') {
 		let hx = q * hexWidth * 0.75;
 		let hy = (r * hexHeight) / 2 - (s * hexHeight) / 2;
 
@@ -202,7 +200,7 @@ export function coords_cubeToWorld(
 			x: hx,
 			y: hy,
 		};
-	} else if (hexOrientation == 'pointyTop') {
+	} else if (hex_orientation == 'pointyTop') {
 		let hx = (q * hexWidth) / 2 - (s * hexWidth) / 2;
 		let hy = r * hexHeight * 0.75;
 

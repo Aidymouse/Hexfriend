@@ -1,4 +1,23 @@
 <script lang="ts">
+	import type { eraser_data, icon_data } from '../types/data';
+	import type { IconLayerIcon, Icon } from '../types/icon';
+	import type { shortcut_data } from '../types/inputs';
+	import type { pan_state } from '../types/panning';
+	import type { terrain_field } from '../types/terrain';
+	import type { cube_coords } from '../types/coordinates';
+	import type { hex_orientation } from '../types/terrain';
+	
+	// Enums
+	import { tools } from '../types/toolData';
+	import { map_shape } from '../types/settings';
+	import { store_has_unsaved_changes } from '../stores/flags';
+	
+	// Stores
+	import * as store_panning from '../stores/panning';
+	import * as store_tfield from '../stores/tfield';
+	import { store_selected_tool } from '../stores/tools';
+	
+	// Lib
 	import {
 		coords_cubeToWorld,
 		coords_cubeToq,
@@ -6,27 +25,11 @@
 		coords_qToCube,
 		coords_rToCube,
 		coords_worldToCube,
-		hexOrientation,
 	} from '../helpers/hexHelpers';
-	import * as store_panning from '../stores/panning';
-	import * as store_tfield from '../stores/tfield';
-	import { store_selected_tool } from '../stores/tools';
-	import { tools } from '../types/toolData';
-	import { map_shape } from '../types/settings';
 	import * as PIXI from 'pixi.js';
-
-	import { store_has_unsaved_changes } from '../stores/flags';
-	
 	import { get_icon_texture } from '../lib/texture_loader'
 	import { afterUpdate, onMount } from 'svelte';
 	
-	import type { eraser_data, icon_data } from '../types/data';
-	import type { IconLayerIcon, Icon } from '../types/icon';
-	import type { shortcut_data } from '../types/inputs';
-	import type { pan_state } from '../types/panning';
-	import type { terrain_field } from '../types/terrain';
-	import type { cube_coords } from '../types/coordinates';
-
 
 	export let icons: IconLayerIcon[] = [];
 	let pixi_icons: {[key: number]: PIXI.Sprite} = {}; // keeps up to date with icons
@@ -289,7 +292,7 @@
 		oldHexHeight = newHexHeight;
 	}
 
-	export function retainIconPositionOnOrientationChange(newOrientation: hexOrientation) {
+	export function retainIconPositionOnOrientationChange(newOrientation: hex_orientation) {
 		switch (tfield.mapShape) {
 			case map_shape.SQUARE:
 				square_retainIconPositionOnOrientationChange(newOrientation);
@@ -301,12 +304,12 @@
 		}
 	}
 
-	function square_retainIconPositionOnOrientationChange(newOrientation: hexOrientation) {
+	function square_retainIconPositionOnOrientationChange(newOrientation: hex_orientation) {
 		// Only really works on square maps afaik
 		// Because it relies on row/col coords
 
 		icons.forEach((icon: IconLayerIcon) => {
-			let oldOrientation: hexOrientation = newOrientation == 'flatTop' ? 'pointyTop' : 'flatTop';
+			let oldOrientation: hex_orientation = newOrientation == 'flatTop' ? 'pointyTop' : 'flatTop';
 
 			// Find the center coordinates of the hex the icon wants to stay in
 			let oldClosestHexCubeCoords = coords_worldToCube(icon.x, icon.y, oldOrientation, oldHexWidth, oldHexHeight);
@@ -359,7 +362,7 @@
 		oldHexHeight = tfield.hexHeight;
 	}
 
-	function flower_retainIconPositionOnOrientationChange(newOrientation: hexOrientation) {
+	function flower_retainIconPositionOnOrientationChange(newOrientation: hex_orientation) {
 		// Find the current
 	}
 

@@ -39,7 +39,7 @@ let DEFAULTSAVEDATA: save_data = {
 			encompassEdges: false,
 		},
 
-		hexes: {},
+		hexes: {}, // Populated below
 	},
 
 	coords: {

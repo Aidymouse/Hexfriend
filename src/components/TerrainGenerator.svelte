@@ -1,60 +1,77 @@
 <script lang="ts">
 	
-	import { genHexId, genHexId_tfieldHex, getNeighbours } from '../helpers/hexHelpers';
-	import { download } from '../lib/download2';
-	import * as store_tfield from '../stores/tfield';
-	import { rand, pick_from_weighted, random_choice } from '../helpers/random';
-	import Checkbox from '../components/Checkbox.svelte';
-	
-	import { store_has_unsaved_changes } from '../stores/flags';
-
-	import type { hex_id } from 'src/types/toolData';
+	// TYPE
 	import type { TerrainHex, terrain_field } from '../types/terrain';
 	import type { Tile, Tileset, tile_id } from '../types/tilesets';
+	import type { hex_id } from '../types/toolData';
 	
-	import { one_e_dmg_ruleset } from '../lib/generation_rulesets/one_e_dmg';
-	import { icy } from '../lib/generation_rulesets/icy';
-	import { jungle } from '../lib/generation_rulesets/jungle';
+	interface rule {
+		id: tile_id
+		weight: number
+	}
+	
+	type generation_ruleset = {[key: hex_id]: rule[]}
+	
+	// STORE
+	import { store_has_unsaved_changes } from '../stores/flags';
+	import * as store_tfield from '../stores/tfield';
 
-	export let loadedTilesets: Tileset[];
 	let tfield: terrain_field;
 	store_tfield.store.subscribe((newTField) => {
 		tfield = newTField;
 	});
+
+	// COMPONENT
+	import Checkbox from '../components/Checkbox.svelte';
+	
+	// HELPER
+	import { genHexId, genHexId_tfieldHex, getNeighbours } from '../helpers/hexHelpers';
+	import { rand, pick_from_weighted, random_choice } from '../helpers/random';
+	
+	// LIB
+	import { download } from '../lib/download2';
+	import { one_e_dmg_ruleset } from '../lib/generation_rulesets/one_e_dmg';
+	import { icy } from '../lib/generation_rulesets/icy';
+	import { jungle } from '../lib/generation_rulesets/jungle';
+
+
+
+	
+	export let loadedTilesets: Tileset[];
 	export let comp_terrainLayer;
 	export let showTerrainGenerator: boolean;
 
 	let importFiles: FileList;
-
 	let selectedId = loadedTilesets[0].tiles[0].id;
 
 	let gen_config_animate = false;
 	let gen_config_clear = false;
 
-	interface rule {
-		id: tile_id
-		weight: number
-	}
 
-	type generation_ruleset = {[key: hex_id]: rule[]}
-
-	let current_ruleset: generation_ruleset = JSON.parse(JSON.stringify(one_e_dmg_ruleset));
-	let selector_ruleset = one_e_dmg_ruleset;
+	let current_ruleset: generation_ruleset = {} //JSON.parse(JSON.stringify(one_e_dmg_ruleset));
+	let selector_ruleset = null //one_e_dmg_ruleset;
 	// Populate the gen function
-	/*
+	
 	loadedTilesets.forEach((tileset: Tileset) => {
 		tileset.tiles.forEach((tile: Tile) => {
 			current_ruleset[tile.id] = [{ id: tile.id, weight: 1 }];
 		});
 	});
-	*/
+	
 
 	function getTileFromId(tileId: tile_id) {
-		let setId = tileId.split('_')[0];
-		
-		let tileset = loadedTilesets.find((tileset: Tileset) => tileset.id == setId);
+		console.log(tileId);
 
-		return tileset.tiles.find((tile: Tile) => tile.id == tileId);
+		let key_obj = JSON.parse(tileId)
+
+		let ts = loadedTilesets.find(ts => ts.id == key_obj.tileset_id)
+		let t = ts.tiles.find(tile => tile.id == tileId)
+
+		console.log(ts)
+
+		console.log(t)
+
+		return t
 	}
 
 	function paint_hex(hex_id, tile, index) {

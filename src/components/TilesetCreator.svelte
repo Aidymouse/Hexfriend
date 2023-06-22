@@ -1,12 +1,38 @@
 <script lang="ts">
-	import ColorInputPixi from '../components/ColorInputPixi.svelte';
-	import type { hexOrientation } from '../helpers/hexHelpers';
-	import { getHexPathRadius } from '../helpers/hexHelpers';
-	import { download } from '../lib/download2';
+	
+	// TYPES
 	import type { Tile, TileSymbol, Tileset } from '../types/tilesets';
+	
+	interface working_tile {
+		display: string;
+		bgColor: number;
+		id: string; 
+		symbol: TileSymbol | null;
+	}
+
+	interface working_tileset {
+		name: string;
+		id: string;
+		author: string;
+		version: number;
+		tiles: working_tile[];
+	}
+
+	// ENUMS
+	import { hex_orientation } from '../types/terrain';
+	
+	// COMPONENTS
+	import ColorInputPixi from './ColorInputPixi.svelte';
+	import CanvasHolder from './CanvasHolder.svelte';
+
+	// HELPER
+	import { getHexPathRadius } from '../helpers/hexHelpers';
+	import { tile_to_tileset_id } from '../helpers/tile_helpers';
+	
+	// LIB
+	import { download } from '../lib/download2';
 	import * as PIXI from 'pixi.js';
 	import { afterUpdate, tick } from 'svelte';
-	import CanvasHolder from './CanvasHolder.svelte';
 	
 
 	let app = new PIXI.Application({
@@ -17,10 +43,11 @@
 
 	export let appState;
 
-	let orientation: hexOrientation = 'flatTop';
-	let oldOrientation: hexOrientation = 'pointyTop';
+	let texture_register = {} // texture_id: texture
 
-	let workingTileset: Tileset = {
+	let orientation: hex_orientation = hex_orientation.FLATTOP;
+
+	let workingTileset: working_tileset = {
 		name: 'New Tileset',
 		id: 'new-tileset',
 		author: '',
@@ -28,32 +55,37 @@
 		tiles: [],
 	};
 
-	let selectedTile: Tile | null = null;
+	
+
+	let selectedTile: working_tile | null = null;
 
 	let previewSprite = new PIXI.Sprite();
 	let previewGraphics = new PIXI.Graphics();
 	let previewContainer = new PIXI.Container();
 	previewContainer.addChild(previewGraphics, previewSprite);
 
-	function findID(baseId: string): TileID {
+	function findID(baseId: string): tile_id {
+		baseId = IDify(baseId)
+		
 		let counter = 0;
-		let proposedId = `${IDify(workingTileset.id)}_${baseId}${counter == 0 ? '' : counter}`;
-
-		while (workingTileset.tiles.find((tile: Tile) => tile.id == proposedId) != null) {
+		let counter_suffix = counter == 0 ? '' : counter
+		let proposedId = `${baseId}${counter_suffix}`;
+		
+		while (workingTileset.tiles.find((tile: working_tile) => tile.id == proposedId) != null) {
 			counter++;
-			proposedId = `${IDify(workingTileset.id)}_${baseId}${counter == 0 ? '' : counter}`;
+			counter_suffix = counter == 0 ? '' : counter
+			proposedId = `${baseId}${counter_suffix}`;
 		}
 
 		return proposedId;
 	}
 
 	async function newTile() {
-		let newTile: Tile = {
+		let newTile: working_tile = {
 			display: 'New Hex',
-			id: findID(IDify('new-hex')),
+			id: findID('New Hex'),
 			symbol: null,
 			bgColor: DEFAULTBLANKHEXCOLOR,
-			preview: '',
 		};
 
 		newTile.preview = await generatePreview(newTile);
@@ -63,21 +95,21 @@
 		selectedTile = workingTileset.tiles[workingTileset.tiles.length - 1];
 	}
 
-	function duplicateTile(tile: Tile) {
+	function duplicateTile(tile: working_tile) {
 		let newTile = { ...tile };
 
 		newTile.display = 'Copy of ' + tile.display;
-		newTile.id = findID(IDify(newTile.display));
+		newTile.id = findID(newTile.display);
 
 		workingTileset.tiles = [...workingTileset.tiles, newTile];
 		selectedTile = workingTileset.tiles[workingTileset.tiles.length - 1];
 	}
 
-	function removeTile(tile: Tile) {
+	function removeTile(tile: working_tile) {
 		workingTileset.tiles = workingTileset.tiles.filter((t: Tile) => t.id != tile.id);
 	}
 
-	async function generatePreview(tile: Tile) {
+	async function generatePreview(tile: working_tile) {
 		previewGraphics.clear();
 		previewGraphics.beginFill(tile.bgColor);
 		previewGraphics.drawPolygon(getHexPathRadius(25, orientation, 0, 0));
@@ -85,7 +117,7 @@
 
 		previewSprite.texture = null;
 		if (tile.symbol) {
-			previewSprite.texture = PIXI.Texture.from(tile.symbol.base64);
+			previewSprite.texture = await PIXI.Assets.load(tile.symbol.base64);
 			previewSprite.scale.set(getSymbolScale(tile.symbol, 25).x);
 			previewSprite.anchor.set(0.5);
 			previewSprite.tint = tile.symbol.color;
@@ -120,7 +152,7 @@
 		r.readAsDataURL(symbolFiles[0]);
 		r.onload = async (eb) => {
 
-				let new_texture = await PIXI.Texture.from(r.result as string);
+				let new_texture = await PIXI.Assets.load(r.result as string);
 
 				selectedTile.symbol = {
 					color: selectedTile.symbol ? selectedTile.symbol.color : 0xffffff,
@@ -156,15 +188,18 @@
 	const DEFAULTBLANKHEXCOLOR = 0xf2f2f2;
 
 	function exportTileset() {
-		workingTileset.id = `${IDify(workingTileset.name)}:v${workingTileset.version}`;
+		let export_tileset: Tileset = workingTileset as Tileset
+
+		export_tileset.id = IDify(workingTileset.name);
 		
-		workingTileset.tiles.forEach(tile => {
-			tile.id = findID(tile.display)
+		export_tileset.tiles.forEach(tile => {
+			tile.id = JSON.stringify({tile_id: findID(tile.display), tileset_id: export_tileset.id})
+			tile.tileset_id = workingTileset.id
 		})
 
 
-		console.log(workingTileset)
-		download(JSON.stringify(workingTileset), workingTileset.name + `:v${workingTileset.version}` + '.hfts', 'application/json');
+		console.log(export_tileset)
+		download(JSON.stringify(export_tileset),  `${export_tileset.id}.hfts`, 'application/json');
 	}
 
 	let importFiles = [];
@@ -194,6 +229,7 @@
 
 
 	// Dragging Code
+	// Has a problem where the tile is deselected after dropping. What???
 	let phantomTileButtonId;
 
 	function dragButton(e: DragEvent, tile: Tile) {
@@ -250,7 +286,7 @@
 			
 			if (selectedTile.symbol) {
 				spr_symbol.visible = true
-				let symbol_texture = await PIXI.Texture.from(selectedTile.symbol.base64) 
+				let symbol_texture = await PIXI.Assets.load(selectedTile.symbol.base64) 
 				
 				spr_symbol.texture = symbol_texture
 				spr_symbol.x = 150
@@ -362,8 +398,9 @@
 
 			<div id="tile-controls">
 				<button
+					class="outline-button"
 					on:click={() => {
-						orientation = orientation == 'flatTop' ? 'pointyTop' : 'flatTop';
+						orientation = orientation == hex_orientation.FLATTOP ? hex_orientation.POINTYTOP : hex_orientation.FLATTOP;
 						generatePreview(selectedTile);
 					}}
 					title="Change Hex Orientation"
@@ -371,6 +408,7 @@
 					<img src="/assets/img/tools/changeOrientation.png" alt="Change Orientation" />
 				</button>
 				<button
+					class="outline-button"
 					on:click={() => {
 						duplicateTile(selectedTile);
 					}}
@@ -379,6 +417,7 @@
 					<img src="/assets/img/tools/duplicate.png" alt="Hex Duplicate" />
 				</button>
 				<button
+					class="outline-button"
 					on:click={() => {
 						removeTile(selectedTile);
 						selectedTile = null;
@@ -388,11 +427,7 @@
 					<img src="/assets/img/tools/trash.png" alt="Trash" />
 				</button>
 			</div>
-			<!--
-      <button on:click={() => {orientation = orientation == "flatTop" ? "pointyTop" : "flatTop"; workingTileset.tiles=workingTileset.tiles}}>Change Orientation</button>
-      <button on:click={() => { deleteTile() } }>Delete Hex</button>
-      <button on:click={() => { duplicateTile() }}> Duplicate Hex </button>
-      -->
+
 		</div>
 
 		<div id="tile-style">
@@ -406,16 +441,8 @@
 				</div>
 			</div>
 
-			<!-- Symbol Filename 
-        {#if workingTileset.tiles[stIndex].symbolFile}
-        Current Symbol: {workingTileset.tiles[stIndex].symbolFile.name}
-        {:else}
-        <p>Current Symbol: —</p>
-        {/if}
-      -->
-
 			<!-- File Upload Button -->
-			<button class="file-input-button">
+			<button class="file-input-button outline-button">
 				Upload Symbol
 				<input
 					type="file"
@@ -428,8 +455,7 @@
 				/>
 			</button>
 
-			<!-- Symbol Input Controls 
-      -->
+			<!-- Symbol Input Controls -->
 			{#if selectedTile.symbol}
 				<div class="color" style="margin-top: 10px">
 					<ColorInputPixi bind:value={selectedTile.symbol.color} w={50} h={50} />
@@ -447,12 +473,17 @@
 				</div>
 			{/if}
 		</div>
+	
+	
+	
 	{:else}
+
 		<div id="editor-placeholder">
 			<p style="color: #f2f2f2; margin-bottom: 10px;">Select a tile or make a new one!</p>
 
 			<p style="font-size: 10pt">For best results, use white 100px by 100px images for symbols.</p>
 		</div>
+	
 	{/if}
 </main>
 

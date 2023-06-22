@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { icon_data, overlay_data, path_data, terrain_data } from '../types/data';
+  	import type { hex_orientation } from '../types/terrain';
 	import { tools } from '../types/toolData';
 	import { afterUpdate } from 'svelte';
 
@@ -112,7 +113,7 @@
 	];
 
 	export let selectedTool: string;
-	export let hexOrientation: 'flatTop' | 'pointyTop';
+	export let hexOrientation: hex_orientation;
 
 	export let changeTool: Function;
 
