@@ -42,7 +42,7 @@
 	export let showTerrainGenerator: boolean;
 
 	let importFiles: FileList;
-	let selectedId = loadedTilesets[0].tiles[0].id;
+	let selected_key = tile_to_key(loadedTilesets[0].tiles[0]);
 
 	let gen_config_animate = false;
 	let gen_config_clear = false;
@@ -64,12 +64,6 @@
 		let ts = loadedTilesets.find(ts => ts.id == key_obj.tileset_id)
 		let t = ts.tiles.find(t => t.id == key_obj.id)
 		return t
-	}
-
-	function getTileFromId(tileId: tile_id) {
-
-		return get_tile_from_key(tileId)
-
 	}
 
 	function paint_hex(hex_id, tile, index) {
@@ -117,6 +111,8 @@
 		//standardGen(tfield.hexes, current_ruleset)
 		gen_old_school_generate(tfield.hexes, current_ruleset);
 		//comp_terrainLayer.renderAllHexes()
+
+		$store_has_unsaved_changes = true
 	}
 
 	function gen_old_school_generate(hexes, ruleset: generation_ruleset) {
@@ -209,7 +205,15 @@
 		let name = prompt("What would you like to call this ruleset?")
 		if (!name) return;
 
-		download(JSON.stringify(current_ruleset), `${name}.hfgrs`, 'hexfriendgeneratorruleset');
+		let transformed_ruleset = {}
+
+		Object.keys(current_ruleset).forEach(tile_key => {
+			if (current_ruleset[tile_key].length > 0) {
+				transformed_ruleset[tile_key] = current_ruleset[tile_key]
+			}
+		})
+
+		download(JSON.stringify(transformed_ruleset), `${name}.hfgrs`, 'hexfriendgeneratorruleset');
 	}
 
 	function importGenFunction() {
@@ -217,32 +221,49 @@
 
 		let r = new FileReader();
 		r.onload = (eb) => {
-			current_ruleset = { ...JSON.parse(r.result as string) };
+
+			let loaded_ruleset = JSON.parse(r.result as string)
+
+			current_ruleset = {}
+			loadedTilesets.forEach(ts => {
+				ts.tiles.forEach(t => {
+					let key = tile_to_key(t)
+					
+					if (Object.keys(loaded_ruleset).find(k => k == key)) {
+						current_ruleset[key] = loaded_ruleset[key]
+					} else {
+						current_ruleset[tile_to_key(t)] = []						
+					}
+
+				})
+			});
+
+			selected_key = Object.keys(current_ruleset)[0]
 		};
 
 		r.readAsText(importFiles[0]);
 	}
 
 	/* Modifying the ruleset */
-	function removeTileFromFunction(tile_id: tile_id, id_to_remove: tile_id) {
+	function removeTileFromFunction(tile_key: tile_id, key_to_remove: tile_id) {
 		selector_ruleset = null
 		
-		let terrain = current_ruleset[tile_id].find((rule_part) => rule_part.id == id_to_remove);
+		let terrain = current_ruleset[tile_key].find((rule_part) => rule_part.key == key_to_remove);
 		terrain.weight -= 1;
 
-		if (terrain.weight < 1) current_ruleset[tile_id].splice(current_ruleset[tile_id].indexOf(terrain), 1);
+		if (terrain.weight < 1) current_ruleset[tile_key].splice(current_ruleset[tile_key].indexOf(terrain), 1);
 		
-		current_ruleset[tile_id] = current_ruleset[tile_id];
+		current_ruleset[tile_key] = current_ruleset[tile_key];
 	}
 
-	function addTileToFunction(tile_id: tile_id, id_to_add: tile_id) {
+	function addTileToFunction(tile_key: tile_id, key_to_add: tile_id) {
 		selector_ruleset = null
 
-		let rule = current_ruleset[tile_id];
+		let rule = current_ruleset[tile_key];
 
-		let rule_part = rule.find((rp) => rp.id == id_to_add);
+		let rule_part = rule.find((rp) => rp.key == key_to_add);
 		if (!rule_part) {
-			rule_part = { id: id_to_add, weight: 0 }
+			rule_part = { key: key_to_add, weight: 0 }
 			rule.push(rule_part);
 		}
 		rule_part.weight += 1;
@@ -251,8 +272,23 @@
 	}
 
 	function selector_ruleset_change() {
-		console.log(selector_ruleset)
-		if (selector_ruleset != null) current_ruleset = JSON.parse(JSON.stringify(selector_ruleset));
+
+		loadedTilesets.forEach((tileset: Tileset) => {
+			tileset.tiles.forEach((tile: Tile) => {
+				let key = tile_to_key(tile)
+				
+				current_ruleset[key] = [];
+				
+				if (selector_ruleset != null) {
+					let selector_rule = Object.keys(selector_ruleset).find(k => k == key)
+					if (selector_rule) {
+						current_ruleset[key] = JSON.parse(JSON.stringify(selector_ruleset[selector_rule]))
+					} 
+				}
+			});
+		});
+
+		selected_key = Object.keys(current_ruleset)[0]
 		current_ruleset = current_ruleset;
 	}
 
@@ -269,43 +305,55 @@
 
 <main class="panel">
 
-	<div id="terrain-categories">
-		{#each Object.keys(current_ruleset) as tileId}
-			<div class="terrain-category">
-				<button
-					on:click={() => {
-						selectedId = tileId;
-					}}
-					class:selected={selectedId == tileId}
-				>
-					<img src={getTileFromId(tileId).preview} alt={getTileFromId(tileId).display} /></button
-				>
+	<div id="terrain-controls">
 
-				<div class="added-ids">
-					{#each current_ruleset[tileId] as allowedData}
-						<div
-							class="added-tile"
-							on:click={() => {
-								removeTileFromFunction(tileId, allowedData.key);
-							}}
-						>
-							<img src={getTileFromId(allowedData.key).preview} alt={allowedData.key} />
-							<p class="weight-container">{allowedData.weight}</p>
-							<!-- Weight has to absolute but also float in middle, hence the container -->
-						</div>
-					{/each}
+		<div id="terrain-list-children">
+			{#each Object.keys(current_ruleset).filter( rs_key => current_ruleset[rs_key].length > 0 ) as tile_key}
+				<div class="terrain-list-children-item">
+					<button
+						on:click={() => {
+							selected_key = tile_key;
+						}}
+						class:selected={selected_key == tile_key}
+					>
+						<img src={get_tile_from_key(tile_key).preview} alt={get_tile_from_key(tile_key).display} /></button
+					>
+
+					<div class="added-ids">
+						{#each current_ruleset[tile_key] as allowedData}
+							<div
+								class="added-tile"
+								on:click={() => {
+									removeTileFromFunction(tile_key, allowedData.key);
+								}}
+							>
+								<img src={get_tile_from_key(allowedData.key).preview} alt={allowedData.key} />
+								<p class="weight-container">{allowedData.weight}</p>
+								<!-- Weight has to absolute but also float in middle, hence the container -->
+							</div>
+						{/each}
+					</div>
 				</div>
-			</div>
-		{/each}
+			{/each}
+		</div>
+
+		<div id="terrain-list-childless">
+			{#each Object.keys(current_ruleset).filter( rs_key => current_ruleset[rs_key].length == 0 ) as tile_key}
+				<button on:click={() => { selected_key = tile_key; }} class:selected={selected_key == tile_key}>
+					<img src={get_tile_from_key(tile_key).preview} alt={tile_key} />
+				</button>
+			{/each}
+		</div>
+		
 	</div>
 
 	<div id="tile-list">
-		{#if selectedId != ''}
+		{#if selected_key != ''}
 			{#each loadedTilesets as tileset}
 				{#each tileset.tiles as tile (tile.id)}
 					<button
 						on:click={() => {
-							addTileToFunction(selectedId, tile_to_key(tile));
+							addTileToFunction(selected_key, tile_to_key(tile));
 						}}
 					>
 						<img src={tile.preview} alt={tile.id} title={`Add ${tile.display} to generation ruleset`} />
@@ -361,22 +409,14 @@
 		background-color: var(--primary-background);
 	}
 
-	#terrain-categories {
-		display: flex;
-		flex-direction: column;
-		gap: 0.25em;
-		margin: 1em 0 0 1em;
-		background-color: var(--primary-background);
-		border-radius: var(--small-radius);
-		overflow-y: auto;
-	}
+	
 
 	#tile-list {
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
 		grid-auto-rows: auto;
-		gap: 0.25em;
 		padding: 0.25em;
+		gap: 0.25em;
 		margin: 1em 1em 0 0;
 		background-color: var(--light-background);
 		border-radius: var(--small-radius);
@@ -396,27 +436,68 @@
 	}
 
 	/* Big Rows */
-	.terrain-category {
+	.terrain-list-children-item {
 		display: flex;
 		background-color: var(--light-background);
 		border-radius: var(--small-radius);
 	}
 
-	.terrain-category button {
+	.terrain-list-children-item button {
 		background-color: var(--lighter-background);
 		border-top-right-radius: 0;
 		border-bottom-right-radius: 0;
 	}
 
-	.terrain-category button:hover {
+	.terrain-list-children-item button:hover {
 		background-color: var(--lightest-background);
 	}
 
-	.terrain-category button.selected {
+	.terrain-list-children-item button.selected {
 		background-color: var(--dark-primary);
 		outline: none;
 		box-sizing: content-box;
 	}
+
+	#terrain-controls {
+		overflow-y: auto;
+		margin: 1em 0 0 1em;
+
+	}
+
+	#terrain-list-children {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25em;
+		background-color: var(--primary-background);
+		border-radius: var(--small-radius);
+	}
+
+	#terrain-list-childless {
+		margin-top: 0.25em;
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+		width: 100%;
+		gap: 0.25em;
+	}
+
+	#terrain-list-childless button {
+		background-color: var(--lighter-background);
+		width: 100%;
+		aspect-ratio: 1/1;
+	}
+
+	#terrain-list-childless button img {
+		width:  90%;
+	}
+	
+	#terrain-list-childless button:hover {
+		background-color: var(--lightest-background);
+	}
+
+	#terrain-list-childless button.selected {
+		background-color: var(--dark-primary);
+	}
+
 
 	/* Added IDs */
 	.added-ids {

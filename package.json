@@ -1,7 +1,7 @@
 {
-  "name": "hf2",
+  "name": "hexfriend",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.7.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "dexie": "^3.2.4",
+    "ghpages": "^0.0.10",
     "pixi.js": "^7.2.4"
   }
 }

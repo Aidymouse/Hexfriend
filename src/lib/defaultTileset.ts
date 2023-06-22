@@ -381,7 +381,7 @@ export const DEFAULTTILESET = {
     {
       "display": "Ice Pine Mountains",
       "bgColor": 15921906,
-      "id": "ice-pine mountains",
+      "id": "ice-pine-mountains",
       "symbol": {
         "color": 8224125,
         "texWidth": 100,
@@ -456,7 +456,7 @@ export const DEFAULTTILESET = {
     {
       "display": "Dead Tree Hills",
       "bgColor": 10921638,
-      "id": "dead-tree hills",
+      "id": "dead-tree-hills",
       "symbol": {
         "color": 3355443,
         "texWidth": 100,
@@ -470,7 +470,7 @@ export const DEFAULTTILESET = {
     {
       "display": "Dead Tree Mountains",
       "bgColor": 10921638,
-      "id": "dead-tree mountains",
+      "id": "dead-tree-mountains",
       "symbol": {
         "color": 3355443,
         "texWidth": 100,

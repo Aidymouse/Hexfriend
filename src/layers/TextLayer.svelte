@@ -204,7 +204,6 @@
 	
 
 	afterUpdate(() => {
-		console.log()
 
 		for (const [text_id, pixi_text] of Object.entries(pixi_texts)) {
 			pixi_text.marked_for_death = true

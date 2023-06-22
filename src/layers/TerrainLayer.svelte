@@ -3,7 +3,6 @@
 	import type { terrain_data } from '../types/data';
 	import type { shortcut_data } from '../types/inputs';
 	import type { pan_state } from '../types/panning';
-	import type { map_shape } from '../types/settings';
 	import type { TerrainHex, terrain_field } from '../types/terrain';
 	import type { Tile } from '../types/tilesets';
 	import type { TileSymbol } from '../types/tilesets';
@@ -12,6 +11,7 @@
 	
 	// Enums
 	import { hex_orientation, hex_raised } from '../types/terrain';
+	import { map_shape } from '../types/settings';
 
 	// There's probably some clean up to do in that different colored hexes can have the same ID...
 	import {

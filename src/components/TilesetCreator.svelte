@@ -126,7 +126,7 @@
 	}
 
 	function IDify(name: string): string {
-		return name.toLowerCase().replace(' ', '-');
+		return name.toLowerCase().replaceAll(' ', '-');
 	}
 
 	/*
