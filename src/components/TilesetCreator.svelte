@@ -27,7 +27,6 @@
 
 	// HELPER
 	import { getHexPathRadius } from '../helpers/hexHelpers';
-	import { tile_to_tileset_id } from '../helpers/tile_helpers';
 	
 	// LIB
 	import { download } from '../lib/download2';
@@ -190,13 +189,13 @@
 	function exportTileset() {
 		let export_tileset: Tileset = workingTileset as Tileset
 
+		// Transformations into real tile and tileset data structures
 		export_tileset.id = IDify(workingTileset.name);
 		
 		export_tileset.tiles.forEach(tile => {
-			tile.id = JSON.stringify({tile_id: findID(tile.display), tileset_id: export_tileset.id})
-			tile.tileset_id = workingTileset.id
+			tile.id = findID(tile.display)
+			tile.tileset_id = export_tileset.id
 		})
-
 
 		console.log(export_tileset)
 		download(JSON.stringify(export_tileset),  `${export_tileset.id}.hfts`, 'application/json');

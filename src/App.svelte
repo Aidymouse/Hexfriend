@@ -6,10 +6,9 @@ hexfiend red: #FF6666
 
 	/* TODO //
 // CORE FUNCTIONS
-- overlay layer
+- undo / redo
 - tooltips
 - keyboard shortcuts - make sure all are working
-- undo / redo
 - find more of a fix for why PIXI objects stick around when a new map is loaded
 // POLISH / ROADMAP
 // not ranked
@@ -584,6 +583,8 @@ hexfiend red: #FF6666
 		data_terrain.usingEyedropper = false;
 	}
 
+
+	/* DATA LOAD */
 	function createNewMap() {
 		/* TODO: Save Data Checking */
 
@@ -679,17 +680,9 @@ hexfiend red: #FF6666
 		//comp_terrainLayer.renderAllHexes()
 	}
 
-	async function loadSave(data: save_data, id: number | null) {
+	async function load_map(data: save_data, id: number | null) {
 		loadedTilesets = data.tilesets;
 		loadedIconsets = data.iconsets;
-
-		// Check if default tile or iconset need updating
-		let loaded_default = data.tilesets.find(ts => ts.id.split(":")[0] == "default")
-		if (loaded_default.version != LATESTDEFAULTTILESVERSION) {
-			//data.tilesets.pop(loaded_default)
-		}
-
-		let loaded_iconset = data.iconsets.find(ts => ts.id.split(":")[0] == "default")
 
 		// Load Textures
 		for (const tileset of loadedTilesets) {
@@ -961,7 +954,7 @@ hexfiend red: #FF6666
 			alt={'Loading'}
 			on:load={() => {
 				setTimeout(() => {
-					loadSave(dataToLoad.data, dataToLoad.id);
+					load_map(dataToLoad.data, dataToLoad.id);
 				}, 100);
 			}}
 		/>

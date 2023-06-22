@@ -1,16 +1,16 @@
 <script lang="ts">
-	
+
 	// TYPE
 	import type { TerrainHex, terrain_field } from '../types/terrain';
-	import type { Tile, Tileset, tile_id } from '../types/tilesets';
+	import type { Tile, Tileset } from '../types/tilesets';
 	import type { hex_id } from '../types/toolData';
 	
+	type hex_key = string
 	interface rule {
-		id: tile_id
+		key: hex_key
 		weight: number
 	}
-	
-	type generation_ruleset = {[key: hex_id]: rule[]}
+	type generation_ruleset = {[key: hex_key]: rule[]}
 	
 	// STORE
 	import { store_has_unsaved_changes } from '../stores/flags';
@@ -27,7 +27,7 @@
 	// HELPER
 	import { genHexId, genHexId_tfieldHex, getNeighbours } from '../helpers/hexHelpers';
 	import { rand, pick_from_weighted, random_choice } from '../helpers/random';
-	
+	import { tile_to_key } from '../helpers/tiles';
 	// LIB
 	import { download } from '../lib/download2';
 	import { one_e_dmg_ruleset } from '../lib/generation_rulesets/one_e_dmg';
@@ -54,24 +54,22 @@
 	
 	loadedTilesets.forEach((tileset: Tileset) => {
 		tileset.tiles.forEach((tile: Tile) => {
-			current_ruleset[tile.id] = [{ id: tile.id, weight: 1 }];
+			let key = tile_to_key(tile)
+			current_ruleset[key] = [{ key: key, weight: 1 }];
 		});
 	});
 	
+	function get_tile_from_key(key: hex_key){
+		let key_obj = JSON.parse(key)
+		let ts = loadedTilesets.find(ts => ts.id == key_obj.tileset_id)
+		let t = ts.tiles.find(t => t.id == key_obj.id)
+		return t
+	}
 
 	function getTileFromId(tileId: tile_id) {
-		console.log(tileId);
 
-		let key_obj = JSON.parse(tileId)
+		return get_tile_from_key(tileId)
 
-		let ts = loadedTilesets.find(ts => ts.id == key_obj.tileset_id)
-		let t = ts.tiles.find(tile => tile.id == tileId)
-
-		console.log(ts)
-
-		console.log(t)
-
-		return t
 	}
 
 	function paint_hex(hex_id, tile, index) {
@@ -125,9 +123,9 @@
 		// Meanders through hexes on random walks
 
 		// Get random hex that actually has a rule
-		let valid_rule_ids: tile_id[] = Object.keys(ruleset).filter(tile_id => ruleset[tile_id].length > 0)
-		let rand_tile_id = valid_rule_ids[rand(0, valid_rule_ids.length-1)]
-		let rand_tile = getTileFromId(rand_tile_id)
+		let valid_rule_ids: hex_key[] = Object.keys(ruleset).filter(tile_key => ruleset[tile_key].length > 0)
+		let rand_tile_key = valid_rule_ids[rand(0, valid_rule_ids.length-1)]
+		let rand_tile = get_tile_from_key(rand_tile_key)
 		
 		let prev_tile = rand_tile
 
@@ -142,15 +140,13 @@
 		// Needs: random walks
 		while (hexes_to_visit.length > 0) {
 			
-			// Paint the current hex
-			//console.log(visit_hex_id);
-			let visit_hex = hexes[visit_hex_id]
-			
-			let rule = ruleset[prev_tile.id]
+			// Find which tile to use
+			let rule = ruleset[tile_to_key(prev_tile)]
 			if (rule.length == 0) return;
-			let selected_id = pick_from_weighted(rule.map( rp => { return {item: rp.id, weight: rp.weight} }))
-			let selected_tile = getTileFromId(selected_id)
+			let selected_key = pick_from_weighted(rule.map( rp => { return {item: rp.key, weight: rp.weight} }))
+			let selected_tile = get_tile_from_key(selected_key)
 			
+			// Paint the hex
 			paint_hex(visit_hex_id, selected_tile, painted_count);
 			painted_count += 1
 			
@@ -160,7 +156,7 @@
 			if (latest_length == hexes_to_visit.length) return // Fail safe in case loop screws up
 			latest_length = hexes_to_visit.length
 			
-			// Choose random neighbour (random blank neighbour if not overwriting)
+			// Choose random blank neighbour
 			let neighbours = comp_terrainLayer.get_existant_neighbours(visit_hex_id)
 			neighbours = neighbours.filter(n_hex => hexes_to_visit.find(id => genHexId_tfieldHex(n_hex) == id)) // Remove hexes that have already been visited
 			visited.push(visit_hex_id)
@@ -179,9 +175,11 @@
 				
 				if (next_neighbours.length != 0) prev_tile = random_choice(next_neighbours).tile
 				
+				/*
 				console.log("== Got Stuck ==")
 				console.log(next_neighbours)
 				console.log(prev_tile)
+				*/
 
 			} else {
 				visit_hex_id = genHexId_tfieldHex(random_choice(neighbours))
@@ -288,10 +286,10 @@
 						<div
 							class="added-tile"
 							on:click={() => {
-								removeTileFromFunction(tileId, allowedData.id);
+								removeTileFromFunction(tileId, allowedData.key);
 							}}
 						>
-							<img src={getTileFromId(allowedData.id).preview} alt={allowedData.id} />
+							<img src={getTileFromId(allowedData.key).preview} alt={allowedData.key} />
 							<p class="weight-container">{allowedData.weight}</p>
 							<!-- Weight has to absolute but also float in middle, hence the container -->
 						</div>
@@ -307,7 +305,7 @@
 				{#each tileset.tiles as tile (tile.id)}
 					<button
 						on:click={() => {
-							addTileToFunction(selectedId, tile.id);
+							addTileToFunction(selectedId, tile_to_key(tile));
 						}}
 					>
 						<img src={tile.preview} alt={tile.id} title={`Add ${tile.display} to generation ruleset`} />

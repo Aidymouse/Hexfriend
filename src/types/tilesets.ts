@@ -2,7 +2,7 @@
 interface Tile {
 	display: string;
 	bgColor: number;
-	id: string; // This is the stringified version of a JSON object containing the tiles ID and tileset id
+	id: string; // Local to the tileset
 	symbol: TileSymbol | null;
 	tileset_id: string;
 	preview: string // Just the background
