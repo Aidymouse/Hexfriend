@@ -6,7 +6,6 @@
 
 	export let value: number = 0x000000;
 
-	export let label: string = null;
 	export let id: string = null;
 
 	export let w = "2em";

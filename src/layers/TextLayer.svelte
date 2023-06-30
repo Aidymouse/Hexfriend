@@ -1,18 +1,16 @@
 <script lang="ts">
 
-	// Floating text areas on top of the text???
-
-
-	
-
-	import * as store_panning from '../stores/panning';
-
-	import { store_has_unsaved_changes } from '../stores/flags';
-
+	// TYPES
 	import type { text_data } from '../types/data';
 	import type { shortcut_data } from '../types/inputs';
 	import type { pan_state } from '../types/panning';
 	import type { text_layer_text } from '../types/text';
+
+	// STORES
+	import * as store_panning from '../stores/panning';
+	import { store_has_unsaved_changes } from '../stores/flags';
+	
+	// LIB
 	import * as PIXI from 'pixi.js';
 	import { afterUpdate, onMount } from 'svelte';
 

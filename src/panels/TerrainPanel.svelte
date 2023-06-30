@@ -132,13 +132,13 @@
 		</div>
 
 		<span class="terrain-preview-control-row">
-			<ColorInputPixi bind:value={data_terrain.tile.bgColor} id={'terrainColor'} label={'Terrain Color'} />
+			<ColorInputPixi bind:value={data_terrain.tile.bgColor} id={'terrainColor'} />
 			<label for="terrainColor">Terrain Color</label>
 		</span>
 
 		{#if data_terrain.tile.symbol}
 			<span class="terrain-preview-control-row">
-				<ColorInputPixi bind:value={data_terrain.tile.symbol.color} id={'symbolColor'} label={'Symbol Color'} />
+				<ColorInputPixi bind:value={data_terrain.tile.symbol.color} id={'symbolColor'} />
 				<label for="symbolColor">Symbol Color</label>
 			</span>
 		{/if}

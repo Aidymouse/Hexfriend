@@ -2,10 +2,13 @@
 	import type { path_data } from '../types/data';
 	import type { pan_state } from '../types/panning';
 	import type { path_layer_path } from '../types/path';
-	import type { hex_orientation, terrain_field } from '../types/terrain';
+	import type { terrain_field } from '../types/terrain';
 	import type { shortcut_data } from '../types/inputs';
 	import type { tools } from '../types/toolData';
-	
+
+	// ENUMS
+	import { hex_orientation } from '../types/terrain';
+
 	import * as store_panning from '../stores/panning';
 	import * as store_tfield from '../stores/tfield';
 	import { store_selected_tool } from '../stores/tools';

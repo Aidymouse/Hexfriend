@@ -1,10 +1,31 @@
 <script lang="ts">
-	import Tooltip from './Tooltip.svelte';
-
+	// TYPES
 	import type { eraser_data, icon_data, overlay_data, path_data, terrain_data, text_data } from '../types/data';
 	import { tools } from '../types/toolData';
+	
+	interface terrain_controls {
+		leftMouse: string;
+	}
 
+	interface icon_controls {
+		leftMouse: string;
+	}
+
+	interface path_controls {
+		leftMouse: string;
+	}
+	
+	interface text_controls {
+		leftMouse: string;
+		clickAndDrag: string;
+	}
+	
+	// ENUMS
 	import { store_selected_tool } from '../stores/tools'
+	
+	// COMPONENTS
+	import Tooltip from './Tooltip.svelte';
+
 
 	let selectedTool: tools;
 	store_selected_tool.subscribe(n => selectedTool = n)
@@ -18,10 +39,6 @@
 	export let data_overlay: overlay_data;
 
 	/* Terrain */
-	interface terrain_controls {
-		leftMouse: string;
-	}
-
 	let c_terrain: terrain_controls = {
 		leftMouse: 'Place Terrain',
 	};
@@ -41,10 +58,6 @@
 	}
 
 	/* Icon */
-	interface icon_controls {
-		leftMouse: string;
-	}
-
 	let c_icon: icon_controls = {
 		leftMouse: 'Place Icon',
 	};
@@ -58,10 +71,6 @@
 	}
 
 	/* Path */
-	interface path_controls {
-		leftMouse: string;
-	}
-
 	let c_path: path_controls = {
 		leftMouse: 'Place Icon',
 	};
@@ -77,11 +86,6 @@
 	}
 
 	/* Text */
-	interface text_controls {
-		leftMouse: string;
-		clickAndDrag: string;
-	}
-
 	let c_text: text_controls = {
 		leftMouse: 'Place New Text',
 		clickAndDrag: 'Move Text',
