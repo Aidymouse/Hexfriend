@@ -970,7 +970,7 @@
 
 	<h2>About</h2>
 	<p class="helperText">
-		Hexfriend version 1.7.5 - "It's a whole new world, Hexfriend!"
+		Hexfriend version 1.8.0 - "Change of stripes, Hexfriend"
 	</p>
 	
 	<p class="helperText">

@@ -9,6 +9,9 @@
 	// ENUMS
 	import { hex_orientation } from '../types/terrain';
 
+	// STORES
+	import { data_path } from '../stores/data';
+
 	import * as store_panning from '../stores/panning';
 	import * as store_tfield from '../stores/tfield';
 	import { store_selected_tool } from '../stores/tools';
@@ -17,8 +20,7 @@
 	import { coords_cubeToWorld, coords_worldToCube, cube_round } from '../helpers/hexHelpers';
 	import { Vector } from '../lib/vector2d';
 	import * as PIXI from 'pixi.js';
-
-
+	import { DashLine } from 'pixi-dashed-line';
 	
 	import { afterUpdate, onMount } from 'svelte';
 
@@ -36,8 +38,6 @@
 		tfield = newTField;
 	});
 
-	export let data_path: path_data;
-
 	export let paths: path_layer_path[] = [];
 	export let cont_all_paths: PIXI.Container;
 
@@ -51,30 +51,36 @@
 	updatePathId();
 
 	function appendPoint(path: path_layer_path, x: number, y: number) {
-		path.points = [...path.points, x, y];
+		if ($data_path.add_to == "end") {
+			path.points = [...path.points, x, y];
+			
+		} else if ($data_path.add_to == "start") {
+			path.points = [x, y, ...path.points];
+		}
+
 		paths = paths;
 		$store_has_unsaved_changes = true;
 	}
 
 	export function pointerdown() {
-		data_path.contextPathId = null;
+		$data_path.contextPathId = null;
 
 		if (controls.mouseDown[0]) {
-			if (data_path.selectedPath) {
+			if ($data_path.selectedPath) {
 				let pX = store_panning.curWorldX();
 				let pY = store_panning.curWorldY();
-				if (data_path.snap) {
+				if ($data_path.snap) {
 					let sP = getSnapPoint();
 					pX = sP.x;
 					pY = sP.y;
 				}
 
-				appendPoint(data_path.selectedPath, pX, pY);
+				appendPoint($data_path.selectedPath, pX, pY);
 
-			} else if (data_path.hoveredPath && !data_path.dontSelectPaths) {
-				data_path.selectedPath = paths[paths.indexOf(data_path.hoveredPath)];
-				data_path.style = { ...data_path.selectedPath.style };
-				data_path.hoveredPath = null;
+			} else if ($data_path.hoveredPath && !$data_path.dontSelectPaths) {
+				$data_path.selectedPath = paths[paths.indexOf($data_path.hoveredPath)];
+				$data_path.style = { ...$data_path.selectedPath.style };
+				$data_path.hoveredPath = null;
 
 			} else {
 				addNewPath();
@@ -82,9 +88,13 @@
 		}
 	}
 
-	export function removeLastPoint(path: path_layer_path) {
-		path.points.pop();
-		path.points.pop();
+	export function remove_latest_point(path: path_layer_path) {
+		if ($data_path.add_to == "end") {
+			path.points.pop();
+			path.points.pop();
+		} else if ($data_path.add_to == "start") {
+			path.points.splice(0, 2)
+		}
 		paths = paths;
 
 		if (path.points.length == 0) deletePath(path);
@@ -93,7 +103,7 @@
 	}
 
 	export function deletePath(path: path_layer_path) {
-		data_path.selectedPath = null;
+		$data_path.selectedPath = null;
 
 		let pathIndex = paths.indexOf(path);
 		paths.splice(pathIndex, 1);
@@ -134,17 +144,22 @@
 		let pX = store_panning.curWorldX();
 		let pY = store_panning.curWorldY();
 
-		if (data_path.snap) {
+		if ($data_path.snap) {
 			let snapPoint = getSnapPoint();
 			pX = snapPoint.x;
 			pY = snapPoint.y;
 		}
 
-		paths.push({ id: pathId, style: { ...data_path.style }, points: [pX, pY], hitboxes: [] });
+		paths.push({
+			id: pathId,
+			style: { ...$data_path.style },
+			points: [pX, pY],
+			hitboxes: [],
+			dashes: $data_path.dashed ? [...$data_path.dashes] : null });
 		paths = paths;
 		pathId++;
-		data_path.selectedPath = paths[paths.length - 1];
-		data_path.hoveredPath = null;
+		$data_path.selectedPath = paths[paths.length - 1];
+		$data_path.hoveredPath = null;
 		//console.log(paths);
 
 		$store_has_unsaved_changes = true;
@@ -330,23 +345,23 @@
 	export function handleKeyboardShortcut(shortcutData: shortcut_data) {
 		switch (shortcutData.function) {
 			case 'toggleSnap':
-				data_path.snap = !data_path.snap;
+				$data_path.snap = !$data_path.snap
 				break;
 
 			case 'deleteLastPoint':
-				if (data_path.selectedPath) {
-					removeLastPoint(data_path.selectedPath);
+				if ($data_path.selectedPath) {
+					remove_latest_point($data_path.selectedPath);
 				}
 				break;
 
 			case 'deletePath':
-				if (data_path.selectedPath) {
-					deletePath(data_path.selectedPath);
+				if ($data_path.selectedPath) {
+					deletePath($data_path.selectedPath);
 				}
 				break;
 
 			case 'deselect':
-				data_path.selectedPath = null;
+				$data_path.selectedPath = null;
 				break;
 		}
 	}
@@ -354,7 +369,7 @@
 	export function keydown(e: KeyboardEvent) {
 		switch (e.key) {
 			case 'Shift':
-				data_path.dontSelectPaths = true;
+				$data_path.dontSelectPaths = true;
 				break;
 		}
 	}
@@ -362,7 +377,7 @@
 	export function keyup(e: KeyboardEvent) {
 		switch (e.key) {
 			case 'Shift':
-				data_path.dontSelectPaths = false;
+				$data_path.dontSelectPaths = false;
 				break;
 		}
 	}
@@ -375,23 +390,33 @@
 	let grph_hovered_path = new PIXI.Graphics();
 	let grph_selected_path = new PIXI.Graphics();
 
+	let dashed_lines = {}; // path id: dashed line object
+
 	cont_all_paths.addChild(cont_pixi_paths, grph_hovered_path, grph_selected_path);
 
 	afterUpdate(() => {
 
+		if (!$data_path) return;
+
+		if ($data_path.selectedPath) {
+			$data_path.selectedPath.style = {...$data_path.style};
+		}
+
 		for (const [path_id, cont_path] of Object.entries(path_containers)) {
 			cont_path.marked_for_death = true
 		}
-			// Update paths to match state
+
+		// Update paths to match state
 		for (const path of paths) {
 
 			if (!path_containers[path.id]) {
 
 				let cont_path = new PIXI.Container();
-				cont_path.on('pointerover', () => { data_path.hoveredPath = path; })
-				cont_path.on('pointerout', () => { data_path.hoveredPath = null; })
+				cont_path.on('pointerover', () => { $data_path.hoveredPath = path; })
+				cont_path.on('pointerout', () => { $data_path.hoveredPath = null; })
 				
 				let grph_path = new PIXI.Graphics();
+
 				cont_path.addChild(grph_path)
 
 				path_containers[path.id] = cont_path;
@@ -399,17 +424,42 @@
 
 			}
 
+			// Handle dashed lines
+			// Make dashed line object if needed
+			if (path.style.dashed) {
+
+				if (dashed_lines[path.id] != null) {
+					delete dashed_lines[path.id]
+				}
+
+				let cont_path = path_containers[path.id]
+				let grph_path = cont_path.children[0]
+				dashed_lines[path.id] = new DashLine(grph_path, {
+					dash: [path.style.dash_length, path.style.dash_gap]
+				})
+
+			}
+
+			// Get rid of dashed line if not needed
+			if (!path.style.dashed && dashed_lines[path.id] != null) {
+				delete dashed_lines[path.id]
+			}
+
 			let cont_path = path_containers[path.id]
 			cont_path.marked_for_death = false
-			cont_path.interactive = selectedTool == 'path' && !data_path.selectedPath
+			cont_path.interactive = selectedTool == 'path' && !$data_path.selectedPath
 			cont_path.hitArea = findHitArea(path)
 
 			let grph_path = cont_path.children[0]
 			grph_path.clear();
 			grph_path.lineStyle(path.style);
-			grph_path.moveTo(path.points[0], path.points[1]);
+
+			let draw_on = grph_path
+			if (dashed_lines[path.id]) draw_on = dashed_lines[path.id]
+
+			draw_on.moveTo(path.points[0], path.points[1]);
 			for (let pI = 0; pI < path.points.length; pI += 2) {
-				grph_path.lineTo(path.points[pI], path.points[pI + 1]);
+				draw_on.lineTo(path.points[pI], path.points[pI + 1]);
 			}
 
 
@@ -421,7 +471,7 @@
 			if (cont_path.marked_for_death) {
 				cont_all_paths.removeChild(cont_path)
 				cont_path.destroy()
-				
+				delete dashed_lines[path_id]
 				delete path_containers[path_id]
 			}
 		}
@@ -429,21 +479,32 @@
 
 		/* Selector Graphics */
 		grph_selected_path.clear();
-		if (data_path.selectedPath) {
+		if ($data_path.selectedPath) {
 			grph_selected_path.lineStyle(SELECTEDSELECTORSTYLE);
 			grph_selected_path.beginFill(0xf2f2f2);
-			for (let pI = 0; pI < data_path.selectedPath.points.length; pI += 2) {
-				grph_selected_path.drawCircle(data_path.selectedPath.points[pI], data_path.selectedPath.points[pI + 1], 4);
+			
+			let points = $data_path.selectedPath.points
+			
+			for (let pI = 0; pI < points.length; pI += 2) {
+				grph_selected_path.drawCircle(points[pI], points[pI + 1], 4);
 			}
+			
+			grph_selected_path.beginFill(0x8cc63f);
+			if ($data_path.add_to == "start") {
+				grph_selected_path.drawCircle(points[0], points[1], 4);
+			} else {
+				grph_selected_path.drawCircle(points[points.length-2], points[points.length-1], 4);
+			}
+
 			grph_selected_path.endFill();
 		}
 		
 		grph_hovered_path.clear();
-		if (data_path.hoveredPath && !data_path.dontSelectPaths) {
+		if ($data_path.hoveredPath && !$data_path.dontSelectPaths) {
 			grph_hovered_path.lineStyle(HOVEREDSELECTORSTYLE);
 			grph_hovered_path.beginFill(0xf2f2f2);
-			for (let pI = 0; pI < data_path.hoveredPath.points.length; pI += 2) {
-				grph_hovered_path.drawCircle(data_path.hoveredPath.points[pI], data_path.hoveredPath.points[pI + 1], 3);
+			for (let pI = 0; pI < $data_path.hoveredPath.points.length; pI += 2) {
+				grph_hovered_path.drawCircle($data_path.hoveredPath.points[pI], $data_path.hoveredPath.points[pI + 1], 3);
 			}
 			grph_hovered_path.endFill();
 		}

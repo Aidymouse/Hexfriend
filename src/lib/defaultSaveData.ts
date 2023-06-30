@@ -68,11 +68,12 @@ let DEFAULTSAVEDATA: save_data = {
 	texts: [],
 
 	pathStyles: [
-		{ display: 'River', style: { color: 10742015, width: 6, cap: 'round', join: 'round' }, id: 1 },
-		{ display: 'Path', style: { color: 16774327, width: 4, cap: 'round', join: 'round' }, id: 2 },
-		{ display: 'Trail', style: { color: 16367733, width: 3, cap: 'round', join: 'round' }, id: 3 },
-		{ display: 'Pass', style: { color: 12632256, width: 5, cap: 'round', join: 'round' }, id: 4 },
-		{ display: 'Border', style: { color: 16711680, width: 5, cap: 'round', join: 'round' }, id: 5 },
+		{ display: 'River', style: { color: 10742015, width: 6, cap: 'round', join: 'round', dashed: false, dash_length: 10, dash_gap: 5 }, id: 1 },
+		{ display: 'Path', style: { color: 16774327, width: 4, cap: 'round', join: 'round', dashed: false, dash_length: 10, dash_gap: 5 }, id: 2 },
+		{ display: 'Trail', style: { color: 16367733, width: 3, cap: 'round', join: 'round', dashed: false, dash_length: 10, dash_gap: 5 }, id: 3 },
+		{ display: 'Pass', style: { color: 12632256, width: 5, cap: 'round', join: 'round', dashed: false, dash_length: 10, dash_gap: 5 }, id: 4 },
+		{ display: 'Border', style: { color: 16711680, width: 5, cap: 'round', join: 'round', dashed: false, dash_length: 10, dash_gap: 5 }, id: 5 },
+		{ display: 'Minor Border', style: { color: 16711680, width: 4, cap: 'round', join: 'round', dashed: true, dash_length: 15, dash_gap: 10 }, id: 6 },
 	],
 
 	textStyles: [

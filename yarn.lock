@@ -1120,6 +1120,11 @@ pinkie@^2.0.0:
   resolved "https://registry.yarnpkg.com/pinkie/-/pinkie-2.0.4.tgz#72556b80cfa0d48a974e80e77248e80ed4f7f870"
   integrity sha512-MnUuEycAemtSaeFSjXKW/aroV7akBbY+Sv+RkyqFjgAe73F+MR0TBWKBRDkmfWq/HiFmdavfZ1G7h4SPZXaCSg==
 
+pixi-dashed-line@^1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/pixi-dashed-line/-/pixi-dashed-line-1.4.2.tgz#093c951ebbc1cbbebdf7bbfd4f07a0059e9786be"
+  integrity sha512-THMJdKc+IrzZTxSm/EncJT2i0VQmRLTn8EVpshA9JnvYBjTk6xiqtVUFQBe72yr4Kzp4UJ9JCKdDdqzdWtUKbw==
+
 pixi.js@^7.2.4:
   version "7.2.4"
   resolved "https://registry.yarnpkg.com/pixi.js/-/pixi.js-7.2.4.tgz#4cd6776bf7f74a6c5e121dd1b59329e66be2ce49"

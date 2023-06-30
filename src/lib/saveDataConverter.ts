@@ -15,6 +15,16 @@ function convert_v5_to_v6(oldData: save_data): save_data {
 
 }
 
+function convert_v6_to_v7(oldData: save_data): save_data {
+	let new_data: save_data = JSON.parse(JSON.stringify(oldData));
+	
+	new_data.pathStyles = new_data.pathStyles.map(ps => {return {...ps, style: {...ps.style, dashed: false, dash_length: 15, dash_gap: 10}} })
+	console.log(new_data.pathStyles)
+
+	new_data.saveVersion = 7
+	return new_data;
+}
+
 export function convertSaveDataToLatest(oldData: save_data): save_data {
 	// Update to latest version
 	let newData: save_data = JSON.parse(JSON.stringify(oldData));
@@ -71,6 +81,7 @@ export function convertSaveDataToLatest(oldData: save_data): save_data {
 	newData.saveVersion = 5;
 
 	newData = convert_v5_to_v6(newData);
+	newData = convert_v6_to_v7(newData);
 
 	return newData;
 }
