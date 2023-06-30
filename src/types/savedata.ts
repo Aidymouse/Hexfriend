@@ -1,9 +1,10 @@
 import type { coordinates_data, overlay_data } from './data';
 import type { Iconset } from './icon';
+import type { path_style } from './path'
 import type { terrain_field } from './terrain';
 import type { Tileset } from './tilesets';
 
-const LATESTSAVEDATAVERSION = 6;
+const LATESTSAVEDATAVERSION = 7;
 const LATESTDEFAULTTILESVERSION = 4;
 const LATESTDEFAULTICONSVERSION = 5;
 
@@ -23,7 +24,7 @@ interface save_data {
 	texts: [];
 	icons: [];
 
-	pathStyles: any[];
+	pathStyles: path_style[];
 	textStyles: any[];
 }
 

@@ -71,6 +71,7 @@ hexfiend red: #FF6666
 	import * as store_tfield from './stores/tfield';
 	import { store_selected_tool } from './stores/tools';
 	import { store_has_unsaved_changes } from './stores/flags';
+	import { data_path } from './stores/data';
 	
 	// GLOBAL STYLES
 	import './styles/inputs.css';
@@ -207,15 +208,6 @@ hexfiend red: #FF6666
 		dragMode: false,
 	};
 
-	let data_path: path_data = {
-		style: { color: 0, width: 3, cap: PIXI.LINE_CAP.ROUND, join: PIXI.LINE_JOIN.ROUND },
-		hoveredPath: null,
-		selectedPath: null,
-		dontSelectPaths: null,
-		snap: false,
-		contextPathId: null,
-	};
-
 	let data_text: text_data = {
 		style: {
 			fontFamily: 'Segoe UI',
@@ -291,10 +283,22 @@ hexfiend red: #FF6666
 	/* TOOL METHODS */
 	function changeTool(newTool: tools) {
 		// A list of stuff that needs to happen every tool change
-		data_path.contextPathId = null;
+		
+		console.log(data_path)
+
+		data_path.update( (n) => {
+			
+			n.contextPathId = null
+			n.selectedPath = null
+
+			return n
+
+		})
+
+		//$data_path.contextPathId = null;
 		data_text.contextStyleId = null;
 
-		data_path.selectedPath = null;
+		//$data_path.selectedPath = null;
 
 		store_selected_tool.update((n) => newTool);
 	}
@@ -442,7 +446,7 @@ hexfiend red: #FF6666
 						showSavedMaps = false;
 						showSettings = false;
 						showKeyboardShortcuts = false;
-						data_path.contextPathId = null;
+						$data_path.contextPathId = null;
 						data_text.contextStyleId = null;
 						break;
 
@@ -673,7 +677,7 @@ hexfiend red: #FF6666
 		//loadSave(data, id);
 		//await loadSave(data, id)
 
-		data_path.selectedPath = null;
+		$data_path.selectedPath = null;
 		data_text.selectedText = null;
 
 		// await tick() // The terrain field needs time to hook onto
@@ -788,7 +792,9 @@ hexfiend red: #FF6666
 		offsetContainer.scale.y = pan.zoomScale;
 	});
 
-	onMount(() => {});
+	onMount(() => {
+		//load_map(dataToLoad.data, dataToLoad.id)
+	});
 </script>
 
 <svelte:window on:keydown={keyDown} on:keyup|preventDefault={keyUp} on:blur={blur} on:beforeunload={before_unload}/>
@@ -834,7 +840,7 @@ hexfiend red: #FF6666
 			<CanvasHolder {app} />
 
 			<TerrainLayer bind:cont_terrain bind:this={comp_terrainLayer} {changeTool} bind:data_terrain {controls} {comp_coordsLayer} />
-			<PathLayer bind:this={comp_pathLayer} bind:cont_all_paths bind:paths={loadedSave.paths} bind:data_path {controls} />
+			<PathLayer bind:this={comp_pathLayer} bind:cont_all_paths bind:paths={loadedSave.paths} {controls} />
 			<IconLayer bind:this={comp_iconLayer} bind:icons={loadedSave.icons} bind:data_icon bind:cont_icon {data_eraser} {controls} />
 			<CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} bind:data_coordinates />
 			<LargeHexesLayer bind:cont_largehexes />
@@ -852,7 +858,7 @@ hexfiend red: #FF6666
 		{:else if selectedTool == 'icon'}
 			<IconPanel {app} {loadedIconsets} bind:data_icon />
 		{:else if selectedTool == 'path'}
-			<PathPanel bind:data_path {comp_pathLayer} bind:pathStyles={loadedSave.pathStyles} />
+			<PathPanel {comp_pathLayer} bind:pathStyles={loadedSave.pathStyles} />
 		{:else if selectedTool == 'text'}
 			<TextPanel bind:data_text {comp_textLayer} bind:textStyles={loadedSave.textStyles} />
 		{:else if selectedTool == tools.OVERLAY}
@@ -866,7 +872,6 @@ hexfiend red: #FF6666
 				{changeTool}
 				bind:data_terrain
 				bind:data_icon
-				bind:data_path
 				bind:data_overlay
 			/>
 		</div>
@@ -940,7 +945,7 @@ hexfiend red: #FF6666
 		/>
 
 		{#if showControls}
-			<ControlTooltips {data_terrain} {data_icon} {data_path} {data_text} {data_eraser} {data_overlay} />
+			<ControlTooltips {data_terrain} {data_icon} {data_text} {data_eraser} {data_overlay} />
 		{/if}
 	</main>
 {:else if appState == app_state.TILESETCREATOR}

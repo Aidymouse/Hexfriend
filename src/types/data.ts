@@ -1,6 +1,6 @@
 import type { coord_system } from './coordinates';
 import type { path_layer_path } from './path';
-import type { text_layer_text } from './text';
+import type { text_layer_text, path_style } from './text';
 import type { Tile } from './tilesets';
 import type * as PIXI from 'pixi.js';
 
@@ -43,7 +43,7 @@ export interface path_data {
 	hoveredPath?: path_layer_path;
 	dontSelectPaths: boolean;
 	snap: boolean;
-	style: PIXI.LineStyle;
+	style: path_style;
 	contextPathId?: number;
 }
 

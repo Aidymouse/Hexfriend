@@ -3,16 +3,21 @@
   	import type { hex_orientation } from '../types/terrain';
 	import { tools } from '../types/toolData';
 	import { afterUpdate } from 'svelte';
+	import { data_path } from '../stores/data';
 
 	export let data_terrain: terrain_data;
 	export let data_icon: icon_data;
-	export let data_path: path_data;
 	export let data_overlay: overlay_data;
+
+	let data_path_proxy: path_data;
+	data_path.subscribe(n => {
+		data_path_proxy = n
+	})
 
 	$: {
 		data_terrain = data_terrain;
 		data_icon = data_icon;
-		data_path = data_path;
+		data_path_proxy = data_path_proxy
 
 		buttons = buttons;
 	}
@@ -98,10 +103,10 @@
 				{
 					display: 'Snap Path Point',
 					action: function () {
-						data_path.snap = !data_path.snap;
+						data_path.update(n => {n.snap = !n.snap; return n} )
 					},
 					image: '/assets/img/tools/snap_path.svg',
-					obj: data_path,
+					obj: data_path_proxy,
 					field: 'snap',
 				},
 			],

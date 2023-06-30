@@ -3,6 +3,8 @@
 	import type { eraser_data, icon_data, overlay_data, path_data, terrain_data, text_data } from '../types/data';
 	import { tools } from '../types/toolData';
 	
+	
+
 	interface terrain_controls {
 		leftMouse: string;
 	}
@@ -22,6 +24,7 @@
 	
 	// ENUMS
 	import { store_selected_tool } from '../stores/tools'
+	import { data_path } from '../stores/data';
 	
 	// COMPONENTS
 	import Tooltip from './Tooltip.svelte';
@@ -33,7 +36,6 @@
 	export let data_terrain: terrain_data;
 
 	export let data_icon: icon_data;
-	export let data_path: path_data;
 	export let data_text: text_data;
 	export let data_eraser: eraser_data;
 	export let data_overlay: overlay_data;
@@ -78,9 +80,9 @@
 	function setTooltips_path() {
 		c_path.leftMouse = 'Start New Path';
 
-		if (data_path.selectedPath) {
+		if ($data_path.selectedPath) {
 			c_path.leftMouse = 'Place Point';
-		} else if (data_path.hoveredPath && !data_path.dontSelectPaths) {
+		} else if ($data_path.hoveredPath && !$data_path.dontSelectPaths) {
 			c_path.leftMouse = 'Select Path';
 		}
 	}
@@ -126,7 +128,6 @@
 	$: {
 		data_terrain = data_terrain;
 		data_icon = data_icon;
-		data_path = data_path;
 		data_text = data_text;
 		data_eraser = data_eraser;
 		data_overlay = data_overlay;
