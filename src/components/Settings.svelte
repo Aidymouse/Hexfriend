@@ -11,7 +11,7 @@
 	import type { save_data } from '../types/savedata';
 	import type { terrain_field } from '../types/terrain';
 	import type { Tileset } from '../types/tilesets';
-	import type { tools } from '../types/toolData';
+	import { tools } from '../types/toolData';
 	import type * as PIXI from 'pixi.js';	
 	
 	// Enums
@@ -50,6 +50,7 @@
 		tilesets: true,
 		iconsets: true,
 		experimental: true,
+		changelog: true,
 	};
 
 	let tfield: terrain_field;
@@ -402,599 +403,655 @@
 			/>
 		</button>
 	</span>
-
 	<!-- GRID -->
-	<h2 class="setting-heading">
-		Grid
-		<button
-			on:click={() => {
-				hidden_settings.grid = !hidden_settings.grid;
-			}}
-		>
-			<img alt={'Toggle Grid Settings'} class:rotated={hidden_settings.grid} src={'/assets/img/ui/arrow.png'} />
-		</button>
-	</h2>
-	<div class="settings-grid" class:hidden={hidden_settings.grid}>
-		<label for="showGrid">Show Grid</label>
-		<!-- Weird bug where the grid wont render if you turn it off then resize the hex flower map ?? -->
-		<Checkbox bind:checked={tfield.grid.shown} id={'showGrid'} on:change={comp_terrainLayer.renderGrid} />
-		{#if tfield.grid.shown}
-			<label for="gridThickness">Grid Thickness</label>
-			<input
-				id="gridThickness"
-				type="number"
-				min="0"
-				max="99"
-				bind:value={tfield.grid.thickness}
-				on:change={() => {
-					renderGrid();
-				}}
-			/>
-			<label for="gridColor">Grid Color</label>
-			<ColorInputPixi
-				bind:value={tfield.grid.stroke}
-				on:change={() => {
-					renderGrid();
-				}}
-				id={'gridColor'}
-			/>
-		{/if}
-
-		<!-- LARGE HEXES -->
-		<label for="showOverlay">Large Hexes</label>
-		<Checkbox bind:checked={tfield.largehexes.shown} id="showOverlay" />
-
-		{#if tfield.largehexes.shown}
-			<label for="overlayDiameter">Size</label>
-			<input type="number" id="overlayDiameter" min={2} bind:value={tfield.largehexes.diameterInHexes} />
-
-			<label for="overlayColor">Color</label>
-			<ColorInputPixi id={'overlayColor'} bind:value={tfield.largehexes.style.color} />
-
-			<label for="overlayThickness">Outline Thickness</label>
-			<input type="number" id={'overlayThickness'} bind:value={tfield.largehexes.style.width} />
-
-			<label for="overlayOffsetX" title="Measured in Hex Widths">Horizontal Offset</label>
-			<input type="number" bind:value={tfield.largehexes.offset.x} min={0} step={0.25} />
-
-			<label for="overlayOffsetY" title="Measured in Hex Heights">Vertical Offset</label>
-			<input type="number" bind:value={tfield.largehexes.offset.y} min={0} step={0.25} />
-
-			<label for="overlayEncompass">Encompass Map Edges</label>
-			<Checkbox bind:checked={tfield.largehexes.encompassEdges} id="overlayEncompass" />
-
-			<p>{tfield.orientation == hex_orientation.FLATTOP ? 'Large Raised Column' : 'Large Indented Row'}</p>
-			<span style={'height: 100%; display: flex; align-items: center;'}>
-				<SelectGrid
-					options={[
-						{
-							title: 'Even',
-							value: 'even',
-							filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'overlayraisedcolumn' : 'overlayindentedrow'}even`,
-						},
-						{
-							title: 'Even',
-							value: 'odd',
-							filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'overlayraisedcolumn' : 'overlayindentedrow'}odd`,
-						},
-					]}
-					bind:value={tfield.largehexes.raised}
-				/>
-			</span>
-		{/if}
-	</div>
-
-	<!-- HEXES -->
-	<h2 class="setting-heading">
-		Hexes
-		<button
-			on:click={() => {
-				hidden_settings.hexes = !hidden_settings.hexes;
-			}}
-		>
-			<img alt={'Toggle Hex Settings'} class:rotated={hidden_settings.hexes} src={'/assets/img/ui/arrow.png'} />
-		</button>
-	</h2>
-	<div class="settings-grid" class:hidden={hidden_settings.hexes}>
-		<label for="blankHexColor">Blank Hex Color</label>
-		<div style="display: flex; gap: 0.25em; align-items: center;">
-			<ColorInputPixi
-				bind:value={tfield.blankHexColor}
-				on:change={() => {
-					renderAllHexes();
-				}}
-				id={'blankHexColor'}
-			/>
-
+	<div class="setting-container">
+		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.grid}>
+			Grid
 			<button
-				style={'height: fit-content;'}
 				on:click={() => {
-					tfield.blankHexColor = 0xf2f2f2;
-				}}>Reset</button
-			>
-		</div>
-
-		<label>Hex Orientation</label>
-		<div style={'height: 100%; display: flex; align-items: center;'}>
-			<SelectGrid
-				options={[
-					{ title: 'Flat Top', value: hex_orientation.FLATTOP, filename: 'flatTop' },
-					{ title: 'Pointy Top', value: hex_orientation.POINTYTOP, filename: 'pointyTop' },
-				]}
-				bind:value={tfield.orientation}
-				on:change={() => {
-					changeOrientation();
-
-					if (retainIconPosition) comp_iconLayer.retainIconPositionOnOrientationChange(tfield.orientation);
-
-					comp_coordsLayer.cullUnusedCoordinates();
-					comp_coordsLayer.updateAllCoordPositions();
-					comp_coordsLayer.updateAllCoordsText();
-					comp_coordsLayer.populateBlankHexes();
+					hidden_settings.grid = !hidden_settings.grid;
 				}}
-			/>
-		</div>
-
-		<label for="hexWidth">Hex Width</label>
-		<input
-			id="hexWidth"
-			type="number"
-			bind:value={tfield.hexWidth}
-			on:focus={() => {
-				comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
-			}}
-			on:change={() => {
-				redrawEntireMap();
-				comp_coordsLayer.updateAllCoordPositions();
-				if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize(tfield.hexWidth, tfield.hexHeight);
-				comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
-			}}
-		/>
-
-		<label for="hexHeight">Hex Height</label>
-		<input
-			id="hexHeight"
-			type="number"
-			bind:value={tfield.hexHeight}
-			on:focus={() => {
-				comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
-			}}
-			on:change={() => {
-				redrawEntireMap();
-				comp_coordsLayer.updateAllCoordPositions();
-				if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize(tfield.hexWidth, tfield.hexHeight);
-				comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
-			}}
-		/>
-
-		<!--
-        <label for="mapShape">Map Type</label>
-        <select id="mapShape" bind:value={tfield.mapShape}>
-            <option value={map_shape.SQUARE}>Square</option>
-            <option value={map_shape.RADIAL}>Radial</option>
-        </select>
-        -->
-
-		{#if tfield.mapShape == map_shape.SQUARE}
-			<p>{tfield.orientation == hex_orientation.FLATTOP ? 'Raised Column' : 'Indented Row'}</p>
-			<span style={'height: 100%; display: flex; align-items: center;'}>
-				<SelectGrid
-					options={[
-						{
-							title: 'Even',
-							value: 'even',
-							filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}even`,
-						},
-						{
-							title: 'Odd',
-							value: 'odd',
-							filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}odd`,
-						},
-					]}
-					bind:value={tfield.raised}
+			>
+				<img alt={'Toggle Grid Settings'} class:rotated={hidden_settings.grid} src={'/assets/img/ui/arrow.png'} />
+			</button>
+		</h2>
+		<div class="settings-grid" class:hidden={hidden_settings.grid}>
+			<label for="showGrid">Show Grid</label>
+			<!-- Weird bug where the grid wont render if you turn it off then resize the hex flower map ?? -->
+			<Checkbox bind:checked={tfield.grid.shown} id={'showGrid'} on:change={comp_terrainLayer.renderGrid} />
+			{#if tfield.grid.shown}
+				<label for="gridThickness">Grid Thickness</label>
+				<input
+					id="gridThickness"
+					type="number"
+					min="0"
+					max="99"
+					bind:value={tfield.grid.thickness}
 					on:change={() => {
-						if (tfield.orientation == hex_orientation.FLATTOP) {
-							comp_terrainLayer.square_updateRaisedColumn();
-						} else {
-							comp_terrainLayer.square_changeIndentedRow();
-						}
-						comp_coordsLayer.cullUnusedCoordinates();
+						renderGrid();
 					}}
 				/>
-			</span>
-		{/if}
+				<label for="gridColor">Grid Color</label>
+				<ColorInputPixi
+					bind:value={tfield.grid.stroke}
+					on:change={() => {
+						renderGrid();
+					}}
+					id={'gridColor'}
+				/>
+			{/if}
 
-		<label for="retainIcon" title="Icons will atempt to remain in their hex when transformations occur">Retain Icon Position</label>
-		<Checkbox bind:checked={retainIconPosition} id="retainIcon" />
+			<!-- LARGE HEXES -->
+			<label for="showOverlay">Large Hexes</label>
+			<Checkbox bind:checked={tfield.largehexes.shown} id="showOverlay" />
+
+			{#if tfield.largehexes.shown}
+				<label for="overlayDiameter">Size</label>
+				<input type="number" id="overlayDiameter" min={2} bind:value={tfield.largehexes.diameterInHexes} />
+
+				<label for="overlayColor">Color</label>
+				<ColorInputPixi id={'overlayColor'} bind:value={tfield.largehexes.style.color} />
+
+				<label for="overlayThickness">Outline Thickness</label>
+				<input type="number" id={'overlayThickness'} bind:value={tfield.largehexes.style.width} />
+
+				<label for="overlayOffsetX" title="Measured in Hex Widths">Horizontal Offset</label>
+				<input type="number" bind:value={tfield.largehexes.offset.x} min={0} step={0.25} />
+
+				<label for="overlayOffsetY" title="Measured in Hex Heights">Vertical Offset</label>
+				<input type="number" bind:value={tfield.largehexes.offset.y} min={0} step={0.25} />
+
+				<label for="overlayEncompass">Encompass Map Edges</label>
+				<Checkbox bind:checked={tfield.largehexes.encompassEdges} id="overlayEncompass" />
+
+				<p>{tfield.orientation == hex_orientation.FLATTOP ? 'Large Raised Column' : 'Large Indented Row'}</p>
+				<span style={'height: 100%; display: flex; align-items: center;'}>
+					<SelectGrid
+						options={[
+							{
+								title: 'Even',
+								value: 'even',
+								filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'overlayraisedcolumn' : 'overlayindentedrow'}even`,
+							},
+							{
+								title: 'Even',
+								value: 'odd',
+								filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'overlayraisedcolumn' : 'overlayindentedrow'}odd`,
+							},
+						]}
+						bind:value={tfield.largehexes.raised}
+					/>
+				</span>
+			{/if}
+		</div>
 	</div>
+	<!-- HEXES -->
+	<div class="setting-container">
+		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.hexes}>
+			Hexes
+			<button
+				on:click={() => {
+					hidden_settings.hexes = !hidden_settings.hexes;
+				}}
+			>
+				<img alt={'Toggle Hex Settings'} class:rotated={hidden_settings.hexes} src={'/assets/img/ui/arrow.png'} />
+			</button>
+		</h2>
+		<div class="settings-grid" class:hidden={hidden_settings.hexes}>
+			<label for="blankHexColor">Blank Hex Color</label>
+			<div style="display: flex; gap: 0.25em; align-items: center;">
+				<ColorInputPixi
+					bind:value={tfield.blankHexColor}
+					on:change={() => {
+						renderAllHexes();
+					}}
+					id={'blankHexColor'}
+				/>
 
+				<button
+					style={'height: fit-content;'}
+					on:click={() => {
+						tfield.blankHexColor = 0xf2f2f2;
+					}}>Reset</button
+				>
+			</div>
+
+			<label>Hex Orientation</label>
+			<div style={'height: 100%; display: flex; align-items: center;'}>
+				<SelectGrid
+					options={[
+						{ title: 'Flat Top', value: hex_orientation.FLATTOP, filename: 'flatTop' },
+						{ title: 'Pointy Top', value: hex_orientation.POINTYTOP, filename: 'pointyTop' },
+					]}
+					bind:value={tfield.orientation}
+					on:change={() => {
+						changeOrientation();
+
+						if (retainIconPosition) comp_iconLayer.retainIconPositionOnOrientationChange(tfield.orientation);
+
+						comp_coordsLayer.cullUnusedCoordinates();
+						comp_coordsLayer.updateAllCoordPositions();
+						comp_coordsLayer.updateAllCoordsText();
+						comp_coordsLayer.populateBlankHexes();
+					}}
+				/>
+			</div>
+
+			<label for="hexWidth">Hex Width</label>
+			<input
+				id="hexWidth"
+				type="number"
+				bind:value={tfield.hexWidth}
+				on:focus={() => {
+					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
+				}}
+				on:change={() => {
+					redrawEntireMap();
+					comp_coordsLayer.updateAllCoordPositions();
+					if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize(tfield.hexWidth, tfield.hexHeight);
+					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
+				}}
+			/>
+
+			<label for="hexHeight">Hex Height</label>
+			<input
+				id="hexHeight"
+				type="number"
+				bind:value={tfield.hexHeight}
+				on:focus={() => {
+					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
+				}}
+				on:change={() => {
+					redrawEntireMap();
+					comp_coordsLayer.updateAllCoordPositions();
+					if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize(tfield.hexWidth, tfield.hexHeight);
+					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
+				}}
+			/>
+
+			<!--
+			<label for="mapShape">Map Type</label>
+			<select id="mapShape" bind:value={tfield.mapShape}>
+				<option value={map_shape.SQUARE}>Square</option>
+				<option value={map_shape.RADIAL}>Radial</option>
+			</select>
+			-->
+
+			{#if tfield.mapShape == map_shape.SQUARE}
+				<p>{tfield.orientation == hex_orientation.FLATTOP ? 'Raised Column' : 'Indented Row'}</p>
+				<span style={'height: 100%; display: flex; align-items: center;'}>
+					<SelectGrid
+						options={[
+							{
+								title: 'Even',
+								value: 'even',
+								filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}even`,
+							},
+							{
+								title: 'Odd',
+								value: 'odd',
+								filename: `${tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}odd`,
+							},
+						]}
+						bind:value={tfield.raised}
+						on:change={() => {
+							if (tfield.orientation == hex_orientation.FLATTOP) {
+								comp_terrainLayer.square_updateRaisedColumn();
+							} else {
+								comp_terrainLayer.square_changeIndentedRow();
+							}
+							comp_coordsLayer.cullUnusedCoordinates();
+						}}
+					/>
+				</span>
+			{/if}
+
+			<label for="retainIcon" title="Icons will atempt to remain in their hex when transformations occur">Retain Icon Position</label>
+			<Checkbox bind:checked={retainIconPosition} id="retainIcon" />
+		</div>
+	</div>
 	<!-- DIMENSIONS AND SHAPE -->
-	<h2 class="setting-heading">
-		Map Dimensions
-		<button
-			on:click={() => {
-				hidden_settings.dimensions = !hidden_settings.dimensions;
-			}}
-		>
-			<img alt={'Toggle Map Dimension Settings'} class:rotated={hidden_settings.dimensions} src={'/assets/img/ui/arrow.png'} />
-		</button>
-	</h2>
+	<div class="setting-container">
+		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.dimensions}>
+			Map Dimensions
+			<button
+				on:click={() => {
+					hidden_settings.dimensions = !hidden_settings.dimensions;
+				}}
+			>
+				<img alt={'Toggle Map Dimension Settings'} class:rotated={hidden_settings.dimensions} src={'/assets/img/ui/arrow.png'} />
+			</button>
+		</h2>
 
-	<div class="settings-grid" style="margin-bottom: 5px;" class:hidden={hidden_settings.dimensions}>
-		<label for="mapShape">Map Shape</label>
+		<div class="settings-grid" style="margin-bottom: 5px;" class:hidden={hidden_settings.dimensions}>
+			<label for="mapShape">Map Shape</label>
 
-		<select
-			bind:value={tfield.mapShape}
-			on:change={() => {
-				changeMapShape();
-			}}
-		>
-			<option value={map_shape.SQUARE}>Square</option>
-			<option value={map_shape.FLOWER}>Hex Flower</option>
-		</select>
+			<select
+				bind:value={tfield.mapShape}
+				on:change={() => {
+					changeMapShape();
+				}}
+			>
+				<option value={map_shape.SQUARE}>Square</option>
+				<option value={map_shape.FLOWER}>Hex Flower</option>
+			</select>
+		</div>
+
+		{#if tfield.mapShape == map_shape.SQUARE}
+			<section id="map-dimensions-container" class:hidden={hidden_settings.dimensions}>
+				<div id="map-dimensions">
+					{#if addOrRemoveMapDimensions == 'add'}
+						<button
+							style="grid-area: left;"
+							on:click={() => {
+								square_expandMapDimension('left', 1);
+							}}>Add<br />Left</button
+						>
+						<button
+							style="grid-area: top;"
+							on:click={() => {
+								square_expandMapDimension('top', 1);
+							}}>Add<br />Top</button
+						>
+						<button
+							style="grid-area: bottom;"
+							on:click={() => {
+								square_expandMapDimension('bottom', 1);
+							}}>Add<br />Bottom</button
+						>
+						<button
+							style="grid-area: right;"
+							on:click={() => {
+								square_expandMapDimension('right', 1);
+							}}>Add<br />Right</button
+						>
+						<button
+							style="grid-area: center;"
+							on:click={() => {
+								addOrRemoveMapDimensions = 'remove';
+							}}
+						>
+							<img
+								src={`/assets/img/tools/addHex_${tfield.orientation == 'flatTop' ? 'ft' : 'pt'}.png`}
+								alt={'Add Hex'}
+								title={'Add Hex'}
+							/>
+						</button>
+					{:else}
+						<button
+							style="grid-area: left;"
+							on:click={() => {
+								square_reduceMapDimension('left', 1);
+							}}>Remove<br />Left</button
+						>
+						<button
+							style="grid-area: top;"
+							on:click={() => {
+								square_reduceMapDimension('top', 1);
+							}}>Remove<br />Top</button
+						>
+						<button
+							style="grid-area: bottom;"
+							on:click={() => {
+								square_reduceMapDimension('bottom', 1);
+							}}>Remove<br />Bottom</button
+						>
+						<button
+							style="grid-area: right;"
+							on:click={() => {
+								square_reduceMapDimension('right', 1);
+							}}>Remove<br />Right</button
+						>
+						<button
+							style="grid-area: center;"
+							on:click={() => {
+								addOrRemoveMapDimensions = 'add';
+							}}
+						>
+							<img
+								src={`/assets/img/tools/removeHex_${tfield.orientation == 'flatTop' ? 'ft' : 'pt'}.png`}
+								alt={'Remove Hex'}
+								title={'Remove Hex'}
+							/>
+						</button>
+					{/if}
+				</div>
+			</section>
+		{:else if tfield.mapShape == map_shape.FLOWER}
+			<section id="flower-dimensions-container" class:hidden={hidden_settings.dimensions}>
+				<p>Hexes out from center</p>
+				<div id="flower-dimensions-controls-grid">
+					<button
+						on:click={() => {
+							flower_reduceHexesOut(1);
+						}}>-</button
+					>
+					<div id="counter-container">{tfield.hexesOut}</div>
+					<button
+						on:click={() => {
+							flower_expandHexesOut(1);
+						}}>+</button
+					>
+				</div>
+			</section>
+		{/if}
 	</div>
 
-	{#if tfield.mapShape == map_shape.SQUARE}
-		<section id="map-dimensions-container" class:hidden={hidden_settings.dimensions}>
-			<div id="map-dimensions">
-				{#if addOrRemoveMapDimensions == 'add'}
-					<button
-						style="grid-area: left;"
-						on:click={() => {
-							square_expandMapDimension('left', 1);
-						}}>Add<br />Left</button
-					>
-					<button
-						style="grid-area: top;"
-						on:click={() => {
-							square_expandMapDimension('top', 1);
-						}}>Add<br />Top</button
-					>
-					<button
-						style="grid-area: bottom;"
-						on:click={() => {
-							square_expandMapDimension('bottom', 1);
-						}}>Add<br />Bottom</button
-					>
-					<button
-						style="grid-area: right;"
-						on:click={() => {
-							square_expandMapDimension('right', 1);
-						}}>Add<br />Right</button
-					>
-					<button
-						style="grid-area: center;"
-						on:click={() => {
-							addOrRemoveMapDimensions = 'remove';
-						}}
-					>
-						<img
-							src={`/assets/img/tools/addHex_${tfield.orientation == 'flatTop' ? 'ft' : 'pt'}.png`}
-							alt={'Add Hex'}
-							title={'Add Hex'}
-						/>
-					</button>
-				{:else}
-					<button
-						style="grid-area: left;"
-						on:click={() => {
-							square_reduceMapDimension('left', 1);
-						}}>Remove<br />Left</button
-					>
-					<button
-						style="grid-area: top;"
-						on:click={() => {
-							square_reduceMapDimension('top', 1);
-						}}>Remove<br />Top</button
-					>
-					<button
-						style="grid-area: bottom;"
-						on:click={() => {
-							square_reduceMapDimension('bottom', 1);
-						}}>Remove<br />Bottom</button
-					>
-					<button
-						style="grid-area: right;"
-						on:click={() => {
-							square_reduceMapDimension('right', 1);
-						}}>Remove<br />Right</button
-					>
-					<button
-						style="grid-area: center;"
-						on:click={() => {
-							addOrRemoveMapDimensions = 'add';
-						}}
-					>
-						<img
-							src={`/assets/img/tools/removeHex_${tfield.orientation == 'flatTop' ? 'ft' : 'pt'}.png`}
-							alt={'Remove Hex'}
-							title={'Remove Hex'}
-						/>
-					</button>
-				{/if}
-			</div>
-		</section>
-	{:else if tfield.mapShape == map_shape.FLOWER}
-		<section id="flower-dimensions-container" class:hidden={hidden_settings.dimensions}>
-			<p>Hexes out from center</p>
-			<div id="flower-dimensions-controls-grid">
-				<button
-					on:click={() => {
-						flower_reduceHexesOut(1);
-					}}>-</button
-				>
-				<div id="counter-container">{tfield.hexesOut}</div>
-				<button
-					on:click={() => {
-						flower_expandHexesOut(1);
-					}}>+</button
-				>
-			</div>
-		</section>
-	{/if}
 
 	<!-- COORDINATES -->
-	<h2 class="setting-heading">
-		Coordinates
-		<button
-			on:click={() => {
-				hidden_settings.coordinates = !hidden_settings.coordinates;
-			}}
-		>
-			<img alt={'Toggle Coordinate Settings'} class:rotated={hidden_settings.coordinates} src={'/assets/img/ui/arrow.png'} />
-		</button>
-	</h2>
-	<div class="settings-grid" class:hidden={hidden_settings.coordinates}>
-		<label class="helperText">Coordinates can slow down map changes such as adding hexes or changing orientation.</label>
-		<label for="showCoords">Show Coordinates</label>
-		<Checkbox bind:checked={data_coordinates.shown} id={'showCoords'} />
-
-		{#if data_coordinates.shown}
-			<label for="coordsSystem"
-				>Coordinate System<sup
-					><a href="https://www.redblobgames.com/grids/hexagons/#coordinates" target="_blank" title="Hex Coordinate Systems Explanation"
-						>?</a
-					></sup
-				></label
+	<div class="setting-container">
+		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.coordinates}>
+			Coordinates
+			<button
+				on:click={() => {
+					hidden_settings.coordinates = !hidden_settings.coordinates;
+				}}
 			>
-			<select id="coordsSystem" bind:value={data_coordinates.system} on:change={comp_coordsLayer.updateAllCoordsText}>
-				<option value={coord_system.ROWCOL}>Column, Row</option>
-				<option value={coord_system.AXIAL}>Axial</option>
-				<option value={coord_system.CUBE}>Cube</option>
-				<option value={coord_system.LETTERNUMBER}>Letter Number</option>
-			</select>
+				<img alt={'Toggle Coordinate Settings'} class:rotated={hidden_settings.coordinates} src={'/assets/img/ui/arrow.png'} />
+			</button>
+		</h2>
+		<div class="settings-grid" class:hidden={hidden_settings.coordinates}>
+			<label class="helperText">Coordinates can slow down map changes such as adding hexes or changing orientation.</label>
+			<label for="showCoords">Show Coordinates</label>
+			<Checkbox bind:checked={data_coordinates.shown} id={'showCoords'} />
 
-			<label for="coordsFill">Color</label>
-			<ColorInputPixi bind:value={data_coordinates.style.fill} id={'coordsFill'} />
+			{#if data_coordinates.shown}
+				<label for="coordsSystem"
+					>Coordinate System<sup
+						><a href="https://www.redblobgames.com/grids/hexagons/#coordinates" target="_blank" title="Hex Coordinate Systems Explanation"
+							>?</a
+						></sup
+					></label
+				>
+				<select id="coordsSystem" bind:value={data_coordinates.system} on:change={comp_coordsLayer.updateAllCoordsText}>
+					<option value={coord_system.ROWCOL}>Column, Row</option>
+					<option value={coord_system.AXIAL}>Axial</option>
+					<option value={coord_system.CUBE}>Cube</option>
+					<option value={coord_system.LETTERNUMBER}>Letter Number</option>
+				</select>
 
-			<label for="coordFontSize">Font Size</label>
-			<input id="coordFontSize" type="number" bind:value={data_coordinates.style.fontSize} />
+				<label for="coordsFill">Color</label>
+				<ColorInputPixi bind:value={data_coordinates.style.fill} id={'coordsFill'} />
 
-			<label for="coordsOutline">Outline Color</label>
-			<ColorInputPixi bind:value={data_coordinates.style.stroke} id={'coordsOutline'} />
+				<label for="coordFontSize">Font Size</label>
+				<input id="coordFontSize" type="number" bind:value={data_coordinates.style.fontSize} />
 
-			<label for="coordsStrokeThickness">Outline Thickness</label>
-			<input id="coordsStrokeThickness" type="number" bind:value={data_coordinates.style.strokeThickness} />
+				<label for="coordsOutline">Outline Color</label>
+				<ColorInputPixi bind:value={data_coordinates.style.stroke} id={'coordsOutline'} />
 
-			<label for="coordSeperator">Separator</label>
-			<input
-				id="coordSeperator"
-				type="text"
-				bind:value={data_coordinates.seperator}
-				on:change={() => {
-					comp_coordsLayer.updateAllCoordsText();
-				}}
-			/>
+				<label for="coordsStrokeThickness">Outline Thickness</label>
+				<input id="coordsStrokeThickness" type="number" bind:value={data_coordinates.style.strokeThickness} />
 
-			<label for="coordGap">Gap</label>
-			<input
-				id="coordGap"
-				type="number"
-				bind:value={data_coordinates.gap}
-				on:change={() => {
-					comp_coordsLayer.updateAllCoordPositions();
-				}}
-			/>
-		{/if}
+				<label for="coordSeperator">Separator</label>
+				<input
+					id="coordSeperator"
+					type="text"
+					bind:value={data_coordinates.seperator}
+					on:change={() => {
+						comp_coordsLayer.updateAllCoordsText();
+					}}
+				/>
+
+				<label for="coordGap">Gap</label>
+				<input
+					id="coordGap"
+					type="number"
+					bind:value={data_coordinates.gap}
+					on:change={() => {
+						comp_coordsLayer.updateAllCoordPositions();
+					}}
+				/>
+			{/if}
+		</div>
 	</div>
 
 	<!-- OVERLAY -->
-	<h2 class="setting-heading">
-		Overlay
-		<button
-			on:click={() => {
-				hidden_settings.overlay = !hidden_settings.overlay;
-			}}
-		>
-			<img alt={'Toggle Experimental Settings'} class:rotated={hidden_settings.overlay} src={'/assets/img/ui/arrow.png'} />
-		</button>
-	</h2>
-
-	<div class="settings-grid" class:hidden={hidden_settings.overlay} style={'justify-items: start;'}>
-		<button class="file-input-button">
-			{#if data_overlay.base64 == ''}Load Overlay Image{:else}Replace Overlay Image{/if}
-			<input
-				type="file"
-				accept="image/*"
-				bind:files={overlay_files}
-				on:change={() => {
-					import_overlay_image();
+	<div class="setting-container">
+		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.overlay}>
+			Overlay
+			<button
+				on:click={() => {
+					hidden_settings.overlay = !hidden_settings.overlay;
 				}}
-			/>
-		</button>
+			>
+				<img alt={'Toggle Experimental Settings'} class:rotated={hidden_settings.overlay} src={'/assets/img/ui/arrow.png'} />
+			</button>
+		</h2>
+
+		<div class="settings-grid" class:hidden={hidden_settings.overlay} style={'justify-items: start;'}>
+			<button class="file-input-button">
+				{#if data_overlay.base64 == ''}Load Overlay Image{:else}Replace Overlay Image{/if}
+				<input
+					type="file"
+					accept="image/*"
+					bind:files={overlay_files}
+					on:change={() => {
+						import_overlay_image();
+					}}
+				/>
+			</button>
+		</div>
 	</div>
 
 	<!-- TILE SETS -->
-	<h2 class="setting-heading">
-		Tilesets
-		<button
-			on:click={() => {
-				hidden_settings.tilesets = !hidden_settings.tilesets;
-			}}
-		>
-			<img alt={'Toggle Experimental Settings'} class:rotated={hidden_settings.tilesets} src={'/assets/img/ui/arrow.png'} />
-		</button>
-	</h2>
-	<div id="tilesets" class:hidden={hidden_settings.tilesets}>
-		{#each loadedTilesets as tileset (tileset.id)}
-			<div
-				class="loaded-tileset"
-				on:click={() => {
-					console.log(tileset);
-				}}
-			>
-				{tileset.name}
-
-				{#if tileset.id.split(":")[0] != 'default' && tileset.version != LATESTDEFAULTTILESVERSION}
-					<button
-						on:click={() => {
-							removeTileset(tileset.id);
-						}}
-					>
-						<img src="/assets/img/tools/trash.png" alt={'Trash'} title={'Remove Tileset'} />
-					</button>
-				{/if}
-
-			</div>
-		{/each}
-
-		<span>
-			<button class="file-input-button"
-				>Import Tileset <input
-					type="file"
-					bind:files={tilesetFiles}
-					on:change={() => {
-						importTileset();
-					}}
-				/></button
-			>
+	<div class="setting-container">
+		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.tilesets}>
+			Tilesets
 			<button
 				on:click={() => {
-					appState = 'tilesetCreator';
-				}}>Tileset Builder</button
+					hidden_settings.tilesets = !hidden_settings.tilesets;
+				}}
 			>
-		</span>
+				<img alt={'Toggle Experimental Settings'} class:rotated={hidden_settings.tilesets} src={'/assets/img/ui/arrow.png'} />
+			</button>
+		</h2>
+		<div id="tilesets" class:hidden={hidden_settings.tilesets}>
+			{#each loadedTilesets as tileset (tileset.id)}
+				<div
+					class="loaded-tileset"
+					on:click={() => {
+						console.log(tileset);
+					}}
+				>
+					{tileset.name}
+
+					{#if tileset.id.split(":")[0] != 'default' && tileset.version != LATESTDEFAULTTILESVERSION}
+						<button
+							on:click={() => {
+								removeTileset(tileset.id);
+							}}
+						>
+							<img src="/assets/img/tools/trash.png" alt={'Trash'} title={'Remove Tileset'} />
+						</button>
+					{/if}
+
+				</div>
+			{/each}
+
+			<span>
+				<button class="file-input-button"
+					>Import Tileset <input
+						type="file"
+						bind:files={tilesetFiles}
+						on:change={() => {
+							importTileset();
+						}}
+					/></button
+				>
+				<button
+					on:click={() => {
+						appState = 'tilesetCreator';
+					}}>Tileset Builder</button
+				>
+			</span>
+		</div>
 	</div>
 
 	<!-- ICON SETS -->
-	<h2 class="setting-heading">
-		<span
-			on:click={(e) => {
-				iconset_text = iconset_text == 'Icon Set' ? 'Iconset' : 'Icon Set';
-			}}>{iconset_text}s</span
-		>
-		<button
-			on:click={() => {
-				hidden_settings.iconsets = !hidden_settings.iconsets;
-			}}
-		>
-			<img alt={'Toggle Icon Set Settings'} src={'/assets/img/ui/arrow.png'} class:rotated={hidden_settings.iconsets} />
-		</button>
-	</h2>
-	<div id="iconsets" class:hidden={hidden_settings.iconsets}>
-		{#each loadedIconsets as iconset (iconset.id)}
-			<div
-				class="loaded-tileset"
-				on:click={() => {
-					console.log(iconset);
-				}}
-			>
-				{iconset.name}
-
-				{#if iconset.id.split(":")[0] != 'default' && iconset.version != LATESTDEFAULTICONSVERSION}
-					<button
-						on:click={() => {
-							removeIconset(iconset.id);
-						}}
-					>
-						<img src="/assets/img/tools/trash.png" alt={'Trash'} title={'Remove Iconset'} />
-					</button>
-				{/if}
-			</div>
-		{/each}
-
-		<span>
-			<button class="file-input-button"
-				>Import {iconset_text}
-				<input
-					type="file"
-					accept=".hfis"
-					bind:files={iconsetFiles}
-					on:change={() => {
-						importIconset();
-					}}
-				/></button
+	<div class="setting-container">
+		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.iconsets}>
+			<span
+				on:click={(e) => {
+					iconset_text = iconset_text == 'Icon Set' ? 'Iconset' : 'Icon Set';
+				}}>{iconset_text}s</span
 			>
 			<button
 				on:click={() => {
-					appState = 'iconsetCreator';
-				}}>{iconset_text} Builder</button
+					hidden_settings.iconsets = !hidden_settings.iconsets;
+				}}
 			>
-		</span>
+				<img alt={'Toggle Icon Set Settings'} src={'/assets/img/ui/arrow.png'} class:rotated={hidden_settings.iconsets} />
+			</button>
+		</h2>
+		<div id="iconsets" class:hidden={hidden_settings.iconsets}>
+			{#each loadedIconsets as iconset (iconset.id)}
+				<div
+					class="loaded-tileset"
+					on:click={() => {
+						console.log(iconset);
+					}}
+				>
+					{iconset.name}
+
+					{#if iconset.id.split(":")[0] != 'default' && iconset.version != LATESTDEFAULTICONSVERSION}
+						<button
+							on:click={() => {
+								removeIconset(iconset.id);
+							}}
+						>
+							<img src="/assets/img/tools/trash.png" alt={'Trash'} title={'Remove Iconset'} />
+						</button>
+					{/if}
+				</div>
+			{/each}
+
+			<span>
+				<button class="file-input-button"
+					>Import {iconset_text}
+					<input
+						type="file"
+						accept=".hfis"
+						bind:files={iconsetFiles}
+						on:change={() => {
+							importIconset();
+						}}
+					/></button
+				>
+				<button
+					on:click={() => {
+						appState = 'iconsetCreator';
+					}}>{iconset_text} Builder</button
+				>
+			</span>
+		</div>
 	</div>
 
-	<h2 class="setting-heading">
-		Generators
-		<button
-			on:click={() => {
-				hidden_settings.experimental = !hidden_settings.experimental;
-			}}
-		>
-			<img alt={'Toggle Generator Menu'} class:rotated={hidden_settings.experimental} src={'/assets/img/ui/arrow.png'} />
-		</button>
-	</h2>
-
-	<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;" class:hidden={hidden_settings.experimental}>
-		<button
-			on:click={() => {
-				showTerrainGenerator = true;
-				show_icon_generator = false;
-				showSettings = false;
-			}}
-			title={'Terrain Generator'}
+	<div class="setting-container">
+		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.experimental}>
+			Generators
+			<button
+				on:click={() => {
+					hidden_settings.experimental = !hidden_settings.experimental;
+				}}
 			>
-			Terrain Generator
-		</button>
+				<img alt={'Toggle Generator Menu'} class:rotated={hidden_settings.experimental} src={'/assets/img/ui/arrow.png'} />
+			</button>
+		</h2>
+
+		<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;" class:hidden={hidden_settings.experimental}>
+			<button
+				on:click={() => {
+					showTerrainGenerator = true;
+					show_icon_generator = false;
+					showSettings = false;
+				}}
+				title={'Terrain Generator'}
+				>
+				Terrain Generator
+			</button>
+			
+			<button
+			on:click={() => {
+				show_icon_generator = true;
+				showTerrainGenerator = false;
+					showSettings = false;
+				}}
+				title={'Icon Generator'}
+			>
+				Icon Generator
+			</button>
+		</div>
+	</div>
+
+	<!-- Changelog -->
+	<div class="setting-container">
+		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.changelog}>
+			Changelog
+			<button
+				on:click={() => {
+					hidden_settings.changelog = !hidden_settings.changelog;
+				}}
+			>
+				<img alt={'Toggle Generator Menu'} class:rotated={hidden_settings.changelog} src={'/assets/img/ui/arrow.png'} />
+			</button>
+		</h2>
+
+		<div id="changelog" class:hidden={hidden_settings.changelog}>
+			<p>Version 1.8.1</p>
+			<ul class="helperText">
+				<li>Added changelog</li>
+			</ul>
+
+			<p>Version 1.8.0</p>
+			<ul class="helperText">
+				<li>Added dashed paths</li>
+				<li>Map version update to accomodate paths</li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="setting-container">
+		<h2>About</h2>
+		<p class="helperText">
+			Hexfriend version 1.8.1 - "New stripes, Hexfriend"
+		</p>
 		
-		<button
-		on:click={() => {
-			show_icon_generator = true;
-			showTerrainGenerator = false;
-				showSettings = false;
-			}}
-			title={'Icon Generator'}
-		>
-			Icon Generator
-		</button>
+		<p class="helperText">
+			By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
+		</p>
+
+		<p class="helperText">
+			Hexfriend is built with Svelte, Pixi JS and Typescript. Check out the <a href="https://www.github.com/Aidymouse/Hexfriend">Github</a>
+		</p>
+	
+		<p class="helperText">
+			Found a bug? Got ideas? Come say Hi on the <a href="https://discord.gg/Jvws27VmWR">Hexfriend Discord</a>
+		</p>
+
+		<p class="helperText">
+			You can give away your hard earned money on <br><a href="https://ko-fi.com/aidymouse">Ko-fi</a>.
+		</p>
 	</div>
 
-	<h2>About</h2>
-	<p class="helperText">
-		Hexfriend version 1.8.0 - "Change of stripes, Hexfriend"
-	</p>
-	
-	<p class="helperText">
-		By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
-	</p>
-
-	<p class="helperText">
-		Hexfriend is built with Svelte, Pixi JS and Typescript. Check out the <a href="https://www.github.com/Aidymouse/Hexfriend">Github</a>
-	</p>
-  
-	<p class="helperText">
-		Found a bug? Got ideas? Come say hi on the <a href="https://discord.gg/Jvws27VmWR">discord</a>
-	</p>
-
-	<p class="helperText">
-		You can give away your hard earned money on <br><a href="https://ko-fi.com/aidymouse">Ko-fi</a>.
-	</p>
-
-	<p class="helperText" style="text-align: center; font-size: 20pt; font-style: normal">☺</p>
+	<p style="text-align: center; font-size: 20pt; font-style: normal; color: var(--lightest-background)">⟨ •‿• ⟩</p>
 </div>
 
 <style>
 	button {
 		border: solid 1px var(--lighter-background);
+	}
+
+	.bottom-margin {
+		margin-bottom: 0.25em;
+	}
+
+	.setting-container {
+		background-color: var(--light-background);
+		padding: 0.25em;
+		padding-left: 0.5em;
+		padding-right: 0.5em;
+		border-radius: var(--large-radius);
+		margin-top: 0.25em;
 	}
 
 	.setting-heading {
@@ -1006,12 +1063,21 @@
 		width: 3em;
 		height: 2em;
 		position: absolute;
+		height: 100%;
 		right: 0px;
 		border: none;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background-color: transparent;
+	}
+	
+	.setting-heading button:hover {
+		background-color: var(--lighter-background);
 	}
 
 	.setting-heading button img {
-		height: 100%;
+		height: 80%;
 		transition-duration: 0.2s;
 	}
 
@@ -1096,7 +1162,7 @@
 	}
 
 	.loaded-tileset {
-		background-color: var(--light-background);
+		background-color: var(--primary-background);
 		padding: 5px;
 		border-radius: var(--small-radius);
 		position: relative;
@@ -1168,14 +1234,16 @@
 		height: auto;
 	}
 
+
+
 	h2 {
-		margin-bottom: 0.2em;
+		margin: 0;
 	}
 
 	.helperText {
 		grid-column: span 2;
 		font-size: 12px;
-		color: var(--lightest-background);
+		color: var(--text);
 		line-height: 1.2;
 		margin: 0;
 		margin-bottom: 5px;

@@ -979,7 +979,6 @@ hexfiend red: #FF6666
 
 	:global(h2) {
 		font-weight: normal;
-		border-bottom: solid 0.125em var(--light-background);
 	}
 
 	:global(html) {
