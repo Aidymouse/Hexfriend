@@ -76,7 +76,7 @@
 		for (let ring=0; ring<hexes_out; ring++) {
 			for (const hex_id of hex_helpers.getRing("0:0:0", ring)) {
 				let hex_coords = hex_helpers.id_to_coords(hex_id)
-				let big_hex_coords = hex_helpers.coords_cubeToWorld(hex_coords.q, hex_coords.r, hex_coords.s, tfield.orientation, big_width, big_height)
+				let big_hex_coords = hex_helpers.coords_cubeToWorld(hex_coords.q, hex_coords.r, hex_coords.s, tfield.orientation, big_width, big_height, tfield.grid.gap)
 
 				let hX = big_hex_coords.x+tfield.largehexes.offset.x*tfield.hexWidth
 				let hY =  big_hex_coords.y+tfield.largehexes.offset.y*tfield.hexHeight

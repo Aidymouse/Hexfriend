@@ -431,6 +431,23 @@
 						renderGrid();
 					}}
 				/>
+				<label for="gridGap">Grid Gap</label>
+				<input
+					id="gap"
+					type="number"
+					min="0"
+					max="99"
+					bind:value={tfield.grid.gap}
+					on:focus={() => {
+						comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
+					}}
+					on:change={() => {
+						redrawEntireMap();
+						comp_coordsLayer.updateAllCoordPositions();
+						if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize(tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
+						comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
+					}}
+				/>
 				<label for="gridColor">Grid Color</label>
 				<ColorInputPixi
 					bind:value={tfield.grid.stroke}
@@ -543,13 +560,13 @@
 				type="number"
 				bind:value={tfield.hexWidth}
 				on:focus={() => {
-					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
+					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
 				}}
 				on:change={() => {
 					redrawEntireMap();
 					comp_coordsLayer.updateAllCoordPositions();
-					if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize(tfield.hexWidth, tfield.hexHeight);
-					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
+					if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize(tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
+					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
 				}}
 			/>
 
@@ -559,13 +576,13 @@
 				type="number"
 				bind:value={tfield.hexHeight}
 				on:focus={() => {
-					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
+					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
 				}}
 				on:change={() => {
 					redrawEntireMap();
 					comp_coordsLayer.updateAllCoordPositions();
-					if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize(tfield.hexWidth, tfield.hexHeight);
-					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
+					if (retainIconPosition) comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
+					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
 				}}
 			/>
 

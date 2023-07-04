@@ -6,7 +6,8 @@
 	import type { TerrainHex, terrain_field } from '../types/terrain';
 	import type { Tile } from '../types/tilesets';
 	import type { TileSymbol } from '../types/tilesets';
-	import type { hex_id, tools } from '../types/toolData';
+	import type { hex_id } from '../types/toolData';
+	import { tools } from '../types/toolData'
 	import type CoordsLayer from './CoordsLayer.svelte';
 	
 	// Enums
@@ -225,15 +226,15 @@
 				square_moveAllHexesRight(amount);
 
 				if (tfield.orientation == 'flatTop') {
-					pan.offsetX -= tfield.hexWidth * 0.75 * pan.zoomScale * amount;
+					pan.offsetX -= (tfield.hexWidth + tfield.grid.gap) * 0.75 * pan.zoomScale * amount;
 
 					if (amount % 2 == 1) {
 						tfield.raised = tfield.raised == hex_raised.ODD ? hex_raised.EVEN : hex_raised.ODD;
 						square_updateRaisedColumn();
-						pan.offsetY += tfield.hexHeight * 0.5 * (tfield.raised == 'odd' ? -1 : 1) * pan.zoomScale;
+						pan.offsetY += (tfield.hexHeight + tfield.grid.gap) * 0.5 * (tfield.raised == 'odd' ? -1 : 1) * pan.zoomScale;
 					}
 				} else {
-					pan.offsetX -= tfield.hexWidth * pan.zoomScale * amount;
+					pan.offsetX -= (tfield.hexWidth + tfield.grid.gap) * pan.zoomScale * amount;
 				}
 
 				break;
@@ -247,14 +248,14 @@
 				square_moveAllHexesDown(amount);
 
 				if (tfield.orientation == 'flatTop') {
-					pan.offsetY -= tfield.hexHeight * pan.zoomScale * amount;
+					pan.offsetY -= (tfield.hexHeight + tfield.grid.gap) * pan.zoomScale * amount;
 				} else {
-					pan.offsetY -= tfield.hexHeight * 0.75 * pan.zoomScale * amount;
+					pan.offsetY -= (tfield.hexHeight + tfield.grid.gap) * 0.75 * pan.zoomScale * amount;
 
 					if (amount % 2 == 1) {
 						tfield.raised = tfield.raised == hex_raised.ODD ? hex_raised.EVEN : hex_raised.ODD;
 						square_changeIndentedRow();
-						pan.offsetX += tfield.hexWidth * 0.5 * (tfield.raised == 'odd' ? -1 : 1) * pan.zoomScale;
+						pan.offsetX += (tfield.hexWidth + tfield.grid.gap) * 0.5 * (tfield.raised == 'odd' ? -1 : 1) * pan.zoomScale;
 					}
 				}
 
@@ -370,10 +371,10 @@
 						square_updateRaisedColumn();
 					}
 
-					pan.offsetX += tfield.hexWidth * 0.75 * pan.zoomScale * amount;
-					pan.offsetY += tfield.hexHeight * 0.5 * (tfield.raised == 'odd' ? -1 : 1) * pan.zoomScale * (amount % 2 == 0 ? 0 : 1);
+					pan.offsetX += (tfield.hexWidth + tfield.grid.gap) * 0.75 * pan.zoomScale * amount;
+					pan.offsetY += (tfield.hexHeight + tfield.grid.gap) * 0.5 * (tfield.raised == 'odd' ? -1 : 1) * pan.zoomScale * (amount % 2 == 0 ? 0 : 1);
 				} else {
-					pan.offsetX += tfield.hexWidth * pan.zoomScale * amount;
+					pan.offsetX += (tfield.hexWidth + tfield.grid.gap) * pan.zoomScale * amount;
 				}
 
 				break;
@@ -400,7 +401,7 @@
 					if (amount % 2 == 1) {
 						tfield.raised = tfield.raised == 'odd' ? 'even' : 'odd';
 						square_changeIndentedRow();
-						pan.offsetX += tfield.hexWidth * 0.5 * (tfield.raised == 'odd' ? -1 : 1) * pan.zoomScale;
+						pan.offsetX += (tfield.hexWidth + tfield.grid.gap) * 0.5 * (tfield.raised == 'odd' ? -1 : 1) * pan.zoomScale;
 					}
 				}
 
@@ -642,9 +643,9 @@
 		Object.keys(tfield.hexes).forEach((hexId: hex_id) => {
 			let hex = tfield.hexes[hexId];
 
-			let hexC = coords_cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.raised);
+			let hexC = coords_cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
 
-			gridGraphics.drawPolygon(getHexPath(tfield.hexWidth, tfield.hexHeight, tfield.orientation, hexC.x, hexC.y));
+			gridGraphics.drawPolygon(getHexPath(tfield.hexWidth + tfield.grid.gap, tfield.hexHeight + tfield.grid.gap, tfield.orientation, hexC.x, hexC.y));
 		});
 	}
 
@@ -665,7 +666,7 @@
 
 	export function renderHex(hexId: hex_id) {
 		let hex = tfield.hexes[hexId];
-		let hexWorldCoords = coords_cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
+		let hexWorldCoords = coords_cubeToWorld(hex.q, hex.r, hex.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
 
 		if (!hex.tile) {
 			terrainGraphics.beginFill(tfield.blankHexColor);
@@ -740,7 +741,7 @@
 		if (controls.mouseDown[0]) {
 			let x = store_panning.curWorldX();
 			let y = store_panning.curWorldY();
-			let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
+			let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
 
 			let clickedId = genHexId(clickedCoords.q, clickedCoords.r, clickedCoords.s);
 
@@ -824,7 +825,7 @@
 		if (controls.mouseDown[0]) {
 			let x = store_panning.curWorldX();
 			let y = store_panning.curWorldY();
-			let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
+			let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
 
 			let clickedId = genHexId(clickedCoords.q, clickedCoords.r, clickedCoords.s);
 
@@ -853,7 +854,8 @@
 			store_panning.curWorldY(),
 			tfield.orientation,
 			tfield.hexWidth,
-			tfield.hexHeight
+			tfield.hexHeight,
+			tfield.grid.gap
 		);
 
 		let clickedId = genHexId(clickedCoords.q, clickedCoords.r, clickedCoords.s);
@@ -871,7 +873,7 @@
 		
 		let x = store_panning.curWorldX();
 		let y = store_panning.curWorldY();
-		let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
+		let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
 
 		let clickedId = genHexId_coordsObj(clickedCoords);
 		if (!hexExists(clickedId)) return;
@@ -891,7 +893,7 @@
 		// Find all like hexes, much like a paintbucket, and perform a specific operation on them, passing in hex id as a parameter
 
 		let clickedId = genHexId_coordsObj(
-			coords_worldToCube(store_panning.curWorldX(), store_panning.curWorldY(), tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+			coords_worldToCube(store_panning.curWorldX(), store_panning.curWorldY(), tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.grid.gap)
 		);
 
 		if (!hexExists(clickedId)) return;

@@ -151,6 +151,12 @@ hexfiend red: #FF6666
 		resizeTo: window,
 	});
 
+	// Enable PixiJS dev tools in development
+	if (process.env.NODE_ENV == 'development') {
+		// @ts-ignore
+		globalThis.__PIXI_APP__ = app;
+	}
+
 	let showSavedMaps = false;
 
 	let saving = false;

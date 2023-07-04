@@ -27,7 +27,7 @@ export interface terrain_field {
 	hexWidth: number;
 	hexHeight: number;
 
-	grid: { stroke: number; thickness: number; shown: boolean };
+	grid: { stroke: number; thickness: number; gap: number; shown: boolean; };
 
 	mapShape: map_shape;
 	largehexes: {
