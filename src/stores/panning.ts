@@ -103,7 +103,7 @@ export const handlers = {
 
 			// controls how far you can zoom out (smaller number is farther out)
 			let minZoom = (window.innerWidth + window.innerHeight) / 2;
-			minZoom /= ((tfield.hexWidth + tfield.hexHeight) / 2) * ((calcColumns + calcRows) / 2) * 2;
+			minZoom /= ((tfield.hexWidth + tfield.hexHeight + tfield.grid.gap) / 2) * ((calcColumns + calcRows) / 2) * 2;
 			if (pan.zoomScale < minZoom) {
 				pan.zoomScale = minZoom;
 			}
@@ -111,7 +111,7 @@ export const handlers = {
 			let maxZoom = (window.innerWidth + window.innerHeight) / 2;
 			// TODO: use tile size
 			// maxZoom /= 100 * 2;
-			maxZoom /= ((tfield.hexWidth + tfield.hexHeight) / 2) * 4;
+			maxZoom /= ((tfield.hexWidth + tfield.hexHeight + tfield.grid.gap) / 2) * 4;
 			if (maxZoom < pan.zoomScale) {
 				pan.zoomScale = maxZoom;
 			}

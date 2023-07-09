@@ -25,6 +25,15 @@ function convert_v6_to_v7(oldData: save_data): save_data {
 	return new_data;
 }
 
+function convert_v7_to_v8(old_data: save_data): save_data {
+	let new_data: save_data = JSON.parse(JSON.stringify(old_data))
+
+	new_data.TerrainField.grid.gap = 0
+
+	new_data.saveVersion = 8
+	return new_data;
+}
+
 export function convertSaveDataToLatest(oldData: save_data): save_data {
 	// Update to latest version
 	let newData: save_data = JSON.parse(JSON.stringify(oldData));
@@ -82,6 +91,7 @@ export function convertSaveDataToLatest(oldData: save_data): save_data {
 
 	newData = convert_v5_to_v6(newData);
 	newData = convert_v6_to_v7(newData);
+	newData = convert_v7_to_v8(newData);
 
 	return newData;
 }

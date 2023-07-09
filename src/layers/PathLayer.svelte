@@ -118,8 +118,8 @@
 		// Overlay a grid of smaller opposite orientation hexes and it lines up perfectly!
 
 		let snap_grid_orientation = tfield.orientation == hex_orientation.FLATTOP ? hex_orientation.POINTYTOP : hex_orientation.FLATTOP
-		let snap_grid_hexWidth = tfield.hexWidth / (tfield.orientation == hex_orientation.FLATTOP ? 2 : 1.5)
-		let snap_grid_hexHeight = tfield.hexHeight / (tfield.orientation == hex_orientation.FLATTOP ? 1.5 : 2)
+		let snap_grid_hexWidth = (tfield.hexWidth + tfield.grid.gap) / (tfield.orientation == hex_orientation.FLATTOP ? 2 : 1.5)
+		let snap_grid_hexHeight = (tfield.hexHeight + tfield.grid.gap) / (tfield.orientation == hex_orientation.FLATTOP ? 1.5 : 2)
 
 		let snap_coords = coords_worldToCube(
 			store_panning.curWorldX(),
@@ -127,6 +127,7 @@
 			snap_grid_orientation,
 			snap_grid_hexWidth,
 			snap_grid_hexHeight,
+			tfield.grid.gap,
 			)
 			
 		return coords_cubeToWorld(
@@ -136,6 +137,7 @@
 			snap_grid_orientation,
 			snap_grid_hexWidth,
 			snap_grid_hexHeight,
+			tfield.grid.gap,
 		)
 
 	}

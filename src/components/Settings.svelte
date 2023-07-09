@@ -431,6 +431,7 @@
 						renderGrid();
 					}}
 				/>
+
 				<label for="gridColor">Grid Color</label>
 				<ColorInputPixi
 					bind:value={tfield.grid.stroke}
@@ -440,6 +441,24 @@
 					id={'gridColor'}
 				/>
 			{/if}
+
+			<label for="gridGap">Gap</label>
+			<input
+				id="gap"
+				type="number"
+				min="0"
+				max="99"
+				bind:value={tfield.grid.gap}
+				on:focus={() => {
+					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
+				}}
+				on:change={() => {
+					redrawEntireMap();
+					comp_coordsLayer.updateAllCoordPositions();
+					if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize(tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
+					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
+				}}
+			/>
 
 			<!-- LARGE HEXES -->
 			<label for="showOverlay">Large Hexes</label>
@@ -543,13 +562,13 @@
 				type="number"
 				bind:value={tfield.hexWidth}
 				on:focus={() => {
-					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
+					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
 				}}
 				on:change={() => {
 					redrawEntireMap();
 					comp_coordsLayer.updateAllCoordPositions();
-					if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize(tfield.hexWidth, tfield.hexHeight);
-					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
+					if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize(tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
+					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
 				}}
 			/>
 
@@ -559,13 +578,13 @@
 				type="number"
 				bind:value={tfield.hexHeight}
 				on:focus={() => {
-					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
+					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
 				}}
 				on:change={() => {
 					redrawEntireMap();
 					comp_coordsLayer.updateAllCoordPositions();
-					if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize(tfield.hexWidth, tfield.hexHeight);
-					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
+					if (retainIconPosition) comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
+					comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
 				}}
 			/>
 
@@ -997,6 +1016,12 @@
 		</h2>
 
 		<div id="changelog" class:hidden={hidden_settings.changelog}>
+			<p>Version 1.8.2</p>
+			<ul class="helperText">
+				<li>Added grid gap (thanks Evan!)</li>
+				<li>Save data update to version 8</li>
+			</ul>
+			
 			<p>Version 1.8.1</p>
 			<ul class="helperText">
 				<li>Added changelog</li>
@@ -1013,7 +1038,7 @@
 	<div class="setting-container">
 		<h2>About</h2>
 		<p class="helperText">
-			Hexfriend version 1.8.1 - "New stripes, Hexfriend"
+			Hexfriend version 1.8.2 - "New stripes, Hexfriend"
 		</p>
 		
 		<p class="helperText">

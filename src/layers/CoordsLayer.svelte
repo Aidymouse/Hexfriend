@@ -100,7 +100,7 @@
 		let text = coordTexts[hexId];
 
 		let idParts = breakDownHexID(hexId);
-		let newPos = coords_cubeToWorld(idParts.q, idParts.r, idParts.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight);
+		let newPos = coords_cubeToWorld(idParts.q, idParts.r, idParts.s, tfield.orientation, tfield.hexWidth + tfield.grid.gap, tfield.hexHeight + tfield.grid.gap);
 
 		text.pixiText.position.x = newPos.x;
 		text.pixiText.position.y = newPos.y + tfield.hexHeight / 2 - data_coordinates.gap;

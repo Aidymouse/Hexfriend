@@ -17,8 +17,11 @@ export function getHexPath(
 	height: number,
 	orientation: hex_orientation = 'flatTop',
 	centerX: number = 0,
-	centerY: number = 0
+	centerY: number = 0,
+	gap: number = 0,
 ): number[] {
+	width += gap;
+	height += gap;
 	if (orientation == 'pointyTop') {
 		return [
 			centerX,
@@ -163,7 +166,9 @@ export function cube_round(frac: cube_coords): cube_coords {
 	return { q: q, r: r, s: s };
 }
 
-export function coords_worldToCube(worldX: number, worldY: number, hex_orientation: hex_orientation, hexWidth: number, hexHeight: number): cube_coords {
+export function coords_worldToCube(worldX: number, worldY: number, hex_orientation: hex_orientation, hexWidth: number, hexHeight: number, gridGap: number): cube_coords {
+	hexWidth += gridGap;
+	hexHeight += gridGap;
 	if (hex_orientation == 'flatTop') {
 		// This is the inversion of the axialToWorld
 		// Of course, substituting -q-r in as S
@@ -190,8 +195,11 @@ export function coords_cubeToWorld(
 	s: number,
 	hex_orientation: hex_orientation,
 	hexWidth: number,
-	hexHeight: number
+	hexHeight: number,
+	gridGap: number
 ): { x: number; y: number } {
+	hexWidth += gridGap;
+	hexHeight += gridGap;
 	if (hex_orientation == 'flatTop') {
 		let hx = q * hexWidth * 0.75;
 		let hy = (r * hexHeight) / 2 - (s * hexHeight) / 2;

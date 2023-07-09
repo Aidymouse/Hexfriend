@@ -88,9 +88,9 @@
 
 		let scale: number;
 		if (tfield.hexWidth < tfield.hexHeight) {
-			scale = (tfield.hexWidth * (data_icon.pHex / 100)) / icon_texture_width;
+			scale = (tfield.hexWidth - tfield.grid.gap * (data_icon.pHex / 100)) / icon_texture_width;
 		} else {
-			scale = (tfield.hexHeight * (data_icon.pHex / 100)) / icon_texture_height;
+			scale = (tfield.hexHeight - tfield.grid.gap * (data_icon.pHex / 100)) / icon_texture_height;
 		}
 
 		return scale;
@@ -106,7 +106,8 @@
 				store_panning.curWorldY(),
 				tfield.orientation,
 				tfield.hexWidth,
-				tfield.hexHeight
+				tfield.hexHeight,
+				tfield.grid.gap,
 			);
 			let iconCoords = coords_cubeToWorld(
 				clickedHexCoords.q,
@@ -114,7 +115,8 @@
 				clickedHexCoords.s,
 				tfield.orientation,
 				tfield.hexWidth,
-				tfield.hexHeight
+				tfield.hexHeight,
+				tfield.grid.gap,
 			);
 			iconX = iconCoords.x;
 			iconY = iconCoords.y;
@@ -128,7 +130,7 @@
 	}
 
 	export function place_icon(icon: Icon, position: cube_coords) {
-		let icon_pos = coords_cubeToWorld(position.q, position.r, position.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight)
+		let icon_pos = coords_cubeToWorld(position.q, position.r, position.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.grid.gap)
 
 		icons.push({ x: icon_pos.x, y: icon_pos.y, color: icon.color, scale: getIconScale(), id: iconId, texId: icon.texId });
 		iconId++;
@@ -188,7 +190,8 @@
 				store_panning.curWorldY(),
 				tfield.orientation,
 				tfield.hexWidth,
-				tfield.hexHeight
+				tfield.hexHeight,
+				tfield.grid.gap,
 			);
 			let iconCoords = coords_cubeToWorld(
 				mouseHexCoords.q,
@@ -196,7 +199,8 @@
 				mouseHexCoords.s,
 				tfield.orientation,
 				tfield.hexWidth,
-				tfield.hexHeight
+				tfield.hexHeight,
+				tfield.grid.gap,
 			);
 
 			iconX = iconCoords.x;
@@ -213,7 +217,8 @@
 				store_panning.curWorldY(),
 				tfield.orientation,
 				tfield.hexWidth,
-				tfield.hexHeight
+				tfield.hexHeight,
+				tfield.grid.gap,
 			);
 			let iconCoords = coords_cubeToWorld(
 				mouseHexCoords.q,
@@ -221,7 +226,8 @@
 				mouseHexCoords.s,
 				tfield.orientation,
 				tfield.hexWidth,
-				tfield.hexHeight
+				tfield.hexHeight,
+				tfield.grid.gap,
 			);
 
 			floatingIcon.x = iconCoords.x;
@@ -247,24 +253,27 @@
 
 	let oldHexWidth: number;
 	let oldHexHeight: number;
+	let oldGap: number;
 	// This is called during layer set up when maps are loaded, or when hex fields are focused on.
-	export function saveOldHexMeasurements(hexWidth: number, hexHeight: number) {
+	export function saveOldHexMeasurements(hexWidth: number, hexHeight: number, gap: number) {
 		oldHexWidth = hexWidth;
 		oldHexHeight = hexHeight;
+		oldGap = gap;
 	}
 
-	export function retainIconPositionOnHexResize(newHexWidth: number, newHexHeight: number) {
+	export function retainIconPositionOnHexResize(newHexWidth: number, newHexHeight: number, newGap: number) {
 		// Find proprtional horizontal and vertical distance from center of nearest hex, and retain the position with the new width and height
 
 		icons.forEach((icon: IconLayerIcon) => {
-			let closestHexCubeCoords = coords_worldToCube(icon.x, icon.y, tfield.orientation, oldHexWidth, oldHexHeight);
+			let closestHexCubeCoords = coords_worldToCube(icon.x, icon.y, tfield.orientation, oldHexWidth, oldHexHeight, tfield.grid.gap);
 			let closestHexPos = coords_cubeToWorld(
 				closestHexCubeCoords.q,
 				closestHexCubeCoords.r,
 				closestHexCubeCoords.s,
 				tfield.orientation,
 				oldHexWidth,
-				oldHexHeight
+				oldHexHeight,
+				oldGap,
 			);
 
 			let distanceFromHexLeft = oldHexWidth / 2 + icon.x - closestHexPos.x;
@@ -279,7 +288,8 @@
 				closestHexCubeCoords.s,
 				tfield.orientation,
 				newHexWidth,
-				newHexHeight
+				newHexHeight,
+				tfield.grid.gap,
 			);
 
 			icon.x = closestHexPosNew.x - newHexWidth / 2 + newHexWidth * proportionalHorizontalDistance;
@@ -312,14 +322,15 @@
 			let oldOrientation: hex_orientation = newOrientation == 'flatTop' ? 'pointyTop' : 'flatTop';
 
 			// Find the center coordinates of the hex the icon wants to stay in
-			let oldClosestHexCubeCoords = coords_worldToCube(icon.x, icon.y, oldOrientation, oldHexWidth, oldHexHeight);
+			let oldClosestHexCubeCoords = coords_worldToCube(icon.x, icon.y, oldOrientation, oldHexWidth, oldHexHeight, tfield.grid.gap);
 			let oldClosestHexPos = coords_cubeToWorld(
 				oldClosestHexCubeCoords.q,
 				oldClosestHexCubeCoords.r,
 				oldClosestHexCubeCoords.s,
 				oldOrientation,
 				oldHexWidth,
-				oldHexHeight
+				oldHexHeight,
+				tfield.grid.gap,
 			);
 
 			let distanceFromHexLeft = oldHexWidth / 2 + icon.x - oldClosestHexPos.x;
@@ -348,7 +359,8 @@
 				newHexCubeCoords.s,
 				tfield.orientation,
 				tfield.hexWidth,
-				tfield.hexHeight
+				tfield.hexHeight,
+				tfield.grid.gap,
 			);
 
 			// Adjust icon position to be the same amount left and down proportional to hex width and height as it was before the transformation
@@ -440,7 +452,8 @@
 				store_panning.curWorldY(),
 				tfield.orientation,
 				tfield.hexWidth,
-				tfield.hexHeight
+				tfield.hexHeight,
+				tfield.grid.gap
 			);
 			let iconCoords = coords_cubeToWorld(
 				mouseHexCoords.q,
@@ -448,7 +461,8 @@
 				mouseHexCoords.s,
 				tfield.orientation,
 				tfield.hexWidth,
-				tfield.hexHeight
+				tfield.hexHeight,
+				tfield.grid.gap
 			);
 
 			draggedIcon.x = iconCoords.x;
