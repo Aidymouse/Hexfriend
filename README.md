@@ -4,7 +4,7 @@ A friendly online hexmapper - you can find it at https://www.hexfriend.net
 
 Hexfriend is a tool for building hexmaps for D&D type games. It aims to be as friendly and usable as possible.
 
-![Sample Hexfriend](https://user-images.githubusercontent.com/17463028/176241241-b48850c9-ab74-4999-a692-186579e2c429.png)
+![Sample Hexfriend](https://github.com/Aidymouse/Hexfriend/assets/17463028/54ce0c15-bd29-4d21-9993-a6b42e20f075)
 
 ### Feature List
 A list of neat things Hexfriend can do!
