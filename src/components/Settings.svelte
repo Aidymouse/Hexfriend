@@ -1016,6 +1016,11 @@
 		</h2>
 
 		<div id="changelog" class:hidden={hidden_settings.changelog}>
+			<p>Version 1.8.3</p>
+			<ul class="helperText">
+				<li>Icon scale bug fix</li>
+			</ul>
+
 			<p>Version 1.8.2</p>
 			<ul class="helperText">
 				<li>Added grid gap (thanks Evan!)</li>

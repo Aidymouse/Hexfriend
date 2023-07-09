@@ -88,9 +88,9 @@
 
 		let scale: number;
 		if (tfield.hexWidth < tfield.hexHeight) {
-			scale = (tfield.hexWidth - tfield.grid.gap * (data_icon.pHex / 100)) / icon_texture_width;
+			scale = (tfield.hexWidth * (data_icon.pHex / 100)) / icon_texture_width;
 		} else {
-			scale = (tfield.hexHeight - tfield.grid.gap * (data_icon.pHex / 100)) / icon_texture_height;
+			scale = (tfield.hexHeight * (data_icon.pHex / 100)) / icon_texture_height;
 		}
 
 		return scale;
