@@ -10,7 +10,8 @@ Hexfriend is a tool for building hexmaps for D&D type games. It aims to be as fr
 A list of neat things Hexfriend can do!
 
 -   Create square or flower shaped maps
--   Draw lines, plain and dotted, and place text
+-   Draw lines, plain and dotted
+-   Place text with a variety of styles
 -   Easily add and remove new hexes to the edge of the map
 -   Show large hexes for multi-scale maps
 -   Import user made custom tiles and icons
@@ -19,6 +20,8 @@ A list of neat things Hexfriend can do!
 -   Save maps in browser
 -   Create and edit path and text styles
 -   Overlay any image on top of the map for easy tracing
+-   Add a gap between hexes for easy cutting out
+-   Generate terrain or icons using in-built or custom made generator rulesets
 
 ### Meat and Bones
 
