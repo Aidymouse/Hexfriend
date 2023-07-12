@@ -1016,6 +1016,11 @@
 		</h2>
 
 		<div id="changelog" class:hidden={hidden_settings.changelog}>
+			<p>Version 1.8.4</p>
+			<ul class="helperText">
+				<li>Coordinates bug fix</li>
+			</ul>
+			
 			<p>Version 1.8.3</p>
 			<ul class="helperText">
 				<li>Icon scale bug fix</li>
@@ -1043,7 +1048,7 @@
 	<div class="setting-container">
 		<h2>About</h2>
 		<p class="helperText">
-			Hexfriend version 1.8.2 - "New stripes, Hexfriend"
+			Hexfriend version 1.8.4 - "New stripes, Hexfriend"
 		</p>
 		
 		<p class="helperText">

@@ -196,7 +196,7 @@ export function coords_cubeToWorld(
 	hex_orientation: hex_orientation,
 	hexWidth: number,
 	hexHeight: number,
-	gridGap: number
+	gridGap: number = 0
 ): { x: number; y: number } {
 	hexWidth += gridGap;
 	hexHeight += gridGap;

@@ -100,7 +100,7 @@
 		let text = coordTexts[hexId];
 
 		let idParts = breakDownHexID(hexId);
-		let newPos = coords_cubeToWorld(idParts.q, idParts.r, idParts.s, tfield.orientation, tfield.hexWidth + tfield.grid.gap, tfield.hexHeight + tfield.grid.gap);
+		let newPos = coords_cubeToWorld(idParts.q, idParts.r, idParts.s, tfield.orientation, tfield.hexWidth + tfield.grid.gap, tfield.hexHeight + tfield.grid.gap, tfield.grid.gap);
 
 		text.pixiText.position.x = newPos.x;
 		text.pixiText.position.y = newPos.y + tfield.hexHeight / 2 - data_coordinates.gap;
@@ -195,7 +195,7 @@
 			let mod = (n-1) % 26;
 			col_name = alphabet[mod] + col_name;
 			n = Math.round((n - mod) / 26);
-			console.log(n)
+			//console.log(n)
 		}
 
 
