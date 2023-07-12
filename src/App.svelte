@@ -289,9 +289,6 @@ hexfiend red: #FF6666
 	/* TOOL METHODS */
 	function changeTool(newTool: tools) {
 		// A list of stuff that needs to happen every tool change
-		
-		console.log(data_path)
-
 		data_path.update( (n) => {
 			
 			n.contextPathId = null
@@ -675,7 +672,7 @@ hexfiend red: #FF6666
 		console.log(`Loaded ${id}`);
 
 		// Deal with outdated save data
-		if (data.saveVersion < LATESTSAVEDATAVERSION) data = convertSaveDataToLatest(data);
+		data = convertSaveDataToLatest(data);
 
 		dataToLoad = { data: data, id: id };
 		appState = app_state.LOADINGMAP;

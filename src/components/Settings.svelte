@@ -1019,6 +1019,7 @@
 			<p>Version 1.8.4</p>
 			<ul class="helperText">
 				<li>Coordinates bug fix</li>
+				<li>Save data converter path fix</li>
 			</ul>
 			
 			<p>Version 1.8.3</p>

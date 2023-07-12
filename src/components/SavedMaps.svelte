@@ -18,9 +18,9 @@
 		let mapString = (await db.mapStrings.get(id)).mapString;
 
 		let mapData = JSON.parse(mapString);
-		if ((await db.mapSaves.get(id)).saveVersion != LATESTSAVEDATAVERSION) {
-			mapData = convertSaveDataToLatest(mapData);
-		}
+		//if ((await db.mapSaves.get(id)).saveVersion != LATESTSAVEDATAVERSION) {
+			//mapData = convertSaveDataToLatest(mapData);
+		//}
 
 		load(mapData, id);
 	}
