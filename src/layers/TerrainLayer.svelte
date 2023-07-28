@@ -30,6 +30,7 @@
 	} from '../helpers/hexHelpers';
 	import * as store_panning from '../stores/panning';
 	import * as store_tfield from '../stores/tfield';
+	import { store_inputs } from '../stores/inputs';
 	import { store_has_unsaved_changes } from '../stores/flags';
 	//import { collapseWaveGen } from '../lib/terrainGenerator';
 	import * as PIXI from 'pixi.js';
@@ -57,7 +58,6 @@
 		pan = newPan;
 	});
 
-	export let controls;
 
 	let tfield: terrain_field;
 	store_tfield.store.subscribe((newTField) => {
@@ -738,7 +738,7 @@
 		
 		//data_terrain = data_terrain
 		// Needs checking if terrain matches what we're trying to place already
-		if (controls.mouseDown[0]) {
+		if ($store_inputs.mouseDown[0]) {
 			let x = store_panning.curWorldX();
 			let y = store_panning.curWorldY();
 			let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
@@ -822,7 +822,7 @@
 	}
 
 	function eyedrop() {
-		if (controls.mouseDown[0]) {
+		if ($store_inputs.mouseDown[0]) {
 			let x = store_panning.curWorldX();
 			let y = store_panning.curWorldY();
 			let clickedCoords = coords_worldToCube(x, y, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);

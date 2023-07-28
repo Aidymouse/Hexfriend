@@ -3,21 +3,26 @@
   	import type { hex_orientation } from '../types/terrain';
 	import { tools } from '../types/toolData';
 	import { afterUpdate } from 'svelte';
-	import { data_path } from '../stores/data';
+	import { data_path, data_icon } from '../stores/data';
 
 	export let data_terrain: terrain_data;
-	export let data_icon: icon_data;
 	export let data_overlay: overlay_data;
 
+	/* These proxies keep the buttons responsive */
 	let data_path_proxy: path_data;
 	data_path.subscribe(n => {
 		data_path_proxy = n
 	})
 
+	let data_icon_proxy: icon_data;
+	data_icon.subscribe(n => {
+		data_icon_proxy = n
+	})
+	
 	$: {
 		data_terrain = data_terrain;
-		data_icon = data_icon;
 		data_path_proxy = data_path_proxy
+		data_icon_proxy = data_icon_proxy
 
 		buttons = buttons;
 	}
@@ -67,31 +72,40 @@
 				{
 					display: 'Drag Icons',
 					action: function () {
-						data_icon.dragMode = !data_icon.dragMode;
+						data_icon.update(n => {n.dragMode = !n.dragMode; return n})
 					},
 					image: '/assets/img/tools/drag.svg',
-					obj: data_icon,
+					obj: data_icon_proxy,
 					field: 'dragMode',
 				},
 
 				{
 					display: 'Icon Eraser',
 					action: function () {
-						data_icon.usingEraser = !data_icon.usingEraser;
+						data_icon.update(n => {n.usingEraser = !n.usingEraser; return n})
 					},
 					image: '/assets/img/tools/mini_eraser.svg',
-					obj: data_icon,
+					obj: data_icon_proxy,
 					field: 'usingEraser',
 				},
-
+				
 				{
 					display: 'Snap Icon',
 					action: function () {
-						data_icon.snapToHex = !data_icon.snapToHex;
+						data_icon.update(n => {n.snapToHex = !n.snapToHex; return n})
 					},
 					image: '/assets/img/tools/snap_icon.svg',
-					obj: data_icon,
+					obj: data_icon_proxy,
 					field: 'snapToHex',
+				},
+				{
+					display: 'Icon Eyedropper',
+					action: function () {
+						data_icon.update(n => {n.usingEyedropper = !n.usingEyedropper; return n})
+					},
+					image: '/assets/img/tools/eyedropper.svg',
+					obj: data_icon_proxy,
+					field: 'usingEyedropper',
 				},
 			],
 		},

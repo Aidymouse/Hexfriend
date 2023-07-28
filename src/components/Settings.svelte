@@ -1016,6 +1016,20 @@
 		</h2>
 
 		<div id="changelog" class:hidden={hidden_settings.changelog}>
+			<p>Version 1.8.6</p>
+			<ul class="helperText">
+				<li>Clicking left mouse + right mouse at the same time no longer makes panning sticky</li>
+				<li>Releasing right click over the toolbar no longer makes panning stick</li>
+			</ul>
+			
+			<p>Version 1.8.5</p>
+			<ul class="helperText">
+				<li>Icon scale UX improvements</li>
+				<li>Icon Eyedropper</li>
+				<li>Save data version update</li>
+				<li>Note: due to code choices the icon eyedropper will not pick out size on old maps</li>
+			</ul>
+
 			<p>Version 1.8.4</p>
 			<ul class="helperText">
 				<li>Coordinates bug fix</li>
@@ -1049,7 +1063,7 @@
 	<div class="setting-container">
 		<h2>About</h2>
 		<p class="helperText">
-			Hexfriend version 1.8.4 - "New stripes, Hexfriend"
+			Hexfriend version 1.8.6 - "New stripes, Hexfriend"
 		</p>
 		
 		<p class="helperText">

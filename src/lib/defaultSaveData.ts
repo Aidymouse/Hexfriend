@@ -42,6 +42,8 @@ let DEFAULTSAVEDATA: save_data = {
 		hexes: {}, // Populated below
 	},
 
+	icon_hex_size_percentage: 80,
+
 	coords: {
 		shown: false,
 		style: { fill: 0x000000, fontSize: 10, stroke: 0xffffff, strokeThickness: 2, fontFamily: 'Segoe UI' },

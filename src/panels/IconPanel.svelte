@@ -1,18 +1,22 @@
 <script lang="ts">
+	// TYPES
+	import type { icon_data } from '../types/data';
+	import type { Icon, Iconset } from '../types/icon';
+	import type { terrain_field } from '../types/terrain';
+	
 	import ColorInputPixi from '../components/ColorInputPixi.svelte';
 	import { getHexPath } from '../helpers/hexHelpers';
 	import { get_icon_texture } from '../lib/texture_loader';
-	import * as store_tfield from '../stores/tfield';
-	import type { icon_data } from '../types/data';
-	import type { Icon, Iconset } from '../types/icon';
 	import * as PIXI from 'pixi.js';
-	import type { terrain_field } from 'src/types/terrain';
 	import { afterUpdate, onMount } from 'svelte';
+	
+	// STORES
+	import * as store_tfield from '../stores/tfield';
+	import { data_icon } from '../stores/data';
 
 	export let loadedIconsets: Iconset[];
 	export let app: PIXI.Application;
-
-	export let data_icon: icon_data;
+	export let pHex: number;
 
 	let tfield: terrain_field;
 	store_tfield.store.subscribe((newTField) => {
@@ -22,11 +26,10 @@
 	let iconPreview = '';
 
 	function selectIcon(iconData: Icon) {
-		data_icon.texId = iconData.texId;
-		data_icon.color = iconData.color;
-		data_icon.pHex = iconData.pHex;
+		$data_icon.texId = iconData.texId;
+		$data_icon.color = iconData.color;
 
-		data_icon.usingEraser = false;
+		$data_icon.usingEraser = false;
 	}
 
 	let spr_preview = new PIXI.Sprite();
@@ -37,9 +40,9 @@
 	function getIconScale(hexWidth: number, hexHeight: number): number {
 		let scale: number;
 		if (hexWidth < hexHeight) {
-			scale = (hexWidth * (data_icon.pHex / 100)) / get_icon_texture(data_icon.texId).width;
+			scale = (hexWidth * (pHex / 100)) / get_icon_texture($data_icon.texId).width;
 		} else {
-			scale = (hexHeight * (data_icon.pHex / 100)) / get_icon_texture(data_icon.texId).height;
+			scale = (hexHeight * (pHex / 100)) / get_icon_texture($data_icon.texId).height;
 		}
 
 		return scale;
@@ -60,7 +63,7 @@
 		grph_preview.drawPolygon(path);
 		grph_preview.endFill();
 
-		spr_preview.texture = get_icon_texture(data_icon.texId);
+		spr_preview.texture = get_icon_texture($data_icon.texId);
 		spr_preview.tint = iconData.color;
 		spr_preview.anchor.set(0.5, 0.5);
 		spr_preview.scale.x = getIconScale(hW, hH);
@@ -72,15 +75,15 @@
 	}
 
 	function iconMatchesData(icon: Icon): boolean {
-		if (data_icon.color != icon.color) return false;
-		if (data_icon.texId != icon.texId) return false;
+		if ($data_icon.color != icon.color) return false;
+		if ($data_icon.texId != icon.texId) return false;
 		return true;
 	}
 
 	afterUpdate(async () => {
 		loadedIconsets = loadedIconsets;
 		tfield.orientation = tfield.orientation;
-		iconPreview = await getIconPreview(data_icon);
+		iconPreview = await getIconPreview($data_icon);
 	});
 
 	onMount(async () => {
@@ -100,12 +103,13 @@
 		</div>
 
 		<span class="icon-preview-control-row">
-			<ColorInputPixi bind:value={data_icon.color} id={'iconPanelColor'} />
+			<ColorInputPixi bind:value={$data_icon.color} id={'iconPanelColor'} />
 			<label for="iconPanelColor">Icon Color</label>
 		</span>
 
 		<span class="icon-preview-control-row">
-			<input type="range" id="iconSize" min={10} max={100} bind:value={data_icon.pHex} />
+			<input type="range" id="iconSize" min={10} max={100} bind:value={pHex} />
+			<button class="outline-button" on:click={() => {pHex = 80}}>Reset</button>
 		</span>
 	</div>
 

@@ -14,6 +14,8 @@
 
 	import * as store_panning from '../stores/panning';
 	import * as store_tfield from '../stores/tfield';
+	
+	import { store_inputs } from '../stores/inputs';
 	import { store_selected_tool } from '../stores/tools';
 	import { store_has_unsaved_changes } from '../stores/flags';
 	
@@ -24,7 +26,6 @@
 	
 	import { afterUpdate, onMount } from 'svelte';
 
-	export let controls;
 	let pan: pan_state;
 	store_panning.store.subscribe((newPan) => {
 		pan = newPan;
@@ -65,7 +66,7 @@
 	export function pointerdown() {
 		$data_path.contextPathId = null;
 
-		if (controls.mouseDown[0]) {
+		if ($store_inputs.mouseDown[0]) {
 			if ($data_path.selectedPath) {
 				let pX = store_panning.curWorldX();
 				let pY = store_panning.curWorldY();

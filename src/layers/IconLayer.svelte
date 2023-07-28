@@ -15,8 +15,11 @@
 	// Stores
 	import * as store_panning from '../stores/panning';
 	import * as store_tfield from '../stores/tfield';
+	import { store_inputs } from '../stores/inputs';
 	import { store_selected_tool } from '../stores/tools';
-	
+	import { data_icon } from '../stores/data';
+
+
 	// Lib
 	import {
 		coords_cubeToWorld,
@@ -30,6 +33,8 @@
 	import { get_icon_texture } from '../lib/texture_loader'
 	import { afterUpdate, onMount } from 'svelte';
 	
+
+	export let pHex: number;
 
 	export let icons: IconLayerIcon[] = [];
 	let pixi_icons: {[key: number]: PIXI.Sprite} = {}; // keeps up to date with icons
@@ -45,14 +50,11 @@
 	let selectedTool: tools;
 	store_selected_tool.subscribe(n => selectedTool = n);
 
-	export let controls;
-
 	let tfield: terrain_field;
 	store_tfield.store.subscribe((newTField) => {
 		tfield = newTField;
 	});
 
-	export let data_icon: icon_data;
 	export let data_eraser: eraser_data;
 
 	let floatingIcon: IconLayerIcon | null = null;
@@ -70,27 +72,23 @@
 		if (floatingIcon) floatingIcon.scale = getIconScale();
 	}
 
-	let areIconsInteractive = false
 	$: {
 		selectedTool = selectedTool
 		data_eraser = data_eraser
-		data_icon = data_icon
-
-		areIconsInteractive = (selectedTool == 'eraser' && !data_eraser.ignoreIcons) || (selectedTool == 'icon' && data_icon.usingEraser)
 	}
 
 	function getIconScale() {
 		
-		let icon_texture = get_icon_texture(data_icon.texId)
+		let icon_texture = get_icon_texture($data_icon.texId)
 		
 		let icon_texture_width = 100
 		let icon_texture_height = 100
 
 		let scale: number;
 		if (tfield.hexWidth < tfield.hexHeight) {
-			scale = (tfield.hexWidth * (data_icon.pHex / 100)) / icon_texture_width;
+			scale = (tfield.hexWidth * (pHex / 100)) / icon_texture_width;
 		} else {
-			scale = (tfield.hexHeight * (data_icon.pHex / 100)) / icon_texture_height;
+			scale = (tfield.hexHeight * (pHex / 100)) / icon_texture_height;
 		}
 
 		return scale;
@@ -100,7 +98,7 @@
 		let iconX = store_panning.curWorldX();
 		let iconY = store_panning.curWorldY();
 
-		if (data_icon.snapToHex) {
+		if ($data_icon.snapToHex) {
 			let clickedHexCoords = coords_worldToCube(
 				store_panning.curWorldX(),
 				store_panning.curWorldY(),
@@ -122,7 +120,7 @@
 			iconY = iconCoords.y;
 		}
 
-		icons.push({ x: iconX, y: iconY, color: data_icon.color, scale: getIconScale(), id: iconId, texId: data_icon.texId });
+		icons.push({ x: iconX, y: iconY, color: $data_icon.color, scale: getIconScale(), pHex: pHex, id: iconId, texId: $data_icon.texId });
 		iconId++;
 		icons = icons;
 
@@ -148,8 +146,9 @@
 	}
 
 	export function pointerdown() {
-		if (data_icon.usingEraser) return;
-		if (data_icon.dragMode) return;
+		if ($data_icon.usingEraser) return;
+		if ($data_icon.dragMode) return;
+		if ($data_icon.usingEyedropper) return;
 
 		newIcon();
 		//createFloatingIcon();
@@ -157,7 +156,7 @@
 
 	export function pointerup() {
 		draggedIcon = null;
-		if (data_icon.usingEraser) return;
+		//if ($data_icon.usingEraser) return;
 
 		//newIcon();
 		//destroyFloatingIcon();
@@ -184,7 +183,7 @@
 		let iconX = store_panning.curWorldX();
 		let iconY = store_panning.curWorldY();
 
-		if (data_icon.snapToHex) {
+		if ($data_icon.snapToHex) {
 			let mouseHexCoords = coords_worldToCube(
 				store_panning.curWorldX(),
 				store_panning.curWorldY(),
@@ -207,11 +206,11 @@
 			iconY = iconCoords.y;
 		}
 
-		floatingIcon = { x: iconX, y: iconY, color: data_icon.color, scale: getIconScale(), id: iconId, texId: data_icon.texId };
+		floatingIcon = { x: iconX, y: iconY, color: $data_icon.color, scale: getIconScale(), id: iconId, texId: $data_icon.texId };
 	}
 
 	function updateFloatingIcon() {
-		if (data_icon.snapToHex) {
+		if ($data_icon.snapToHex) {
 			let mouseHexCoords = coords_worldToCube(
 				store_panning.curWorldX(),
 				store_panning.curWorldY(),
@@ -237,8 +236,8 @@
 			floatingIcon.y = store_panning.curWorldY();
 		}
 
-		floatingIcon.color = data_icon.color
-		floatingIcon.texId = data_icon.texId
+		floatingIcon.color = $data_icon.color
+		floatingIcon.texId = $data_icon.texId
 	}
 
 	export function moveAllIcons(xMod: number, yMod: number) {
@@ -381,13 +380,13 @@
 	export function handleKeyboardShortcut(shortcutData: shortcut_data) {
 		switch (shortcutData.function) {
 			case 'toggleSnap': {
-				data_icon.snapToHex = !data_icon.snapToHex;
+				$data_icon.snapToHex = !$data_icon.snapToHex;
 				pointermove()
 				break;
 			}
 
 			case 'toggleEraser': {
-				data_icon.usingEraser = !data_icon.usingEraser;
+				$data_icon.usingEraser = !$data_icon.usingEraser;
 				break;
 			}
 
@@ -398,12 +397,16 @@
 	export function keyup(e: KeyboardEvent) {
 		switch (e.key) {
 			case 'Shift': 
-				data_icon.usingEraser = false;
+				$data_icon.usingEraser = false;
 				break;
 
 			case 'Control':
-				data_icon.dragMode = false;
+				$data_icon.dragMode = false;
 				break;
+			
+			case 'Alt':
+				$data_icon.usingEyedropper = false;
+				break
 
 		}
 	}
@@ -411,19 +414,23 @@
 	export function keydown(e: KeyboardEvent) {
 		switch (e.key) {
 			case "Shift": 
-				data_icon.usingEraser = true;
+				$data_icon.usingEraser = true;
 				break;
 
 			case 'Control':
-				data_icon.dragMode = true;
+				$data_icon.dragMode = true;
 				break;
+
+			case 'Alt':
+				$data_icon.usingEyedropper = true;
+				break
 
 
 		}
 	}
 
 	function shouldEraseIcons(): boolean {
-		return (selectedTool == 'eraser' && !data_eraser.ignoreIcons) || data_icon.usingEraser
+		return (selectedTool == 'eraser' && !data_eraser.ignoreIcons) || $data_icon.usingEraser
 	}
 
 	let dragOffsetX = 0;
@@ -433,20 +440,29 @@
 			deleteIcon(icon)
 			$store_has_unsaved_changes = true;
 
-		} else if ( data_icon.dragMode && draggedIcon == null ) {
+		} else if ( $data_icon.dragMode && draggedIcon == null ) {
 			draggedIcon = icon
 			dragOffsetX = store_panning.curWorldX() - icon.x
 			dragOffsetY = store_panning.curWorldY() - icon.y
+		
+		} else if ($data_icon.usingEyedropper) {
+			
+			pHex = icon.pHex
+			$data_icon.color = icon.color
+			$data_icon.texId = icon.texId
+
+			updateFloatingIcon();
+
 		}
 	}
 
 	function icon_pointerover(e: CustomEvent<PointerEvent>, icon: IconLayerIcon) {
 
-		if (controls.mouseDown[0] && shouldEraseIcons()) deleteIcon(icon)
+		if ($store_inputs.mouseDown[0] && shouldEraseIcons()) deleteIcon(icon)
 	}
 
 	function updateDraggedIcon() {
-		if (data_icon.snapToHex) {
+		if ($data_icon.snapToHex) {
 			let mouseHexCoords = coords_worldToCube(
 				store_panning.curWorldX(),
 				store_panning.curWorldY(),
@@ -529,7 +545,7 @@
 		/* Floating Icon */
 		spr_floating_icon.visible = false
 		if (floatingIcon) {
-			spr_floating_icon.visible = !data_icon.usingEraser && selectedTool == tools.ICON && cursorOnLayer && !data_icon.dragMode && draggedIcon == null
+			spr_floating_icon.visible = !$data_icon.usingEraser && selectedTool == tools.ICON && cursorOnLayer && !$data_icon.dragMode && draggedIcon == null && !$data_icon.usingEyedropper
 			spr_floating_icon.texture = get_icon_texture(floatingIcon.texId)
 			spr_floating_icon.tint = floatingIcon.color
 
@@ -563,11 +579,11 @@
 		texture={get_icon_texture(floatingIcon.texId)}
 		x={floatingIcon.x}
 		y={floatingIcon.y}
-		tint={data_icon.color}
+		tint={$data_icon.color}
 		anchor={{ x: 0.5, y: 0.5 }}
 		scale={{ x: floatingIcon.scale, y: floatingIcon.scale }}
 		
-		visible={!data_icon.usingEraser && selectedTool == tools.ICON && cursorOnLayer && !data_icon.dragMode && draggedIcon == null}
+		visible={!$data_icon.usingEraser && selectedTool == tools.ICON && cursorOnLayer && !$data_icon.dragMode && draggedIcon == null}
 	/>
 {/if}
 -->

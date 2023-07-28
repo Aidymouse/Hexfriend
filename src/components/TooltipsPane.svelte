@@ -22,9 +22,10 @@
 		clickAndDrag: string;
 	}
 	
-	// ENUMS
+	// STORES
 	import { store_selected_tool } from '../stores/tools'
 	import { data_path } from '../stores/data';
+	import { data_icon } from '../stores/data';
 	
 	// COMPONENTS
 	import Tooltip from './Tooltip.svelte';
@@ -35,7 +36,6 @@
 	
 	export let data_terrain: terrain_data;
 
-	export let data_icon: icon_data;
 	export let data_text: text_data;
 	export let data_eraser: eraser_data;
 	export let data_overlay: overlay_data;
@@ -67,7 +67,7 @@
 	function setTooltips_icon() {
 		c_icon.leftMouse = 'Place Icon';
 
-		if (data_icon.usingEraser) {
+		if ($data_icon.usingEraser) {
 			c_icon.leftMouse = 'Erase Icon';
 		}
 	}
@@ -127,7 +127,6 @@
 
 	$: {
 		data_terrain = data_terrain;
-		data_icon = data_icon;
 		data_text = data_text;
 		data_eraser = data_eraser;
 		data_overlay = data_overlay;

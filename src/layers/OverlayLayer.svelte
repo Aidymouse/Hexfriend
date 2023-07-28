@@ -5,7 +5,7 @@
     
     import { store_selected_tool } from '../stores/tools';
 	import * as store_panning from '../stores/panning';
-	import * as store_inputs from '../stores/inputs';
+	import { store_inputs } from '../stores/inputs';
 	
     import { store_has_unsaved_changes } from '../stores/flags';
 
@@ -31,10 +31,6 @@
 		pan = newPan;
 	});
     
-    let controls: input_state;
-	store_inputs.store.subscribe((newInputState) => {
-		controls = newInputState;
-	});
 
     // Local
     let current_base64 = "";

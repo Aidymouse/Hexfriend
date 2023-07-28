@@ -1,30 +1,29 @@
 <script lang="ts">
-	/* COLORS //
-hexfriend green: #8cc63f
-hexfiend red: #FF6666
-*/
+	/* DOTO
+		// CORE FUNCTIONS //
+		- undo / redo
+		- tooltips
+		- keyboard shortcuts - make sure all are working
+		- find more of a fix for why PIXI objects stick around when a new map is loaded - does this still happen ??
+		- textured hex backgrounds
+		- put all data into stores
+		- update to latest version of tileset
 
-	/* TODO //
-// CORE FUNCTIONS
-- undo / redo
-- tooltips
-- keyboard shortcuts - make sure all are working
-- find more of a fix for why PIXI objects stick around when a new map is loaded
-// POLISH / ROADMAP
-// not ranked
-- save data checking (if loading, making new map, quitting)
-- floating loaders - better feedback
-- export at different sizes
-- dashed line
-- more fonts
-- tests?? I dont think I'm a real enough dev
-- abolish technical debt
-*/
+		// POLISH / ROADMAP //
+		// not ranked
+		- floating loaders - better feedback
+		- export at different sizes
+		- make fonts load better
+		- tests?? I dont think I'm a real enough dev
+		- text sucks - increase internal resolution ?
 
-	/* BUGS //
-- symbol size is weird in preview when hex size is big
-- coordinates show under some stuff for some reason
-*/
+		// BUGS //
+		- symbol size is weird in preview when hex size is big
+		- cant erase icon below text
+		- releasing right or left mouse over a panel results in its action getting stuck on
+			- add mouseup event to panels to fix
+	*/
+
 	// Components
 	import CanvasHolder from './components/CanvasHolder.svelte';
 	import IconGenerator from './components/IconGenerator.svelte';
@@ -35,7 +34,7 @@ hexfiend red: #FF6666
 	import TerrainGenerator from './components/TerrainGenerator.svelte';
 	import TilesetCreator from './components/TilesetCreator.svelte';
 	import ToolButtons from './components/ToolButtons.svelte';
-	import ControlTooltips from './components/TooltipsPane.svelte';
+	import TooltipsPane from './components/TooltipsPane.svelte';
 	
 	// Layers
 	import CoordsLayer from './layers/CoordsLayer.svelte';
@@ -66,12 +65,12 @@ hexfiend red: #FF6666
 	import TextPanel from './panels/TextPanel.svelte';
 
 	// Stores
-	import * as store_inputs from './stores/inputs';
 	import * as store_panning from './stores/panning';
 	import * as store_tfield from './stores/tfield';
+	import { store_inputs } from './stores/inputs';
 	import { store_selected_tool } from './stores/tools';
 	import { store_has_unsaved_changes } from './stores/flags';
-	import { data_path } from './stores/data';
+	import { data_path, data_icon } from './stores/data';
 	
 	// GLOBAL STYLES
 	import './styles/inputs.css';
@@ -179,10 +178,6 @@ hexfiend red: #FF6666
 		pan = pan;
 	}
 
-	let controls: input_state;
-	store_inputs.store.subscribe((newInputState) => {
-		controls = newInputState;
-	});
 
 	let selectedTool;
 	store_selected_tool.subscribe((t) => {
@@ -203,15 +198,6 @@ hexfiend red: #FF6666
 		usingPaintbucket: false,
 		usingEraser: false,
 		renderOpacity: 1,
-	};
-
-	let data_icon: icon_data = {
-		color: null,
-		texId: null,
-		pHex: 80,
-		snapToHex: true,
-		usingEraser: false,
-		dragMode: false,
 	};
 
 	let data_text: text_data = {
@@ -308,12 +294,14 @@ hexfiend red: #FF6666
 
 	/* ALL PURPOSE POINTER METHODS */
 	function pointerdown(e: PointerEvent) {
+		console.log(`Down: ${e.button} :: ${e.buttons}`)
+
 		store_panning.handlers.handle(e);
-		controls.mouseDown[e.button] = true;
+		$store_inputs.mouseDown[e.button] = true;
 
-		if (controls.mouseDown[2]) store_panning.handlers.startPan(e);
+		if ($store_inputs.mouseDown[2]) store_panning.handlers.startPan(e);
 
-		if (controls.mouseDown[0]) {
+		if ($store_inputs.mouseDown[0]) {
 			switch (selectedTool) {
 				case tools.TERRAIN:
 					comp_terrainLayer.pointerdown();
@@ -342,9 +330,11 @@ hexfiend red: #FF6666
 	}
 
 	function pointerup(e: PointerEvent) {
-		controls.mouseDown[e.button] = false;
+		console.log(`Up: ${e.button} :: ${e.buttons}`)
+		
+		$store_inputs.mouseDown[e.button] = false;
 
-		if (!controls.mouseDown[2]) store_panning.handlers.endPan();
+		if (!$store_inputs.mouseDown[2]) store_panning.handlers.endPan();
 
 		switch (selectedTool) {
 			case tools.ICON:
@@ -366,7 +356,7 @@ hexfiend red: #FF6666
 
 		switch (selectedTool) {
 			case tools.TERRAIN:
-				if (controls.mouseDown[0]) comp_terrainLayer.pointerdown();
+				if ($store_inputs.mouseDown[0]) comp_terrainLayer.pointerdown();
 				break;
 
 			case tools.ICON:
@@ -378,7 +368,7 @@ hexfiend red: #FF6666
 				break;
 
 			case tools.ERASER:
-				if (controls.mouseDown[0]) {
+				if ($store_inputs.mouseDown[0]) {
 					if (!data_eraser.ignoreTerrain) comp_terrainLayer.eraseAtMouse();
 				}
 				/* Icons are handled differently in the icon handler */
@@ -720,8 +710,8 @@ hexfiend red: #FF6666
 		data_terrain.tile = { ...firstTile, symbol: firstTile.symbol ? { ...firstTile.symbol } : null };
 
 		let firstIcon = loadedIconsets[0].icons[0];
-		data_icon.color = firstIcon.color;
-		data_icon.texId = firstIcon.texId;
+		$data_icon.color = firstIcon.color;
+		$data_icon.texId = firstIcon.texId;
 
 		// Center the map
 		let tf = loadedSave.TerrainField;
@@ -825,26 +815,29 @@ hexfiend red: #FF6666
 			on:wheel={(e) => {
 				store_panning.handlers.zoom(e);
 			}}
-			on:pointerdown={(e) => {
+			on:mousedown={(e) => {
 				pointerdown(e);
 			}}
-			on:pointermove={(e) => {
+			on:mousemove={(e) => {
 				pointermove(e);
 			}}
-			on:pointerup={(e) => {
+			on:mouseup={(e) => {
 				pointerup(e);
 			}}
-			on:pointerout={(e) => {
+			on:mouseout={(e) => {
 				pointerOffLayers(e);
+			}}
+			on:blur={() => {
+				console.log("Sheeit")
 			}}
 			on:keydown={keyDown}
 			on:keyup={keyUp}
 		>
 			<CanvasHolder {app} />
 
-			<TerrainLayer bind:cont_terrain bind:this={comp_terrainLayer} {changeTool} bind:data_terrain {controls} {comp_coordsLayer} />
-			<PathLayer bind:this={comp_pathLayer} bind:cont_all_paths bind:paths={loadedSave.paths} {controls} />
-			<IconLayer bind:this={comp_iconLayer} bind:icons={loadedSave.icons} bind:data_icon bind:cont_icon {data_eraser} {controls} />
+			<TerrainLayer bind:cont_terrain bind:this={comp_terrainLayer} {changeTool} bind:data_terrain {comp_coordsLayer} />
+			<PathLayer bind:this={comp_pathLayer} bind:cont_all_paths bind:paths={loadedSave.paths} />
+			<IconLayer bind:this={comp_iconLayer} bind:pHex={loadedSave.icon_hex_size_percentage} bind:icons={loadedSave.icons} bind:cont_icon {data_eraser} />
 			<CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} bind:data_coordinates />
 			<LargeHexesLayer bind:cont_largehexes />
 			<TextLayer bind:cont_all_text bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text />
@@ -859,7 +852,7 @@ hexfiend red: #FF6666
 		{:else if selectedTool == 'terrain'}
 			<TerrainPanel bind:this={comp_terrain_panel} {loadedTilesets} {app} bind:data_terrain />
 		{:else if selectedTool == 'icon'}
-			<IconPanel {app} {loadedIconsets} bind:data_icon />
+			<IconPanel {app} {loadedIconsets} bind:pHex={loadedSave.icon_hex_size_percentage} />
 		{:else if selectedTool == 'path'}
 			<PathPanel {comp_pathLayer} bind:pathStyles={loadedSave.pathStyles} />
 		{:else if selectedTool == 'text'}
@@ -868,18 +861,17 @@ hexfiend red: #FF6666
 			<OverlayPanel bind:data_overlay />
 		{/if}
 
-		<div id="tool-buttons">
+		<div id="tool-buttons" on:mouseup={pointerup}>
 			<ToolButtons
 				bind:selectedTool
 				bind:hexOrientation={tfield.orientation}
 				{changeTool}
 				bind:data_terrain
-				bind:data_icon
 				bind:data_overlay
 			/>
 		</div>
 
-		<div id="setting-buttons">
+		<div id="setting-buttons" on:mouseup={pointerup}>
 			<button
 				on:click={() => {
 					showSettings = true;
@@ -913,10 +905,10 @@ hexfiend red: #FF6666
 		</div>
 
 		{#if showKeyboardShortcuts}
-			<ShortcutList bind:this={comp_shortcutList} />
+			<ShortcutList bind:this={comp_shortcutList} on:mouseup={pointerup}/>
 		{/if}
 
-		<SavedMaps bind:showSavedMaps {createNewMap} load={loadInit} />
+		<SavedMaps bind:showSavedMaps {createNewMap} load={loadInit} on:mouseup={pointerup}/>
 
 		<Settings
 			{loadedSave}
@@ -945,10 +937,11 @@ hexfiend red: #FF6666
 			}}
 			{exportMap}
 			load={loadInit}
+			on:mouseup={pointerup}
 		/>
 
 		{#if showControls}
-			<ControlTooltips {data_terrain} {data_icon} {data_text} {data_eraser} {data_overlay} />
+			<TooltipsPane {data_terrain} {data_text} {data_eraser} {data_overlay} />
 		{/if}
 	</main>
 {:else if appState == app_state.TILESETCREATOR}

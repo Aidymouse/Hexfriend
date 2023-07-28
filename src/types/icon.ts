@@ -20,12 +20,13 @@ export interface Iconset {
 	icons: Icon[];
 }
 
-/* USED DURING PROGRAM */
+/* Used during program and also saved in list to keep track of icons */
 export interface IconLayerIcon {
 	x: number;
 	y: number;
 	color: number;
 	scale: number;
+	pHex: number;
 	id: number;
 	texId: string;
 }

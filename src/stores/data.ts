@@ -11,3 +11,13 @@ export let data_path = writable({
     contextPathId: null,
     add_to: "start"
 })
+
+export let data_icon = writable({
+    color: null,
+    texId: null,
+    pHex: 80,
+    snapToHex: true,
+    usingEraser: false,
+    dragMode: false,
+    usingEyedropper: false,
+})
