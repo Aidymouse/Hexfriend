@@ -8,6 +8,9 @@
 	import type { TileSymbol } from '../types/tilesets';
 	import type { hex_id } from '../types/toolData';
 	import { tools } from '../types/toolData'
+
+	import {tiles_match} from '../helpers/tiles';
+
 	import type CoordsLayer from './CoordsLayer.svelte';
 	
 	// Enums
@@ -700,7 +703,7 @@
 			// Re-use the sprite that already exists
 			let ns = terrainSprites[hexId];
 
-			ns.texture = get_symbol_texture(hex.tile.id);
+			ns.texture = get_symbol_texture(hex.tile);
 			ns.scale = findSymbolScale(hex.tile.symbol);
 			ns.tint = hex.tile.symbol.color;
 			ns.position.set(hexWorldCoords.x, hexWorldCoords.y); // Position is updated even though it's usually the same, but if hex has been resized since last draw the symbol position will be different
@@ -711,7 +714,7 @@
 			let hc = hexWorldCoords;
 			ns.position.set(hc.x, hc.y);
 
-			ns.texture = get_symbol_texture(hex.tile.id);
+			ns.texture = get_symbol_texture(hex.tile);
 			ns.tint = hex.tile.symbol.color;
 			ns.scale = findSymbolScale(hex.tile.symbol);
 
@@ -727,7 +730,7 @@
 		
 		if (!hexExists(hexId)) return;
 
-		if (tilesMatch(tfield.hexes[hexId].tile, tile)) return;
+		if (tiles_match(tfield.hexes[hexId].tile, tile)) return;
 
 		tfield.hexes[hexId].tile = tile ? { ...tile, symbol: tile.symbol ? { ...tile.symbol } : null } : null;
 		if (render) renderHex(hexId);
@@ -775,26 +778,7 @@
 		let hex1 = tfield.hexes[hexId1];
 		let hex2 = tfield.hexes[hexId2];
 
-		return tilesMatch(hex1.tile, hex2.tile);
-	}
-
-	function tilesMatch(tile1: Tile, tile2: Tile): boolean {
-		if (tile1 == null && tile2 != null) return false;
-		if (tile1 != null && tile2 == null) return false;
-		if (tile1 == null && tile2 == null) return true; // Both are blank
-
-		// Return false if one has a symbol and one does not
-		if (tile1.symbol != null && tile2.symbol == null) return false;
-		if (tile1.symbol == null && tile2.symbol != null) return false;
-
-		if (tile1.bgColor != tile2.bgColor) return false;
-
-		if (tile1.symbol && tile2.symbol) {
-			if (tile1.symbol.color != tile2.symbol.color) return false;
-			if (get_symbol_texture(tile1.id) != get_symbol_texture(tile2.id)) return false;
-		}
-
-		return true;
+		return tiles_match(hex1.tile, hex2.tile);
 	}
 
 	function hexMatchesData(hexId: hex_id): boolean {
@@ -802,7 +786,7 @@
 
 		let hex = tfield.hexes[hexId];
 
-		return tilesMatch(hex.tile, data_terrain.tile);
+		return tiles_match(hex.tile, data_terrain.tile);
 	}
 
 
@@ -925,6 +909,7 @@
 			bgColor: tfield.blankHexColor,
 			display: 'Blank',
 			id: 'noset_blank',
+			tileset_id: "noset_blank",
 			symbol: null,
 			preview: '',
 		};

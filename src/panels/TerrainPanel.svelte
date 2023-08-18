@@ -1,6 +1,7 @@
 <script lang="ts">
 	import ColorInputPixi from '../components/ColorInputPixi.svelte';
 	import { getHexPath } from '../helpers/hexHelpers';
+	import { tiles_match } from '../helpers/tiles';
 	import { get_symbol_texture } from '../lib/texture_loader';
 	import * as store_tfield from '../stores/tfield';
 	import type { terrain_data } from '../types/data';
@@ -71,7 +72,7 @@
 		g.endFill();
 
 		if (data_terrain.tile && data_terrain.tile.symbol) {
-			s.texture = get_symbol_texture(data_terrain.tile.id);
+			s.texture = get_symbol_texture(data_terrain.tile);
 			s.tint = data_terrain.tile.symbol.color;
 			s.scale = findSymbolScale(data_terrain.tile.symbol, hexWidth, hexHeight);
 			s.anchor.set(0.5);
@@ -85,27 +86,7 @@
 	}
 
 	function styleMatchesData(tile: Tile): boolean {
-		return tilesMatch(tile, data_terrain.tile);
-	}
-
-	function tilesMatch(tile1: Tile, tile2: Tile): boolean {
-		if (tile1 == null && tile2 != null) return false;
-		if (tile1 != null && tile2 == null) return false;
-
-		if (tile1 == null && tile2 == null) return true; // Both are blank
-
-		// Return false if one has a symbol and one does not
-		if (tile1.symbol != null && tile2.symbol == null) return false;
-		if (tile1.symbol == null && tile2.symbol != null) return false;
-
-		if (tile1.bgColor != tile2.bgColor) return false;
-
-		if (tile1.symbol && tile2.symbol) {
-			if (tile1.symbol.color != tile2.symbol.color) return false;
-			if (get_symbol_texture(tile1.id) != get_symbol_texture(tile2.id)) return false;
-		}
-
-		return true;
+		return tiles_match(tile, data_terrain.tile);
 	}
 
 	afterUpdate(async () => {

@@ -69,12 +69,16 @@
 
 		if ($data_icon.usingEraser) {
 			c_icon.leftMouse = 'Erase Icon';
+		} else if ($data_icon.dragMode) {
+			c_icon.leftMouse = "Move Icon";
+		} else if ($data_icon.usingEyedropper) {
+			c_icon.leftMouse = "Eyedrop Icon";
 		}
 	}
 
 	/* Path */
 	let c_path: path_controls = {
-		leftMouse: 'Place Icon',
+		leftMouse: 'Start New Path',
 	};
 
 	function setTooltips_path() {

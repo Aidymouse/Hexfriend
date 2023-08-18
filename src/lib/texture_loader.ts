@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js'
 
-import type { Iconset } from 'src/types/icon'
-import type { Tileset } from 'src/types/tilesets'
+import type { Iconset } from '../types/icon'
+import type { Tile, Tileset } from '../types/tilesets'
 import type { Texture } from 'pixi.js'
 
 // ICON TEXTURES //
@@ -78,12 +78,16 @@ export async function load_tileset_textures(tileset: Tileset) {
 		
         if (!tile.symbol) continue;
 
-        await load_symbol_texture(tile.id, tile.symbol.base64)
+		let tile_symbol_texture_id = `${tile.tileset_id}:${tile.id}`
+
+        await load_symbol_texture(tile_symbol_texture_id, tile.symbol.base64)
 
 	}
 }
 
-export function get_symbol_texture(tile_id: string): Texture {
-    return loaded_symbol_textures[ tile_id ]
+export function get_symbol_texture(tile: Tile): Texture {
+	let tile_symbol_texture_id = `${tile.tileset_id}:${tile.id}`
+	
+    return loaded_symbol_textures[ tile_symbol_texture_id ]
 }
 

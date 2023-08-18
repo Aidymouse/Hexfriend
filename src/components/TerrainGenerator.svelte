@@ -273,6 +273,8 @@
 
 	function selector_ruleset_change() {
 
+		console.log(selector_ruleset)
+
 		loadedTilesets.forEach((tileset: Tileset) => {
 			tileset.tiles.forEach((tile: Tile) => {
 				let key = tile_to_key(tile)
