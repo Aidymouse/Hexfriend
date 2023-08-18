@@ -19,6 +19,7 @@
 	import { LATESTDEFAULTICONSVERSION, LATESTDEFAULTTILESVERSION } from '../types/savedata';
 	import { hex_raised, hex_orientation } from '../types/terrain';
 	import { map_shape } from '../types/settings';
+	import { LATESTTILESETFORMATVERSION } from '../types/tilesets';
 	
 	// Stores
 	import * as store_tfield from '../stores/tfield';
@@ -32,6 +33,7 @@
 
 	// Lib
 	import * as texture_loader from '../lib/texture_loader';
+	import { update_tileset_format } from '../lib/tileset_updater';
 
 	export let loadedSave: save_data;
 	export let showSettings: boolean;
@@ -127,6 +129,10 @@
 				return;
 				
 			} 
+
+			if (setToImport.format_version < LATESTTILESETFORMATVERSION) {
+				setToImport = update_tileset_format(setToImport);
+			}
 
 			loadedTilesets.push(setToImport);
 			loadedTilesets = loadedTilesets;

@@ -2,6 +2,8 @@ export const DEFAULTTILESET = {
   "name": "Default",
   "id": "default",
   "author": "Aidymouse",
+  "version": 6,
+  "format_version": 2,
   "tiles": [
     {
       "display": "Plains",
@@ -538,5 +540,4 @@ export const DEFAULTTILESET = {
       "tileset_id": "default"
     }
   ],
-  "version": 6
 }

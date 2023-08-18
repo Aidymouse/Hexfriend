@@ -24,8 +24,11 @@ interface Tileset {
 	version: number;
 	collapsed: boolean; // This needs to go in a list of collapsed IDs in the save data somewhere, not in the tileset itself !
 	tiles: Tile[];
+	format_version: number; // Internal ID of tileset format. 
 }
 
-export const LATESTDEFAULTTILESETVERSION = 5
+export const LATESTDEFAULTTILESETVERSION = 6
+
+export const LATESTTILESETFORMATVERSION = 2
 
 export type { Tile, TileSymbol, Tileset };

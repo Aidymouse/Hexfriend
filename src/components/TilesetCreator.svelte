@@ -95,7 +95,7 @@
 	}
 
 	function duplicateTile(tile: working_tile) {
-		let newTile = { ...tile };
+		let newTile = { ...tile, symbol: tile.symbol ? { ...tile.symbol } : null };
 
 		newTile.display = 'Copy of ' + tile.display;
 		newTile.id = findID(newTile.display);

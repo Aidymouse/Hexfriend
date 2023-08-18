@@ -56,6 +56,7 @@
 	
 	// Lib
 	import * as texture_loader from './lib/texture_loader';
+	import { update_tileset_format } from './lib/tileset_updater'
 	
 	// Panels
 	import IconPanel from './panels/IconPanel.svelte';
@@ -88,7 +89,7 @@
 	import { LATESTSAVEDATAVERSION, LATESTDEFAULTTILESVERSION, LATESTDEFAULTICONSVERSION } from './types/savedata';
 	import { map_shape } from './types/settings';
 	import type { terrain_field } from './types/terrain';
-	import type { Tileset } from './types/tilesets';
+	import { LATESTTILESETFORMATVERSION, type Tileset } from './types/tilesets';
 	// Enums
 	import { tools } from './types/toolData';
 	import * as PIXI from 'pixi.js';
@@ -294,7 +295,7 @@
 
 	/* ALL PURPOSE POINTER METHODS */
 	function pointerdown(e: PointerEvent) {
-		console.log(`Down: ${e.button} :: ${e.buttons}`)
+		//console.log(`Down: ${e.button} :: ${e.buttons}`)
 
 		store_panning.handlers.handle(e);
 		$store_inputs.mouseDown[e.button] = true;
@@ -330,7 +331,7 @@
 	}
 
 	function pointerup(e: PointerEvent) {
-		console.log(`Up: ${e.button} :: ${e.buttons}`)
+		//console.log(`Up: ${e.button} :: ${e.buttons}`)
 		
 		$store_inputs.mouseDown[e.button] = false;
 
@@ -681,11 +682,25 @@
 		loadedTilesets = data.tilesets;
 		loadedIconsets = data.iconsets;
 
+		
+
 		// Load Textures
-		for (const tileset of loadedTilesets) {
+		
+		loadedTilesets.forEach(async tileset => {
+			
+			console.log(tileset.format_version)
+
+			if (tileset.format_version == undefined || tileset.format_version < LATESTTILESETFORMATVERSION) {
+				console.log("Stuff")
+				let updated_tileset = update_tileset_format(tileset)
+				
+				loadedTilesets = loadedTilesets.filter(ts => ts.id != tileset.id)
+				loadedTilesets.push(updated_tileset)
+			}
+			
 			console.log(`Loading textures for ${tileset.name}`);
 			await texture_loader.load_tileset_textures(tileset);
-		}
+		})
 
 		// Load Icons
 		for (const iconset of loadedIconsets) {
