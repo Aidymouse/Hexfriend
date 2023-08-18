@@ -101,6 +101,7 @@ function convert_v7_to_v8(old_data: save_data): save_data {
 }
 
 function convert_v8_to_v9(old_data: save_data): save_data {
+	console.log("Converting save: v8 to v9")
 	
 	let new_data: save_data = JSON.parse(JSON.stringify(old_data))
 	
@@ -113,12 +114,46 @@ function convert_v8_to_v9(old_data: save_data): save_data {
 		
 		return i
 	})
-
+	
 	new_data.saveVersion = 9
 	
 	return new_data
 }
-	export function convertSaveDataToLatest(oldData: save_data): save_data {
+
+function convert_v9_to_v10(old_data: save_data): save_data {
+	console.log("Converting save: v9 to v10")
+	let new_data: save_data = JSON.parse(JSON.stringify(old_data))
+	
+	Object.keys(new_data.TerrainField.hexes).forEach(hex_id => {
+		let hex = new_data.TerrainField.hexes[hex_id]
+		if (hex.tile == null) return
+		if (hex.tile.tileset_id == undefined) {
+
+			console.log(`Updating tile ${hex_id}`)
+
+			// Attempt to find tile id. This is fallible if you have tiles with the same ID across two different tilesets
+			for (const tileset of old_data.tilesets) {
+				for (const tile of tileset.tiles) {
+					if (tile.id == hex.tile.id) {
+						hex.tile.tileset_id = tileset.id
+						break
+					}
+					if (hex.tile.tileset_id == tileset.id) break
+				}
+			}
+			
+			// Fallback to default
+			if (!hex.tile.tileset_id) hex.tile.tileset_id = "default"
+			
+		}
+	})
+
+	new_data.saveVersion = 10
+	
+	return new_data
+}
+
+export function convertSaveDataToLatest(oldData: save_data): save_data {
 	// Update to latest version
 	let newData: save_data = JSON.parse(JSON.stringify(oldData));
 
@@ -127,6 +162,7 @@ function convert_v8_to_v9(old_data: save_data): save_data {
 	if (newData.saveVersion == 6) { newData = convert_v6_to_v7(newData) }
 	if (newData.saveVersion == 7) { newData = convert_v7_to_v8(newData) }
 	if (newData.saveVersion == 8) { newData = convert_v8_to_v9(newData) }
+	if (newData.saveVersion == 9) { newData = convert_v9_to_v10(newData) }
 
 	return newData;
 }

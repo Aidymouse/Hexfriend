@@ -877,14 +877,26 @@
 					on:click={() => {
 						console.log(tileset);
 					}}
+					on:keydown={()=>{}}
 				>
 					{tileset.name}
 
-					{#if tileset.id.split(":")[0] != 'default' && tileset.version != LATESTDEFAULTTILESVERSION}
+					{#if tileset.id.split(":")[0] != 'default'} 
 						<button
 							on:click={() => {
 								removeTileset(tileset.id);
 							}}
+						>
+							<img src="/assets/img/tools/trash.png" alt={'Trash'} title={'Remove Tileset'} />
+						</button>
+					{/if}
+
+					{#if tileset.id == "default" && tileset.version < LATESTDEFAULTTILESVERSION}
+						<button
+							on:click={() => {
+								removeTileset(tileset.id);
+							}}
+							title={`Update Tileset to v${LATESTDEFAULTTILESVERSION}`}
 						>
 							<img src="/assets/img/tools/trash.png" alt={'Trash'} title={'Remove Tileset'} />
 						</button>

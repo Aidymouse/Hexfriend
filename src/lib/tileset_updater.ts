@@ -1,3 +1,4 @@
+import type { terrain_field } from "../types/terrain";
 import type { Tileset } from "../types/tilesets";
 
 function tileset_format_1_to_2(old_tileset: Tileset): Tileset {
@@ -37,8 +38,28 @@ export function update_tileset_format(tileset: Tileset) {
 
 const tile_id_map = {
 
+
+
 }
 
-function update_map_to_new_default_tileset() {
+function update_default_tileset() {
+
+
+
+}
+
+function update_map_to_new_default_tileset(tfield: terrain_field) {
+
+    Object.keys(tfield.hexes).forEach(hex_id => {
+        let hex = tfield.hexes[hex_id]
+
+        if (hex.tile == null) return;
+        if (hex.tile.tileset_id != "default") return;
+
+        if (tile_id_map[hex.tile.id]) {
+            hex.tile.id = tile_id_map[hex.tile.id]
+        }
+    })
+    
 
 }

@@ -4,8 +4,8 @@ import type { path_style } from './path'
 import type { terrain_field } from './terrain';
 import type { Tileset } from './tilesets';
 
-const LATESTSAVEDATAVERSION = 9;
-const LATESTDEFAULTTILESVERSION = 4;
+const LATESTSAVEDATAVERSION = 10;
+const LATESTDEFAULTTILESVERSION = 6;
 const LATESTDEFAULTICONSVERSION = 5;
 
 interface save_data {

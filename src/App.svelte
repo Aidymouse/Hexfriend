@@ -691,7 +691,7 @@
 			console.log(tileset.format_version)
 
 			if (tileset.format_version == undefined || tileset.format_version < LATESTTILESETFORMATVERSION) {
-				console.log("Stuff")
+
 				let updated_tileset = update_tileset_format(tileset)
 				
 				loadedTilesets = loadedTilesets.filter(ts => ts.id != tileset.id)

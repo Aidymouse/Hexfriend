@@ -72,7 +72,7 @@
 	export let data_terrain: terrain_data;
 
 	export function copyHex(from: TerrainHex, to: TerrainHex) {
-		to.tile = from.tile ? { ...from.tile, symbol: from.tile.symbol ? { ...from.tile.symbol } : null } : null;
+		to.tile = from.tile ? { ...from.tile, preview: "", symbol: from.tile.symbol ? { ...from.tile.symbol, base64: "" } : null } : null;
 	}
 
 	/* SQUARE SHAPED MAPS */
@@ -732,7 +732,7 @@
 
 		if (tiles_match(tfield.hexes[hexId].tile, tile)) return;
 
-		tfield.hexes[hexId].tile = tile ? { ...tile, symbol: tile.symbol ? { ...tile.symbol } : null } : null;
+		tfield.hexes[hexId].tile = tile ? { ...tile, preview: "", symbol: tile.symbol ? { ...tile.symbol, base64: "" } : null } : null;
 		if (render) renderHex(hexId);
 	}
 
@@ -824,7 +824,8 @@
 			}
 
 			// HACKY!!!! Needs changing
-			data_terrain.tile = cHex.tile ? { ...cHex.tile, symbol: cHex.tile.symbol ? { ...cHex.tile.symbol } : null } : generateBlankTile();
+			//data_terrain.tile = cHex.tile ? { ...cHex.tile, symbol: cHex.tile.symbol ? { ...cHex.tile.symbol } : null } : generateBlankTile();
+			data_terrain.tile = { ...cHex.tile, symbol: cHex.tile.symbol ? { ...cHex.tile.symbol } : null };
 
 			data_terrain.usingEyedropper = false;
 		}
