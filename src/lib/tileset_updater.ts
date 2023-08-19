@@ -35,15 +35,8 @@ export function update_tileset_format(tileset: Tileset) {
 }
 
 
-
+// Up to date as of v6 of the default tileset
 const tile_id_map = {
-
-
-
-}
-
-function update_default_tileset() {
-
 
 
 }
