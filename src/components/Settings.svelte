@@ -55,8 +55,7 @@
 		overlay: true,
 		tilesets: true,
 		iconsets: true,
-		experimental: true,
-		changelog: true,
+		experimental: true
 	};
 
 	let tfield: terrain_field;
@@ -1059,73 +1058,19 @@
 	</div>
 
 	<!-- Changelog -->
-	<div class="setting-container">
-		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.changelog}>
-			Changelog
-			<button
-				on:click={() => {
-					hidden_settings.changelog = !hidden_settings.changelog;
-				}}
-			>
-				<img alt={'Toggle Generator Menu'} class:rotated={hidden_settings.changelog} src={'/assets/img/ui/arrow.png'} />
-			</button>
-		</h2>
-
-		<div id="changelog" class:hidden={hidden_settings.changelog}>
-			<p>Version 1.8.7</p>
-			<ul class="helper-text">
-				<li>Tile names now local scoped to tileset ID</li>
-				<li>Texture loader revamped to identify tile textures based on tileset ID and tile name</li>
-				<li>Save data updated to v10</li>
-			</ul>
-			
-			<p>Version 1.8.6</p>
-			<ul class="helper-text">
-				<li>Clicking left mouse + right mouse at the same time no longer makes panning sticky</li>
-				<li>Releasing right click over the toolbar no longer makes panning stick</li>
-			</ul>
-			<p>Version 1.8.5</p>
-			<ul class="helper-text">
-				<li>Icon scale UX improvements</li>
-				<li>Icon Eyedropper</li>
-				<li>Save data version update</li>
-				<li>Note: due to code choices the icon eyedropper will not pick out size on old maps</li>
-			</ul>
-
-			<p>Version 1.8.4</p>
-			<ul class="helper-text">
-				<li>Coordinates bug fix</li>
-				<li>Save data converter path fix</li>
-			</ul>
-			
-			<p>Version 1.8.3</p>
-			<ul class="helper-text">
-				<li>Icon scale bug fix</li>
-			</ul>
-
-			<p>Version 1.8.2</p>
-			<ul class="helper-text">
-				<li>Grid gap added (thanks Evan!)</li>
-				<li>Save data update to version 8</li>
-			</ul>
-			
-			<p>Version 1.8.1</p>
-			<ul class="helper-text">
-				<li>Added changelog</li>
-			</ul>
-
-			<p>Version 1.8.0</p>
-			<ul class="helper-text">
-				<li>Added dashed paths</li>
-				<li>Map version update to accomodate paths</li>
-			</ul>
+	<a href="https://github.com/Aidymouse/Hexfriend/blob/master/changelog.md" style="color: var(--text);">
+		<div class="setting-container">
+			<h2 class="setting-heading">
+				Changelog 
+				<button><img alt={'Go to Changelog'} src={'/assets/img/ui/arrow.png'} style="transform: rotate(90deg);"/></button>
+			</h2>
 		</div>
-	</div>
+	</a>
 
 	<div class="setting-container">
 		<h2>About</h2>
 		<p class="helper-text">
-			Hexfriend version 1.8.7 - "New stripes, Hexfriend"
+			Hexfriend version 1.9.0 - "Sorting out your internals, Hexfriend"
 		</p>
 		
 		<p class="helper-text">
