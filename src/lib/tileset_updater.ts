@@ -116,10 +116,51 @@ const tile_id_map = {
     "default_dead-tree hills1": "dead-tree-hills",
     "default_dead-tree mountains": "dead-tree-mountains",
 
-    // For more recent versions of the map
+    // v6
+    "plains1": "plains",
+    "farmland1": "farmland",
+    "grassland1": "grassland",
+    "scrubland1": "scrubland",
+    "tree1": "tree",
+    "forest1": "forest",
+    "beach1": "beach",
+    "palm-tree1": "palm-tree",
+    "water1": "water",
+    "deep-water1": "deep-water",
+    "hills1": "hills",
+    "mountain1": "mountain",
+    "mountains1": "mountains",
+    "volcano1": "volcano",
+    "badlands1": "badlands",
+    "desert1": "desert",
+    "grassy-hills1": "grassy-hills",
+    "forest-hills1": "forest-hills",
+    "forest-mountain1": "forest-mountain",
+    "pine-tree1": "pine-tree",
+    "pine-forest1": "pine-forest",
+    "pine-hills1": "pine-hills",
+    "pine-mountains1": "pine-mountains",
+    "icy1": "icy",
+    "ice-tree1": "ice-tree",
+    "ice-hills1": "ice-hills",
+    "ice-mountain1": "ice-mountain",
+    "ice-pine-mountains1": "ice-pine-mountains",
+    "ice-mountains1": "ice-mountains",
+    "marsh1": "marsh",
+    "swamp1": "swamp",
+    "jungle-tree1": "jungle-tree",
+    "dense-jungle1": "dense-jungle",
+    "jungle-hills1": "jungle-hills",
+    "jungle-mountains1": "jungle-mountains",
+    "dead-tree1": "dead-tree",
+    "dead-tree-hills1": "dead-tree-hills",
+    "dead-tree-mountains1": "dead-tree-mountains",
+
+    // For more recent versions of the map. Catch all for tiles that are up to date
     "plains": "plains",
     "farmland": "farmland",
     "grassland": "grassland",
+    "scrubland": "scrubland",
     "tree": "tree",
     "forest": "forest",
     "beach": "beach",
@@ -155,22 +196,31 @@ const tile_id_map = {
     "dead-tree-hills": "dead-tree-hills",
     "dead-tree-mountains": "dead-tree-mountains",
 
+    
+
 }
 
 export function update_map_to_new_default_tileset(tfield: terrain_field) {
 
+    let covered_in_map = true
     // Check to make sure all hexes have a substitute in the map, if they don't ax em.
     for (const hex_id of Object.keys(tfield.hexes)) {
         let hex = tfield.hexes[hex_id]
     
         if (hex.tile == null) continue;
         if (hex.tile.tileset_id != "default") continue;
-    
+
         if (!tile_id_map[hex.tile.id]) {
-            alert("Default tiles could not be updated. You are on an as-of-yet unaccounted for version of the old tileset. Please export your map as a .hexfriend and upload it to https://github.com/Aidymouse/Hexfriend/issues/25.")
-            return;
+            console.log(`Couldn't find ${hex.tile.id} in map`)
+            covered_in_map = false;
         } 
     } 
+
+    if (!covered_in_map) {
+        alert("Default tiles could not be updated. You are on an as-of-yet unaccounted for version of the old tileset. Please export your map as a .hexfriend and upload it to https://github.com/Aidymouse/Hexfriend/issues/25.")
+        return false;
+    }
+    
 
     Object.keys(tfield.hexes).forEach(hex_id => {
         let hex = tfield.hexes[hex_id]
@@ -184,8 +234,6 @@ export function update_map_to_new_default_tileset(tfield: terrain_field) {
     })
 
     alert("Successfully updated default tileset!")
-
-
-    
+    return true;    
 
 }

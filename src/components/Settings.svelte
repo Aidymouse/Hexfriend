@@ -168,7 +168,8 @@
 	}
 
 	function update_default_tileset() {
-		update_map_to_new_default_tileset(tfield)
+		let successfully_updated = update_map_to_new_default_tileset(tfield)
+		if (!successfully_updated) return;
 
 		// Remove default tileset
 		loadedTilesets = loadedTilesets.filter(ts => get_tileset_id(ts) != "default")

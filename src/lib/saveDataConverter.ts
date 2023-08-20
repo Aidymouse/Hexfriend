@@ -127,6 +127,8 @@ function convert_v9_to_v10(old_data: save_data): save_data {
 	Object.keys(new_data.TerrainField.hexes).forEach(hex_id => {
 		let hex = new_data.TerrainField.hexes[hex_id]
 		if (hex.tile == null) return
+		
+		// Find tileset ID
 		if (hex.tile.tileset_id == undefined) {
 
 			//console.log(`Updating tile ${hex_id}`)
@@ -145,6 +147,14 @@ function convert_v9_to_v10(old_data: save_data): save_data {
 			// Fallback to default
 			if (!hex.tile.tileset_id) hex.tile.tileset_id = "default"
 			
+		}
+
+
+		// Remove unneeded stuff from the save data
+		hex.tile.preview = ""
+		if (hex.tile.symbol) {
+			hex.tile.symbol.base64 = ""
+			hex.tile.symbol.preview = ""
 		}
 	})
 
