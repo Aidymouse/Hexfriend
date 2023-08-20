@@ -86,7 +86,7 @@
 	import type { pan_state } from './types/panning';
 	import type { save_data } from './types/savedata';
 	// Constants
-	import { LATESTSAVEDATAVERSION, LATESTDEFAULTTILESVERSION, LATESTDEFAULTICONSVERSION } from './types/savedata';
+	import { LATESTSAVEDATAVERSION, LATESTDEFAULTICONSVERSION } from './types/savedata';
 	import { map_shape } from './types/settings';
 	import type { terrain_field } from './types/terrain';
 	import { LATESTTILESETFORMATVERSION, type Tileset } from './types/tilesets';
@@ -653,6 +653,8 @@
 			loadedId = Number(id);
 		}
 
+
+		
 		$store_has_unsaved_changes = false
 
 		saving = false;
@@ -682,13 +684,8 @@
 		loadedTilesets = data.tilesets;
 		loadedIconsets = data.iconsets;
 
-		
-
 		// Load Textures
-		
 		loadedTilesets.forEach(async tileset => {
-			
-			console.log(tileset.format_version)
 
 			if (tileset.format_version == undefined || tileset.format_version < LATESTTILESETFORMATVERSION) {
 
@@ -771,6 +768,8 @@
 		loadedSave = loadedSave;
 
 		/* Set up tools - would be nice to remember tool settings but this works regardless of loaded tileset */
+
+		console.log(loadedSave);
 
 		//loadedSave = data
 		//loadedId = id

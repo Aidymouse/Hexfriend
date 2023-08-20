@@ -2,7 +2,7 @@ export const DEFAULTTILESET = {
   "name": "Default",
   "id": "default",
   "author": "Aidymouse",
-  "version": 6,
+  "version": 7,
   "format_version": 2,
   "tiles": [
     {

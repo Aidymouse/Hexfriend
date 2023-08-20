@@ -129,7 +129,7 @@ function convert_v9_to_v10(old_data: save_data): save_data {
 		if (hex.tile == null) return
 		if (hex.tile.tileset_id == undefined) {
 
-			console.log(`Updating tile ${hex_id}`)
+			//console.log(`Updating tile ${hex_id}`)
 
 			// Attempt to find tile id. This is fallible if you have tiles with the same ID across two different tilesets
 			for (const tileset of old_data.tilesets) {

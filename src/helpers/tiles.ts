@@ -1,5 +1,11 @@
 import { get_symbol_texture } from "../lib/texture_loader";
-import type { Tile } from "../types/tilesets" 
+import type { Tile, Tileset } from "../types/tilesets" 
+
+export function get_tileset_id(tileset: Tileset) {
+    console.log(tileset)
+    // The format of IDs didnt go through any sort of uniform change and so now I have to have this crappy function
+    return tileset.id.split(":")[0]
+}
 
 export function tile_to_key(tile: Tile) {
     return JSON.stringify({ id: tile.id, tileset_id: tile.tileset_id })

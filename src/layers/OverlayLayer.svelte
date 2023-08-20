@@ -209,9 +209,7 @@
     onMount(() => {
         
 
-        console.log(cont_overlay.children.length)
         cont_overlay.removeChildren(0)
-        console.log(cont_overlay.children.length)
 
         spr_overlay_image = new PIXI.Sprite();
         spr_overlay_image.anchor.x = 0.5
@@ -247,7 +245,6 @@
             handle.sprite.on("pointerdown", () => { handle_grabbed(handle) } )
         
         })
-        console.log(cont_overlay.children.length)
     })
 
 </script>

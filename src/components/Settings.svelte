@@ -16,10 +16,11 @@
 	
 	// Enums
 	import { coord_system } from '../types/coordinates';
-	import { LATESTDEFAULTICONSVERSION, LATESTDEFAULTTILESVERSION } from '../types/savedata';
+	import { LATESTDEFAULTICONSVERSION } from '../types/savedata';
 	import { hex_raised, hex_orientation } from '../types/terrain';
 	import { map_shape } from '../types/settings';
-	import { LATESTTILESETFORMATVERSION } from '../types/tilesets';
+	import { LATESTTILESETFORMATVERSION, LATESTDEFAULTTILESETVERSION } from '../types/tilesets';
+	import { DEFAULTTILESET } from '../lib/defaultTileset';
 	
 	// Stores
 	import * as store_tfield from '../stores/tfield';
@@ -33,7 +34,10 @@
 
 	// Lib
 	import * as texture_loader from '../lib/texture_loader';
-	import { update_tileset_format } from '../lib/tileset_updater';
+	import { update_map_to_new_default_tileset, update_tileset_format } from '../lib/tileset_updater';
+
+	// Helpers
+	import { get_tileset_id } from '../helpers/tiles';
 
 	export let loadedSave: save_data;
 	export let showSettings: boolean;
@@ -162,6 +166,16 @@
 		// Maybe we should remove tiles here, because otherwise the tiles just... fail to load.
 		// Check if these tiles are being used anywere
 	}
+
+	function update_default_tileset() {
+		update_map_to_new_default_tileset(tfield)
+
+		// Remove default tileset
+		loadedTilesets = loadedTilesets.filter(ts => get_tileset_id(ts) != "default")
+		loadedTilesets.push( DEFAULTTILESET );
+		loadedSave.tilesets = loadedTilesets;
+	}
+
 
 	function removeIconset(setId: string) {
 		loadedIconsets = loadedIconsets.filter((is: Iconset) => is.id != setId);
@@ -397,7 +411,7 @@
 			<option value={'application/json'}>Hexfriend</option>
 		</select>
 
-		<button class="file-input-button" on:click={() => {}} title="Import">
+		<button class="file-input-button outline-button" on:click={() => {}} title="Import">
 			Import
 			<input
 				type="file"
@@ -510,6 +524,9 @@
 			{/if}
 		</div>
 	</div>
+
+
+
 	<!-- HEXES -->
 	<div class="setting-container">
 		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.hexes}>
@@ -635,6 +652,10 @@
 			<Checkbox bind:checked={retainIconPosition} id="retainIcon" />
 		</div>
 	</div>
+
+
+
+
 	<!-- DIMENSIONS AND SHAPE -->
 	<div class="setting-container">
 		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.dimensions}>
@@ -763,6 +784,9 @@
 	</div>
 
 
+
+
+
 	<!-- COORDINATES -->
 	<div class="setting-container">
 		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.coordinates}>
@@ -830,6 +854,11 @@
 		</div>
 	</div>
 
+
+
+
+
+
 	<!-- OVERLAY -->
 	<div class="setting-container">
 		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.overlay}>
@@ -858,6 +887,11 @@
 		</div>
 	</div>
 
+
+
+
+
+
 	<!-- TILE SETS -->
 	<div class="setting-container">
 		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.tilesets}>
@@ -881,8 +915,9 @@
 				>
 					{tileset.name}
 
-					{#if tileset.id.split(":")[0] != 'default'} 
+					{#if get_tileset_id(tileset) != 'default'} 
 						<button
+							class="set-rollover-button"
 							on:click={() => {
 								removeTileset(tileset.id);
 							}}
@@ -891,14 +926,15 @@
 						</button>
 					{/if}
 
-					{#if tileset.id == "default" && tileset.version < LATESTDEFAULTTILESVERSION}
+					<!-- Update Default Tileset Button -->
+					{#if get_tileset_id(tileset) == "default" && tileset.version < LATESTDEFAULTTILESETVERSION}
 						<button
 							on:click={() => {
-								removeTileset(tileset.id);
+								update_default_tileset();
 							}}
-							title={`Update Tileset to v${LATESTDEFAULTTILESVERSION}`}
+							title={`Update Tileset to v${LATESTDEFAULTTILESETVERSION}`}
 						>
-							<img src="/assets/img/tools/trash.png" alt={'Trash'} title={'Remove Tileset'} />
+							<img src="/assets/img/ui/arrow.png" alt={''} title={`Update Tileset to v${LATESTDEFAULTTILESETVERSION}`} />
 						</button>
 					{/if}
 
@@ -1034,12 +1070,18 @@
 		</h2>
 
 		<div id="changelog" class:hidden={hidden_settings.changelog}>
+			<p>Version 1.8.7</p>
+			<ul class="helperText">
+				<li>Tile names now local scoped to tileset ID</li>
+				<li>Texture loader revamped to identify tile textures based on tileset ID and tile name</li>
+				<li>Save data updated to v10</li>
+			</ul>
+			
 			<p>Version 1.8.6</p>
 			<ul class="helperText">
 				<li>Clicking left mouse + right mouse at the same time no longer makes panning sticky</li>
 				<li>Releasing right click over the toolbar no longer makes panning stick</li>
 			</ul>
-			
 			<p>Version 1.8.5</p>
 			<ul class="helperText">
 				<li>Icon scale UX improvements</li>
@@ -1061,7 +1103,7 @@
 
 			<p>Version 1.8.2</p>
 			<ul class="helperText">
-				<li>Added grid gap (thanks Evan!)</li>
+				<li>Grid gap added (thanks Evan!)</li>
 				<li>Save data update to version 8</li>
 			</ul>
 			
@@ -1081,7 +1123,7 @@
 	<div class="setting-container">
 		<h2>About</h2>
 		<p class="helperText">
-			Hexfriend version 1.8.6 - "New stripes, Hexfriend"
+			Hexfriend version 1.8.7 - "New stripes, Hexfriend"
 		</p>
 		
 		<p class="helperText">
@@ -1105,9 +1147,6 @@
 </div>
 
 <style>
-	button {
-		border: solid 1px var(--lighter-background);
-	}
 
 	.bottom-margin {
 		margin-bottom: 0.25em;
@@ -1236,12 +1275,16 @@
 		position: relative;
 	}
 
-	.loaded-tileset:hover button {
+	.loaded-tileset:hover button.set-rollover-button {
 		opacity: 1;
 	}
 
-	.loaded-tileset button {
+	.loaded-tileset button.set-rollover-button {
 		opacity: 0;
+	}
+	
+	
+	.loaded-tileset button {
 		position: absolute;
 		height: 100%;
 		top: 0px;
@@ -1251,7 +1294,6 @@
 		border: none;
 		border-top-left-radius: 0px;
 		border-bottom-left-radius: 0px;
-		border: solid 1px var(--light-background);
 	}
 
 	.loaded-tileset button img {
