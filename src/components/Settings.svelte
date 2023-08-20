@@ -801,7 +801,7 @@
 			</button>
 		</h2>
 		<div class="settings-grid" class:hidden={hidden_settings.coordinates}>
-			<label class="helperText">Coordinates can slow down map changes such as adding hexes or changing orientation.</label>
+			<label class="helper-text">Coordinates can slow down map changes such as adding hexes or changing orientation.</label>
 			<label for="showCoords">Show Coordinates</label>
 			<Checkbox bind:checked={data_coordinates.shown} id={'showCoords'} />
 
@@ -914,7 +914,7 @@
 					}}
 					on:keydown={()=>{}}
 				>
-					{tileset.name}
+					<span style="display: flex;">{tileset.name} <span class="helper-text">v{tileset.version}</span></span>
 
 					{#if get_tileset_id(tileset) != 'default'} 
 						<button
@@ -930,6 +930,7 @@
 					<!-- Update Default Tileset Button -->
 					{#if get_tileset_id(tileset) == "default" && tileset.version < LATESTDEFAULTTILESETVERSION}
 						<button
+							id="default-tileset-update-button"
 							on:click={() => {
 								update_default_tileset();
 							}}
@@ -1072,19 +1073,19 @@
 
 		<div id="changelog" class:hidden={hidden_settings.changelog}>
 			<p>Version 1.8.7</p>
-			<ul class="helperText">
+			<ul class="helper-text">
 				<li>Tile names now local scoped to tileset ID</li>
 				<li>Texture loader revamped to identify tile textures based on tileset ID and tile name</li>
 				<li>Save data updated to v10</li>
 			</ul>
 			
 			<p>Version 1.8.6</p>
-			<ul class="helperText">
+			<ul class="helper-text">
 				<li>Clicking left mouse + right mouse at the same time no longer makes panning sticky</li>
 				<li>Releasing right click over the toolbar no longer makes panning stick</li>
 			</ul>
 			<p>Version 1.8.5</p>
-			<ul class="helperText">
+			<ul class="helper-text">
 				<li>Icon scale UX improvements</li>
 				<li>Icon Eyedropper</li>
 				<li>Save data version update</li>
@@ -1092,29 +1093,29 @@
 			</ul>
 
 			<p>Version 1.8.4</p>
-			<ul class="helperText">
+			<ul class="helper-text">
 				<li>Coordinates bug fix</li>
 				<li>Save data converter path fix</li>
 			</ul>
 			
 			<p>Version 1.8.3</p>
-			<ul class="helperText">
+			<ul class="helper-text">
 				<li>Icon scale bug fix</li>
 			</ul>
 
 			<p>Version 1.8.2</p>
-			<ul class="helperText">
+			<ul class="helper-text">
 				<li>Grid gap added (thanks Evan!)</li>
 				<li>Save data update to version 8</li>
 			</ul>
 			
 			<p>Version 1.8.1</p>
-			<ul class="helperText">
+			<ul class="helper-text">
 				<li>Added changelog</li>
 			</ul>
 
 			<p>Version 1.8.0</p>
-			<ul class="helperText">
+			<ul class="helper-text">
 				<li>Added dashed paths</li>
 				<li>Map version update to accomodate paths</li>
 			</ul>
@@ -1123,23 +1124,23 @@
 
 	<div class="setting-container">
 		<h2>About</h2>
-		<p class="helperText">
+		<p class="helper-text">
 			Hexfriend version 1.8.7 - "New stripes, Hexfriend"
 		</p>
 		
-		<p class="helperText">
+		<p class="helper-text">
 			By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
 		</p>
 
-		<p class="helperText">
+		<p class="helper-text">
 			Hexfriend is built with Svelte, Pixi JS and Typescript. Check out the <a href="https://www.github.com/Aidymouse/Hexfriend">Github</a>
 		</p>
 	
-		<p class="helperText">
+		<p class="helper-text">
 			Found a bug? Got ideas? Come say Hi on the <a href="https://discord.gg/Jvws27VmWR">Hexfriend Discord</a>
 		</p>
 
-		<p class="helperText">
+		<p class="helper-text">
 			You can give away your hard earned money on <br><a href="https://ko-fi.com/aidymouse">Ko-fi</a>.
 		</p>
 	</div>
@@ -1148,6 +1149,12 @@
 </div>
 
 <style>
+
+	#default-tileset-update-button {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
 
 	.bottom-margin {
 		margin-bottom: 0.25em;
@@ -1351,7 +1358,7 @@
 		margin: 0;
 	}
 
-	.helperText {
+	.helper-text {
 		grid-column: span 2;
 		font-size: 12px;
 		color: var(--text);
