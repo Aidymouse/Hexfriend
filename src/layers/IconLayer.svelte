@@ -258,9 +258,6 @@
 	export function retainIconPositionOnHexResize(newHexWidth: number, newHexHeight: number, newGap: number) {
 		// Find proprtional horizontal and vertical distance from center of nearest hex, and retain the position with the new width and height
 
-		console.log(oldHexWidth, oldHexHeight, oldGap)
-		console.log(newHexWidth, newHexHeight, newGap)
-
 		icons.forEach((icon: IconLayerIcon) => {
 			let closestHexCubeCoords = coords_worldToCube(icon.x, icon.y, $tfield.orientation, oldHexWidth, oldHexHeight, $tfield.grid.gap);
 			let closestHexPos = coords_cubeToWorld(
@@ -289,7 +286,6 @@
 				newGap
 			);
 
-			console.log(closestHexPosNew)
 
 			icon.x = closestHexPosNew.x - newHexWidth / 2 + newHexWidth * proportionalHorizontalDistance;
 			icon.y = closestHexPosNew.y - newHexHeight / 2 + newHexHeight * proportionalVerticalDistance;
@@ -563,6 +559,8 @@
 	})
 
 	onMount(() => {
+		saveOldHexMeasurements($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
+
 		cont_icon.removeChildren(0)
 		
 		cont_icon.addChild(spr_floating_icon)

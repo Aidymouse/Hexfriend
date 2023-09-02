@@ -576,13 +576,11 @@
 				}}
 				on:change={(e) => {
 					
-					console.log($tfield.hexWidth)
-
-					console.log(e);
 					redrawEntireMap();
 					comp_coordsLayer.updateAllCoordPositions();
 					if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
 					comp_iconLayer.saveOldHexMeasurements($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
+				
 				}}
 			/>
 
@@ -597,7 +595,7 @@
 				on:change={() => {
 					redrawEntireMap();
 					comp_coordsLayer.updateAllCoordPositions();
-					if (retainIconPosition) comp_iconLayer.saveOldHexMeasurements($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
+					if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
 					comp_iconLayer.saveOldHexMeasurements($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
 				}}
 			/>
@@ -1061,7 +1059,7 @@
 	<div class="setting-container">
 		<h2>About</h2>
 		<p class="helper-text">
-			Hexfriend version 1.9.0 - "Sorting out your internals, Hexfriend"
+			Hexfriend version 1.9.1 - "Sorting out your internals, Hexfriend"
 		</p>
 		
 		<p class="helper-text">

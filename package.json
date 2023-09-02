@@ -1,13 +1,14 @@
 {
   "name": "hexfriend",
   "private": true,
-  "version": "1.9.0",
+  "version": "1.9.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "deploy": "node ./gh-pages.js"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.0.4",
