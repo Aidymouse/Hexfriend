@@ -26,15 +26,18 @@
 	import { tfield } from '../stores/tfield';
 	import { store_selected_tool } from '../stores/tools';
 	import { store_has_unsaved_changes } from '../stores/flags';
+	import { resize_parameters } from '../stores/resize_parameters';
 	
 	// Components
 	import Checkbox from './Checkbox.svelte';
 	import ColorInputPixi from './ColorInputPixi.svelte';
 	import SelectGrid from './SelectGrid.svelte';
+	import ImageCheckbox from './ImageCheckbox.svelte';
 
 	// Lib
 	import * as texture_loader from '../lib/texture_loader';
 	import { update_map_to_new_default_tileset, update_tileset_format } from '../lib/tileset_updater';
+	import { onMount } from 'svelte';
 
 	// Helpers
 	import { get_width_height_from_radius } from '../helpers/hexHelpers'
@@ -84,6 +87,8 @@
 	export let load: Function;
 
 	let retainIconPosition: boolean = true;
+	let retainPathPosition: boolean = true;
+	let retainTextPosition: boolean = true;
 
 	let exportType: 'Export As...' | 'image/png' | 'application/json' = 'Export As...';
 
@@ -100,6 +105,21 @@
 		$store_has_unsaved_changes = true;
 
 		//redrawEntireMap()
+	}
+
+
+	function retain_positions() {
+		if (retainIconPosition) comp_iconLayer.retain_icon_position_on_hex_resize($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
+		if (retainPathPosition) comp_pathLayer.retain_path_position_on_hex_resize();
+		//if (retainTextPosition) comp_textLayer.retainTextPosition();
+	}
+
+	function save_old_resize_parameters() {
+		
+		$resize_parameters.old_hex_width = $tfield.hexWidth
+		$resize_parameters.old_hex_height = $tfield.hexHeight
+		$resize_parameters.old_gap = $tfield.grid.gap
+
 	}
 
 	let addOrRemoveMapDimensions: 'add' | 'remove' = 'add';
@@ -362,6 +382,11 @@
 		};
 	}
 
+
+	onMount(() => {
+		save_old_resize_parameters()
+	})
+
 </script>
 
 <button
@@ -458,13 +483,11 @@
 				max="99"
 				bind:value={$tfield.grid.gap}
 				on:focus={() => {
-					comp_iconLayer.saveOldHexMeasurements($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
 				}}
 				on:change={(e) => {
 					redrawEntireMap();
 					comp_coordsLayer.updateAllCoordPositions();
-					if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
-					comp_iconLayer.saveOldHexMeasurements($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
+					retain_positions();
 				}}
 			/>
 
@@ -571,17 +594,17 @@
 			<input
 				id="hexWidth"
 				type="number"
+				min={1}
 				bind:value={$tfield.hexWidth}
 				on:focus={() => {
-					comp_iconLayer.saveOldHexMeasurements($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
 				}}
-				on:change={(e) => {
+				on:change={() => {
 					
 					redrawEntireMap();
 					comp_coordsLayer.updateAllCoordPositions();
-					if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
-					comp_iconLayer.saveOldHexMeasurements($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
-				
+					retain_positions();
+					save_old_resize_parameters();
+					
 				}}
 			/>
 
@@ -589,15 +612,15 @@
 			<input
 				id="hexHeight"
 				type="number"
+				min={1}
 				bind:value={$tfield.hexHeight}
 				on:focus={() => {
-					comp_iconLayer.saveOldHexMeasurements($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
 				}}
 				on:change={() => {
 					redrawEntireMap();
 					comp_coordsLayer.updateAllCoordPositions();
-					if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
-					comp_iconLayer.saveOldHexMeasurements($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
+					retain_positions();
+					save_old_resize_parameters();
 				}}
 			/>
 
@@ -620,8 +643,9 @@
 						$tfield.hexHeight = new_dims.height
 						
 						redrawEntireMap();
-						if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
-						comp_iconLayer.saveOldHexMeasurements($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
+						
+						retain_positions();
+						save_old_resize_parameters();
 
 						document.getElementById("hex-radius").value = ""
 					}}>Set</button>
@@ -664,8 +688,14 @@
 				</span>
 			{/if}
 
-			<label for="retainIcon" title="Icons will atempt to remain in their hex when transformations occur">Retain Icon Position</label>
-			<Checkbox bind:checked={retainIconPosition} id="retainIcon" />
+			<label title="Selected objects will attempt to remain in their hex when they are resized">Retain Position</label>
+			<div id="retain-position-container">
+				<div id="retain-position-grid">
+					<ImageCheckbox image_filename={ "/assets/img/tools/icon.svg" } title={"Icons"} bind:checked={ retainIconPosition } />
+					<ImageCheckbox image_filename={ "/assets/img/tools/path.svg" } title={"Paths"} bind:checked={ retainPathPosition } />
+					<ImageCheckbox image_filename={ "/assets/img/tools/text.svg" } title={"Text"} bind:checked={ retainTextPosition } />
+				</div>
+			</div>
 		</div>
 	</div>
 
@@ -1402,4 +1432,20 @@
 		margin: 0;
 		width: 100%;
 	}
+
+	#retain-position-container {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	#retain-position-grid {
+		height: 2em;
+		display: flex;
+		border-radius: var(--small-radius);
+		overflow: hidden;
+	}
+
 </style>

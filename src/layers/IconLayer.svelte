@@ -18,6 +18,7 @@
 	import { store_inputs } from '../stores/inputs';
 	import { store_selected_tool } from '../stores/tools';
 	import { data_icon } from '../stores/data';
+	import { resize_parameters } from '../stores/resize_parameters';
 
 
 	// Lib
@@ -245,36 +246,29 @@
 		
 	}
 
-	let oldHexWidth: number;
-	let oldHexHeight: number;
-	let oldGap: number;
 	// This is called during layer set up when maps are loaded, or when hex fields are focused on.
-	export function saveOldHexMeasurements(hexWidth: number, hexHeight: number, gap: number) {
-		oldHexWidth = hexWidth;
-		oldHexHeight = hexHeight;
-		oldGap = gap;
-	}
 
-	export function retainIconPositionOnHexResize(newHexWidth: number, newHexHeight: number, newGap: number) {
+	export function retain_icon_position_on_hex_resize(newHexWidth: number, newHexHeight: number, newGap: number) {
 		// Find proprtional horizontal and vertical distance from center of nearest hex, and retain the position with the new width and height
-
 		icons.forEach((icon: IconLayerIcon) => {
-			let closestHexCubeCoords = coords_worldToCube(icon.x, icon.y, $tfield.orientation, oldHexWidth, oldHexHeight, $tfield.grid.gap);
+			let closestHexCubeCoords = coords_worldToCube(icon.x, icon.y, $tfield.orientation, $resize_parameters.old_hex_width, $resize_parameters.old_hex_height, $resize_parameters.old_gap );
 			let closestHexPos = coords_cubeToWorld(
 				closestHexCubeCoords.q,
 				closestHexCubeCoords.r,
 				closestHexCubeCoords.s,
 				$tfield.orientation,
-				oldHexWidth,
-				oldHexHeight,
-				oldGap,
+				$resize_parameters.old_hex_width,
+				$resize_parameters.old_hex_height,
+				$resize_parameters.old_gap,
 			);
 
-			let distanceFromHexLeft = oldHexWidth / 2 + icon.x - closestHexPos.x;
-			let distanceFromHexTop = oldHexHeight / 2 + icon.y - closestHexPos.y;
+			let vector_from_hex_center = {
+				x: closestHexPos.x - icon.x,
+				y: closestHexPos.y - icon.y
+			}
 
-			let proportionalHorizontalDistance = distanceFromHexLeft / oldHexWidth;
-			let proportionalVerticalDistance = distanceFromHexTop / oldHexHeight;
+			let hex_horiz_scale = newHexWidth / $resize_parameters.old_hex_width;
+			let hex_vert_scale = newHexHeight / $resize_parameters.old_hex_height;
 
 			let closestHexPosNew = coords_cubeToWorld(
 				closestHexCubeCoords.q,
@@ -286,15 +280,12 @@
 				newGap
 			);
 
-
-			icon.x = closestHexPosNew.x - newHexWidth / 2 + newHexWidth * proportionalHorizontalDistance;
-			icon.y = closestHexPosNew.y - newHexHeight / 2 + newHexHeight * proportionalVerticalDistance;
+			icon.x = closestHexPosNew.x - vector_from_hex_center.x*hex_horiz_scale;
+			icon.y = closestHexPosNew.y - vector_from_hex_center.y*hex_vert_scale;
 		});
 
 		icons = icons;
 
-		oldHexWidth = newHexWidth;
-		oldHexHeight = newHexHeight;
 	}
 
 	export function retainIconPositionOnOrientationChange(newOrientation: hex_orientation) {
@@ -559,7 +550,6 @@
 	})
 
 	onMount(() => {
-		saveOldHexMeasurements($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
 
 		cont_icon.removeChildren(0)
 		

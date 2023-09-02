@@ -14,6 +14,7 @@
 
 	import * as store_panning from '../stores/panning';
 	import { tfield } from '../stores/tfield';
+	import { resize_parameters } from '../stores/resize_parameters';
 	
 	import { store_inputs } from '../stores/inputs';
 	import { store_selected_tool } from '../stores/tools';
@@ -36,6 +37,12 @@
 
 	export let paths: path_layer_path[] = [];
 	export let cont_all_paths: PIXI.Container;
+
+
+	export function retain_path_position_on_hex_resize() {
+		console.log("Retain Path Position")
+	}
+
 
 	let pathId: number = 0;
 

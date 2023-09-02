@@ -90,17 +90,17 @@ export const handlers = {
 			let calcColumns;
 			let calcRows;
 
-			if ($tfield.mapShape == map_shape.SQUARE) {
-				calcColumns = $tfield.columns;
-				calcRows = $tfield.rows;
-			} else if ($tfield.mapShape == map_shape.FLOWER) {
-				calcColumns = $tfield.hexesOut * 2;
-				calcRows = $tfield.hexesOut * 2;
+			if (get(tfield).mapShape == map_shape.SQUARE) {
+				calcColumns = get(tfield).columns;
+				calcRows = get(tfield).rows;
+			} else if (get(tfield).mapShape == map_shape.FLOWER) {
+				calcColumns = get(tfield).hexesOut * 2;
+				calcRows = get(tfield).hexesOut * 2;
 			}
 
 			// controls how far you can zoom out (smaller number is farther out)
 			let minZoom = (window.innerWidth + window.innerHeight) / 2;
-			minZoom /= (($tfield.hexWidth + $tfield.hexHeight + $tfield.grid.gap) / 2) * ((calcColumns + calcRows) / 2) * 2;
+			minZoom /= ((get(tfield).hexWidth + get(tfield).hexHeight + get(tfield).grid.gap) / 2) * ((calcColumns + calcRows) / 2) * 2;
 			if (pan.zoomScale < minZoom) {
 				pan.zoomScale = minZoom;
 			}
@@ -108,7 +108,7 @@ export const handlers = {
 			let maxZoom = (window.innerWidth + window.innerHeight) / 2;
 			// TODO: use tile size
 			// maxZoom /= 100 * 2;
-			maxZoom /= (($tfield.hexWidth + $tfield.hexHeight + $tfield.grid.gap) / 2) * 4;
+			maxZoom /= ((get(tfield).hexWidth + get(tfield).hexHeight + get(tfield).grid.gap) / 2) * 4;
 			if (maxZoom < pan.zoomScale) {
 				pan.zoomScale = maxZoom;
 			}

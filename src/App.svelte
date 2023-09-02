@@ -72,6 +72,7 @@
 	import { store_selected_tool } from './stores/tools';
 	import { store_has_unsaved_changes } from './stores/flags';
 	import { data_path, data_icon } from './stores/data';
+	import { resize_parameters } from './stores/resize_parameters';
 	
 	
 	// GLOBAL STYLES

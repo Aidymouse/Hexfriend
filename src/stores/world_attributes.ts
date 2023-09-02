@@ -9,5 +9,5 @@ interface world_attributes {
 let world_attributes = {
     hex_height: 45,
     hex_width: 50,
-    orientation: 
+    orientation: hex_orientation.FLATTOP
 }
