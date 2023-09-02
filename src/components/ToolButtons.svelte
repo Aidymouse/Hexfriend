@@ -1,9 +1,11 @@
 <script lang="ts">
 	import type { icon_data, overlay_data, path_data, terrain_data } from '../types/data';
-  	import type { hex_orientation } from '../types/terrain';
+  	import { hex_orientation } from '../types/terrain';
 	import { tools } from '../types/toolData';
 	import { afterUpdate } from 'svelte';
 	import { data_path, data_icon } from '../stores/data';
+
+	import { tfield } from '../stores/tfield'
 
 	export let data_terrain: terrain_data;
 	export let data_overlay: overlay_data;
@@ -132,7 +134,6 @@
 	];
 
 	export let selectedTool: string;
-	export let hexOrientation: hex_orientation;
 
 	export let changeTool: Function;
 
@@ -182,7 +183,7 @@
 
 				<div
 					class="tool-icon"
-					class:rotated90={(b.toolCode == tools.TERRAIN || b.toolCode == tools.OVERLAY) && hexOrientation == 'pointyTop'}
+					class:rotated90={(b.toolCode == tools.TERRAIN || b.toolCode == tools.OVERLAY) && $tfield.orientation == hex_orientation.POINTYTOP}
 					style={`-webkit-mask: url(/assets/img/tools/${b.toolCode}.svg) no-repeat center`}
 				/>
 			</button>
@@ -209,7 +210,7 @@
 
 				<div
 					class="tool-icon"
-					class:rotated90={(b.toolCode == tools.TERRAIN || b.toolCode == tools.OVERLAY) && hexOrientation == 'pointyTop'}
+					class:rotated90={(b.toolCode == tools.TERRAIN || b.toolCode == tools.OVERLAY) && $tfield.orientation == hex_orientation.FLATTOP}
 					style={`-webkit-mask: url(/assets/img/tools/${b.toolCode}.svg) no-repeat center`}
 				/>
 			</button>

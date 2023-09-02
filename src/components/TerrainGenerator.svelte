@@ -14,12 +14,7 @@
 	
 	// STORE
 	import { store_has_unsaved_changes } from '../stores/flags';
-	import * as store_tfield from '../stores/tfield';
-
-	let tfield: terrain_field;
-	store_tfield.store.subscribe((newTField) => {
-		tfield = newTField;
-	});
+	import { tfield } from '../stores/tfield';
 
 	// COMPONENT
 	import Checkbox from '../components/Checkbox.svelte';
@@ -82,7 +77,7 @@
 		$store_has_unsaved_changes = true
 
 		// Get length of empty hexes
-		let blank_hexes = Object.keys(tfield.hexes).filter(hex_id => tfield.hexes[hex_id].tile == null)
+		let blank_hexes = Object.keys($tfield.hexes).filter(hex_id => $tfield.hexes[hex_id].tile == null)
 		let clear_override = false
 		if (blank_hexes.length == 0 && !gen_config_clear) {
 			clear_override = confirm("No blank hexes to generate in. Would you like to clear all hexes before generation?")
@@ -90,7 +85,7 @@
 		}
 
 		if (gen_config_clear || clear_override) {
-			Object.keys(tfield.hexes).forEach(hex_id => {
+			Object.keys($tfield.hexes).forEach(hex_id => {
 				comp_terrainLayer.eraseHex(hex_id);
 			})
 		}
@@ -104,12 +99,12 @@
 
 		if (total_weights == 0) {
 			console.log("Random!")
-			gen_completely_random(tfield.hexes)
+			gen_completely_random($tfield.hexes)
 			return;
 		}
 
-		//standardGen(tfield.hexes, current_ruleset)
-		gen_old_school_generate(tfield.hexes, current_ruleset);
+		//standardGen($tfield.hexes, current_ruleset)
+		gen_old_school_generate($tfield.hexes, current_ruleset);
 		//comp_terrainLayer.renderAllHexes()
 
 		$store_has_unsaved_changes = true
@@ -126,7 +121,7 @@
 		let prev_tile = rand_tile
 
 		let hexes_to_visit = Object.keys(hexes)
-		hexes_to_visit = hexes_to_visit.filter(hex_id => tfield.hexes[hex_id].tile == null)
+		hexes_to_visit = hexes_to_visit.filter(hex_id => $tfield.hexes[hex_id].tile == null)
 		let visited = []
 		let visit_hex_id = random_choice(hexes_to_visit) 
 
@@ -154,7 +149,7 @@
 			
 			// Choose random blank neighbour
 			let neighbours = comp_terrainLayer.get_existant_neighbours(visit_hex_id)
-			neighbours = neighbours.filter(n_hex => hexes_to_visit.find(id => genHexId_tfieldHex(n_hex) == id)) // Remove hexes that have already been visited
+			neighbours = neighbours.filter(n_hex => hexes_to_visit.find(id => genHexId_$tfieldHex(n_hex) == id)) // Remove hexes that have already been visited
 			visited.push(visit_hex_id)
 			//if (!gen_config_overwrite) neighbours = neighbours.filter(n_hex => n_hex.tile == null) // Get rid of any hexes that are already filled
 
@@ -166,7 +161,7 @@
 				visit_hex_id = random_choice(hexes_to_visit)
 				// Choose a random filled in and visited neighbour, if any, to be the previous tile
 				let next_neighbours = comp_terrainLayer.get_existant_neighbours(visit_hex_id)
-				next_neighbours = next_neighbours.filter(n_hex => n_hex.tile != null && visited.find(id => id == genHexId_tfieldHex(n_hex)))
+				next_neighbours = next_neighbours.filter(n_hex => n_hex.tile != null && visited.find(id => id == genHexId_$tfieldHex(n_hex)))
 
 				
 				if (next_neighbours.length != 0) prev_tile = random_choice(next_neighbours).tile
@@ -178,7 +173,7 @@
 				*/
 
 			} else {
-				visit_hex_id = genHexId_tfieldHex(random_choice(neighbours))
+				visit_hex_id = genHexId_$tfieldHex(random_choice(neighbours))
 			}
 			
 			

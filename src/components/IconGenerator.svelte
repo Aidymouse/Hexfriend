@@ -1,12 +1,12 @@
 <script lang="ts">
-import type { hex_id } from 'src/types/toolData';
+	import type { hex_id } from '../types/toolData';
 
 	import { genHexId, genHexId_tfieldHex, getNeighbours } from '../helpers/hexHelpers';
 	import { download } from '../lib/download2';
-	import * as store_tfield from '../stores/tfield';
 	import { rand, pick_from_weighted } from '../helpers/random';
 	
 	import { store_has_unsaved_changes } from '../stores/flags';
+	import { tfield } from '../stores/tfield';
 
 	import type { TerrainHex, terrain_field } from '../types/terrain';
 	import type { Tile, Tileset, tile_id } from '../types/tilesets';
@@ -16,10 +16,7 @@ import type { hex_id } from 'src/types/toolData';
 
 
 	export let loadedIconsets: Iconset[];
-	let tfield: terrain_field;
-	store_tfield.store.subscribe((newTField) => {
-		tfield = newTField;
-	});
+
 	
 	export let comp_iconLayer;
 	export let show_icon_generator: boolean;
@@ -62,11 +59,11 @@ import type { hex_id } from 'src/types/toolData';
 		//comp_terrainLayer.renderAllHexes()
 		let icons_placed = 0
 
-		Object.keys(tfield.hexes).forEach( (hex_id, i) => {
+		Object.keys($tfield.hexes).forEach( (hex_id, i) => {
 			let icon_chance = rand(1, current_ruleset.chance_for_icon_high)
 			if (icon_chance > current_ruleset.chance_for_icon) return;
 
-			let hex: TerrainHex = tfield.hexes[hex_id]
+			let hex: TerrainHex = $tfield.hexes[hex_id]
 
 			let hex_pos = {q: hex.q, r: hex.r, s: hex.s}
 

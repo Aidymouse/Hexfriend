@@ -67,11 +67,12 @@
 
 	// Stores
 	import * as store_panning from './stores/panning';
-	import * as store_tfield from './stores/tfield';
+	import { tfield } from './stores/tfield';
 	import { store_inputs } from './stores/inputs';
 	import { store_selected_tool } from './stores/tools';
 	import { store_has_unsaved_changes } from './stores/flags';
 	import { data_path, data_icon } from './stores/data';
+	
 	
 	// GLOBAL STYLES
 	import './styles/inputs.css';
@@ -163,11 +164,6 @@
 
 	let loadedTilesets: Tileset[];
 	let loadedIconsets: Iconset[];
-
-	let tfield: terrain_field;
-	store_tfield.store.subscribe((newTField) => {
-		tfield = newTField;
-	});
 
 	let pan: pan_state;
 	store_panning.store.subscribe((newPan) => {
@@ -708,8 +704,7 @@
 			await texture_loader.load_iconset_textures(iconset);
 		}
 
-		store_tfield.store.set(data.TerrainField);
-		//tfield = data.TerrainField;
+		$tfield = data.TerrainField
 
 		data_coordinates = data.coords;
 
@@ -758,7 +753,7 @@
 		appState = app_state.NORMAL;
 
 		// Final Layer Setup
-		//comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight);
+		//comp_iconLayer.saveOldHexMeasurements(tfield.hexWidth, tfield.hexHeight, tfield.grid.gap);
 
 		//comp_coordsLayer.cullUnusedCoordinates();
 		//comp_coordsLayer.updateAllCoordPositions();
@@ -879,7 +874,6 @@
 		<div id="tool-buttons" on:mouseup={pointerup}>
 			<ToolButtons
 				bind:selectedTool
-				bind:hexOrientation={tfield.orientation}
 				{changeTool}
 				bind:data_terrain
 				bind:data_overlay

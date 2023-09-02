@@ -14,7 +14,7 @@
 	
 	// Stores
 	import * as store_panning from '../stores/panning';
-	import * as store_tfield from '../stores/tfield';
+	import { tfield } from '../stores/tfield';
 	import { store_inputs } from '../stores/inputs';
 	import { store_selected_tool } from '../stores/tools';
 	import { data_icon } from '../stores/data';
@@ -50,11 +50,6 @@
 	let selectedTool: tools;
 	store_selected_tool.subscribe(n => selectedTool = n);
 
-	let tfield: terrain_field;
-	store_tfield.store.subscribe((newTField) => {
-		tfield = newTField;
-	});
-
 	export let data_eraser: eraser_data;
 
 	let floatingIcon: IconLayerIcon | null = null;
@@ -85,10 +80,10 @@
 		let icon_texture_height = 100
 
 		let scale: number;
-		if (tfield.hexWidth < tfield.hexHeight) {
-			scale = (tfield.hexWidth * (pHex / 100)) / icon_texture_width;
+		if ($tfield.hexWidth < $tfield.hexHeight) {
+			scale = ($tfield.hexWidth * (pHex / 100)) / icon_texture_width;
 		} else {
-			scale = (tfield.hexHeight * (pHex / 100)) / icon_texture_height;
+			scale = ($tfield.hexHeight * (pHex / 100)) / icon_texture_height;
 		}
 
 		return scale;
@@ -102,19 +97,19 @@
 			let clickedHexCoords = coords_worldToCube(
 				store_panning.curWorldX(),
 				store_panning.curWorldY(),
-				tfield.orientation,
-				tfield.hexWidth,
-				tfield.hexHeight,
-				tfield.grid.gap,
+				$tfield.orientation,
+				$tfield.hexWidth,
+				$tfield.hexHeight,
+				$tfield.grid.gap,
 			);
 			let iconCoords = coords_cubeToWorld(
 				clickedHexCoords.q,
 				clickedHexCoords.r,
 				clickedHexCoords.s,
-				tfield.orientation,
-				tfield.hexWidth,
-				tfield.hexHeight,
-				tfield.grid.gap,
+				$tfield.orientation,
+				$tfield.hexWidth,
+				$tfield.hexHeight,
+				$tfield.grid.gap,
 			);
 			iconX = iconCoords.x;
 			iconY = iconCoords.y;
@@ -128,7 +123,7 @@
 	}
 
 	export function place_icon(icon: Icon, position: cube_coords) {
-		let icon_pos = coords_cubeToWorld(position.q, position.r, position.s, tfield.orientation, tfield.hexWidth, tfield.hexHeight, tfield.grid.gap)
+		let icon_pos = coords_cubeToWorld(position.q, position.r, position.s, $tfield.orientation, $tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap)
 
 		icons.push({ x: icon_pos.x, y: icon_pos.y, color: icon.color, scale: getIconScale(), id: iconId, texId: icon.texId });
 		iconId++;
@@ -187,19 +182,19 @@
 			let mouseHexCoords = coords_worldToCube(
 				store_panning.curWorldX(),
 				store_panning.curWorldY(),
-				tfield.orientation,
-				tfield.hexWidth,
-				tfield.hexHeight,
-				tfield.grid.gap,
+				$tfield.orientation,
+				$tfield.hexWidth,
+				$tfield.hexHeight,
+				$tfield.grid.gap,
 			);
 			let iconCoords = coords_cubeToWorld(
 				mouseHexCoords.q,
 				mouseHexCoords.r,
 				mouseHexCoords.s,
-				tfield.orientation,
-				tfield.hexWidth,
-				tfield.hexHeight,
-				tfield.grid.gap,
+				$tfield.orientation,
+				$tfield.hexWidth,
+				$tfield.hexHeight,
+				$tfield.grid.gap,
 			);
 
 			iconX = iconCoords.x;
@@ -214,19 +209,19 @@
 			let mouseHexCoords = coords_worldToCube(
 				store_panning.curWorldX(),
 				store_panning.curWorldY(),
-				tfield.orientation,
-				tfield.hexWidth,
-				tfield.hexHeight,
-				tfield.grid.gap,
+				$tfield.orientation,
+				$tfield.hexWidth,
+				$tfield.hexHeight,
+				$tfield.grid.gap,
 			);
 			let iconCoords = coords_cubeToWorld(
 				mouseHexCoords.q,
 				mouseHexCoords.r,
 				mouseHexCoords.s,
-				tfield.orientation,
-				tfield.hexWidth,
-				tfield.hexHeight,
-				tfield.grid.gap,
+				$tfield.orientation,
+				$tfield.hexWidth,
+				$tfield.hexHeight,
+				$tfield.grid.gap,
 			);
 
 			floatingIcon.x = iconCoords.x;
@@ -263,13 +258,16 @@
 	export function retainIconPositionOnHexResize(newHexWidth: number, newHexHeight: number, newGap: number) {
 		// Find proprtional horizontal and vertical distance from center of nearest hex, and retain the position with the new width and height
 
+		console.log(oldHexWidth, oldHexHeight, oldGap)
+		console.log(newHexWidth, newHexHeight, newGap)
+
 		icons.forEach((icon: IconLayerIcon) => {
-			let closestHexCubeCoords = coords_worldToCube(icon.x, icon.y, tfield.orientation, oldHexWidth, oldHexHeight, tfield.grid.gap);
+			let closestHexCubeCoords = coords_worldToCube(icon.x, icon.y, $tfield.orientation, oldHexWidth, oldHexHeight, $tfield.grid.gap);
 			let closestHexPos = coords_cubeToWorld(
 				closestHexCubeCoords.q,
 				closestHexCubeCoords.r,
 				closestHexCubeCoords.s,
-				tfield.orientation,
+				$tfield.orientation,
 				oldHexWidth,
 				oldHexHeight,
 				oldGap,
@@ -285,11 +283,13 @@
 				closestHexCubeCoords.q,
 				closestHexCubeCoords.r,
 				closestHexCubeCoords.s,
-				tfield.orientation,
+				$tfield.orientation,
 				newHexWidth,
 				newHexHeight,
-				tfield.grid.gap,
+				newGap
 			);
+
+			console.log(closestHexPosNew)
 
 			icon.x = closestHexPosNew.x - newHexWidth / 2 + newHexWidth * proportionalHorizontalDistance;
 			icon.y = closestHexPosNew.y - newHexHeight / 2 + newHexHeight * proportionalVerticalDistance;
@@ -302,7 +302,7 @@
 	}
 
 	export function retainIconPositionOnOrientationChange(newOrientation: hex_orientation) {
-		switch (tfield.mapShape) {
+		switch ($tfield.mapShape) {
 			case map_shape.SQUARE:
 				square_retainIconPositionOnOrientationChange(newOrientation);
 				break;
@@ -321,7 +321,7 @@
 			let oldOrientation: hex_orientation = newOrientation == 'flatTop' ? 'pointyTop' : 'flatTop';
 
 			// Find the center coordinates of the hex the icon wants to stay in
-			let oldClosestHexCubeCoords = coords_worldToCube(icon.x, icon.y, oldOrientation, oldHexWidth, oldHexHeight, tfield.grid.gap);
+			let oldClosestHexCubeCoords = coords_worldToCube(icon.x, icon.y, oldOrientation, oldHexWidth, oldHexHeight, $tfield.grid.gap);
 			let oldClosestHexPos = coords_cubeToWorld(
 				oldClosestHexCubeCoords.q,
 				oldClosestHexCubeCoords.r,
@@ -329,7 +329,7 @@
 				oldOrientation,
 				oldHexWidth,
 				oldHexHeight,
-				tfield.grid.gap,
+				$tfield.grid.gap,
 			);
 
 			let distanceFromHexLeft = oldHexWidth / 2 + icon.x - oldClosestHexPos.x;
@@ -342,35 +342,35 @@
 			// Find the row / col of the old hex
 			let conservedClosestHexRowCol =
 				oldOrientation == 'flatTop'
-					? coords_cubeToq(tfield.raised, oldClosestHexCubeCoords.q, oldClosestHexCubeCoords.r, oldClosestHexCubeCoords.s)
-					: coords_cubeTor(tfield.raised, oldClosestHexCubeCoords.q, oldClosestHexCubeCoords.r, oldClosestHexCubeCoords.s);
+					? coords_cubeToq($tfield.raised, oldClosestHexCubeCoords.q, oldClosestHexCubeCoords.r, oldClosestHexCubeCoords.s)
+					: coords_cubeTor($tfield.raised, oldClosestHexCubeCoords.q, oldClosestHexCubeCoords.r, oldClosestHexCubeCoords.s);
 
 			// Find the hex position of the hex at the same row/col, but opposite orientation
 			let newHexCubeCoords =
-				tfield.orientation == 'flatTop'
-					? coords_qToCube(tfield.raised, conservedClosestHexRowCol.col, conservedClosestHexRowCol.row)
-					: coords_rToCube(tfield.raised, conservedClosestHexRowCol.col, conservedClosestHexRowCol.row);
+				$tfield.orientation == 'flatTop'
+					? coords_qToCube($tfield.raised, conservedClosestHexRowCol.col, conservedClosestHexRowCol.row)
+					: coords_rToCube($tfield.raised, conservedClosestHexRowCol.col, conservedClosestHexRowCol.row);
 
 			// Find X and Y world position of new hex
 			let newHexPos = coords_cubeToWorld(
 				newHexCubeCoords.q,
 				newHexCubeCoords.r,
 				newHexCubeCoords.s,
-				tfield.orientation,
-				tfield.hexWidth,
-				tfield.hexHeight,
-				tfield.grid.gap,
+				$tfield.orientation,
+				$tfield.hexWidth,
+				$tfield.hexHeight,
+				$tfield.grid.gap,
 			);
 
 			// Adjust icon position to be the same amount left and down proportional to hex width and height as it was before the transformation
-			icon.x = newHexPos.x - tfield.hexWidth / 2 + tfield.hexWidth * proportionalHorizontalDistance;
-			icon.y = newHexPos.y - tfield.hexHeight / 2 + tfield.hexHeight * proportionalVerticalDistance;
+			icon.x = newHexPos.x - $tfield.hexWidth / 2 + $tfield.hexWidth * proportionalHorizontalDistance;
+			icon.y = newHexPos.y - $tfield.hexHeight / 2 + $tfield.hexHeight * proportionalVerticalDistance;
 		});
 
 		icons = icons;
 
-		oldHexWidth = tfield.hexWidth;
-		oldHexHeight = tfield.hexHeight;
+		oldHexWidth = $tfield.hexWidth;
+		oldHexHeight = $tfield.hexHeight;
 	}
 
 	function flower_retainIconPositionOnOrientationChange(newOrientation: hex_orientation) {
@@ -466,19 +466,19 @@
 			let mouseHexCoords = coords_worldToCube(
 				store_panning.curWorldX(),
 				store_panning.curWorldY(),
-				tfield.orientation,
-				tfield.hexWidth,
-				tfield.hexHeight,
-				tfield.grid.gap
+				$tfield.orientation,
+				$tfield.hexWidth,
+				$tfield.hexHeight,
+				$tfield.grid.gap
 			);
 			let iconCoords = coords_cubeToWorld(
 				mouseHexCoords.q,
 				mouseHexCoords.r,
 				mouseHexCoords.s,
-				tfield.orientation,
-				tfield.hexWidth,
-				tfield.hexHeight,
-				tfield.grid.gap
+				$tfield.orientation,
+				$tfield.hexWidth,
+				$tfield.hexHeight,
+				$tfield.grid.gap
 			);
 
 			draggedIcon.x = iconCoords.x;

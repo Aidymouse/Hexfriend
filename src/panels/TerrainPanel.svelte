@@ -3,7 +3,7 @@
 	import { getHexPath } from '../helpers/hexHelpers';
 	import { tiles_match } from '../helpers/tiles';
 	import { get_symbol_texture } from '../lib/texture_loader';
-	import * as store_tfield from '../stores/tfield';
+	import { tfield } from '../stores/tfield';
 	import type { terrain_data } from '../types/data';
 	import type { terrain_field } from '../types/terrain';
 	import type { Tile, TileSymbol, Tileset } from '../types/tilesets';
@@ -13,11 +13,6 @@
 
 	export let loadedTilesets: Tileset[];
 	export let data_terrain: terrain_data;
-
-	let tfield: terrain_field;
-	store_tfield.store.subscribe((newTField) => {
-		tfield = newTField;
-	});
 
 	export let app: PIXI.Application;
 
@@ -58,17 +53,17 @@
 
 	async function generateTilePreview(data_terrain: terrain_data) {
 		g.clear();
-		g.beginFill(data_terrain.tile ? data_terrain.tile.bgColor : tfield.blankHexColor);
+		g.beginFill(data_terrain.tile ? data_terrain.tile.bgColor : $tfield.blankHexColor);
 
 		let hexWidth = 50;
 		let hexHeight = 45;
 
-		if (tfield.orientation == 'pointyTop') {
+		if ($tfield.orientation == 'pointyTop') {
 			hexWidth = 45;
 			hexHeight = 50;
 		}
 
-		g.drawPolygon(getHexPath(hexWidth, hexHeight, tfield.orientation, 0, 0));
+		g.drawPolygon(getHexPath(hexWidth, hexHeight, $tfield.orientation, 0, 0));
 		g.endFill();
 
 		if (data_terrain.tile && data_terrain.tile.symbol) {
@@ -91,7 +86,7 @@
 
 	afterUpdate(async () => {
 		loadedTilesets = loadedTilesets;
-		tfield.orientation = tfield.orientation;
+		$tfield.orientation = $tfield.orientation;
 
 		tilePreview = await generateTilePreview(data_terrain);
 	});
@@ -107,8 +102,8 @@
 			<img
 				src={tilePreview}
 				alt={'Current Tile Preview'}
-				class:flatTop={tfield.orientation == 'flatTop'}
-				class:pointyTop={tfield.orientation == 'pointyTop'}
+				class:flatTop={$tfield.orientation == 'flatTop'}
+				class:pointyTop={$tfield.orientation == 'pointyTop'}
 			/>
 		</div>
 

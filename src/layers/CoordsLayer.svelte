@@ -2,7 +2,9 @@
 	// Small random bug that i'll come investigate later: if you change orientation, then raised col/indented row, then change orientation again, hex at (col.row) (1.0) or (1.1) will be duplicated??
 	import { coords_cubeToWorld, genHexId } from '../helpers/hexHelpers';
 	import { coords_cubeToq, coords_cubeTor } from '../helpers/hexHelpers';
-	import * as store_tfield from '../stores/tfield';
+	
+	import { tfield } from '../stores/tfield';
+	
 	import { store_has_unsaved_changes } from '../stores/flags';
 	import { coord_system } from '../types/coordinates';
 	import type { coordinates_data } from '../types/data';
@@ -31,11 +33,6 @@
 	let cont_textContainer = new PIXI.Container();
 	cont_coordinates.addChild(cont_textContainer);
 
-	let tfield: terrain_field;
-	store_tfield.store.subscribe((newTField) => {
-		tfield = newTField;
-	});
-
 	export let data_coordinates: coordinates_data;
 
 	function breakDownHexID(hexId: hex_id) {
@@ -48,18 +45,18 @@
 	}
 
 	function generateAllCoords(system: coord_system) {
-		Object.keys(tfield.hexes).forEach((hexId: hex_id) => {
+		Object.keys($tfield.hexes).forEach((hexId: hex_id) => {
 			generateNewCoord(hexId, system);
 		});
 		$store_has_unsaved_changes = true;
 	}
 
 	export function populateBlankHexes() {
-		Object.keys(tfield.hexes).forEach((hexId: hex_id) => {
+		Object.keys($tfield.hexes).forEach((hexId: hex_id) => {
 			if (!coordTextExists(hexId)) generateNewCoord(hexId);
 		});
 
-		if (tfield.mapShape == map_shape.FLOWER && data_coordinates.system == coord_system.LETTERNUMBER) {
+		if ($tfield.mapShape == map_shape.FLOWER && data_coordinates.system == coord_system.LETTERNUMBER) {
 			updateAllCoordsText();
 		}
 		$store_has_unsaved_changes = true;
@@ -100,10 +97,10 @@
 		let text = coordTexts[hexId];
 
 		let idParts = breakDownHexID(hexId);
-		let newPos = coords_cubeToWorld(idParts.q, idParts.r, idParts.s, tfield.orientation, tfield.hexWidth + tfield.grid.gap, tfield.hexHeight + tfield.grid.gap, tfield.grid.gap);
+		let newPos = coords_cubeToWorld(idParts.q, idParts.r, idParts.s, $tfield.orientation, $tfield.hexWidth + $tfield.grid.gap, $tfield.hexHeight + $tfield.grid.gap, $tfield.grid.gap);
 
 		text.pixiText.position.x = newPos.x;
-		text.pixiText.position.y = newPos.y + tfield.hexHeight / 2 - data_coordinates.gap;
+		text.pixiText.position.y = newPos.y + $tfield.hexHeight / 2 - data_coordinates.gap;
 	}
 
 	export function eliminateCoord(hexId: hex_id) {
@@ -134,9 +131,9 @@
 			case coord_system.ROWCOL: {
 				let cube = breakDownHexID(hexId);
 				let idParts =
-					tfield.orientation == 'flatTop'
-						? coords_cubeToq(tfield.raised, cube.q, cube.r, cube.s)
-						: coords_cubeTor(tfield.raised, cube.q, cube.r, cube.s);
+					$tfield.orientation == 'flatTop'
+						? coords_cubeToq($tfield.raised, cube.q, cube.r, cube.s)
+						: coords_cubeTor($tfield.raised, cube.q, cube.r, cube.s);
 
 				let parts = [idParts.col, idParts.row];
 
@@ -159,16 +156,16 @@
 
 			case coord_system.LETTERNUMBER: {
 		
-				if (tfield.mapShape == map_shape.FLOWER) {
-					row_offset = tfield.hexesOut
-					col_offset = tfield.hexesOut
+				if ($tfield.mapShape == map_shape.FLOWER) {
+					row_offset = $tfield.hexesOut
+					col_offset = $tfield.hexesOut
 				}
 
 				let cube = breakDownHexID(hexId);
 
-				let idParts = tfield.orientation == 'flatTop'
-						? coords_cubeToq(tfield.raised, cube.q, cube.r, cube.s)
-						: coords_cubeTor(tfield.raised, cube.q, cube.r, cube.s);
+				let idParts = $tfield.orientation == 'flatTop'
+						? coords_cubeToq($tfield.raised, cube.q, cube.r, cube.s)
+						: coords_cubeTor($tfield.raised, cube.q, cube.r, cube.s);
 				
 				
 
@@ -220,12 +217,12 @@
 
 	export function cullUnusedCoordinates() {
 		Object.keys(coordTexts).forEach((hexId: hex_id) => {
-			if (tfield.hexes[hexId] == null) {
+			if ($tfield.hexes[hexId] == null) {
 				eliminateCoord(hexId);
 			}
 		});
 
-		if (tfield.mapShape == map_shape.FLOWER && data_coordinates.system == coord_system.LETTERNUMBER) {
+		if ($tfield.mapShape == map_shape.FLOWER && data_coordinates.system == coord_system.LETTERNUMBER) {
 			updateAllCoordsText();
 		}
 

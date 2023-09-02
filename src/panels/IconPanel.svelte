@@ -11,17 +11,12 @@
 	import { afterUpdate, onMount } from 'svelte';
 	
 	// STORES
-	import * as store_tfield from '../stores/tfield';
+	import { tfield } from '../stores/tfield';
 	import { data_icon } from '../stores/data';
 
 	export let loadedIconsets: Iconset[];
 	export let app: PIXI.Application;
 	export let pHex: number;
-
-	let tfield: terrain_field;
-	store_tfield.store.subscribe((newTField) => {
-		tfield = newTField;
-	});
 
 	let iconPreview = '';
 
@@ -52,14 +47,14 @@
 		let hW = 50;
 		let hH = 45;
 
-		if (tfield.orientation == 'pointyTop') {
+		if ($tfield.orientation == 'pointyTop') {
 			hW = 45;
 			hH = 50;
 		}
 
-		let path = getHexPath(hW, hH, tfield.orientation, 0, 0);
+		let path = getHexPath(hW, hH, $tfield.orientation, 0, 0);
 		grph_preview.clear();
-		grph_preview.beginFill(tfield.blankHexColor);
+		grph_preview.beginFill($tfield.blankHexColor);
 		grph_preview.drawPolygon(path);
 		grph_preview.endFill();
 
@@ -82,7 +77,7 @@
 
 	afterUpdate(async () => {
 		loadedIconsets = loadedIconsets;
-		tfield.orientation = tfield.orientation;
+		$tfield.orientation = $tfield.orientation;
 		iconPreview = await getIconPreview($data_icon);
 	});
 
@@ -97,8 +92,8 @@
 			<img
 				src={iconPreview}
 				alt={'Icon Preview'}
-				class:flatTop={tfield.orientation == 'flatTop'}
-				class:pointyTop={tfield.orientation == 'pointyTop'}
+				class:flatTop={$tfield.orientation == 'flatTop'}
+				class:pointyTop={$tfield.orientation == 'pointyTop'}
 			/>
 		</div>
 
