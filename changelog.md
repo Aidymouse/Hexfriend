@@ -3,6 +3,12 @@ For Techy People
 
 # Version 1.9 - Sorting out your internals, Hexfriend
 
+## Version 1.9.3
+- Position retaining algorithm now uses vector to center of hex rather than postion from left and top of hex
+- Paths and texts now retain relative positions when 
+- Old retainment parameters are now kept in a store
+- Added new toggles for icon, path and text position retaining when resizing hexes
+
 ## Version 1.9.2
 - Can determine hex size by radius
 
