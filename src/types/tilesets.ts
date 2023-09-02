@@ -27,7 +27,7 @@ interface Tileset {
 	format_version: number; // Internal ID of tileset format. 
 }
 
-export const LATESTDEFAULTTILESETVERSION = 6
+export const LATESTDEFAULTTILESETVERSION = 7
 
 export const LATESTTILESETFORMATVERSION = 2
 

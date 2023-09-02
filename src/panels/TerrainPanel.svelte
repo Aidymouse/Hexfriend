@@ -9,7 +9,6 @@
 	import type { Tile, TileSymbol, Tileset } from '../types/tilesets';
 	import * as PIXI from 'pixi.js';
 	import { afterUpdate, onMount } from 'svelte';
-	import { LATESTDEFAULTTILESVERSION } from '../types/savedata';
 
 	export let loadedTilesets: Tileset[];
 	export let data_terrain: terrain_data;

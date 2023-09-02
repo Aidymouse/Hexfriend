@@ -18,6 +18,7 @@
 	import { map_shape } from '../types/settings';
 
 	// There's probably some clean up to do in that different colored hexes can have the same ID...
+	// This isnt *really* an issue, because ID is only used for symbol textures and we want those to double up anyway.
 	import {
 		coords_cubeToWorld,
 		coords_qToCube,
@@ -35,10 +36,10 @@
 	import { tfield } from '../stores/tfield';
 	import { store_inputs } from '../stores/inputs';
 	import { store_has_unsaved_changes } from '../stores/flags';
-	//import { collapseWaveGen } from '../lib/terrainGenerator';
 	import * as PIXI from 'pixi.js';
 	import { onMount } from 'svelte';
 
+	import { get_symbol_texture } from '../lib/texture_loader';
 
 	export let cont_terrain: PIXI.Container;
 
@@ -54,7 +55,6 @@
 
 	let terrainSprites: { [key: hex_id]: PIXI.Sprite } = {};
 
-	import { get_symbol_texture } from '../lib/texture_loader';
 
 	let pan: pan_state;
 	store_panning.store.subscribe((newPan) => {

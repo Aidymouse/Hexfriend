@@ -49,8 +49,8 @@
 		<img src="/assets/img/ui/back.png" alt={'Close Maps'} />
 	</button>
 
-	<div id="maps-container" class="shown">
-		<h1 class="title">Saved Maps</h1>
+	<div id="maps-grid-container" class="shown">
+		<h1 class="title">Maps</h1>
 		<div
 			id="save-map-button"
 			on:click={() => {
@@ -59,8 +59,10 @@
 			}}
 		>
 			<img src="/assets/img/ui/new.svg" alt={'New Map'} />
-			<span>New map</span>
+			<p>New Map</p>
 		</div>
+
+		<div id="maps-container">
 		<div id="maps">
 			{#if $saves}
 				{#each $saves as save (save.id)}
@@ -106,6 +108,7 @@
 				<p id="loading-text">Loading...</p>
 			{/if}
 		</div>
+		</div>
 	</div>
 </main>
 
@@ -124,7 +127,7 @@
 		transition-duration: 0.2s;
 	}
 
-	#maps-container {
+	#maps-grid-container {
 		top: 0;
 		width: 100%;
 		padding: 1em;
@@ -134,15 +137,17 @@
 		gap: 1em;
 		flex-direction: column;
 		box-sizing: border-box;
-		overflow-y: scroll;
+		overflow-y: hidden;
+		padding-bottom: 0;
 	}
 
-	#maps-container.shown {
+	#maps-grid-container.shown {
 		left: 0em;
 	}
 
 	.title {
 		margin: 0;
+		font-weight: normal;
 	}
 
 	#save-map-button {
@@ -177,14 +182,21 @@
 		height: calc(2em + 0%);
 	}
 
-	#save-map-button span {
-		align-self: flex-start;
+	#save-map-button p {
 		font-size: 2em;
 		opacity: 0.6;
+		font-size: 18pt;
+	}
+
+	#maps-container {
+		overflow-y: scroll;
+		margin-bottom: 0;
+		padding-bottom: 1em;
 	}
 
 	#maps {
 		width: 100%;
+		height: auto;
 		background: var(--primary-background);
 
 		position: relative;
@@ -212,7 +224,7 @@
 		height: 100%;
 	}
 
-	p {
+	.map-save p {
 		position: absolute;
 		bottom: 0;
 		text-align: center;

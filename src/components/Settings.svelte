@@ -16,10 +16,11 @@
 	
 	// Enums
 	import { coord_system } from '../types/coordinates';
-	import { LATESTDEFAULTICONSVERSION, LATESTDEFAULTTILESVERSION } from '../types/savedata';
+	import { LATESTDEFAULTICONSVERSION } from '../types/savedata';
 	import { hex_raised, hex_orientation } from '../types/terrain';
 	import { map_shape } from '../types/settings';
-	import { LATESTTILESETFORMATVERSION } from '../types/tilesets';
+	import { LATESTTILESETFORMATVERSION, LATESTDEFAULTTILESETVERSION } from '../types/tilesets';
+	import { DEFAULTTILESET } from '../lib/defaultTileset';
 	
 	// Stores
 	import { tfield } from '../stores/tfield';
@@ -33,7 +34,10 @@
 
 	// Lib
 	import * as texture_loader from '../lib/texture_loader';
-	import { update_tileset_format } from '../lib/tileset_updater';
+	import { update_map_to_new_default_tileset, update_tileset_format } from '../lib/tileset_updater';
+
+	// Helpers
+	import { get_tileset_id } from '../helpers/tiles';
 
 	export let loadedSave: save_data;
 	export let showSettings: boolean;
@@ -51,8 +55,7 @@
 		overlay: true,
 		tilesets: true,
 		iconsets: true,
-		experimental: true,
-		changelog: true,
+		experimental: true
 	};
 
 
@@ -155,6 +158,17 @@
 		// Maybe we should remove tiles here, because otherwise the tiles just... fail to load.
 		// Check if these tiles are being used anywere
 	}
+
+	function update_default_tileset() {
+		let successfully_updated = update_map_to_new_default_tileset(tfield)
+		if (!successfully_updated) return;
+
+		// Remove default tileset
+		loadedTilesets = loadedTilesets.filter(ts => get_tileset_id(ts) != "default")
+		loadedTilesets.push( DEFAULTTILESET );
+		loadedSave.tilesets = loadedTilesets;
+	}
+
 
 	function removeIconset(setId: string) {
 		loadedIconsets = loadedIconsets.filter((is: Iconset) => is.id != setId);
@@ -384,7 +398,7 @@
 			<option value={'application/json'}>Hexfriend</option>
 		</select>
 
-		<button class="file-input-button" on:click={() => {}} title="Import">
+		<button class="file-input-button outline-button" on:click={() => {}} title="Import">
 			Import
 			<input
 				type="file"
@@ -497,6 +511,9 @@
 			{/if}
 		</div>
 	</div>
+
+
+
 	<!-- HEXES -->
 	<div class="setting-container">
 		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.hexes}>
@@ -626,6 +643,10 @@
 			<Checkbox bind:checked={retainIconPosition} id="retainIcon" />
 		</div>
 	</div>
+
+
+
+
 	<!-- DIMENSIONS AND SHAPE -->
 	<div class="setting-container">
 		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.dimensions}>
@@ -754,6 +775,9 @@
 	</div>
 
 
+
+
+
 	<!-- COORDINATES -->
 	<div class="setting-container">
 		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.coordinates}>
@@ -767,7 +791,7 @@
 			</button>
 		</h2>
 		<div class="settings-grid" class:hidden={hidden_settings.coordinates}>
-			<label class="helperText">Coordinates can slow down map changes such as adding hexes or changing orientation.</label>
+			<label class="helper-text">Coordinates can slow down map changes such as adding hexes or changing orientation.</label>
 			<label for="showCoords">Show Coordinates</label>
 			<Checkbox bind:checked={data_coordinates.shown} id={'showCoords'} />
 
@@ -821,6 +845,11 @@
 		</div>
 	</div>
 
+
+
+
+
+
 	<!-- OVERLAY -->
 	<div class="setting-container">
 		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.overlay}>
@@ -849,6 +878,11 @@
 		</div>
 	</div>
 
+
+
+
+
+
 	<!-- TILE SETS -->
 	<div class="setting-container">
 		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.tilesets}>
@@ -870,10 +904,11 @@
 					}}
 					on:keydown={()=>{}}
 				>
-					{tileset.name}
+					<span style="display: flex;">{tileset.name} <span class="helper-text">v{tileset.version}</span></span>
 
-					{#if tileset.id.split(":")[0] != 'default'} 
+					{#if get_tileset_id(tileset) != 'default'} 
 						<button
+							class="set-rollover-button"
 							on:click={() => {
 								removeTileset(tileset.id);
 							}}
@@ -882,14 +917,16 @@
 						</button>
 					{/if}
 
-					{#if tileset.id == "default" && tileset.version < LATESTDEFAULTTILESVERSION}
+					<!-- Update Default Tileset Button -->
+					{#if get_tileset_id(tileset) == "default" && tileset.version < LATESTDEFAULTTILESETVERSION}
 						<button
+							id="default-tileset-update-button"
 							on:click={() => {
-								removeTileset(tileset.id);
+								update_default_tileset();
 							}}
-							title={`Update Tileset to v${LATESTDEFAULTTILESVERSION}`}
+							title={`Update Tileset to v${LATESTDEFAULTTILESETVERSION}`}
 						>
-							<img src="/assets/img/tools/trash.png" alt={'Trash'} title={'Remove Tileset'} />
+							<img src="/assets/img/ui/arrow.png" alt={''} title={`Update Tileset to v${LATESTDEFAULTTILESETVERSION}`} />
 						</button>
 					{/if}
 
@@ -1012,82 +1049,34 @@
 	</div>
 
 	<!-- Changelog -->
-	<div class="setting-container">
-		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.changelog}>
-			Changelog
-			<button
-				on:click={() => {
-					hidden_settings.changelog = !hidden_settings.changelog;
-				}}
-			>
-				<img alt={'Toggle Generator Menu'} class:rotated={hidden_settings.changelog} src={'/assets/img/ui/arrow.png'} />
-			</button>
-		</h2>
-
-		<div id="changelog" class:hidden={hidden_settings.changelog}>
-			<p>Version 1.8.6</p>
-			<ul class="helperText">
-				<li>Clicking left mouse + right mouse at the same time no longer makes panning sticky</li>
-				<li>Releasing right click over the toolbar no longer makes panning stick</li>
-			</ul>
-			
-			<p>Version 1.8.5</p>
-			<ul class="helperText">
-				<li>Icon scale UX improvements</li>
-				<li>Icon Eyedropper</li>
-				<li>Save data version update</li>
-				<li>Note: due to code choices the icon eyedropper will not pick out size on old maps</li>
-			</ul>
-
-			<p>Version 1.8.4</p>
-			<ul class="helperText">
-				<li>Coordinates bug fix</li>
-				<li>Save data converter path fix</li>
-			</ul>
-			
-			<p>Version 1.8.3</p>
-			<ul class="helperText">
-				<li>Icon scale bug fix</li>
-			</ul>
-
-			<p>Version 1.8.2</p>
-			<ul class="helperText">
-				<li>Added grid gap (thanks Evan!)</li>
-				<li>Save data update to version 8</li>
-			</ul>
-			
-			<p>Version 1.8.1</p>
-			<ul class="helperText">
-				<li>Added changelog</li>
-			</ul>
-
-			<p>Version 1.8.0</p>
-			<ul class="helperText">
-				<li>Added dashed paths</li>
-				<li>Map version update to accomodate paths</li>
-			</ul>
+	<a href="https://github.com/Aidymouse/Hexfriend/blob/master/changelog.md" style="color: var(--text);">
+		<div class="setting-container">
+			<h2 class="setting-heading">
+				Changelog 
+				<button><img alt={'Go to Changelog'} src={'/assets/img/ui/arrow.png'} style="transform: rotate(90deg);"/></button>
+			</h2>
 		</div>
-	</div>
+	</a>
 
 	<div class="setting-container">
 		<h2>About</h2>
-		<p class="helperText">
-			Hexfriend version 1.8.6 - "New stripes, Hexfriend"
+		<p class="helper-text">
+			Hexfriend version 1.9.0 - "Sorting out your internals, Hexfriend"
 		</p>
 		
-		<p class="helperText">
+		<p class="helper-text">
 			By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
 		</p>
 
-		<p class="helperText">
+		<p class="helper-text">
 			Hexfriend is built with Svelte, Pixi JS and Typescript. Check out the <a href="https://www.github.com/Aidymouse/Hexfriend">Github</a>
 		</p>
 	
-		<p class="helperText">
+		<p class="helper-text">
 			Found a bug? Got ideas? Come say Hi on the <a href="https://discord.gg/Jvws27VmWR">Hexfriend Discord</a>
 		</p>
 
-		<p class="helperText">
+		<p class="helper-text">
 			You can give away your hard earned money on <br><a href="https://ko-fi.com/aidymouse">Ko-fi</a>.
 		</p>
 	</div>
@@ -1096,8 +1085,11 @@
 </div>
 
 <style>
-	button {
-		border: solid 1px var(--lighter-background);
+
+	#default-tileset-update-button {
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 
 	.bottom-margin {
@@ -1227,12 +1219,16 @@
 		position: relative;
 	}
 
-	.loaded-tileset:hover button {
+	.loaded-tileset:hover button.set-rollover-button {
 		opacity: 1;
 	}
 
-	.loaded-tileset button {
+	.loaded-tileset button.set-rollover-button {
 		opacity: 0;
+	}
+	
+	
+	.loaded-tileset button {
 		position: absolute;
 		height: 100%;
 		top: 0px;
@@ -1242,7 +1238,6 @@
 		border: none;
 		border-top-left-radius: 0px;
 		border-bottom-left-radius: 0px;
-		border: solid 1px var(--light-background);
 	}
 
 	.loaded-tileset button img {
@@ -1299,7 +1294,7 @@
 		margin: 0;
 	}
 
-	.helperText {
+	.helper-text {
 		grid-column: span 2;
 		font-size: 12px;
 		color: var(--text);
