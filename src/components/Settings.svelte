@@ -37,6 +37,7 @@
 	import { update_map_to_new_default_tileset, update_tileset_format } from '../lib/tileset_updater';
 
 	// Helpers
+	import { get_width_height_from_radius } from '../helpers/hexHelpers'
 	import { get_tileset_id } from '../helpers/tiles';
 
 	export let loadedSave: save_data;
@@ -600,6 +601,32 @@
 				}}
 			/>
 
+			<label for="hex-radius">Size by Radius</label>
+			<span>
+				<input
+					id="hex-radius"
+					type="number"					
+				/>
+				<button on:click={() => {
+
+						let radius = document.getElementById("hex-radius").valueAsNumber;
+						console.log(radius);
+						if (Number.isNaN(radius)|| radius < 1) return;	
+						
+
+						let new_dims = get_width_height_from_radius(radius, $tfield.orientation)
+						
+						$tfield.hexWidth = new_dims.width
+						$tfield.hexHeight = new_dims.height
+						
+						redrawEntireMap();
+						if (retainIconPosition) comp_iconLayer.retainIconPositionOnHexResize($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
+						comp_iconLayer.saveOldHexMeasurements($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
+
+						document.getElementById("hex-radius").value = ""
+					}}>Set</button>
+			</span>
+
 			<!--
 			<label for="mapShape">Map Type</label>
 			<select id="mapShape" bind:value={$tfield.mapShape}>
@@ -1059,7 +1086,7 @@
 	<div class="setting-container">
 		<h2>About</h2>
 		<p class="helper-text">
-			Hexfriend version 1.9.1 - "Sorting out your internals, Hexfriend"
+			Hexfriend version 1.9.2 - "Sorting out your internals, Hexfriend"
 		</p>
 		
 		<p class="helper-text">

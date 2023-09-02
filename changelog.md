@@ -3,6 +3,9 @@ For Techy People
 
 # Version 1.9 - Sorting out your internals, Hexfriend
 
+## Version 1.9.2
+- Can determine hex size by radius
+
 ## Version 1.9.1
 - The terrain field (tfield) is now a store
 - Fixed bug where icons would dissapear on hex resize
