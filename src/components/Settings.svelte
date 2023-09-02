@@ -111,7 +111,7 @@
 	function retain_positions() {
 		if (retainIconPosition) comp_iconLayer.retain_icon_position_on_hex_resize($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
 		if (retainPathPosition) comp_pathLayer.retain_path_position_on_hex_resize();
-		//if (retainTextPosition) comp_textLayer.retainTextPosition();
+		if (retainTextPosition) comp_textLayer.retain_text_position_on_hex_resize();
 	}
 
 	function save_old_resize_parameters() {
@@ -580,12 +580,12 @@
 					on:change={() => {
 						changeOrientation();
 
-						if (retainIconPosition) comp_iconLayer.retainIconPositionOnOrientationChange($tfield.orientation);
-
 						comp_coordsLayer.cullUnusedCoordinates();
 						comp_coordsLayer.updateAllCoordPositions();
 						comp_coordsLayer.updateAllCoordsText();
 						comp_coordsLayer.populateBlankHexes();
+
+						save_old_resize_parameters();
 					}}
 				/>
 			</div>
@@ -596,10 +596,12 @@
 				type="number"
 				min={1}
 				bind:value={$tfield.hexWidth}
-				on:focus={() => {
-				}}
-				on:change={() => {
-					
+				on:change={(e) => {
+					if (Number.isNaN(e.target.valueAsNumber)) {
+						$tfield.hexWidth = $resize_parameters.old_hex_width;
+						return;
+					}
+
 					redrawEntireMap();
 					comp_coordsLayer.updateAllCoordPositions();
 					retain_positions();
@@ -614,9 +616,11 @@
 				type="number"
 				min={1}
 				bind:value={$tfield.hexHeight}
-				on:focus={() => {
-				}}
-				on:change={() => {
+				on:change={(e) => {
+					if (Number.isNaN(e.target.valueAsNumber)) {
+						$tfield.hexHeight = $resize_parameters.old_hex_height;
+						return;
+					}
 					redrawEntireMap();
 					comp_coordsLayer.updateAllCoordPositions();
 					retain_positions();

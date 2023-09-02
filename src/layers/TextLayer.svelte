@@ -9,10 +9,15 @@
 	// STORES
 	import * as store_panning from '../stores/panning';
 	import { store_has_unsaved_changes } from '../stores/flags';
+	import { tfield } from '../stores/tfield';
+	import { resize_parameters } from '../stores/resize_parameters';
 	
 	// LIB
 	import * as PIXI from 'pixi.js';
 	import { afterUpdate, onMount } from 'svelte';
+
+	// Helpers
+	import { coords_cubeToWorld, coords_worldToCube } from '../helpers/hexHelpers';
 
 	//import { Transformer, TransformerHandle } from "@pixi-essentials/transformer"
 
@@ -65,6 +70,30 @@
 		};
 		texts = texts;
 		hoveredText = hoveredText;
+	}
+
+	export function retain_text_position_on_hex_resize() {
+
+		texts.forEach(text => {
+
+			let text_y = text.y+getTextHeight(text) // Makes anchor point of text the bottom
+
+			let closest_old_hex = coords_worldToCube(text.x, text_y, $tfield.orientation, $resize_parameters.old_hex_width, $resize_parameters.old_hex_height, $resize_parameters.old_gap)
+			let closest_old_hex_center = coords_cubeToWorld(closest_old_hex.q, closest_old_hex.r, closest_old_hex.s, $tfield.orientation, $resize_parameters.old_hex_width, $resize_parameters.old_hex_height, $resize_parameters.old_gap)
+
+			let vec_to_hex_center = {x: closest_old_hex_center.x - text.x, y: closest_old_hex_center.y - text_y}
+
+			let hex_pos_new = coords_cubeToWorld(closest_old_hex.q, closest_old_hex.r, closest_old_hex.s, $tfield.orientation, $tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap)
+			let pos_scale_horiz = $tfield.hexWidth / $resize_parameters.old_hex_width
+			let pos_scale_vert = $tfield.hexHeight / $resize_parameters.old_hex_height
+
+			text.x = hex_pos_new.x - vec_to_hex_center.x*pos_scale_horiz
+			text.y = hex_pos_new.y - vec_to_hex_center.y*pos_scale_vert - getTextHeight(text)
+
+		})
+
+		texts = texts;
+
 	}
 
 	export function pointerdown() {
@@ -124,7 +153,7 @@
 	}
 
 	function newText() {
-		texts.push({ 
+		let new_text = { 
 			id: textId,
 			text: '',
 			alpha: data_text.alpha,
@@ -132,7 +161,14 @@
 			x: store_panning.curWorldX(),
 			y: store_panning.curWorldY(),
 			rotation: 0
-		});
+		}
+
+		new_text.y = new_text.y - getTextHeight(new_text)
+
+		texts.push(new_text);
+
+
+
 		textId++;
 		texts = texts;
 		data_text.selectedText = texts[texts.length - 1];

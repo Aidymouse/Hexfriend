@@ -40,7 +40,30 @@
 
 
 	export function retain_path_position_on_hex_resize() {
-		console.log("Retain Path Position")
+
+		paths.forEach(path => {
+			for (let pI = 0; pI < path.points.length; pI+=2) {
+
+				let path_point_x = path.points[pI]
+				let path_point_y = path.points[pI+1]
+
+				let closest_old_hex = coords_worldToCube(path_point_x, path_point_y, $tfield.orientation, $resize_parameters.old_hex_width, $resize_parameters.old_hex_height, $resize_parameters.old_gap)
+				let closest_old_hex_center = coords_cubeToWorld(closest_old_hex.q, closest_old_hex.r, closest_old_hex.s, $tfield.orientation, $resize_parameters.old_hex_width, $resize_parameters.old_hex_height, $resize_parameters.old_gap)
+
+				let vec_to_hex_center = {x: closest_old_hex_center.x - path_point_x, y: closest_old_hex_center.y - path_point_y}
+
+				let hex_pos_new = coords_cubeToWorld(closest_old_hex.q, closest_old_hex.r, closest_old_hex.s, $tfield.orientation, $tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap)
+				let pos_scale_horiz = $tfield.hexWidth / $resize_parameters.old_hex_width
+				let pos_scale_vert = $tfield.hexHeight / $resize_parameters.old_hex_height
+
+				path.points[pI] = hex_pos_new.x - vec_to_hex_center.x*pos_scale_horiz
+				path.points[pI+1] = hex_pos_new.y - vec_to_hex_center.y*pos_scale_vert
+
+			}
+		})
+
+		paths = paths;
+
 	}
 
 
