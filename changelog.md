@@ -5,6 +5,8 @@ For Techy People
 
 ## Version 1.9.4
 - Added ability to erase all icons, paths and text
+- Overlay image no longer moves when map is resized
+- Overlay data now kept in store
 
 ## Version 1.9.3
 - Position retaining algorithm now uses vector to center of hex rather than postion from left and top of hex

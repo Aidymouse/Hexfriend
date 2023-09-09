@@ -17,6 +17,8 @@
 	import { hex_orientation, hex_raised } from '../types/terrain';
 	import { map_shape } from '../types/settings';
 
+	import { data_overlay } from '../stores/data';
+
 	// There's probably some clean up to do in that different colored hexes can have the same ID...
 	// This isnt *really* an issue, because ID is only used for symbol textures and we want those to double up anyway.
 	import {
@@ -223,15 +225,24 @@
 				square_moveAllHexesRight(amount);
 
 				if ($tfield.orientation == 'flatTop') {
-					pan.offsetX -= ($tfield.hexWidth + $tfield.grid.gap) * 0.75 * pan.zoomScale * amount;
+					let delta_x = ($tfield.hexWidth + $tfield.grid.gap) * 0.75 * amount					
+					pan.offsetX -= delta_x * pan.zoomScale;
+					$data_overlay.x += delta_x;
 
 					if (amount % 2 == 1) {
 						$tfield.raised = $tfield.raised == hex_raised.ODD ? hex_raised.EVEN : hex_raised.ODD;
 						square_updateRaisedColumn();
-						pan.offsetY += ($tfield.hexHeight + $tfield.grid.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1) * pan.zoomScale;
+						let delta_y = ($tfield.hexHeight + $tfield.grid.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1) 
+						pan.offsetY += delta_y * pan.zoomScale;
+
+						$data_overlay.y -= delta_y;
 					}
+
+
 				} else {
-					pan.offsetX -= ($tfield.hexWidth + $tfield.grid.gap) * pan.zoomScale * amount;
+					let delta_x = ($tfield.hexWidth + $tfield.grid.gap) * amount
+					pan.offsetX -= delta_x * pan.zoomScale;
+					$data_overlay.x += delta_x;
 				}
 
 				break;
@@ -245,14 +256,22 @@
 				square_moveAllHexesDown(amount);
 
 				if ($tfield.orientation == 'flatTop') {
-					pan.offsetY -= ($tfield.hexHeight + $tfield.grid.gap) * pan.zoomScale * amount;
+					let delta_y = ($tfield.hexHeight + $tfield.grid.gap) * amount;
+					pan.offsetY -= delta_y * pan.zoomScale ;
+
+					$data_overlay.y += delta_y;
+				
 				} else {
-					pan.offsetY -= ($tfield.hexHeight + $tfield.grid.gap) * 0.75 * pan.zoomScale * amount;
+					let delta_y = ($tfield.hexHeight + $tfield.grid.gap) * 0.75 * amount;
+					pan.offsetY -= delta_y * pan.zoomScale;
+					$data_overlay.y += delta_y;
 
 					if (amount % 2 == 1) {
 						$tfield.raised = $tfield.raised == hex_raised.ODD ? hex_raised.EVEN : hex_raised.ODD;
 						square_changeIndentedRow();
-						pan.offsetX += ($tfield.hexWidth + $tfield.grid.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1) * pan.zoomScale;
+						let delta_x = ($tfield.hexWidth + $tfield.grid.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1) 
+						pan.offsetX += delta_x * pan.zoomScale;
+						$data_overlay.x -= delta_x;
 					}
 				}
 
