@@ -3,9 +3,12 @@ For Techy People
 
 # Version 1.9 - Sorting out your internals, Hexfriend
 
+## Version 1.9.5
+- Overlay image no longer moves when map is reduced in size
+
 ## Version 1.9.4
 - Added ability to erase all icons, paths and text
-- Overlay image no longer moves when map is resized
+- Overlay image no longer moves when map is expanded
 - Overlay data now kept in store
 
 ## Version 1.9.3

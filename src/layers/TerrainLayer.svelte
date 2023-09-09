@@ -387,10 +387,19 @@
 						square_updateRaisedColumn();
 					}
 
-					pan.offsetX += ($tfield.hexWidth + $tfield.grid.gap) * 0.75 * pan.zoomScale * amount;
-					pan.offsetY += ($tfield.hexHeight + $tfield.grid.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1) * pan.zoomScale * (amount % 2 == 0 ? 0 : 1);
+					let delta_x = ($tfield.hexWidth + $tfield.grid.gap) * 0.75 * amount
+					let delta_y = ($tfield.hexHeight + $tfield.grid.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1) * (amount % 2 == 0 ? 0 : 1)
+
+					pan.offsetX += delta_x * pan.zoomScale;
+					pan.offsetY += delta_y * pan.zoomScale;
+
+					$data_overlay.x -= delta_x;
+					$data_overlay.y -= delta_y;
 				} else {
-					pan.offsetX += ($tfield.hexWidth + $tfield.grid.gap) * pan.zoomScale * amount;
+					let delta_x = ($tfield.hexWidth + $tfield.grid.gap) * amount
+					pan.offsetX += delta_x * pan.zoomScale;
+
+					$data_overlay.x -= delta_x;
 				}
 
 				break;
@@ -410,14 +419,23 @@
 				square_removeBottom(amount);
 
 				if ($tfield.orientation == 'flatTop') {
-					pan.offsetY += $tfield.hexHeight * pan.zoomScale * amount;
+					let delta_y = $tfield.hexHeight * amount
+					pan.offsetY += delta_y * pan.zoomScale;
+
+					$data_overlay.y -= delta_y;
+
 				} else {
-					pan.offsetY += $tfield.hexHeight * 0.75 * pan.zoomScale * amount;
+					let delta_y = $tfield.hexHeight * 0.75 * amount
+					pan.offsetY += delta_y * pan.zoomScale;
+					$data_overlay.y -= delta_y;
 
 					if (amount % 2 == 1) {
-						$tfield.raised = $tfield.raised == 'odd' ? 'even' : 'odd';
+						$tfield.raised = $tfield.raised == hex_raised.ODD ? hex_raised.EVEN : hex_raised.ODD;
 						square_changeIndentedRow();
-						pan.offsetX += ($tfield.hexWidth + $tfield.grid.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1) * pan.zoomScale;
+						let delta_x = ($tfield.hexWidth + $tfield.grid.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1) 
+						pan.offsetX += delta_x * pan.zoomScale;
+						$data_overlay.x -= delta_x;
+					
 					}
 				}
 
