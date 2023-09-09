@@ -149,7 +149,7 @@
 			
 			// Choose random blank neighbour
 			let neighbours = comp_terrainLayer.get_existant_neighbours(visit_hex_id)
-			neighbours = neighbours.filter(n_hex => hexes_to_visit.find(id => genHexId_$tfieldHex(n_hex) == id)) // Remove hexes that have already been visited
+			neighbours = neighbours.filter(n_hex => hexes_to_visit.find(id => genHexId_tfieldHex(n_hex) == id)) // Remove hexes that have already been visited
 			visited.push(visit_hex_id)
 			//if (!gen_config_overwrite) neighbours = neighbours.filter(n_hex => n_hex.tile == null) // Get rid of any hexes that are already filled
 
@@ -161,7 +161,7 @@
 				visit_hex_id = random_choice(hexes_to_visit)
 				// Choose a random filled in and visited neighbour, if any, to be the previous tile
 				let next_neighbours = comp_terrainLayer.get_existant_neighbours(visit_hex_id)
-				next_neighbours = next_neighbours.filter(n_hex => n_hex.tile != null && visited.find(id => id == genHexId_$tfieldHex(n_hex)))
+				next_neighbours = next_neighbours.filter(n_hex => n_hex.tile != null && visited.find(id => id == genHexId_tfieldHex(n_hex)))
 
 				
 				if (next_neighbours.length != 0) prev_tile = random_choice(next_neighbours).tile
@@ -173,7 +173,7 @@
 				*/
 
 			} else {
-				visit_hex_id = genHexId_$tfieldHex(random_choice(neighbours))
+				visit_hex_id = genHexId_tfieldHex(random_choice(neighbours))
 			}
 			
 			
