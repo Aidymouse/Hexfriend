@@ -3,6 +3,9 @@ For Techy People
 
 # Version 1.9 - Sorting out your internals, Hexfriend
 
+## Version 1.9.4
+- Added ability to erase all icons, paths and text
+
 ## Version 1.9.3
 - Position retaining algorithm now uses vector to center of hex rather than postion from left and top of hex
 - Paths and texts now retain relative positions when 

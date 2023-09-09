@@ -3,12 +3,11 @@
   	import { hex_orientation } from '../types/terrain';
 	import { tools } from '../types/toolData';
 	import { afterUpdate } from 'svelte';
-	import { data_path, data_icon } from '../stores/data';
+	import { data_path, data_icon, data_overlay } from '../stores/data';
 
 	import { tfield } from '../stores/tfield'
 
 	export let data_terrain: terrain_data;
-	export let data_overlay: overlay_data;
 
 	/* These proxies keep the buttons responsive */
 	let data_path_proxy: path_data;
@@ -171,7 +170,7 @@
 				}}
 				title={`${b.display} Tool`}
 				class="tool-button"
-				class:hidden={b.toolCode == tools.OVERLAY && data_overlay.base64 == ''}
+				class:hidden={b.toolCode == tools.OVERLAY && $data_overlay.base64 == ''}
 				id={`tool-button-${b.toolCode}`}
 			>
 				<!-- Button Image 
@@ -198,7 +197,7 @@
 				}}
 				title={`${b.display} Tool`}
 				class="tool-button"
-				class:hidden={b.toolCode == tools.OVERLAY && data_overlay.base64 == ''}
+				class:hidden={b.toolCode == tools.OVERLAY && $data_overlay.base64 == ''}
 				id={`b-tool-button-${b.toolCode}`}
 			>
 				<!-- Button Image 

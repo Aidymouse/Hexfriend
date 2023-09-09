@@ -71,7 +71,7 @@
 	import { store_inputs } from './stores/inputs';
 	import { store_selected_tool } from './stores/tools';
 	import { store_has_unsaved_changes } from './stores/flags';
-	import { data_path, data_icon } from './stores/data';
+	import { data_path, data_icon, data_overlay } from './stores/data';
 	import { resize_parameters } from './stores/resize_parameters';
 	
 	
@@ -230,15 +230,6 @@
 	let data_eraser: eraser_data = {
 		ignoreTerrain: false,
 		ignoreIcons: false,
-	};
-
-	let data_overlay: overlay_data = {
-		shown: true,
-		base64: '',
-		x: 0,
-		y: 0,
-		scale: { x: 1, y: 1 },
-		opacity: 0.5,
 	};
 
 	//let L = new PIXI.Loader()
@@ -458,12 +449,12 @@
 						changeTool(tools.ERASER);
 						break;
 					case 'changeTool_overlay':
-						if (data_overlay.base64 != '') changeTool(tools.OVERLAY);
+						if ($data_overlay.base64 != '') changeTool(tools.OVERLAY);
 						break;
 
 					case 'toggle_overlay':
-						if (data_overlay.base64 != '') {
-							data_overlay.shown = !data_overlay.shown;
+						if ($data_overlay.base64 != '') {
+							$data_overlay.shown = !$data_overlay.shown;
 							$store_has_unsaved_changes = true;
 						}
 						break;
@@ -707,7 +698,7 @@
 
 		data_coordinates = data.coords;
 
-		data_overlay = data.overlay;
+		$data_overlay = data.overlay;
 		if (selectedTool == tools.OVERLAY && data_overlay.base64 == '') store_selected_tool.update((n) => tools.TERRAIN);
 
 		//console.log(PIXI_Assets.Assets)
@@ -852,7 +843,7 @@
 			<CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} bind:data_coordinates />
 			<LargeHexesLayer bind:cont_largehexes />
 			<TextLayer bind:cont_all_text bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text />
-			<OverlayLayer bind:this={comp_overlayLayer} bind:cont_overlay bind:data_overlay {app} />
+			<OverlayLayer bind:this={comp_overlayLayer} bind:cont_overlay {app} />
 		</section>
 
 		<!-- Panels -->
@@ -871,7 +862,7 @@
 		{:else if selectedTool == tools.ERASER}
 			<EraserPanel bind:loaded_save={loadedSave} />
 		{:else if selectedTool == tools.OVERLAY}
-			<OverlayPanel bind:data_overlay />
+			<OverlayPanel />
 		{/if}
 
 		<div id="tool-buttons" on:mouseup={pointerup}>
@@ -879,7 +870,6 @@
 				bind:selectedTool
 				{changeTool}
 				bind:data_terrain
-				bind:data_overlay
 			/>
 		</div>
 
@@ -929,7 +919,6 @@
 			bind:showTerrainGenerator
 			bind:show_icon_generator
 			bind:data_coordinates
-			bind:data_overlay
 			bind:loadedTilesets
 			bind:loadedIconsets
 			{comp_terrainLayer}
@@ -953,7 +942,7 @@
 		/>
 
 		{#if showControls}
-			<TooltipsPane {data_terrain} {data_text} {data_eraser} {data_overlay} />
+			<TooltipsPane {data_terrain} {data_text} {data_eraser} />
 		{/if}
 	</main>
 {:else if appState == app_state.TILESETCREATOR}

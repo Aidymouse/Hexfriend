@@ -13,9 +13,10 @@
 	import type { overlay_data } from '../types/data';
 	import type { pan_state } from '../types/panning';
     
+    import { data_overlay } from '../stores/data';
+
 	import { tools } from '../types/toolData';
 
-    export let data_overlay: overlay_data;
 
     export let cont_overlay: PIXI.Container;
 
@@ -65,8 +66,8 @@
             let dX = store_panning.curWorldX() - oldX
             let dY = store_panning.curWorldY() - oldY
             
-            data_overlay.x += dX
-            data_overlay.y += dY
+            $data_overlay.x += dX
+            $data_overlay.y += dY
             
             oldX = store_panning.curWorldX()
             oldY = store_panning.curWorldY()
@@ -108,21 +109,21 @@
             if (grabbed_handle.x != 0.5) {
                 new_width = cur_width + (dX * (grabbed_handle.x == 0 ? -1 : 1))
                 let new_x_scale = new_width / OG_width           
-                data_overlay.scale.x = new_x_scale
-                data_overlay.x += dX/2
+                $data_overlay.scale.x = new_x_scale
+                $data_overlay.x += dX/2
             }
             // Y Transform
             if (grabbed_handle.y != 0.5) {
                 new_height = cur_height + (dY * (grabbed_handle.y == 0 ? -1 : 1))
                 let new_y_scale = new_height / OG_height
-                data_overlay.scale.y = new_y_scale
-                data_overlay.y += dY/2
+                $data_overlay.scale.y = new_y_scale
+                $data_overlay.y += dY/2
             }            
 
             old_handle_x = store_panning.curWorldX();
             old_handle_y = store_panning.curWorldY();
             
-            data_overlay = data_overlay
+            $data_overlay = $data_overlay
 
             $store_has_unsaved_changes = true;
         } 
@@ -150,22 +151,22 @@
 
     afterUpdate(() => {
 
-        if (current_base64 != data_overlay.base64) {
+        if (current_base64 != $data_overlay.base64) {
 
-            if (data_overlay.base64 == "") {
+            if ($data_overlay.base64 == "") {
                 tex_overlay = null
                 OG_width = -1
                 OG_height = -1
 
             } else {
-                tex_overlay = PIXI.Texture.from(data_overlay.base64)
+                tex_overlay = PIXI.Texture.from($data_overlay.base64)
                 OG_width = tex_overlay.width
                 OG_height = tex_overlay.height
             }
             
             
             spr_overlay_image.texture = tex_overlay
-            current_base64 = data_overlay.base64
+            current_base64 = $data_overlay.base64
         }
 
         // Update texture width and height
@@ -175,30 +176,30 @@
         }
 
         
-        spr_overlay_image.visible = data_overlay.shown
-        spr_overlay_image.alpha = data_overlay.opacity
-        spr_overlay_image.x = data_overlay.x
-        spr_overlay_image.y = data_overlay.y        
-        spr_overlay_image.scale.x = data_overlay.scale.x
-        spr_overlay_image.scale.y = data_overlay.scale.y
+        spr_overlay_image.visible = $data_overlay.shown
+        spr_overlay_image.alpha = $data_overlay.opacity
+        spr_overlay_image.x = $data_overlay.x
+        spr_overlay_image.y = $data_overlay.y        
+        spr_overlay_image.scale.x = $data_overlay.scale.x
+        spr_overlay_image.scale.y = $data_overlay.scale.y
         spr_overlay_image.interactive = (selected_tool == tools.OVERLAY)
 
 
         // Resizer
         grph_resizer.clear();
-        grph_resizer.visible = data_overlay.shown && selected_tool == tools.OVERLAY
+        grph_resizer.visible = $data_overlay.shown && selected_tool == tools.OVERLAY
         
         grph_resizer.lineStyle(3/pan.zoomScale, 0x333333, 1)
         let resizer_width = spr_overlay_image.width + 10
         let resizer_height = spr_overlay_image.height + 10
-        grph_resizer.drawRect(data_overlay.x - resizer_width/2, data_overlay.y - resizer_height/2, resizer_width, resizer_height);
+        grph_resizer.drawRect($data_overlay.x - resizer_width/2, $data_overlay.y - resizer_height/2, resizer_width, resizer_height);
         
         // Resizer Handles
         handles.forEach(handle => {
             
-            handle.sprite.visible = selected_tool == tools.OVERLAY && data_overlay.shown
-            handle.sprite.x = data_overlay.x - resizer_width/2 + handle.x*resizer_width
-            handle.sprite.y = data_overlay.y - resizer_height/2 + handle.y*resizer_height
+            handle.sprite.visible = selected_tool == tools.OVERLAY && $data_overlay.shown
+            handle.sprite.x = $data_overlay.x - resizer_width/2 + handle.x*resizer_width
+            handle.sprite.y = $data_overlay.y - resizer_height/2 + handle.y*resizer_height
             handle.sprite.scale.x = 1/pan.zoomScale
             handle.sprite.scale.y = 1/pan.zoomScale
             

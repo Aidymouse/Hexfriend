@@ -7,12 +7,12 @@
     import type { overlay_data } from "../types/data";
 	import { tools } from "../types/toolData";
 
-    export let data_overlay: overlay_data;
+    import { data_overlay } from '../stores/data'
 
     function remove_overlay() {
         
         if (confirm("Remove overlay?")) {
-            data_overlay.base64 = ""
+            $data_overlay.base64 = ""
             store_selected_tool.update(n => tools.TERRAIN)
             $store_has_unsaved_changes = true
         }
@@ -20,14 +20,14 @@
     }
 
     function reset_scale() {
-        data_overlay.scale.x = 1
-        data_overlay.scale.y = 1
+        $data_overlay.scale.x = 1
+        $data_overlay.scale.y = 1
         $store_has_unsaved_changes = true;
     }
 
     function reset_positon() {
-        data_overlay.x = 0
-        data_overlay.y = 0
+        $data_overlay.x = 0
+        $data_overlay.y = 0
         $store_has_unsaved_changes = true;
     }
 
@@ -35,8 +35,8 @@
 
 <div class="panel panel-grid">
 
-    <label for="ov_shown">Show</label><Checkbox id={"ov_shown"} bind:checked={data_overlay.shown} />
-    <label for="ov_opacity">Opacity</label><input id="ov_opacity" type="range" min={0.05} max={1} step={0.05} bind:value={data_overlay.opacity} />
+    <label for="ov_shown">Show</label><Checkbox id={"ov_shown"} bind:checked={$data_overlay.shown} />
+    <label for="ov_opacity">Opacity</label><input id="ov_opacity" type="range" min={0.05} max={1} step={0.05} bind:value={$data_overlay.opacity} />
     <span class="col-span"><button on:click={reset_scale}>Reset Scale</button></span>
     <span class="col-span"><button on:click={reset_positon}>Reset Position</button></span>
     <span class="col-span"><button class="evil" on:click={remove_overlay}>Remove Overlay</button></span>

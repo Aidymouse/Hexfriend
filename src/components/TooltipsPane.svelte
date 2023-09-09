@@ -3,6 +3,7 @@
 	import type { eraser_data, icon_data, overlay_data, path_data, terrain_data, text_data } from '../types/data';
 	import { tools } from '../types/toolData';
 	
+	import { data_overlay } from '../stores/data';
 	
 
 	interface terrain_controls {
@@ -38,7 +39,6 @@
 
 	export let data_text: text_data;
 	export let data_eraser: eraser_data;
-	export let data_overlay: overlay_data;
 
 	/* Terrain */
 	let c_terrain: terrain_controls = {
@@ -126,14 +126,13 @@
 	}
 
 	function setTooltips_overlay() {
-		c_overlay.clickAndDrag = data_overlay.shown ? "Move Overlay" : ""
+		c_overlay.clickAndDrag = $data_overlay.shown ? "Move Overlay" : ""
 	}
 
 	$: {
 		data_terrain = data_terrain;
 		data_text = data_text;
 		data_eraser = data_eraser;
-		data_overlay = data_overlay;
 		setTooltips();
 	}
 
@@ -195,7 +194,7 @@
 	
 	{/if}
 
-	{#if data_overlay.base64 != ""}
+	{#if $data_overlay.base64 != ""}
 		<Tooltip control="Ctrl+Q" tip="Toggle Overlay" />
 	{/if}
 

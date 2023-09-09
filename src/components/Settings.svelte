@@ -27,6 +27,7 @@
 	import { store_selected_tool } from '../stores/tools';
 	import { store_has_unsaved_changes } from '../stores/flags';
 	import { resize_parameters } from '../stores/resize_parameters';
+	import { data_overlay } from '../stores/data';
 	
 	// Components
 	import Checkbox from './Checkbox.svelte';
@@ -71,7 +72,6 @@
 	// For Coordinates
 	export let comp_coordsLayer: CoordsLayer;
 	export let data_coordinates: coordinates_data;
-	export let data_overlay: overlay_data;
 
 	//export let data_terrain: terrain_data
 	export let loadedTilesets: Tileset[];
@@ -372,9 +372,9 @@
 		r.onload = (eb) => {
 			let b64 = r.result as string;
 
-			data_overlay.base64 = b64;
-			data_overlay.scale.x = 1;
-			data_overlay.scale.y = 1;
+			$data_overlay.base64 = b64;
+			$data_overlay.scale.x = 1;
+			$data_overlay.scale.y = 1;
 			showSettings = false;
 			store_selected_tool.update((n) => tools.OVERLAY);
 
@@ -924,7 +924,7 @@
 
 		<div class="settings-grid" class:hidden={hidden_settings.overlay} style={'justify-items: start;'}>
 			<button class="file-input-button">
-				{#if data_overlay.base64 == ''}Load Overlay Image{:else}Replace Overlay Image{/if}
+				{#if $data_overlay.base64 == ''}Load Overlay Image{:else}Replace Overlay Image{/if}
 				<input
 					type="file"
 					accept="image/*"

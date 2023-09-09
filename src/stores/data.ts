@@ -21,3 +21,12 @@ export let data_icon = writable({
     dragMode: false,
     usingEyedropper: false,
 })
+
+export let data_overlay = writable({
+    shown: true,
+    base64: '',
+    x: 0,
+    y: 0,
+    scale: { x: 1, y: 1 },
+    opacity: 0.5,
+})
