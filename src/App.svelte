@@ -96,6 +96,7 @@
 	import { tools } from './types/toolData';
 	import * as PIXI from 'pixi.js';
 	import { afterUpdate, onMount } from 'svelte';
+  import EraserPanel from './panels/EraserPanel.svelte';
 
 	/* STATE */
 
@@ -859,14 +860,16 @@
 			<TerrainGenerator {loadedTilesets} {comp_terrainLayer} bind:showTerrainGenerator />
 		{:else if show_icon_generator}
 			<IconGenerator {loadedIconsets} {comp_iconLayer} bind:show_icon_generator />
-		{:else if selectedTool == 'terrain'}
+		{:else if selectedTool == tools.TERRAIN}
 			<TerrainPanel bind:this={comp_terrain_panel} {loadedTilesets} {app} bind:data_terrain />
-		{:else if selectedTool == 'icon'}
+		{:else if selectedTool == tools.ICON}
 			<IconPanel {app} {loadedIconsets} bind:pHex={loadedSave.icon_hex_size_percentage} />
-		{:else if selectedTool == 'path'}
+		{:else if selectedTool == tools.PATH}
 			<PathPanel {comp_pathLayer} bind:pathStyles={loadedSave.pathStyles} />
-		{:else if selectedTool == 'text'}
+		{:else if selectedTool == tools.TEXT}
 			<TextPanel bind:data_text {comp_textLayer} bind:textStyles={loadedSave.textStyles} />
+		{:else if selectedTool == tools.ERASER}
+			<EraserPanel bind:loaded_save={loadedSave} />
 		{:else if selectedTool == tools.OVERLAY}
 			<OverlayPanel bind:data_overlay />
 		{/if}
