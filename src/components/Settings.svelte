@@ -894,7 +894,7 @@
 					}}
 				/>
 
-				<label for="coordGap">Gap</label>
+				<label for="coordGap">Space from bottom</label>
 				<input
 					id="coordGap"
 					type="number"
@@ -904,6 +904,26 @@
 					}}
 				/>
 
+				{#if $data_coordinates.system == coord_system.ROWCOL || $data_coordinates.system == coord_system.LETTERNUMBER}
+					<label for="coord-offset-rowcol-row">Row Offset</label>
+					<input  id="coord-offset-rowcol-row" type="number" bind:value={$data_coordinates.offsets.row_col.row} on:change={() => { comp_coordsLayer.updateAllCoordsText(); }}/>
+					
+					<label for="coord-offset-rowcol-col">Column Offset</label>
+					<input  id="coord-offset-rowcol-col" type="number" bind:value={$data_coordinates.offsets.row_col.col} on:change={() => { comp_coordsLayer.updateAllCoordsText(); }}/>
+				{/if}
+				
+				{#if $data_coordinates.system == coord_system.AXIAL || $data_coordinates.system == coord_system.CUBE}
+					<label for="coord-offset-cube-q">Q Offset</label>
+					<input  id="coord-offset-cube-q" type="number" bind:value={$data_coordinates.offsets.cube.q} on:change={() => { comp_coordsLayer.updateAllCoordsText(); }}/>
+					
+					<label for="coord-offset-cube-r">R Offset</label>
+					<input  id="coord-offset-cube-r" type="number" bind:value={$data_coordinates.offsets.cube.r} on:change={() => { comp_coordsLayer.updateAllCoordsText(); }}/>
+				{/if}
+				
+				{#if $data_coordinates.system == coord_system.CUBE}
+					<label for="coord-offset-cube-s">S Offset</label>
+					<input  id="coord-offset-cube-s" type="number" bind:value={$data_coordinates.offsets.cube.s} on:change={() => { comp_coordsLayer.updateAllCoordsText(); }}/>
+				{/if}
 
 			{/if}
 		</div>

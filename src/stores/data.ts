@@ -42,6 +42,6 @@ export let data_coordinates = writable({
     gap: 4,
     offsets: {
         row_col: {row: 0, col: 0},
-        cubes: {q: 0, r: 0, s: 0}
+        cube: {q: 0, r: 0, s: 0}
     }
 })

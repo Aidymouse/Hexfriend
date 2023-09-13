@@ -113,14 +113,16 @@
 
 	function generateCoordTextAndParts(hexId: hex_id, system: coord_system = $data_coordinates.system): { parts: number[]; text: string } {
 
-		let row_offset = 0
-		let col_offset = 0
+		
 
 		switch (system) {
 			case coord_system.CUBE: {
 				let idParts = breakDownHexID(hexId);
 
-				let parts = [idParts.q, idParts.r, idParts.s];
+				let parts = [
+					idParts.q + $data_coordinates.offsets.cube.q,
+					idParts.r + $data_coordinates.offsets.cube.r,
+					idParts.s + $data_coordinates.offsets.cube.s];
 
 				return {
 					parts: [idParts.q, idParts.r, idParts.s],
@@ -135,7 +137,7 @@
 						? coords_cubeToq($tfield.raised, cube.q, cube.r, cube.s)
 						: coords_cubeTor($tfield.raised, cube.q, cube.r, cube.s);
 
-				let parts = [idParts.col, idParts.row];
+				let parts = [idParts.col + $data_coordinates.offsets.row_col.row, idParts.row + $data_coordinates.offsets.row_col.col];
 
 				return {
 					parts: [idParts.col, idParts.row],
@@ -146,7 +148,7 @@
 			case coord_system.AXIAL: {
 				let cube = breakDownHexID(hexId);
 
-				let parts = [cube.q, cube.r];
+				let parts = [cube.q + $data_coordinates.offsets.cube.q, cube.r + $data_coordinates.offsets.cube.r];
 
 				return {
 					parts: [cube.q, cube.r],
@@ -155,7 +157,9 @@
 			}
 
 			case coord_system.LETTERNUMBER: {
-		
+				let row_offset = 0
+				let col_offset = 0
+
 				if ($tfield.mapShape == map_shape.FLOWER) {
 					row_offset = $tfield.hexesOut
 					col_offset = $tfield.hexesOut
@@ -170,7 +174,9 @@
 				
 
 				// Convert column to letter
-				let parts = [ num_to_alphabet(idParts.col+col_offset+1), idParts.row+row_offset+1 ];
+				let parts = [ 
+					num_to_alphabet(idParts.col+col_offset+1 + Math.max($data_coordinates.offsets.row_col.row, 0)),
+					idParts.row+row_offset+1+$data_coordinates.offsets.row_col.col ];
 
 				return {
 					parts: parts,
