@@ -64,6 +64,7 @@
 	import PathPanel from './panels/PathPanel.svelte';
 	import TerrainPanel from './panels/TerrainPanel.svelte';
 	import TextPanel from './panels/TextPanel.svelte';
+	import EraserPanel from './panels/EraserPanel.svelte';
 
 	// Stores
 	import * as store_panning from './stores/panning';
@@ -71,7 +72,7 @@
 	import { store_inputs } from './stores/inputs';
 	import { store_selected_tool } from './stores/tools';
 	import { store_has_unsaved_changes } from './stores/flags';
-	import { data_path, data_icon, data_overlay } from './stores/data';
+	import { data_path, data_icon, data_overlay, data_coordinates } from './stores/data';
 	import { resize_parameters } from './stores/resize_parameters';
 	
 	
@@ -80,11 +81,9 @@
 	import './styles/panels.css';
 	import './styles/scrollbar.css';
 	import './styles/variables.css';
-	import { coord_system } from './types/coordinates';
 	// TYPES
-	import type { coordinates_data, eraser_data, icon_data, overlay_data, path_data, terrain_data, text_data, trace_data } from './types/data';
+	import type { eraser_data, terrain_data, text_data } from './types/data';
 	import type { Iconset } from './types/icon';
-	import type { input_state } from './types/inputs';
 	import type { pan_state } from './types/panning';
 	import type { save_data } from './types/savedata';
 	// Constants
@@ -96,7 +95,6 @@
 	import { tools } from './types/toolData';
 	import * as PIXI from 'pixi.js';
 	import { afterUpdate, onMount } from 'svelte';
-  import EraserPanel from './panels/EraserPanel.svelte';
 
 	/* STATE */
 
@@ -218,14 +216,6 @@
 		contextStyleId: null,
 	};
 	$: data_text.usingTextTool = selectedTool == tools.TEXT;
-
-	let data_coordinates: coordinates_data = {
-		shown: true,
-		style: { fill: 0x000000, fontSize: 10 },
-		system: coord_system.ROWCOL,
-		seperator: '.',
-		gap: 4,
-	};
 
 	let data_eraser: eraser_data = {
 		ignoreTerrain: false,
@@ -696,7 +686,7 @@
 
 		$tfield = data.TerrainField
 
-		data_coordinates = data.coords;
+		$data_coordinates = data.coords;
 
 		$data_overlay = data.overlay;
 		if (selectedTool == tools.OVERLAY && data_overlay.base64 == '') store_selected_tool.update((n) => tools.TERRAIN);
@@ -840,7 +830,7 @@
 			<TerrainLayer bind:cont_terrain bind:this={comp_terrainLayer} {changeTool} bind:data_terrain {comp_coordsLayer} />
 			<PathLayer bind:this={comp_pathLayer} bind:cont_all_paths bind:paths={loadedSave.paths} />
 			<IconLayer bind:this={comp_iconLayer} bind:pHex={loadedSave.icon_hex_size_percentage} bind:icons={loadedSave.icons} bind:cont_icon {data_eraser} />
-			<CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} bind:data_coordinates />
+			<CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} />
 			<LargeHexesLayer bind:cont_largehexes />
 			<TextLayer bind:cont_all_text bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text />
 			<OverlayLayer bind:this={comp_overlayLayer} bind:cont_overlay {app} />
@@ -918,7 +908,6 @@
 			bind:appState
 			bind:showTerrainGenerator
 			bind:show_icon_generator
-			bind:data_coordinates
 			bind:loadedTilesets
 			bind:loadedIconsets
 			{comp_terrainLayer}

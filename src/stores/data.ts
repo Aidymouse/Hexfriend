@@ -1,6 +1,9 @@
 import type { path_data } from "../types/data";
+import { coord_system } from "../types/coordinates";
+
 import * as PIXI from 'pixi.js'
 import { get, writable } from 'svelte/store';
+
 
 export let data_path = writable({
     style: { color: 0, width: 3, cap: PIXI.LINE_CAP.ROUND, join: PIXI.LINE_JOIN.ROUND, dashed: false, dash_length: 10, dash_gap: 5 },
@@ -29,4 +32,16 @@ export let data_overlay = writable({
     y: 0,
     scale: { x: 1, y: 1 },
     opacity: 0.5,
+})
+
+export let data_coordinates = writable({
+    shown: true,
+    style: { fill: 0x000000, fontSize: 10 },
+    system: coord_system.ROWCOL,
+    seperator: '.',
+    gap: 4,
+    offsets: {
+        row_col: {row: 0, col: 0},
+        cubes: {q: 0, r: 0, s: 0}
+    }
 })

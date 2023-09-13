@@ -50,6 +50,10 @@ let DEFAULTSAVEDATA: save_data = {
 		system: coord_system.ROWCOL,
 		seperator: '.',
 		gap: 4,
+		offsets: {
+			row_col: {row: 0, col: 0},
+			cube: {q: 0, r: 0, s: 0}
+		}
 	},
 
 	tilesets: [DEFAULTTILESET],

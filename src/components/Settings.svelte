@@ -27,7 +27,7 @@
 	import { store_selected_tool } from '../stores/tools';
 	import { store_has_unsaved_changes } from '../stores/flags';
 	import { resize_parameters } from '../stores/resize_parameters';
-	import { data_overlay } from '../stores/data';
+	import { data_overlay, data_coordinates } from '../stores/data';
 	
 	// Components
 	import Checkbox from './Checkbox.svelte';
@@ -71,7 +71,6 @@
 
 	// For Coordinates
 	export let comp_coordsLayer: CoordsLayer;
-	export let data_coordinates: coordinates_data;
 
 	//export let data_terrain: terrain_data
 	export let loadedTilesets: Tileset[];
@@ -514,24 +513,26 @@
 				<label for="overlayEncompass">Encompass Map Edges</label>
 				<Checkbox bind:checked={$tfield.largehexes.encompassEdges} id="overlayEncompass" />
 
-				<p>{$tfield.orientation == hex_orientation.FLATTOP ? 'Large Raised Column' : 'Large Indented Row'}</p>
-				<span style={'height: 100%; display: flex; align-items: center;'}>
-					<SelectGrid
-						options={[
-							{
-								title: 'Even',
-								value: 'even',
-								filename: `${$tfield.orientation == hex_orientation.FLATTOP ? 'overlayraisedcolumn' : 'overlayindentedrow'}even`,
-							},
-							{
-								title: 'Even',
-								value: 'odd',
-								filename: `${$tfield.orientation == hex_orientation.FLATTOP ? 'overlayraisedcolumn' : 'overlayindentedrow'}odd`,
-							},
-						]}
-						bind:value={$tfield.largehexes.raised}
-					/>
-				</span>
+				{#if $tfield.mapShape == map_shape.SQUARE}
+					<label>{$tfield.orientation == hex_orientation.FLATTOP ? 'Large Raised Column' : 'Large Indented Row'}</label>
+					<span style={'height: 100%; display: flex; align-items: center;'}>
+						<SelectGrid
+							options={[
+								{
+									title: 'Even',
+									value: 'even',
+									filename: `${$tfield.orientation == hex_orientation.FLATTOP ? 'bigraisedcolumn' : 'bigindentedrow'}even`,
+								},
+								{
+									title: 'Even',
+									value: 'odd',
+									filename: `${$tfield.orientation == hex_orientation.FLATTOP ? 'bigraisedcolumn' : 'bigindentedrow'}odd`,
+								},
+							]}
+							bind:value={$tfield.largehexes.raised}
+						/>
+					</span>
+				{/if}
 			{/if}
 		</div>
 	</div>
@@ -589,6 +590,35 @@
 					}}
 				/>
 			</div>
+
+			{#if $tfield.mapShape == map_shape.SQUARE}
+				<label>{$tfield.orientation == hex_orientation.FLATTOP ? 'Raised Column' : 'Indented Row'}</label>
+				<span style={'height: 100%; display: flex; align-items: center;'}>
+					<SelectGrid
+						options={[
+							{
+								title: 'Even',
+								value: 'even',
+								filename: `${$tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}even`,
+							},
+							{
+								title: 'Odd',
+								value: 'odd',
+								filename: `${$tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}odd`,
+							},
+						]}
+						bind:value={$tfield.raised}
+						on:change={() => {
+							if ($tfield.orientation == hex_orientation.FLATTOP) {
+								comp_terrainLayer.square_updateRaisedColumn();
+							} else {
+								comp_terrainLayer.square_changeIndentedRow();
+							}
+							comp_coordsLayer.cullUnusedCoordinates();
+						}}
+					/>
+				</span>
+			{/if}
 
 			<label for="hexWidth">Hex Width</label>
 			<input
@@ -651,6 +681,8 @@
 						retain_positions();
 						save_old_resize_parameters();
 
+						comp_coordsLayer.updateAllCoordPositions();
+
 						document.getElementById("hex-radius").value = ""
 					}}>Set</button>
 			</span>
@@ -662,35 +694,6 @@
 				<option value={map_shape.RADIAL}>Radial</option>
 			</select>
 			-->
-
-			{#if $tfield.mapShape == map_shape.SQUARE}
-				<p>{$tfield.orientation == hex_orientation.FLATTOP ? 'Raised Column' : 'Indented Row'}</p>
-				<span style={'height: 100%; display: flex; align-items: center;'}>
-					<SelectGrid
-						options={[
-							{
-								title: 'Even',
-								value: 'even',
-								filename: `${$tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}even`,
-							},
-							{
-								title: 'Odd',
-								value: 'odd',
-								filename: `${$tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}odd`,
-							},
-						]}
-						bind:value={$tfield.raised}
-						on:change={() => {
-							if ($tfield.orientation == hex_orientation.FLATTOP) {
-								comp_terrainLayer.square_updateRaisedColumn();
-							} else {
-								comp_terrainLayer.square_changeIndentedRow();
-							}
-							comp_coordsLayer.cullUnusedCoordinates();
-						}}
-					/>
-				</span>
-			{/if}
 
 			<label title="Selected objects will attempt to remain in their hex when they are resized">Retain Position</label>
 			<div id="retain-position-container">
@@ -852,9 +855,9 @@
 		<div class="settings-grid" class:hidden={hidden_settings.coordinates}>
 			<label class="helper-text">Coordinates can slow down map changes such as adding hexes or changing orientation.</label>
 			<label for="showCoords">Show Coordinates</label>
-			<Checkbox bind:checked={data_coordinates.shown} id={'showCoords'} />
+			<Checkbox bind:checked={$data_coordinates.shown} id={'showCoords'} />
 
-			{#if data_coordinates.shown}
+			{#if $data_coordinates.shown}
 				<label for="coordsSystem"
 					>Coordinate System<sup
 						><a href="https://www.redblobgames.com/grids/hexagons/#coordinates" target="_blank" title="Hex Coordinate Systems Explanation"
@@ -862,7 +865,7 @@
 						></sup
 					></label
 				>
-				<select id="coordsSystem" bind:value={data_coordinates.system} on:change={comp_coordsLayer.updateAllCoordsText}>
+				<select id="coordsSystem" bind:value={$data_coordinates.system} on:change={comp_coordsLayer.updateAllCoordsText}>
 					<option value={coord_system.ROWCOL}>Column, Row</option>
 					<option value={coord_system.AXIAL}>Axial</option>
 					<option value={coord_system.CUBE}>Cube</option>
@@ -870,22 +873,22 @@
 				</select>
 
 				<label for="coordsFill">Color</label>
-				<ColorInputPixi bind:value={data_coordinates.style.fill} id={'coordsFill'} />
+				<ColorInputPixi bind:value={$data_coordinates.style.fill} id={'coordsFill'} />
 
 				<label for="coordFontSize">Font Size</label>
-				<input id="coordFontSize" type="number" bind:value={data_coordinates.style.fontSize} />
+				<input id="coordFontSize" type="number" bind:value={$data_coordinates.style.fontSize} />
 
 				<label for="coordsOutline">Outline Color</label>
-				<ColorInputPixi bind:value={data_coordinates.style.stroke} id={'coordsOutline'} />
+				<ColorInputPixi bind:value={$data_coordinates.style.stroke} id={'coordsOutline'} />
 
 				<label for="coordsStrokeThickness">Outline Thickness</label>
-				<input id="coordsStrokeThickness" type="number" bind:value={data_coordinates.style.strokeThickness} />
+				<input id="coordsStrokeThickness" type="number" bind:value={$data_coordinates.style.strokeThickness} />
 
 				<label for="coordSeperator">Separator</label>
 				<input
 					id="coordSeperator"
 					type="text"
-					bind:value={data_coordinates.seperator}
+					bind:value={$data_coordinates.seperator}
 					on:change={() => {
 						comp_coordsLayer.updateAllCoordsText();
 					}}
@@ -895,11 +898,13 @@
 				<input
 					id="coordGap"
 					type="number"
-					bind:value={data_coordinates.gap}
+					bind:value={$data_coordinates.gap}
 					on:change={() => {
 						comp_coordsLayer.updateAllCoordPositions();
 					}}
 				/>
+
+
 			{/if}
 		</div>
 	</div>

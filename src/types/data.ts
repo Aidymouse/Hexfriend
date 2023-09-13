@@ -27,6 +27,10 @@ export interface coordinates_data {
 	system: coord_system;
 	seperator: string;
 	gap: number;
+	offsets: {
+		row_col: {row: number, col: number},
+		cube: {q: number, r: number, s: number}
+	}
 }
 
 export interface text_data {

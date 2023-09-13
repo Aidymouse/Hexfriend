@@ -3,6 +3,12 @@ For Techy People
 
 # Version 1.9 - Sorting out your internals, Hexfriend
 
+## Version 1.9.6
+- Coordinates can now be offset
+- Coordinates update properly when resizing by hex radius
+- Hexes setting layout change - indented column above size changes
+- Raised Column / Indented Row for Big Grid Hexes only appears on square map shapes  
+
 ## Version 1.9.5
 - Overlay image no longer moves when map is reduced in size
 

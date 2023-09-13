@@ -163,6 +163,23 @@ function convert_v9_to_v10(old_data: save_data): save_data {
 	return new_data
 }
 
+function convert_v10_to_v11(old_data: save_data): save_data {
+
+	if (old_data.coords.offsets == null) {
+	
+		old_data.coords.offsets = {
+			row_col: {row: 0, col: 0},
+			cube: {q: 0, r: 0, s: 0}
+		}
+	
+	}
+
+	old_data.saveVersion = 11
+	
+	return old_data
+
+}
+
 export function convertSaveDataToLatest(oldData: save_data): save_data {
 	// Update to latest version
 	let newData: save_data = JSON.parse(JSON.stringify(oldData));
@@ -173,6 +190,7 @@ export function convertSaveDataToLatest(oldData: save_data): save_data {
 	if (newData.saveVersion == 7) { newData = convert_v7_to_v8(newData) }
 	if (newData.saveVersion == 8) { newData = convert_v8_to_v9(newData) }
 	if (newData.saveVersion == 9) { newData = convert_v9_to_v10(newData) }
+	if (newData.saveVersion == 10) { newData = convert_v10_to_v11(newData) }
 
 	return newData;
 }

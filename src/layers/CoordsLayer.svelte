@@ -3,6 +3,8 @@
 	import { coords_cubeToWorld, genHexId } from '../helpers/hexHelpers';
 	import { coords_cubeToq, coords_cubeTor } from '../helpers/hexHelpers';
 	
+	import { data_coordinates } from '../stores/data';
+
 	import { tfield } from '../stores/tfield';
 	
 	import { store_has_unsaved_changes } from '../stores/flags';
@@ -21,10 +23,10 @@
 
 	$: {
 		Object.entries(coordTexts).forEach(([hexId, text]) => {
-			text.pixiText.style = data_coordinates.style;
+			text.pixiText.style = $data_coordinates.style;
 		});
 
-		cont_textContainer.visible = data_coordinates.shown
+		cont_textContainer.visible = $data_coordinates.shown
 	}
 
 	let coordTexts: { [key: hex_id]: coordText } = {}; // hex id: coordText
@@ -32,8 +34,6 @@
 	export let cont_coordinates;
 	let cont_textContainer = new PIXI.Container();
 	cont_coordinates.addChild(cont_textContainer);
-
-	export let data_coordinates: coordinates_data;
 
 	function breakDownHexID(hexId: hex_id) {
 		let brokenId = hexId.split(':');
@@ -56,18 +56,18 @@
 			if (!coordTextExists(hexId)) generateNewCoord(hexId);
 		});
 
-		if ($tfield.mapShape == map_shape.FLOWER && data_coordinates.system == coord_system.LETTERNUMBER) {
+		if ($tfield.mapShape == map_shape.FLOWER && $data_coordinates.system == coord_system.LETTERNUMBER) {
 			updateAllCoordsText();
 		}
 		$store_has_unsaved_changes = true;
 	}
 
-	export function generateNewCoord(hexId: hex_id, system: coord_system = data_coordinates.system) {
+	export function generateNewCoord(hexId: hex_id, system: coord_system = $data_coordinates.system) {
 		if (coordTextExists(hexId)) {
 			console.log(`You already have a text at ${hexId}! Use updateCoord() instead, goofball.`);
 		}
 
-		coordTexts[hexId] = { pixiText: new PIXI.Text('', data_coordinates.style), parts: [] };
+		coordTexts[hexId] = { pixiText: new PIXI.Text('', $data_coordinates.style), parts: [] };
 		coordTexts[hexId].pixiText.anchor.x = 0.5;
 		coordTexts[hexId].pixiText.anchor.y = 1;
 		cont_textContainer.addChild(coordTexts[hexId].pixiText);
@@ -86,7 +86,7 @@
 			updateCoordPosition(hexId);
 		});
 
-		if (data_coordinates.system == coord_system.LETTERNUMBER) {
+		if ($data_coordinates.system == coord_system.LETTERNUMBER) {
 			updateAllCoordsText();
 		}
 
@@ -100,7 +100,7 @@
 		let newPos = coords_cubeToWorld(idParts.q, idParts.r, idParts.s, $tfield.orientation, $tfield.hexWidth + $tfield.grid.gap, $tfield.hexHeight + $tfield.grid.gap, $tfield.grid.gap);
 
 		text.pixiText.position.x = newPos.x;
-		text.pixiText.position.y = newPos.y + $tfield.hexHeight / 2 - data_coordinates.gap;
+		text.pixiText.position.y = newPos.y + $tfield.hexHeight / 2 - $data_coordinates.gap;
 	}
 
 	export function eliminateCoord(hexId: hex_id) {
@@ -111,7 +111,7 @@
 		$store_has_unsaved_changes = true;
 	}
 
-	function generateCoordTextAndParts(hexId: hex_id, system: coord_system = data_coordinates.system): { parts: number[]; text: string } {
+	function generateCoordTextAndParts(hexId: hex_id, system: coord_system = $data_coordinates.system): { parts: number[]; text: string } {
 
 		let row_offset = 0
 		let col_offset = 0
@@ -124,7 +124,7 @@
 
 				return {
 					parts: [idParts.q, idParts.r, idParts.s],
-					text: `${parts[0]}${data_coordinates.seperator}${parts[1]}${data_coordinates.seperator}${parts[2]}`,
+					text: `${parts[0]}${$data_coordinates.seperator}${parts[1]}${$data_coordinates.seperator}${parts[2]}`,
 				};
 			}
 
@@ -139,7 +139,7 @@
 
 				return {
 					parts: [idParts.col, idParts.row],
-					text: `${ (parts[0] < 10 && parts[0] >= 0) ? 0 : ''}${parts[0]}${data_coordinates.seperator}${(parts[1] < 10 && parts[1] >= 0) ? 0 : ''}${parts[1]}`,
+					text: `${ (parts[0] < 10 && parts[0] >= 0) ? 0 : ''}${parts[0]}${$data_coordinates.seperator}${(parts[1] < 10 && parts[1] >= 0) ? 0 : ''}${parts[1]}`,
 				};
 			}
 
@@ -150,7 +150,7 @@
 
 				return {
 					parts: [cube.q, cube.r],
-					text: `${parts[0]}${data_coordinates.seperator}${parts[1]}`,
+					text: `${parts[0]}${$data_coordinates.seperator}${parts[1]}`,
 				};
 			}
 
@@ -174,7 +174,7 @@
 
 				return {
 					parts: parts,
-					text: `${parts[0]}${data_coordinates.seperator}${parts[1]}`
+					text: `${parts[0]}${$data_coordinates.seperator}${parts[1]}`
 				}
 				
 			}
@@ -209,7 +209,7 @@
 	}
 
 	export function updateCoordText(hexId: hex_id) {
-		let generated = generateCoordTextAndParts(hexId, data_coordinates.system);
+		let generated = generateCoordTextAndParts(hexId, $data_coordinates.system);
 		coordTexts[hexId].parts = [...generated.parts];
 		coordTexts[hexId].pixiText.text = generated.text;
 		$store_has_unsaved_changes = true;
@@ -222,7 +222,7 @@
 			}
 		});
 
-		if ($tfield.mapShape == map_shape.FLOWER && data_coordinates.system == coord_system.LETTERNUMBER) {
+		if ($tfield.mapShape == map_shape.FLOWER && $data_coordinates.system == coord_system.LETTERNUMBER) {
 			updateAllCoordsText();
 		}
 
@@ -236,7 +236,7 @@
 		cont_coordinates.addChild(cont_textContainer);
 
 		cullUnusedCoordinates();
-		generateAllCoords(data_coordinates.system);
+		generateAllCoords($data_coordinates.system);
 	});
 </script>
 
