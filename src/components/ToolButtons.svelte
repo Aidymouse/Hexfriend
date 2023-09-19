@@ -209,7 +209,7 @@
 
 				<div
 					class="tool-icon"
-					class:rotated90={(b.toolCode == tools.TERRAIN || b.toolCode == tools.OVERLAY) && $tfield.orientation == hex_orientation.FLATTOP}
+					class:rotated90={(b.toolCode == tools.TERRAIN || b.toolCode == tools.OVERLAY) && $tfield.orientation == hex_orientation.POINTYTOP}
 					style={`-webkit-mask: url(/assets/img/tools/${b.toolCode}.svg) no-repeat center`}
 				/>
 			</button>

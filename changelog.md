@@ -3,6 +3,10 @@ For Techy People
 
 # Version 1.9 - Sorting out your internals, Hexfriend
 
+## Version 1.9.7
+- Fixed tilset updating not working
+- Orientation of selected overlay and hex tools sync up with hex orientation again 
+
 ## Version 1.9.6
 - Coordinates can now be offset
 - Coordinates update properly when resizing by hex radius

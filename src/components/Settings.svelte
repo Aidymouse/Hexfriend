@@ -180,7 +180,7 @@
 	}
 
 	function update_default_tileset() {
-		let successfully_updated = update_map_to_new_default_tileset(tfield)
+		let successfully_updated = update_map_to_new_default_tileset($tfield)
 		if (!successfully_updated) return;
 
 		// Remove default tileset
@@ -1145,7 +1145,7 @@
 	<div class="setting-container">
 		<h2>About</h2>
 		<p class="helper-text">
-			Hexfriend version 1.9.6 - "Sorting out your internals, Hexfriend"
+			Hexfriend version 1.9.7 - "Sorting out your internals, Hexfriend"
 		</p>
 		
 		<p class="helper-text">
