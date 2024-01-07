@@ -3,6 +3,10 @@ For Techy People
 
 # Version 1.9 - Sorting out your internals, Hexfriend
 
+## Version 1.9.8
+- Changelog now opens new tab
+- Icon Eyedropper doesnt get stuck when alt tabbing
+
 ## Version 1.9.7
 - Fixed tilset updating not working
 - Orientation of selected overlay and hex tools sync up with hex orientation again 

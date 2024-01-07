@@ -81,6 +81,7 @@
 	import './styles/panels.css';
 	import './styles/scrollbar.css';
 	import './styles/variables.css';
+	
 	// TYPES
 	import type { eraser_data, terrain_data, text_data } from './types/data';
 	import type { Iconset } from './types/icon';
@@ -558,6 +559,7 @@
 
 	function blur() {
 		data_terrain.usingEyedropper = false;
+		$data_icon.usingEyedropper = false;
 	}
 
 

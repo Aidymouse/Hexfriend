@@ -41,8 +41,12 @@
 	import { onMount } from 'svelte';
 
 	// Helpers
-	import { get_width_height_from_radius } from '../helpers/hexHelpers'
+	
 	import { get_tileset_id } from '../helpers/tiles';
+  import GridSettings from './settings/GridSettings.svelte';
+  import SettingHeading from './settings/SettingHeading.svelte';
+  import HexesSettings from './settings/HexesSettings.svelte';
+  import DimensionSettings from './settings/DimensionSettings.svelte';
 
 	export let loadedSave: save_data;
 	export let showSettings: boolean;
@@ -93,19 +97,6 @@
 
 	let iconset_text = 'Icon Set';
 
-	function changeOrientation() {
-		let t = $tfield.hexWidth;
-		$tfield.hexWidth = $tfield.hexHeight;
-		$tfield.hexHeight = t;
-		//$tfield.hexWidth, $tfield.hexHeight = $tfield.hexHeight, $tfield.hexWidth
-
-		comp_terrainLayer.changeOrientation();
-
-		$store_has_unsaved_changes = true;
-
-		//redrawEntireMap()
-	}
-
 
 	function retain_positions() {
 		if (retainIconPosition) comp_iconLayer.retain_icon_position_on_hex_resize($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
@@ -121,7 +112,7 @@
 
 	}
 
-	let addOrRemoveMapDimensions: 'add' | 'remove' = 'add';
+	
 
 	let tilesetFiles: FileList;
 
@@ -227,127 +218,6 @@
 		};
 	}
 
-	/* Map Dimensions and Map Shape */
-	function square_expandMapDimension(direction, amount) {
-		comp_terrainLayer.square_expandMapDimension(direction, amount);
-
-		let xMod = 0;
-		let yMod = 0;
-
-		switch (direction) {
-			case 'left': {
-				if ($tfield.orientation == hex_orientation.FLATTOP) {
-					//pan.offsetX -= $tfield.hexWidth * 0.75 * pan.zoomScale * amountOfHexes
-
-					xMod = $tfield.hexWidth * 0.75 * amount;
-
-					if (amount % 2 == 1) {
-						yMod = -$tfield.hexHeight * 0.5 * ($tfield.raised == 'odd' ? -1 : 1);
-					}
-				} else {
-					xMod = $tfield.hexWidth * amount;
-				}
-				break;
-			}
-
-			case 'top': {
-				if ($tfield.orientation == hex_orientation.FLATTOP) {
-					yMod = $tfield.hexHeight * amount;
-				} else {
-					yMod = $tfield.hexHeight * 0.75 * amount;
-
-					if (amount % 2 == 1) {
-						xMod = -$tfield.hexWidth * 0.5 * ($tfield.raised == 'odd' ? -1 : 1);
-					}
-				}
-				break;
-			}
-		}
-
-		comp_iconLayer.moveAllIcons(xMod, yMod);
-		comp_pathLayer.moveAllPaths(xMod, yMod);
-		comp_textLayer.moveAllTexts(xMod, yMod);
-
-		$store_has_unsaved_changes = true;
-	}
-
-	function square_reduceMapDimension(direction, amount) {
-		if (direction == 'left' || direction == 'right') {
-			if ($tfield.columns <= amount) amount = $tfield.columns - 1;
-			if (amount == 0) return;
-		}
-
-		if (direction == 'top' || direction == 'bottom') {
-			if ($tfield.rows <= amount) amount = $tfield.rows - 1;
-			if (amount == 0) return;
-		}
-
-		comp_terrainLayer.square_reduceMapDimension(direction, amount);
-
-		let xMod = 0;
-		let yMod = 0;
-
-		switch (direction) {
-			case 'left': {
-				if ($tfield.orientation == hex_orientation.FLATTOP) {
-					//pan.offsetX -= $tfield.hexWidth * 0.75 * pan.zoomScale * amountOfHexes
-
-					xMod = -$tfield.hexWidth * 0.75 * amount;
-
-					if (amount % 2 == 1) {
-						yMod = -$tfield.hexHeight * 0.5 * ($tfield.raised == 'odd' ? -1 : 1);
-					}
-				} else {
-					xMod = -$tfield.hexWidth * amount;
-				}
-				break;
-			}
-
-			case 'top': {
-				if ($tfield.orientation == hex_orientation.FLATTOP) {
-					yMod = -$tfield.hexHeight * amount;
-				} else {
-					yMod = -$tfield.hexHeight * 0.75 * amount;
-
-					if (amount % 2 == 1) {
-						xMod = -$tfield.hexWidth * 0.5 * ($tfield.raised == 'odd' ? -1 : 1);
-					}
-				}
-				break;
-			}
-		}
-
-		comp_iconLayer.moveAllIcons(xMod, yMod);
-		comp_pathLayer.moveAllPaths(xMod, yMod);
-		comp_textLayer.moveAllTexts(xMod, yMod);
-
-		$store_has_unsaved_changes = true;
-	}
-
-	function flower_expandHexesOut(amount) {
-		comp_terrainLayer.flower_expandHexesOut(amount);
-	}
-
-	function flower_reduceHexesOut(amount) {
-		comp_terrainLayer.flower_reduceHexesOut(amount);
-	}
-
-	function changeMapShape() {
-		// TODO: Update zoom when map shape is changed
-
-		if (comp_terrainLayer.areAllHexesBlank()) {
-			comp_terrainLayer.changeMapShape($tfield.mapShape);
-		} else {
-			let changeConfirm = confirm('Are you sure? Changing shape will erase all hexes.');
-
-			if (changeConfirm) {
-				comp_terrainLayer.changeMapShape($tfield.mapShape);
-			}
-		}
-
-		$store_has_unsaved_changes = true;
-	}
-
 	// Imports
 	let mapImportFiles: FileList;
 	function importMap() {
@@ -435,275 +305,52 @@
 			/>
 		</button>
 	</span>
+
 	<!-- GRID -->
 	<div class="setting-container">
-		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.grid}>
-			Grid
-			<button
-				on:click={() => {
-					hidden_settings.grid = !hidden_settings.grid;
-				}}
-			>
-				<img alt={'Toggle Grid Settings'} class:rotated={hidden_settings.grid} src={'/assets/img/ui/arrow.png'} />
-			</button>
-		</h2>
-		<div class="settings-grid" class:hidden={hidden_settings.grid}>
-			<label for="showGrid">Show Grid</label>
-			<!-- Weird bug where the grid wont render if you turn it off then resize the hex flower map ?? -->
-			<Checkbox bind:checked={$tfield.grid.shown} id={'showGrid'} on:change={comp_terrainLayer.renderGrid} />
-			{#if $tfield.grid.shown}
-				<label for="gridThickness">Grid Thickness</label>
-				<input
-					id="gridThickness"
-					type="number"
-					min="0"
-					max="99"
-					bind:value={$tfield.grid.thickness}
-					on:change={() => {
-						renderGrid();
-					}}
-				/>
+		
+		<SettingHeading text="Grid" bind:bound_var={hidden_settings.grid} />
 
-				<label for="gridColor">Grid Color</label>
-				<ColorInputPixi
-					bind:value={$tfield.grid.stroke}
-					on:change={() => {
-						renderGrid();
-					}}
-					id={'gridColor'}
-				/>
-			{/if}
+		<GridSettings 
+			bind:comp_terrainLayer
+			bind:comp_coordsLayer
 
-			<label for="gridGap">Gap</label>
-			<input
-				id="gap"
-				type="number"
-				min="0"
-				max="99"
-				bind:value={$tfield.grid.gap}
-				on:focus={() => {
-				}}
-				on:change={(e) => {
-					redrawEntireMap();
-					comp_coordsLayer.updateAllCoordPositions();
-					retain_positions();
-				}}
-			/>
+			bind:shown={hidden_settings.grid}
 
-			<!-- LARGE HEXES -->
-			<label for="showOverlay">Large Hexes</label>
-			<Checkbox bind:checked={$tfield.largehexes.shown} id="showOverlay" />
+			
 
-			{#if $tfield.largehexes.shown}
-				<label for="overlayDiameter">Size</label>
-				<input type="number" id="overlayDiameter" min={2} bind:value={$tfield.largehexes.diameterInHexes} />
+			renderGrid={renderGrid}
+			redrawEntireMap={redrawEntireMap}
+			retain_positions={retain_positions}
+		/>
 
-				<label for="overlayColor">Color</label>
-				<ColorInputPixi id={'overlayColor'} bind:value={$tfield.largehexes.style.color} />
-
-				<label for="overlayThickness">Outline Thickness</label>
-				<input type="number" id={'overlayThickness'} bind:value={$tfield.largehexes.style.width} />
-
-				<label for="overlayOffsetX" title="Measured in Hex Widths">Horizontal Offset</label>
-				<input type="number" bind:value={$tfield.largehexes.offset.x} min={0} step={0.25} />
-
-				<label for="overlayOffsetY" title="Measured in Hex Heights">Vertical Offset</label>
-				<input type="number" bind:value={$tfield.largehexes.offset.y} min={0} step={0.25} />
-
-				<label for="overlayEncompass">Encompass Map Edges</label>
-				<Checkbox bind:checked={$tfield.largehexes.encompassEdges} id="overlayEncompass" />
-
-				{#if $tfield.mapShape == map_shape.SQUARE}
-					<label>{$tfield.orientation == hex_orientation.FLATTOP ? 'Large Raised Column' : 'Large Indented Row'}</label>
-					<span style={'height: 100%; display: flex; align-items: center;'}>
-						<SelectGrid
-							options={[
-								{
-									title: 'Even',
-									value: 'even',
-									filename: `${$tfield.orientation == hex_orientation.FLATTOP ? 'bigraisedcolumn' : 'bigindentedrow'}even`,
-								},
-								{
-									title: 'Even',
-									value: 'odd',
-									filename: `${$tfield.orientation == hex_orientation.FLATTOP ? 'bigraisedcolumn' : 'bigindentedrow'}odd`,
-								},
-							]}
-							bind:value={$tfield.largehexes.raised}
-						/>
-					</span>
-				{/if}
-			{/if}
-		</div>
 	</div>
 
 
 
 	<!-- HEXES -->
 	<div class="setting-container">
-		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.hexes}>
-			Hexes
-			<button
-				on:click={() => {
-					hidden_settings.hexes = !hidden_settings.hexes;
-				}}
-			>
-				<img alt={'Toggle Hex Settings'} class:rotated={hidden_settings.hexes} src={'/assets/img/ui/arrow.png'} />
-			</button>
-		</h2>
-		<div class="settings-grid" class:hidden={hidden_settings.hexes}>
-			<label for="blankHexColor">Blank Hex Color</label>
-			<div style="display: flex; gap: 0.25em; align-items: center;">
-				<ColorInputPixi
-					bind:value={$tfield.blankHexColor}
-					on:change={() => {
-						renderAllHexes();
-					}}
-					id={'blankHexColor'}
-				/>
 
-				<button
-					style={'height: fit-content;'}
-					on:click={() => {
-						$tfield.blankHexColor = 0xf2f2f2;
-					}}>Reset</button
-				>
-			</div>
+		<SettingHeading text="Hexes" bind:bound_var={hidden_settings.hexes} />
 
-			<label>Hex Orientation</label>
-			<div style={'height: 100%; display: flex; align-items: center;'}>
-				<SelectGrid
-					options={[
-						{ title: 'Flat Top', value: hex_orientation.FLATTOP, filename: 'flatTop' },
-						{ title: 'Pointy Top', value: hex_orientation.POINTYTOP, filename: 'pointyTop' },
-					]}
-					bind:value={$tfield.orientation}
-					on:change={() => {
-						changeOrientation();
+		<HexesSettings
 
-						comp_coordsLayer.cullUnusedCoordinates();
-						comp_coordsLayer.updateAllCoordPositions();
-						comp_coordsLayer.updateAllCoordsText();
-						comp_coordsLayer.populateBlankHexes();
+			bind:comp_coordsLayer
+			bind:comp_terrainLayer
 
-						save_old_resize_parameters();
-					}}
-				/>
-			</div>
+			bind:retainIconPosition
+			bind:retainPathPosition
+			bind:retainTextPosition
 
-			{#if $tfield.mapShape == map_shape.SQUARE}
-				<label>{$tfield.orientation == hex_orientation.FLATTOP ? 'Raised Column' : 'Indented Row'}</label>
-				<span style={'height: 100%; display: flex; align-items: center;'}>
-					<SelectGrid
-						options={[
-							{
-								title: 'Even',
-								value: 'even',
-								filename: `${$tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}even`,
-							},
-							{
-								title: 'Odd',
-								value: 'odd',
-								filename: `${$tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}odd`,
-							},
-						]}
-						bind:value={$tfield.raised}
-						on:change={() => {
-							if ($tfield.orientation == hex_orientation.FLATTOP) {
-								comp_terrainLayer.square_updateRaisedColumn();
-							} else {
-								comp_terrainLayer.square_changeIndentedRow();
-							}
-							comp_coordsLayer.cullUnusedCoordinates();
-						}}
-					/>
-				</span>
-			{/if}
+			bind:shown={hidden_settings.hexes}
 
-			<label for="hexWidth">Hex Width</label>
-			<input
-				id="hexWidth"
-				type="number"
-				min={1}
-				bind:value={$tfield.hexWidth}
-				on:change={(e) => {
-					if (Number.isNaN(e.target.valueAsNumber)) {
-						$tfield.hexWidth = $resize_parameters.old_hex_width;
-						return;
-					}
+			retain_positions={retain_positions}
+			save_old_resize_parameters={save_old_resize_parameters}
+			renderAllHexes={renderAllHexes}
+			redrawEntireMap={redrawEntireMap}
 
-					redrawEntireMap();
-					comp_coordsLayer.updateAllCoordPositions();
-					retain_positions();
-					save_old_resize_parameters();
-					
-				}}
-			/>
+		/>
 
-			<label for="hexHeight">Hex Height</label>
-			<input
-				id="hexHeight"
-				type="number"
-				min={1}
-				bind:value={$tfield.hexHeight}
-				on:change={(e) => {
-					if (Number.isNaN(e.target.valueAsNumber)) {
-						$tfield.hexHeight = $resize_parameters.old_hex_height;
-						return;
-					}
-					redrawEntireMap();
-					comp_coordsLayer.updateAllCoordPositions();
-					retain_positions();
-					save_old_resize_parameters();
-				}}
-			/>
-
-			<label for="hex-radius">Size by Radius</label>
-			<span>
-				<input
-					id="hex-radius"
-					type="number"					
-				/>
-				<button on:click={() => {
-
-						let radius = document.getElementById("hex-radius").valueAsNumber;
-						console.log(radius);
-						if (Number.isNaN(radius)|| radius < 1) return;	
-						
-
-						let new_dims = get_width_height_from_radius(radius, $tfield.orientation)
-						
-						$tfield.hexWidth = new_dims.width
-						$tfield.hexHeight = new_dims.height
-						
-						redrawEntireMap();
-						
-						retain_positions();
-						save_old_resize_parameters();
-
-						comp_coordsLayer.updateAllCoordPositions();
-
-						document.getElementById("hex-radius").value = ""
-					}}>Set</button>
-			</span>
-
-			<!--
-			<label for="mapShape">Map Type</label>
-			<select id="mapShape" bind:value={$tfield.mapShape}>
-				<option value={map_shape.SQUARE}>Square</option>
-				<option value={map_shape.RADIAL}>Radial</option>
-			</select>
-			-->
-
-			<label title="Selected objects will attempt to remain in their hex when they are resized">Retain Position</label>
-			<div id="retain-position-container">
-				<div id="retain-position-grid">
-					<ImageCheckbox image_filename={ "/assets/img/tools/icon.svg" } title={"Icons"} bind:checked={ retainIconPosition } />
-					<ImageCheckbox image_filename={ "/assets/img/tools/path.svg" } title={"Paths"} bind:checked={ retainPathPosition } />
-					<ImageCheckbox image_filename={ "/assets/img/tools/text.svg" } title={"Text"} bind:checked={ retainTextPosition } />
-				</div>
-			</div>
-		</div>
 	</div>
 
 
@@ -711,129 +358,20 @@
 
 	<!-- DIMENSIONS AND SHAPE -->
 	<div class="setting-container">
-		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.dimensions}>
-			Map Dimensions
-			<button
-				on:click={() => {
-					hidden_settings.dimensions = !hidden_settings.dimensions;
-				}}
-			>
-				<img alt={'Toggle Map Dimension Settings'} class:rotated={hidden_settings.dimensions} src={'/assets/img/ui/arrow.png'} />
-			</button>
-		</h2>
 
-		<div class="settings-grid" style="margin-bottom: 5px;" class:hidden={hidden_settings.dimensions}>
-			<label for="mapShape">Map Shape</label>
+		<SettingHeading text="Shape and Size" bind:bound_var={hidden_settings.dimensions} />
 
-			<select
-				bind:value={$tfield.mapShape}
-				on:change={() => {
-					changeMapShape();
-				}}
-			>
-				<option value={map_shape.SQUARE}>Square</option>
-				<option value={map_shape.FLOWER}>Hex Flower</option>
-			</select>
-		</div>
+		<DimensionSettings 
+		
+			bind:comp_terrainLayer
+			bind:comp_iconLayer
+			bind:comp_textLayer
+			bind:comp_pathLayer
 
-		{#if $tfield.mapShape == map_shape.SQUARE}
-			<section id="map-dimensions-container" class:hidden={hidden_settings.dimensions}>
-				<div id="map-dimensions">
-					{#if addOrRemoveMapDimensions == 'add'}
-						<button
-							style="grid-area: left;"
-							on:click={() => {
-								square_expandMapDimension('left', 1);
-							}}>Add<br />Left</button
-						>
-						<button
-							style="grid-area: top;"
-							on:click={() => {
-								square_expandMapDimension('top', 1);
-							}}>Add<br />Top</button
-						>
-						<button
-							style="grid-area: bottom;"
-							on:click={() => {
-								square_expandMapDimension('bottom', 1);
-							}}>Add<br />Bottom</button
-						>
-						<button
-							style="grid-area: right;"
-							on:click={() => {
-								square_expandMapDimension('right', 1);
-							}}>Add<br />Right</button
-						>
-						<button
-							style="grid-area: center;"
-							on:click={() => {
-								addOrRemoveMapDimensions = 'remove';
-							}}
-						>
-							<img
-								src={`/assets/img/tools/addHex_${$tfield.orientation == hex_orientation.FLATTOP ? 'ft' : 'pt'}.png`}
-								alt={'Add Hex'}
-								title={'Add Hex'}
-							/>
-						</button>
-					{:else}
-						<button
-							style="grid-area: left;"
-							on:click={() => {
-								square_reduceMapDimension('left', 1);
-							}}>Remove<br />Left</button
-						>
-						<button
-							style="grid-area: top;"
-							on:click={() => {
-								square_reduceMapDimension('top', 1);
-							}}>Remove<br />Top</button
-						>
-						<button
-							style="grid-area: bottom;"
-							on:click={() => {
-								square_reduceMapDimension('bottom', 1);
-							}}>Remove<br />Bottom</button
-						>
-						<button
-							style="grid-area: right;"
-							on:click={() => {
-								square_reduceMapDimension('right', 1);
-							}}>Remove<br />Right</button
-						>
-						<button
-							style="grid-area: center;"
-							on:click={() => {
-								addOrRemoveMapDimensions = 'add';
-							}}
-						>
-							<img
-								src={`/assets/img/tools/removeHex_${$tfield.orientation == hex_orientation.FLATTOP ? 'ft' : 'pt'}.png`}
-								alt={'Remove Hex'}
-								title={'Remove Hex'}
-							/>
-						</button>
-					{/if}
-				</div>
-			</section>
-		{:else if $tfield.mapShape == map_shape.FLOWER}
-			<section id="flower-dimensions-container" class:hidden={hidden_settings.dimensions}>
-				<p>Hexes out from center</p>
-				<div id="flower-dimensions-controls-grid">
-					<button
-						on:click={() => {
-							flower_reduceHexesOut(1);
-						}}>-</button
-					>
-					<div id="counter-container">{$tfield.hexesOut}</div>
-					<button
-						on:click={() => {
-							flower_expandHexesOut(1);
-						}}>+</button
-					>
-				</div>
-			</section>
-		{/if}
+			bind:shown={hidden_settings.dimensions}
+		
+		/>
+		
 	</div>
 
 
@@ -1133,7 +671,7 @@
 	</div>
 
 	<!-- Changelog -->
-	<a href="https://github.com/Aidymouse/Hexfriend/blob/master/changelog.md" style="color: var(--text);">
+	<a href="https://github.com/Aidymouse/Hexfriend/blob/master/changelog.md" target={"_blank"} style="color: var(--text);">
 		<div class="setting-container">
 			<h2 class="setting-heading">
 				Changelog 
@@ -1145,7 +683,7 @@
 	<div class="setting-container">
 		<h2>About</h2>
 		<p class="helper-text">
-			Hexfriend version 1.9.7 - "Sorting out your internals, Hexfriend"
+			Hexfriend version 1.9.8 - "Sorting out your internals, Hexfriend"
 		</p>
 		
 		<p class="helper-text">
@@ -1233,31 +771,7 @@
 		color: var(--hexfriend-green);
 	}
 
-	#flower-dimensions-controls-grid {
-		display: grid;
-		grid-template-columns: 60px 1fr 60px;
-		width: 100%;
-	}
-
-	#flower-dimensions-container p {
-		margin-bottom: 10px;
-		width: 100%;
-		display: flex;
-		justify-content: center;
-	}
-
-	#flower-dimensions-controls-grid button {
-		height: 60px;
-	}
-
-	#flower-dimensions-controls-grid #counter-container {
-		width: 100%;
-		height: 60px;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		font-size: 20px;
-	}
+	
 
 	#export-map-select {
 		border: solid 1px var(--lighter-background);
@@ -1342,35 +856,7 @@
 		opacity: 0;
 	}
 
-	#map-dimensions-container {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	#map-dimensions {
-		display: grid;
-
-		grid-template-columns: 60px 60px 60px;
-		grid-template-rows: 60px 60px 60px;
-		gap: 5px;
-
-		grid-template-areas:
-			'top-left top top-right'
-			'left center right'
-			'bottom-left bottom bottom-right';
-	}
-
-	#map-dimensions button {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	#map-dimensions button img {
-		width: 90%;
-		height: auto;
-	}
+	
 
 
 
@@ -1462,19 +948,6 @@
 		width: 100%;
 	}
 
-	#retain-position-container {
-		width: 100%;
-		height: 100%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	#retain-position-grid {
-		height: 2em;
-		display: flex;
-		border-radius: var(--small-radius);
-		overflow: hidden;
-	}
+	
 
 </style>

@@ -1,0 +1,23 @@
+
+.hidden {
+    display: none !important;
+}
+
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    grid-auto-rows: 2em;
+    align-items: center;
+    justify-items: center;
+    row-gap: 0.3em;
+}
+
+.settings-grid label {
+    justify-self: start;
+}
+
+.settings-grid input {
+    width: 8ch;
+    height: 2em;
+}
