@@ -141,6 +141,10 @@
 		$store_has_unsaved_changes = true;
 	}
 
+	export function deleteIcons() {
+		icons.splice(0, icons.length);
+	}
+
 	export function pointerdown() {
 		if ($data_icon.usingEraser) return;
 		if ($data_icon.dragMode) return;

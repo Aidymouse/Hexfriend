@@ -380,7 +380,7 @@
 		<div id="right-side">
 			<div id="generate-buttons">
 				<span><Checkbox bind:checked={gen_config_animate} /> Animate </span>
-				<span style="margin-left: 0.25em;"><Checkbox bind:checked={gen_config_clear} /> Clear Before Generation</span>
+				<span><Checkbox bind:checked={gen_config_clear} /> Clear Before Generation</span>
 			</div>
 			<div id="generate">
 				<button class="evil" on:click={() => { showTerrainGenerator = false }}>Close</button>
@@ -576,6 +576,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5em;
+		justify-content: space-between;
 	}
 
 	#preset {
@@ -596,8 +597,9 @@
 
 	#generate-buttons {
 		display: flex;
+		flex-direction: column;
 		gap: 0.5em;
-		justify-content: space-between;
+		justify-content: flex-end;
 	}
 
 	#generate-buttons span {

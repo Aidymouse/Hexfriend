@@ -683,7 +683,7 @@
 	<div class="setting-container">
 		<h2>About</h2>
 		<p class="helper-text">
-			Hexfriend version 1.9.8 - "Sorting out your internals, Hexfriend"
+			Hexfriend version 1.9.9 - "Sorting out your internals, Hexfriend"
 		</p>
 		
 		<p class="helper-text">
