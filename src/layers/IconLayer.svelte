@@ -43,10 +43,11 @@
 	export let cont_icon: PIXI.Container;
 
 
-	let pan: pan_state;
-	store_panning.store.subscribe((newPan) => {
-		pan = newPan;
-	});
+	// seems unused - check back later?
+	// let pan: pan_state;
+	// store_panning.store.subscribe((newPan) => {
+	// 	pan = newPan;
+	// });
 	
 	let selectedTool: tools;
 	store_selected_tool.subscribe(n => selectedTool = n);

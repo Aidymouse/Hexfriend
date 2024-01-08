@@ -541,12 +541,13 @@
 		renderGrid();
 		comp_coordsLayer.populateBlankHexes();
 
-		store_$tfield.store.update(() => {
-			return $tfield;
-		});
+		// unused
+		// store_$tfield.store.update(() => {
+		// 	return $tfield;
+		// });
 	}
 
-	export function flower_reduceHexesOut(amount) {
+	export function flower_reduceHexesOut(amount: number) {
 		$store_has_unsaved_changes = true
 		
 		if ($tfield.hexesOut == 0) return;
@@ -565,9 +566,10 @@
 		renderGrid();
 		comp_coordsLayer.cullUnusedCoordinates();
 
-		store_$tfield.store.update(() => {
-			return $tfield;
-		});
+		// unused
+		// store_$tfield.store.update(() => {
+		// 	return $tfield;
+		// });
 	}
 
 	/* TRANSFORMATIONS THAT APPLY TO ALL MAP TYPES */
