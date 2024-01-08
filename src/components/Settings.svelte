@@ -14,13 +14,10 @@
 	import { tools } from '../types/toolData';
 	import type * as PIXI from 'pixi.js';	
 	
+	// Styles
+	import "../styles/settings.css";
+
 	// Enums
-	import { coord_system } from '../types/coordinates';
-	import { LATESTDEFAULTICONSVERSION } from '../types/savedata';
-	import { hex_raised, hex_orientation } from '../types/terrain';
-	import { map_shape } from '../types/settings';
-	import { LATESTTILESETFORMATVERSION, LATESTDEFAULTTILESETVERSION } from '../types/tilesets';
-	import { DEFAULTTILESET } from '../lib/defaultTileset';
 	
 	// Stores
 	import { tfield } from '../stores/tfield';
@@ -35,18 +32,20 @@
 	import SelectGrid from './SelectGrid.svelte';
 	import ImageCheckbox from './ImageCheckbox.svelte';
 
+	import GridSettings from './settings/GridSettings.svelte';
+	import SettingHeading from './settings/SettingHeading.svelte';
+	import HexesSettings from './settings/HexesSettings.svelte';
+	import DimensionSettings from './settings/DimensionSettings.svelte';
+	import CoordinateSettings from './settings/CoordinateSettings.svelte';
+	import OverlaySettings from './settings/OverlaySettings.svelte';
+	import TilesetSettings from './settings/TilesetSettings.svelte';
+	import IconsetSettings from './settings/IconsetSettings.svelte';
+
 	// Lib
 	import * as texture_loader from '../lib/texture_loader';
-	import { update_map_to_new_default_tileset, update_tileset_format } from '../lib/tileset_updater';
 	import { onMount } from 'svelte';
+  import GeneratorSettings from './settings/GeneratorSettings.svelte';
 
-	// Helpers
-	
-	import { get_tileset_id } from '../helpers/tiles';
-  import GridSettings from './settings/GridSettings.svelte';
-  import SettingHeading from './settings/SettingHeading.svelte';
-  import HexesSettings from './settings/HexesSettings.svelte';
-  import DimensionSettings from './settings/DimensionSettings.svelte';
 
 	export let loadedSave: save_data;
 	export let showSettings: boolean;
@@ -73,18 +72,16 @@
 	export let renderGrid: Function;
 	export let redrawEntireMap: Function;
 
-	// For Coordinates
-	export let comp_coordsLayer: CoordsLayer;
-
 	//export let data_terrain: terrain_data
 	export let loadedTilesets: Tileset[];
 	export let loadedIconsets: Iconset[];
-
+	
 	export let comp_terrainLayer: TerrainLayer;
 	export let comp_iconLayer: IconLayer;
 	export let comp_pathLayer: PathLayer;
 	export let comp_textLayer: TextLayer;
-
+	export let comp_coordsLayer: CoordsLayer;
+	
 	export let comp_terrain_panel: TerrainPanel;
 
 	export let load: Function;
@@ -114,109 +111,10 @@
 
 	
 
-	let tilesetFiles: FileList;
-
-	function importTileset() {
-		let importFile = tilesetFiles[0];
-
-		if (!importFile) return;
-
-		let r = new FileReader();
-		r.readAsText(importFile);
-		r.onload = (eb) => {
-			/* Read the file */
-			let setToImport = JSON.parse(eb.target.result as string);
-
-			let set_already_imported = loadedTilesets.find((ts: Tileset) => ts.id == setToImport.id)
-
-			/* Check that set hasn't already been imported */
-			if (set_already_imported != null) {
-
-				alert("You've already imported this tileset :)");
-				return;
-				
-			} 
-
-			if (setToImport.format_version < LATESTTILESETFORMATVERSION) {
-				setToImport = update_tileset_format(setToImport);
-			}
-
-			loadedTilesets.push(setToImport);
-			loadedTilesets = loadedTilesets;
-
-			/* We also have to load all of these textures */
-			//addTilesetTextures(setToImport, L);
-			texture_loader.load_tileset_textures(setToImport);
-			$store_has_unsaved_changes = true;
-		};
-	}
-
-	function removeTileset(setId: string) {
-		if (!confirm("This will remove all tiles in use from this set. Continue?")) return;
-
-		comp_terrainLayer.removeAllTilesOfSet(setId)
-		comp_terrain_panel.reset_tile();
+	
 
 
-		// This line will need to change if the default tileset ever gets removeable
-		//data_terrain.tile = {...loadedTilesets[0].tiles[0]}
-
-		loadedTilesets = loadedTilesets.filter((ts: Tileset) => ts.id != setId);
-		loadedSave.tilesets = loadedTilesets;
-
-		$store_has_unsaved_changes = true;
-
-		// Maybe we should remove tiles here, because otherwise the tiles just... fail to load.
-		// Check if these tiles are being used anywere
-	}
-
-	function update_default_tileset() {
-		let successfully_updated = update_map_to_new_default_tileset($tfield)
-		if (!successfully_updated) return;
-
-		// Remove default tileset
-		loadedTilesets = loadedTilesets.filter(ts => get_tileset_id(ts) != "default")
-		loadedTilesets.push( DEFAULTTILESET );
-		loadedSave.tilesets = loadedTilesets;
-	}
-
-
-	function removeIconset(setId: string) {
-		loadedIconsets = loadedIconsets.filter((is: Iconset) => is.id != setId);
-		loadedSave.iconsets = loadedIconsets;
-
-		$store_has_unsaved_changes = true;
-	}
-
-	let iconsetFiles: FileList;
-
-	function importIconset() {
-		let importFile = iconsetFiles[0];
-
-		if (!importFile) return;
-
-		let r = new FileReader();
-		r.readAsText(importFile);
-		r.onload = (eb) => {
-			/* Read the file */
-			let setToImport = JSON.parse(eb.target.result as string);
-
-			/* Check that set hasn't already been imported */
-			if (loadedIconsets.find((is: Iconset) => is.id == setToImport.id) != null) {
-				alert("You've already imported this icon set :)");
-				return;
-			}
-
-			loadedIconsets.push(setToImport);
-			loadedIconsets = loadedIconsets;
-
-			/* We also have to load all of these textures */
-			//addIconsetTextures(setToImport, L);
-			texture_loader.load_iconset_textures(setToImport);
-
-			$store_has_unsaved_changes = true;
-		};
-	}
+	
 
 	// Imports
 	let mapImportFiles: FileList;
@@ -229,25 +127,6 @@
 			let saveData = JSON.parse(eb.target.result);
 			//console.log(saveData)
 			load(saveData, null);
-		};
-	}
-
-	let overlay_files: FileList;
-	function import_overlay_image() {
-		if (!overlay_files[0]) return;
-
-		let r = new FileReader();
-		r.readAsDataURL(overlay_files[0]);
-		r.onload = (eb) => {
-			let b64 = r.result as string;
-
-			$data_overlay.base64 = b64;
-			$data_overlay.scale.x = 1;
-			$data_overlay.scale.y = 1;
-			showSettings = false;
-			store_selected_tool.update((n) => tools.OVERLAY);
-
-			$store_has_unsaved_changes = true;
 		};
 	}
 
@@ -309,20 +188,18 @@
 	<!-- GRID -->
 	<div class="setting-container">
 		
-		<SettingHeading text="Grid" bind:bound_var={hidden_settings.grid} />
+		<SettingHeading text="Grid" bind:toggle={hidden_settings.grid} />
 
-		<GridSettings 
-			bind:comp_terrainLayer
-			bind:comp_coordsLayer
+		<div class="settings-hider" class:hidden={hidden_settings.grid}>
+			<GridSettings 
+				bind:comp_terrainLayer
+				bind:comp_coordsLayer				
 
-			bind:shown={hidden_settings.grid}
-
-			
-
-			renderGrid={renderGrid}
-			redrawEntireMap={redrawEntireMap}
-			retain_positions={retain_positions}
-		/>
+				renderGrid={renderGrid}
+				redrawEntireMap={redrawEntireMap}
+				retain_positions={retain_positions}
+			/>
+		</div>
 
 	</div>
 
@@ -331,25 +208,25 @@
 	<!-- HEXES -->
 	<div class="setting-container">
 
-		<SettingHeading text="Hexes" bind:bound_var={hidden_settings.hexes} />
+		<SettingHeading text="Hexes" bind:toggle={hidden_settings.hexes} />
 
-		<HexesSettings
+		<div class="settings-hider" class:hidden={hidden_settings.hexes}>
+			<HexesSettings
 
-			bind:comp_coordsLayer
-			bind:comp_terrainLayer
+				bind:comp_coordsLayer
+				bind:comp_terrainLayer
 
-			bind:retainIconPosition
-			bind:retainPathPosition
-			bind:retainTextPosition
+				bind:retainIconPosition
+				bind:retainPathPosition
+				bind:retainTextPosition
 
-			bind:shown={hidden_settings.hexes}
+				retain_positions={retain_positions}
+				save_old_resize_parameters={save_old_resize_parameters}
+				renderAllHexes={renderAllHexes}
+				redrawEntireMap={redrawEntireMap}
 
-			retain_positions={retain_positions}
-			save_old_resize_parameters={save_old_resize_parameters}
-			renderAllHexes={renderAllHexes}
-			redrawEntireMap={redrawEntireMap}
-
-		/>
+			/>
+		</div>
 
 	</div>
 
@@ -359,18 +236,18 @@
 	<!-- DIMENSIONS AND SHAPE -->
 	<div class="setting-container">
 
-		<SettingHeading text="Shape and Size" bind:bound_var={hidden_settings.dimensions} />
+		<SettingHeading text="Shape and Size" bind:toggle={hidden_settings.dimensions} />
 
-		<DimensionSettings 
-		
-			bind:comp_terrainLayer
-			bind:comp_iconLayer
-			bind:comp_textLayer
-			bind:comp_pathLayer
-
-			bind:shown={hidden_settings.dimensions}
-		
-		/>
+		<div class="settings-hider" class:hidden={hidden_settings.dimensions}>
+			<DimensionSettings 
+			
+				bind:comp_terrainLayer
+				bind:comp_iconLayer
+				bind:comp_textLayer
+				bind:comp_pathLayer
+			
+			/>
+		</div>
 		
 	</div>
 
@@ -380,91 +257,18 @@
 
 	<!-- COORDINATES -->
 	<div class="setting-container">
-		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.coordinates}>
-			Coordinates
-			<button
-				on:click={() => {
-					hidden_settings.coordinates = !hidden_settings.coordinates;
-				}}
-			>
-				<img alt={'Toggle Coordinate Settings'} class:rotated={hidden_settings.coordinates} src={'/assets/img/ui/arrow.png'} />
-			</button>
-		</h2>
-		<div class="settings-grid" class:hidden={hidden_settings.coordinates}>
-			<label class="helper-text">Coordinates can slow down map changes such as adding hexes or changing orientation.</label>
-			<label for="showCoords">Show Coordinates</label>
-			<Checkbox bind:checked={$data_coordinates.shown} id={'showCoords'} />
 
-			{#if $data_coordinates.shown}
-				<label for="coordsSystem"
-					>Coordinate System<sup
-						><a href="https://www.redblobgames.com/grids/hexagons/#coordinates" target="_blank" title="Hex Coordinate Systems Explanation"
-							>?</a
-						></sup
-					></label
-				>
-				<select id="coordsSystem" bind:value={$data_coordinates.system} on:change={comp_coordsLayer.updateAllCoordsText}>
-					<option value={coord_system.ROWCOL}>Column, Row</option>
-					<option value={coord_system.AXIAL}>Axial</option>
-					<option value={coord_system.CUBE}>Cube</option>
-					<option value={coord_system.LETTERNUMBER}>Letter Number</option>
-				</select>
+		<SettingHeading text="Coordinates" bind:toggle={hidden_settings.coordinates} />
 
-				<label for="coordsFill">Color</label>
-				<ColorInputPixi bind:value={$data_coordinates.style.fill} id={'coordsFill'} />
+		<div class="settings-hider" class:hidden={hidden_settings.coordinates}>
+			<CoordinateSettings
+			
+				bind:comp_coordsLayer
 
-				<label for="coordFontSize">Font Size</label>
-				<input id="coordFontSize" type="number" bind:value={$data_coordinates.style.fontSize} />
-
-				<label for="coordsOutline">Outline Color</label>
-				<ColorInputPixi bind:value={$data_coordinates.style.stroke} id={'coordsOutline'} />
-
-				<label for="coordsStrokeThickness">Outline Thickness</label>
-				<input id="coordsStrokeThickness" type="number" bind:value={$data_coordinates.style.strokeThickness} />
-
-				<label for="coordSeperator">Separator</label>
-				<input
-					id="coordSeperator"
-					type="text"
-					bind:value={$data_coordinates.seperator}
-					on:change={() => {
-						comp_coordsLayer.updateAllCoordsText();
-					}}
-				/>
-
-				<label for="coordGap">Space from bottom</label>
-				<input
-					id="coordGap"
-					type="number"
-					bind:value={$data_coordinates.gap}
-					on:change={() => {
-						comp_coordsLayer.updateAllCoordPositions();
-					}}
-				/>
-
-				{#if $data_coordinates.system == coord_system.ROWCOL || $data_coordinates.system == coord_system.LETTERNUMBER}
-					<label for="coord-offset-rowcol-row">Row Offset</label>
-					<input  id="coord-offset-rowcol-row" type="number" bind:value={$data_coordinates.offsets.row_col.row} on:change={() => { comp_coordsLayer.updateAllCoordsText(); }}/>
-					
-					<label for="coord-offset-rowcol-col">Column Offset</label>
-					<input  id="coord-offset-rowcol-col" type="number" bind:value={$data_coordinates.offsets.row_col.col} on:change={() => { comp_coordsLayer.updateAllCoordsText(); }}/>
-				{/if}
-				
-				{#if $data_coordinates.system == coord_system.AXIAL || $data_coordinates.system == coord_system.CUBE}
-					<label for="coord-offset-cube-q">Q Offset</label>
-					<input  id="coord-offset-cube-q" type="number" bind:value={$data_coordinates.offsets.cube.q} on:change={() => { comp_coordsLayer.updateAllCoordsText(); }}/>
-					
-					<label for="coord-offset-cube-r">R Offset</label>
-					<input  id="coord-offset-cube-r" type="number" bind:value={$data_coordinates.offsets.cube.r} on:change={() => { comp_coordsLayer.updateAllCoordsText(); }}/>
-				{/if}
-				
-				{#if $data_coordinates.system == coord_system.CUBE}
-					<label for="coord-offset-cube-s">S Offset</label>
-					<input  id="coord-offset-cube-s" type="number" bind:value={$data_coordinates.offsets.cube.s} on:change={() => { comp_coordsLayer.updateAllCoordsText(); }}/>
-				{/if}
-
-			{/if}
+			/>
 		</div>
+
+		
 	</div>
 
 
@@ -474,30 +278,12 @@
 
 	<!-- OVERLAY -->
 	<div class="setting-container">
-		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.overlay}>
-			Overlay
-			<button
-				on:click={() => {
-					hidden_settings.overlay = !hidden_settings.overlay;
-				}}
-			>
-				<img alt={'Toggle Experimental Settings'} class:rotated={hidden_settings.overlay} src={'/assets/img/ui/arrow.png'} />
-			</button>
-		</h2>
+		<SettingHeading text="Overlay" bind:toggle={hidden_settings.overlay} />
 
-		<div class="settings-grid" class:hidden={hidden_settings.overlay} style={'justify-items: start;'}>
-			<button class="file-input-button">
-				{#if $data_overlay.base64 == ''}Load Overlay Image{:else}Replace Overlay Image{/if}
-				<input
-					type="file"
-					accept="image/*"
-					bind:files={overlay_files}
-					on:change={() => {
-						import_overlay_image();
-					}}
-				/>
-			</button>
+		<div class="settings-hider" class:hidden={hidden_settings.overlay}>
+			<OverlaySettings bind:showSettings />
 		</div>
+
 	</div>
 
 
@@ -507,76 +293,28 @@
 
 	<!-- TILE SETS -->
 	<div class="setting-container">
-		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.tilesets}>
-			Tilesets
-			<button
-				on:click={() => {
-					hidden_settings.tilesets = !hidden_settings.tilesets;
-				}}
-			>
-				<img alt={'Toggle Experimental Settings'} class:rotated={hidden_settings.tilesets} src={'/assets/img/ui/arrow.png'} />
-			</button>
-		</h2>
-		<div id="tilesets" class:hidden={hidden_settings.tilesets}>
-			{#each loadedTilesets as tileset (tileset.id)}
-				<div
-					class="loaded-tileset"
-					on:click={() => {
-						console.log(tileset);
-					}}
-					on:keydown={()=>{}}
-				>
-					<span style="display: flex;">{tileset.name} <span class="helper-text">v{tileset.version}</span></span>
+		<SettingHeading text="Tilesets" bind:toggle={hidden_settings.tilesets} />
+		
+		<div class="settings-hider" class:hidden={hidden_settings.tilesets}>
+			<TilesetSettings 
+			
+				bind:loadedSave
+				bind:loadedTilesets
 
-					{#if get_tileset_id(tileset) != 'default'} 
-						<button
-							class="set-rollover-button"
-							on:click={() => {
-								removeTileset(tileset.id);
-							}}
-						>
-							<img src="/assets/img/tools/trash.png" alt={'Trash'} title={'Remove Tileset'} />
-						</button>
-					{/if}
+				bind:comp_terrainLayer
+				bind:comp_terrain_panel
 
-					<!-- Update Default Tileset Button -->
-					{#if get_tileset_id(tileset) == "default" && tileset.version < LATESTDEFAULTTILESETVERSION}
-						<button
-							id="default-tileset-update-button"
-							on:click={() => {
-								update_default_tileset();
-							}}
-							title={`Update Tileset to v${LATESTDEFAULTTILESETVERSION}`}
-						>
-							<img src="/assets/img/ui/arrow.png" alt={''} title={`Update Tileset to v${LATESTDEFAULTTILESETVERSION}`} />
-						</button>
-					{/if}
+				bind:appState
 
-				</div>
-			{/each}
-
-			<span>
-				<button class="file-input-button"
-					>Import Tileset <input
-						type="file"
-						bind:files={tilesetFiles}
-						on:change={() => {
-							importTileset();
-						}}
-					/></button
-				>
-				<button
-					on:click={() => {
-						appState = 'tilesetCreator';
-					}}>Tileset Builder</button
-				>
-			</span>
+			/>
 		</div>
+
 	</div>
 
 	<!-- ICON SETS -->
 	<div class="setting-container">
-		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.iconsets}>
+		
+		<h2 class="setting-heading">
 			<span
 				on:click={(e) => {
 					iconset_text = iconset_text == 'Icon Set' ? 'Iconset' : 'Icon Set';
@@ -590,84 +328,31 @@
 				<img alt={'Toggle Icon Set Settings'} src={'/assets/img/ui/arrow.png'} class:rotated={hidden_settings.iconsets} />
 			</button>
 		</h2>
-		<div id="iconsets" class:hidden={hidden_settings.iconsets}>
-			{#each loadedIconsets as iconset (iconset.id)}
-				<div
-					class="loaded-tileset"
-					on:click={() => {
-						console.log(iconset);
-					}}
-				>
-					{iconset.name}
 
-					{#if iconset.id.split(":")[0] != 'default' && iconset.version != LATESTDEFAULTICONSVERSION}
-						<button
-							on:click={() => {
-								removeIconset(iconset.id);
-							}}
-						>
-							<img src="/assets/img/tools/trash.png" alt={'Trash'} title={'Remove Iconset'} />
-						</button>
-					{/if}
-				</div>
-			{/each}
+		<div class="settings-hider" class:hidden={hidden_settings.iconsets}>
+			<IconsetSettings 
+			
+				bind:loadedSave
+				bind:loadedIconsets
+				bind:iconset_text
+				bind:appState
 
-			<span>
-				<button class="file-input-button"
-					>Import {iconset_text}
-					<input
-						type="file"
-						accept=".hfis"
-						bind:files={iconsetFiles}
-						on:change={() => {
-							importIconset();
-						}}
-					/></button
-				>
-				<button
-					on:click={() => {
-						appState = 'iconsetCreator';
-					}}>{iconset_text} Builder</button
-				>
-			</span>
+			/>
 		</div>
 	</div>
 
 	<div class="setting-container">
-		<h2 class="setting-heading" class:bottom-margin={!hidden_settings.experimental}>
-			Generators
-			<button
-				on:click={() => {
-					hidden_settings.experimental = !hidden_settings.experimental;
-				}}
-			>
-				<img alt={'Toggle Generator Menu'} class:rotated={hidden_settings.experimental} src={'/assets/img/ui/arrow.png'} />
-			</button>
-		</h2>
+		<SettingHeading text="Generators" bind:toggle={hidden_settings.experimental} />
 
-		<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;" class:hidden={hidden_settings.experimental}>
-			<button
-				on:click={() => {
-					showTerrainGenerator = true;
-					show_icon_generator = false;
-					showSettings = false;
-				}}
-				title={'Terrain Generator'}
-				>
-				Terrain Generator
-			</button>
-			
-			<button
-			on:click={() => {
-				show_icon_generator = true;
-				showTerrainGenerator = false;
-					showSettings = false;
-				}}
-				title={'Icon Generator'}
-			>
-				Icon Generator
-			</button>
+		<div class="settings-hider" class:hidden={hidden_settings.experimental}>
+			<GeneratorSettings 
+				bind:show_icon_generator
+				bind:showTerrainGenerator
+				bind:showSettings
+			/>
 		</div>
+
+		
 	</div>
 
 	<!-- Changelog -->
@@ -683,7 +368,7 @@
 	<div class="setting-container">
 		<h2>About</h2>
 		<p class="helper-text">
-			Hexfriend version 1.9.8 - "Sorting out your internals, Hexfriend"
+			Hexfriend version 1.9.9 - "Sorting out your internals, Hexfriend"
 		</p>
 		
 		<p class="helper-text">
@@ -708,19 +393,13 @@
 
 <style>
 
-	#default-tileset-update-button {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	.bottom-margin {
-		margin-bottom: 0.25em;
+	.setting-hider.hidden {
+		display: none !important;
 	}
 
 	.setting-container {
 		background-color: var(--light-background);
-		padding: 0.25em;
+		padding: 0.5em;
 		padding-left: 0.5em;
 		padding-right: 0.5em;
 		border-radius: var(--large-radius);
@@ -771,8 +450,6 @@
 		color: var(--hexfriend-green);
 	}
 
-	
-
 	#export-map-select {
 		border: solid 1px var(--lighter-background);
 		border-radius: var(--small-radius);
@@ -787,110 +464,8 @@
 		background-color: var(--light-background);
 	}
 
-	#iconsets {
-		display: grid;
-		grid-template-columns: 1fr;
-		grid-template-rows: 30px;
-		grid-auto-rows: 30px;
-		row-gap: 5px;
-	}
-
-	#tilesets {
-		display: grid;
-		grid-template-columns: 1fr;
-		grid-template-rows: 30px;
-		grid-auto-rows: 30px;
-		row-gap: 5px;
-	}
-
-	#tilesets span,
-	#iconsets span {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		column-gap: 5px;
-	}
-
-	.loaded-tileset {
-		background-color: var(--primary-background);
-		padding: 5px;
-		border-radius: var(--small-radius);
-		position: relative;
-	}
-
-	.loaded-tileset:hover button.set-rollover-button {
-		opacity: 1;
-	}
-
-	.loaded-tileset button.set-rollover-button {
-		opacity: 0;
-	}
-	
-	
-	.loaded-tileset button {
-		position: absolute;
-		height: 100%;
-		top: 0px;
-		right: 0px;
-		width: 30px;
-		padding: 0;
-		border: none;
-		border-top-left-radius: 0px;
-		border-bottom-left-radius: 0px;
-	}
-
-	.loaded-tileset button img {
-		width: 80%;
-		height: auto;
-	}
-
-	.file-input-button {
-		position: relative;
-	}
-
-	.file-input-button input {
-		width: 100% !important;
-		height: 100%;
-		position: absolute;
-		top: 0px;
-		left: 0px;
-		opacity: 0;
-	}
-
-	
-
-
-
 	h2 {
 		margin: 0;
-	}
-
-	.helper-text {
-		grid-column: span 2;
-		font-size: 12px;
-		color: var(--text);
-		line-height: 1.2;
-		margin: 0;
-		margin-bottom: 5px;
-		margin-top: 5px;
-		font-style: oblique;
-	}
-
-	.settings-grid {
-		display: grid;
-		grid-template-columns: 3fr 2fr;
-		grid-auto-rows: 2em;
-		align-items: center;
-		justify-items: center;
-		row-gap: 0.3em;
-	}
-
-	.settings-grid label {
-		justify-self: start;
-	}
-
-	.settings-grid input {
-		width: 8ch;
-		height: 2em;
 	}
 
 	p {

@@ -13,8 +13,6 @@
     export let comp_pathLayer;
     export let comp_textLayer;
 
-    export let shown: boolean;
-
     let addOrRemoveMapDimensions: 'add' | 'remove' = 'add';
 
     function square_expandMapDimension(direction, amount) {
@@ -139,7 +137,7 @@
 
 </script>
 
-<div class="settings-grid" class:hidden={shown}>
+<div class="settings-grid">
 
     <label for="mapShape">Map Shape</label>
 
@@ -156,7 +154,7 @@
 </div>
 
 {#if $tfield.mapShape == map_shape.SQUARE}
-    <section id="map-dimensions-container" class:hidden={shown}>
+    <section id="map-dimensions-container" >
         <div id="map-dimensions">
             {#if addOrRemoveMapDimensions == 'add'}
                 <button
@@ -236,7 +234,7 @@
         </div>
     </section>
 {:else if $tfield.mapShape == map_shape.FLOWER}
-    <section id="flower-dimensions-container" class:hidden={shown}>
+    <section id="flower-dimensions-container">
         <p>Hexes out from center</p>
         <div id="flower-dimensions-controls-grid">
             <button

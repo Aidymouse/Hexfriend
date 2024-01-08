@@ -37,8 +37,8 @@
 
     <label for="ov_shown">Show</label><Checkbox id={"ov_shown"} bind:checked={$data_overlay.shown} />
     <label for="ov_opacity">Opacity</label><input id="ov_opacity" type="range" min={0.05} max={1} step={0.05} bind:value={$data_overlay.opacity} />
-    <span class="col-span"><button on:click={reset_scale}>Reset Scale</button></span>
-    <span class="col-span"><button on:click={reset_positon}>Reset Position</button></span>
+    <span class="col-span"><button class="outline-button" on:click={reset_scale}>Reset Scale</button></span>
+    <span class="col-span"><button class="outline-button" on:click={reset_positon}>Reset Position</button></span>
     <span class="col-span"><button class="evil" on:click={remove_overlay}>Remove Overlay</button></span>
 
 </div>

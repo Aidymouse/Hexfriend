@@ -27,8 +27,6 @@
     export let retainPathPosition;
     export let retainTextPosition;
 
-    export let shown: boolean;
-
     function changeOrientation() {
 		let t = $tfield.hexWidth;
 		$tfield.hexWidth = $tfield.hexHeight;
@@ -44,7 +42,7 @@
 
 </script>
 
-<div class="settings-grid" class:hidden={shown}>
+<div class="settings-grid">
     <label for="blankHexColor">Blank Hex Color</label>
     <div style="display: flex; gap: 0.25em; align-items: center;">
         <ColorInputPixi

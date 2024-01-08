@@ -2,22 +2,23 @@
 
     export let text: string;
 
-    export let bound_var: boolean;
+    export let toggle: boolean;
 
 </script>
 
-<h2 class="setting-heading" class:bottom-margin={!bound_var}>
+<h2 class="setting-heading">
     {text}
     <button
         on:click={() => {
-            bound_var = !bound_var;
+            toggle = !toggle;
         }}
     >
-        <img alt={`Toggle ${{text}} Settings`} class:rotated={bound_var} src={'/assets/img/ui/arrow.png'} />
+        <img alt={`Toggle ${{text}} Settings`} class:rotated={toggle} src={'/assets/img/ui/arrow.png'} />
     </button>
 </h2>
 
 <style>
+
     .setting-heading {
 		display: flex;
 		position: relative;
