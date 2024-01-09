@@ -19,13 +19,9 @@
     export let redrawEntireMap: Function;
     export let retain_positions: Function;
 
-    
-
-    export let shown: boolean;
-
 </script>
 
-<div class="settings-grid" class:hidden={shown}>
+<div class="settings-grid">
 
     <label for="showGrid">Show Grid</label>
     <!-- Weird bug where the grid wont render if you turn it off then resize the hex flower map ?? -->
@@ -115,5 +111,3 @@
             {/if}
         {/if}
 </div>
-        
-<style href="../../styles/settings.css"></style>

@@ -6,32 +6,18 @@
 	import type TerrainLayer from '../layers/TerrainLayer.svelte';
 	import type TextLayer from '../layers/TextLayer.svelte';
 	import type TerrainPanel from '../panels/TerrainPanel.svelte';
-	import type { coordinates_data, overlay_data, terrain_data, trace_data } from '../types/data';
 	import type { Iconset } from '../types/icon';
 	import type { save_data } from '../types/savedata';
-	import type { terrain_field } from '../types/terrain';
 	import type { Tileset } from '../types/tilesets';
-	import { tools } from '../types/toolData';
-	import type * as PIXI from 'pixi.js';	
 	
 	// Styles
 	import "../styles/settings.css";
 
-	// Enums
-	
 	// Stores
 	import { tfield } from '../stores/tfield';
-	import { store_selected_tool } from '../stores/tools';
-	import { store_has_unsaved_changes } from '../stores/flags';
 	import { resize_parameters } from '../stores/resize_parameters';
-	import { data_overlay, data_coordinates } from '../stores/data';
 	
 	// Components
-	import Checkbox from './Checkbox.svelte';
-	import ColorInputPixi from './ColorInputPixi.svelte';
-	import SelectGrid from './SelectGrid.svelte';
-	import ImageCheckbox from './ImageCheckbox.svelte';
-
 	import GridSettings from './settings/GridSettings.svelte';
 	import SettingHeading from './settings/SettingHeading.svelte';
 	import HexesSettings from './settings/HexesSettings.svelte';
@@ -40,12 +26,10 @@
 	import OverlaySettings from './settings/OverlaySettings.svelte';
 	import TilesetSettings from './settings/TilesetSettings.svelte';
 	import IconsetSettings from './settings/IconsetSettings.svelte';
+	import GeneratorSettings from './settings/GeneratorSettings.svelte';
 
 	// Lib
-	import * as texture_loader from '../lib/texture_loader';
 	import { onMount } from 'svelte';
-  import GeneratorSettings from './settings/GeneratorSettings.svelte';
-
 
 	export let loadedSave: save_data;
 	export let showSettings: boolean;
@@ -65,8 +49,6 @@
 		iconsets: true,
 		experimental: true
 	};
-
-
 
 	export let renderAllHexes: Function;
 	export let renderGrid: Function;
@@ -94,7 +76,6 @@
 
 	let iconset_text = 'Icon Set';
 
-
 	function retain_positions() {
 		if (retainIconPosition) comp_iconLayer.retain_icon_position_on_hex_resize($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
 		if (retainPathPosition) comp_pathLayer.retain_path_position_on_hex_resize();
@@ -102,18 +83,10 @@
 	}
 
 	function save_old_resize_parameters() {
-		
 		$resize_parameters.old_hex_width = $tfield.hexWidth
 		$resize_parameters.old_hex_height = $tfield.hexHeight
 		$resize_parameters.old_gap = $tfield.grid.gap
-
 	}
-
-	
-
-	
-
-
 	
 
 	// Imports
@@ -124,16 +97,25 @@
 		let r = new FileReader();
 		r.readAsText(mapImportFiles[0]);
 		r.onload = (eb) => {
-			let saveData = JSON.parse(eb.target.result);
+			let saveData = JSON.parse(eb.target.result as string);
 			//console.log(saveData)
 			load(saveData, null);
 		};
 	}
 
-
 	onMount(() => {
 		save_old_resize_parameters()
 	})
+
+	function hexfriend_wink(e: MouseEvent) {
+
+		document.getElementById("little-hexfriend").innerHTML = "⟨ >‿• ⟩"
+
+		setTimeout(() => {
+			document.getElementById("little-hexfriend").innerHTML = "⟨ •‿• ⟩"
+		}, 200)
+
+	}
 
 </script>
 
@@ -203,8 +185,6 @@
 
 	</div>
 
-
-
 	<!-- HEXES -->
 	<div class="setting-container">
 
@@ -230,9 +210,6 @@
 
 	</div>
 
-
-
-
 	<!-- DIMENSIONS AND SHAPE -->
 	<div class="setting-container">
 
@@ -251,10 +228,6 @@
 		
 	</div>
 
-
-
-
-
 	<!-- COORDINATES -->
 	<div class="setting-container">
 
@@ -271,11 +244,6 @@
 		
 	</div>
 
-
-
-
-
-
 	<!-- OVERLAY -->
 	<div class="setting-container">
 		<SettingHeading text="Overlay" bind:toggle={hidden_settings.overlay} />
@@ -285,11 +253,6 @@
 		</div>
 
 	</div>
-
-
-
-
-
 
 	<!-- TILE SETS -->
 	<div class="setting-container">
@@ -341,6 +304,7 @@
 		</div>
 	</div>
 
+	<!-- GENERATORS -->
 	<div class="setting-container">
 		<SettingHeading text="Generators" bind:toggle={hidden_settings.experimental} />
 
@@ -388,13 +352,18 @@
 		</p>
 	</div>
 
-	<p style="text-align: center; font-size: 20pt; font-style: normal; color: var(--lightest-background)">⟨ •‿• ⟩</p>
+	<p id="little-hexfriend" on:click={hexfriend_wink}>
+		⟨ •‿• ⟩
+	</p>
 </div>
 
 <style>
 
-	.setting-hider.hidden {
-		display: none !important;
+	#little-hexfriend {
+		text-align: center;
+		font-size: 20pt;
+		font-style: normal;
+		color: var(--lightest-background)
 	}
 
 	.setting-container {
@@ -493,10 +462,8 @@
 
 	#close-tab {
 		position: absolute;
-
 		left: -2.5em;
 		top: 0;
-
 		width: 2.5em;
 		height: 8em;
 		border-radius: 0em;
@@ -524,5 +491,4 @@
 	}
 
 	
-
 </style>

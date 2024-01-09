@@ -6,6 +6,8 @@ For Techy People
 ## Version 1.9.9
 - Icon generator has a new option to clear icons before generation
 - Tweaked checkbox config option placement for icon and terrain generators
+- Settings refactored into seperate containers. Minor UI changes
+- New easter egg
 
 ## Version 1.9.8
 - Changelog now opens new tab

@@ -1,8 +1,8 @@
 <script lang="ts">
 
-    export let showTerrainGenerator
-    export let show_icon_generator
-    export let showSettings
+    export let showTerrainGenerator: boolean;
+    export let show_icon_generator: boolean;
+    export let showSettings: boolean;
 
 </script>
 
