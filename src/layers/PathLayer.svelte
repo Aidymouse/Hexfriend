@@ -475,7 +475,7 @@
 
 			let cont_path = path_containers[path.id]
 			cont_path.marked_for_death = false
-			cont_path.interactive = selectedTool == 'path' && !$data_path.selectedPath
+			cont_path.eventMode = (selectedTool == 'path' && !$data_path.selectedPath) ? 'static' : 'auto'
 			cont_path.hitArea = findHitArea(path)
 
 			let grph_path = cont_path.children[0]

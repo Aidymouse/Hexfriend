@@ -518,7 +518,7 @@
 			pixi_icons[icon.id].tint = icon.color
 			pixi_icons[icon.id].scale.x = icon.scale
 			pixi_icons[icon.id].scale.y = icon.scale
-			// pixi_icons[icon.id].interactive = true // !!! TODO
+			// pixi_icons[icon.id].eventMode = 'static' // !!! TODO
 
 			marked_for_saving.push(icon.id)
 		});
@@ -544,7 +544,7 @@
 			spr_floating_icon.tint = floatingIcon.color
 			spr_floating_icon.scale.x = floatingIcon.scale
 			spr_floating_icon.scale.y = floatingIcon.scale
-			//spr_floating_icon.interactive = true // !!! TODO
+			//spr_floating_icon.eventMode = 'static' // !!! TODO
 
 		}
 	})
