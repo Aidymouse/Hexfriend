@@ -105,15 +105,80 @@
 
 	onMount(() => {
 		save_old_resize_parameters()
+
+		hexfriend_blink();
 	})
 
-	function hexfriend_wink(e: MouseEvent) {
 
+	let hexfriend_affection = 0;
+	let petting_hexfriend = false;
+	let hexfriend_hearts = false;
+	
+	function getRandomInt(min, max) {
+		min = Math.ceil(min);
+		max = Math.floor(max);
+		return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+	}
+
+
+	function hexfriend_blink() {
+		console.log(petting_hexfriend)
+		if (!(petting_hexfriend || hexfriend_hearts)) {
+			console.log("HUH!?")
+			document.getElementById("little-hexfriend").innerHTML = "⟨ -‿- ⟩"
+			setTimeout(() => {
+				if (!(petting_hexfriend || hexfriend_hearts)) {
+					document.getElementById("little-hexfriend").innerHTML = "⟨ •‿• ⟩"
+				}
+			}, 400)
+			
+		}
+		setTimeout(hexfriend_blink, getRandomInt(60, 120)*1000)
+	}
+
+	function hexfriend_pet() {
+		if (!petting_hexfriend) return;
+		hexfriend_affection += 1;
+		
+		document.getElementById("floating-hexfriend").style.opacity = hexfriend_affection/100;
+		
+		if (hexfriend_affection > 100) {
+			// Some hearts
+
+			
+
+			document.getElementById("floating-hexfriend").style.opacity = 0;
+			
+			document.getElementById("little-hexfriend").innerHTML = "⟨ ꈍ‿ꈍ ⟩"
+			document.getElementById("floating-hexfriend").innerHTML = "⟨ ꈍ‿ꈍ ⟩"
+			document.getElementById("floating-hexfriend").style.transitionDuration = "2s";
+			document.getElementById("floating-hexfriend").style.opacity = 0;
+
+			hexfriend_hearts = true;
+			setTimeout(() => {
+				document.getElementById("floating-hexfriend").innerHTML = "⟨ >‿• ⟩"
+				document.getElementById("floating-hexfriend").style.transitionDuration = "0s";
+				hexfriend_hearts = false;
+				hexfriend_stop_petting()
+			}, 2000);
+			
+		} 
+	}
+	
+	function hexfriend_stop_petting() {
+		if (hexfriend_hearts) return;
+		document.getElementById("floating-hexfriend").style.opacity = 0;
+		document.getElementById("little-hexfriend").innerHTML = "⟨ •‿• ⟩"
+		document.getElementById("little-hexfriend").style.cursor = "grab";
+		petting_hexfriend = false;
+		hexfriend_affection = 0;
+	}
+
+	function hexfriend_start_petting(e: MouseEvent) {
+		if (hexfriend_hearts) return;
 		document.getElementById("little-hexfriend").innerHTML = "⟨ >‿• ⟩"
-
-		setTimeout(() => {
-			document.getElementById("little-hexfriend").innerHTML = "⟨ •‿• ⟩"
-		}, 200)
+		document.getElementById("little-hexfriend").style.cursor = "grabbing";
+		petting_hexfriend = true;
 
 	}
 
@@ -335,35 +400,73 @@
 			Hexfriend version 1.9.9 - "Sorting out your internals, Hexfriend"
 		</p>
 		
-		<p class="helper-text">
+		<p class="helper-text" style="margin-top: var(--small-radius)">
 			By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
 		</p>
 
-		<p class="helper-text">
+		<p class="helper-text" style="margin-top: var(--small-radius)">
 			Hexfriend is built with Svelte, Pixi JS and Typescript. Check out the <a href="https://www.github.com/Aidymouse/Hexfriend">Github</a>
 		</p>
 	
-		<p class="helper-text">
+		<p class="helper-text" style="margin-top: var(--small-radius)">
 			Found a bug? Got ideas? Come say Hi on the <a href="https://discord.gg/Jvws27VmWR">Hexfriend Discord</a>
 		</p>
 
-		<p class="helper-text">
+		<p class="helper-text" style="margin-top: var(--small-radius)">
 			You can give away your hard earned money on <br><a href="https://ko-fi.com/aidymouse">Ko-fi</a>.
 		</p>
 	</div>
 
-	<p id="little-hexfriend" on:click={hexfriend_wink}>
-		⟨ •‿• ⟩
-	</p>
+	<div id="hexfriends-house">
+		<p id="little-hexfriend" 
+			on:mousedown={hexfriend_start_petting}
+			on:mousemove={hexfriend_pet}
+			on:mouseup={hexfriend_stop_petting}
+			on:mouseleave={hexfriend_stop_petting}
+			on:blur={hexfriend_stop_petting}
+		>
+			⟨ •‿• ⟩
+		</p>
+		<p id="floating-hexfriend" class="hexfriend-ungreen">
+			⟨ >‿• ⟩
+		</p>
+	</div>
 </div>
 
 <style>
 
+	.hexfriend-ungreen {
+		color: var(--hexfriend-green) !important;
+	}
+
+	#hexfriends-house {
+		display: flex;
+		justify-content: center;
+	}
+	
+	#floating-hexfriend,
 	#little-hexfriend {
 		text-align: center;
 		font-size: 20pt;
 		font-style: normal;
-		color: var(--lightest-background)
+		color: var(--lightest-background);
+		cursor: grab;
+		max-width: auto;
+	}
+
+	#little-hexfriend {
+		transition-duration: 2s;
+	}
+
+	#floating-hexfriend {
+		position:absolute;
+		pointer-events: none;
+		color: var(--hexfriend-green);
+		opacity: 0;
+	}
+
+	#little-hexfriend:active {
+		cursor: grabbing;
 	}
 
 	.setting-container {
