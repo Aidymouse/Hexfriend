@@ -3,6 +3,10 @@ For Techy People
 
 # Version 1.9 - Sorting out your internals, Hexfriend
 
+## Version 1.9.9
+- Icon generator has a new option to clear icons before generation
+- Tweaked checkbox config option placement for icon and terrain generators
+
 ## Version 1.9.8
 - Changelog now opens new tab
 - Icon Eyedropper doesnt get stuck when alt tabbing

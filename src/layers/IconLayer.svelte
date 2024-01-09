@@ -43,10 +43,11 @@
 	export let cont_icon: PIXI.Container;
 
 
-	let pan: pan_state;
-	store_panning.store.subscribe((newPan) => {
-		pan = newPan;
-	});
+	// seems unused - check back later?
+	// let pan: pan_state;
+	// store_panning.store.subscribe((newPan) => {
+	// 	pan = newPan;
+	// });
 	
 	let selectedTool: tools;
 	store_selected_tool.subscribe(n => selectedTool = n);
@@ -139,6 +140,10 @@
 		icons = icons;
 
 		$store_has_unsaved_changes = true;
+	}
+
+	export function deleteIcons() {
+		icons.splice(0, icons.length);
 	}
 
 	export function pointerdown() {
@@ -490,44 +495,42 @@
 
 	// TODO: This could use a bit of cleanup...
 	afterUpdate(() => {
-
-		Object.keys(pixi_icons).forEach(icon_id => {
-			pixi_icons[icon_id].marked_for_death = true
-		})
+		let marked_for_saving: number[] = []
 
 		// Update icons to be in line with state
 		icons.forEach(icon => {
+			// if the icon doesn't exist
 			if (!pixi_icons[icon.id]) {
 				// Create icon
 				let new_icon = new PIXI.Sprite( get_icon_texture(icon.texId) )
 				new_icon.anchor.x = 0.5
 				new_icon.anchor.y = 0.5
-
+				// register icon events
 				new_icon.on('pointerdown', (e) => { icon_pointerdown(e, icon) })
 				new_icon.on('pointerover', (e) => { icon_pointerover(e, icon) })
-
+				// add the icon
 				pixi_icons[icon.id] = new_icon
 				cont_icon.addChild(new_icon)
 			}
-
 
 			pixi_icons[icon.id].x = icon.x
 			pixi_icons[icon.id].y = icon.y
 			pixi_icons[icon.id].tint = icon.color
 			pixi_icons[icon.id].scale.x = icon.scale
 			pixi_icons[icon.id].scale.y = icon.scale
-			pixi_icons[icon.id].interactive = true // !!! TODO
+			// pixi_icons[icon.id].interactive = true // !!! TODO
 
-			pixi_icons[icon.id].marked_for_death = false
+			marked_for_saving.push(icon.id)
 		});
 
 		Object.keys(pixi_icons).forEach(icon_id => {
-			if (pixi_icons[icon_id].marked_for_death) {
+			if (!marked_for_saving.includes(+icon_id)) {
+				// this can be slow when using the generator
 				cont_icon.removeChild(pixi_icons[icon_id])
+				// this is not the problem
 				delete pixi_icons[icon_id]
 			}
-		})		
-
+		})
 
 		/* Floating Icon */
 		spr_floating_icon.visible = false
@@ -544,17 +547,11 @@
 			//spr_floating_icon.interactive = true // !!! TODO
 
 		}
-
-
-
 	})
 
 	onMount(() => {
-
 		cont_icon.removeChildren(0)
-		
 		cont_icon.addChild(spr_floating_icon)
-
 	})
 
 </script>

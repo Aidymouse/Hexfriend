@@ -23,8 +23,9 @@
 
 	let importFiles: FileList;
 
-	let gen_config_center = true;
 	let gen_config_animate = false;
+	let gen_config_center = true;
+	let gen_config_clear = false;
 
 	interface rule {
 		item: Icon
@@ -58,6 +59,10 @@
 
 		//comp_terrainLayer.renderAllHexes()
 		let icons_placed = 0
+
+		if (gen_config_clear) {
+			comp_iconLayer.deleteIcons();
+		}
 
 		Object.keys($tfield.hexes).forEach( (hex_id, i) => {
 			let icon_chance = rand(1, current_ruleset.chance_for_icon_high)
@@ -192,7 +197,8 @@
 		<div id="right-side">
 			<div id="generate-buttons">
 				<span><Checkbox bind:checked = {gen_config_animate} id="config-animate" /> <label for="config-animate">Animate</label></span>
-				<span style="margin-right: 0.5em"><Checkbox bind:checked = {gen_config_center} id="config-snap" /> <label for="config-snap">Place In Hex Center</label></span>
+				<span><Checkbox bind:checked = {gen_config_center} id="config-snap" /> <label for="config-snap">Place In Hex Center</label></span>
+				<span><Checkbox bind:checked = {gen_config_clear} id="config-clear" /> <label for="config-clear">Clear Before Generation</label></span>
 			</div>
 			<div id="generate">
 				<button class="evil" on:click={() => { show_icon_generator = false }}>Close</button>
@@ -339,6 +345,7 @@
 
 	#generate-buttons {
 		display: flex;
+		flex-direction: column;
 		gap: 0.5em;
 		justify-content: flex-end;
 	}
