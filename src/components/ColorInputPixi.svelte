@@ -11,15 +11,15 @@
 	export let w = "2em";
 	export let h = "2em";
 
-	let oldStringValue = PIXI.utils.hex2string(value);
+	let oldStringValue = PIXI.Color.shared.setValue(value).toHex();
 	let stringValue = oldStringValue;
 
 	$: {
 		if (stringValue != oldStringValue) {
 			/* If the old and new values dont match, then the value was changed on the input, not externally */
-			value = PIXI.utils.string2hex(stringValue);
+			value = PIXI.Color.shared.setValue(value).toNumber();
 		} else {
-			stringValue = PIXI.utils.hex2string(value);
+			stringValue = PIXI.Color.shared.setValue(value).toHex();
 		}
 		oldStringValue = stringValue;
 
