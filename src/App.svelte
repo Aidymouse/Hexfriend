@@ -643,7 +643,12 @@
 
 	function loadInit(data: save_data, id: number | null) {
 		// Clean up
-		console.log(`Loaded ${id}`);
+		if (id) {
+			console.log(`Loaded ${id}`);
+		} else {
+			console.log("Loaded default save data");
+		}
+		
 
 		// Deal with outdated save data
 		data = convertSaveDataToLatest(data);
