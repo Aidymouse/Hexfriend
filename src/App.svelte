@@ -591,7 +591,7 @@
 	}
 
 	async function saveToDexie() {
-		console.log(loadedSave);
+		// console.log(loadedSave);
 
 		let c = JSON.stringify(loadedSave);
 
@@ -644,9 +644,9 @@
 	function loadInit(data: save_data, id: number | null) {
 		// Clean up
 		if (id) {
-			console.log(`Loaded ${id}`);
+			console.log(`Loading ${id}`);
 		} else {
-			console.log("Loaded default save data");
+			console.log("Loading default save data");
 		}
 		
 
@@ -754,7 +754,8 @@
 
 		/* Set up tools - would be nice to remember tool settings but this works regardless of loaded tileset */
 
-		console.log(loadedSave);
+		// console.log(loadedSave);
+		console.log("Loaded, ready")
 
 		//loadedSave = data
 		//loadedId = id

@@ -122,9 +122,9 @@
 
 
 	function hexfriend_blink() {
-		console.log(petting_hexfriend)
+		// console.log(petting_hexfriend)
 		if (!(petting_hexfriend || hexfriend_hearts)) {
-			console.log("HUH!?")
+			// console.log("HUH!?")
 			document.getElementById("little-hexfriend").innerHTML = "⟨ -‿- ⟩"
 			setTimeout(() => {
 				if (!(petting_hexfriend || hexfriend_hearts)) {
