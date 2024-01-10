@@ -645,6 +645,8 @@
 		// Clean up
 		if (id) {
 			console.log(`Loading ${id}`);
+		} else if (data.title) {
+			console.log(`Loading ${data.title}`);
 		} else {
 			console.log("Loading default save data");
 		}
