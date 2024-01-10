@@ -223,6 +223,21 @@
 		ignoreIcons: false,
 	};
 
+	let ignored_keys: string[] = [
+		"F1",
+		"F2",
+		"F3",
+		"F4",
+		"F5",
+		"F6",
+		"F7",
+		"F8",
+		"F9",
+		"F10",
+		"F11",
+		"F12",
+	]
+
 	//let L = new PIXI.Loader()
 
 	// Never cleared, to stop duplicate textures being added
@@ -472,6 +487,7 @@
 	}
 
 	function keyDown(e: KeyboardEvent) {
+		if (ignored_keys.includes(e.key)) return;
 		if (appState != app_state.NORMAL) return;
 
 		// Prevent keyboard shortcuts
