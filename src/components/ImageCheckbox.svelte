@@ -61,7 +61,7 @@
 	}
 
 	.image-checkbox.selected:hover {
-		background-color: var(--hexfriend-green);
+		background-color: var(--dark-primary);
 	}
 
 </style>

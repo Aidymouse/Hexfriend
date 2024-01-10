@@ -3,6 +3,11 @@ For Techy People
 
 # Version 1.9 - Sorting out your internals, Hexfriend
 
+## Version 1.9.10
+- Settings UX improvements (they slide now!)
+- Addressed pixi deprecations (thanks craig)
+- Easter egg upgrade
+
 ## Version 1.9.9
 - Icon generator has a new option to clear icons before generation
 - Tweaked checkbox config option placement for icon and terrain generators
