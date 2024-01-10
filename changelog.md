@@ -3,6 +3,9 @@ For Techy People
 
 # Version 1.9 - Sorting out your internals, Hexfriend
 
+## Version 1.9.11
+- Icon fixes
+
 ## Version 1.9.10
 - Settings UX improvements (they slide now!)
 - Addressed pixi deprecations (thanks craig)

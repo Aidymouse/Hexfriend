@@ -382,7 +382,7 @@
 	<div class="setting-container">
 		<h2>About</h2>
 		<p class="helper-text">
-			Hexfriend version 1.9.10 - "Sorting out your internals, Hexfriend"
+			Hexfriend version 1.9.11 - "Sorting out your internals, Hexfriend"
 		</p>
 		
 		<p class="helper-text" style="margin-top: var(--small-radius)">
