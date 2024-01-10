@@ -234,87 +234,77 @@
 
 	<!-- GRID -->
 	<div class="setting-container">
-		
 		<SettingHeading text="Grid" bind:toggle={hidden_settings.grid} />
-
 		<div class="settings-hider" class:hidden={hidden_settings.grid}>
-			<GridSettings 
-				bind:comp_terrainLayer
-				bind:comp_coordsLayer				
+			<div class="hider">
+				<GridSettings 
+					bind:comp_terrainLayer
+					bind:comp_coordsLayer				
 
-				renderGrid={renderGrid}
-				redrawEntireMap={redrawEntireMap}
-				retain_positions={retain_positions}
-			/>
+					renderGrid={renderGrid}
+					redrawEntireMap={redrawEntireMap}
+					retain_positions={retain_positions}
+				/>
+			</div>
 		</div>
-
 	</div>
 
 	<!-- HEXES -->
 	<div class="setting-container">
-
 		<SettingHeading text="Hexes" bind:toggle={hidden_settings.hexes} />
-
 		<div class="settings-hider" class:hidden={hidden_settings.hexes}>
-			<HexesSettings
+			<div class="hider">
+				<HexesSettings
+					bind:comp_coordsLayer
+					bind:comp_terrainLayer
 
-				bind:comp_coordsLayer
-				bind:comp_terrainLayer
+					bind:retainIconPosition
+					bind:retainPathPosition
+					bind:retainTextPosition
 
-				bind:retainIconPosition
-				bind:retainPathPosition
-				bind:retainTextPosition
-
-				retain_positions={retain_positions}
-				save_old_resize_parameters={save_old_resize_parameters}
-				renderAllHexes={renderAllHexes}
-				redrawEntireMap={redrawEntireMap}
-
-			/>
+					retain_positions={retain_positions}
+					save_old_resize_parameters={save_old_resize_parameters}
+					renderAllHexes={renderAllHexes}
+					redrawEntireMap={redrawEntireMap}
+				/>
+			</div>
 		</div>
-
 	</div>
 
 	<!-- DIMENSIONS AND SHAPE -->
 	<div class="setting-container">
-
 		<SettingHeading text="Shape and Size" bind:toggle={hidden_settings.dimensions} />
-
 		<div class="settings-hider" class:hidden={hidden_settings.dimensions}>
-			<DimensionSettings 
-			
-				bind:comp_terrainLayer
-				bind:comp_iconLayer
-				bind:comp_textLayer
-				bind:comp_pathLayer
-			
-			/>
+			<div class="hider">
+				<DimensionSettings 
+					bind:comp_terrainLayer
+					bind:comp_iconLayer
+					bind:comp_textLayer
+					bind:comp_pathLayer
+				/>
+			</div>
 		</div>
-		
 	</div>
 
 	<!-- COORDINATES -->
 	<div class="setting-container">
-
 		<SettingHeading text="Coordinates" bind:toggle={hidden_settings.coordinates} />
-
 		<div class="settings-hider" class:hidden={hidden_settings.coordinates}>
-			<CoordinateSettings
-			
-				bind:comp_coordsLayer
-
-			/>
+			<div class="hider">
+				<CoordinateSettings
+					bind:comp_coordsLayer
+				/>
+			</div>
 		</div>
-
-		
 	</div>
 
 	<!-- OVERLAY -->
 	<div class="setting-container">
 		<SettingHeading text="Overlay" bind:toggle={hidden_settings.overlay} />
-
 		<div class="settings-hider" class:hidden={hidden_settings.overlay}>
-			<OverlaySettings bind:showSettings />
+			<div class="hider">
+				<OverlaySettings bind:showSettings />
+			</div>
 		</div>
 
 	</div>
@@ -322,26 +312,23 @@
 	<!-- TILE SETS -->
 	<div class="setting-container">
 		<SettingHeading text="Tilesets" bind:toggle={hidden_settings.tilesets} />
-		
 		<div class="settings-hider" class:hidden={hidden_settings.tilesets}>
-			<TilesetSettings 
-			
-				bind:loadedSave
-				bind:loadedTilesets
+			<div class="hider">
+				<TilesetSettings 
+					bind:loadedSave
+					bind:loadedTilesets
 
-				bind:comp_terrainLayer
-				bind:comp_terrain_panel
+					bind:comp_terrainLayer
+					bind:comp_terrain_panel
 
-				bind:appState
-
-			/>
+					bind:appState
+				/>
+			</div>
 		</div>
-
 	</div>
 
 	<!-- ICON SETS -->
 	<div class="setting-container">
-		
 		<h2 class="setting-heading">
 			<span
 				on:click={(e) => {
@@ -356,32 +343,30 @@
 				<img alt={'Toggle Icon Set Settings'} src={'/assets/img/ui/arrow.png'} class:rotated={hidden_settings.iconsets} />
 			</button>
 		</h2>
-
 		<div class="settings-hider" class:hidden={hidden_settings.iconsets}>
-			<IconsetSettings 
-			
-				bind:loadedSave
-				bind:loadedIconsets
-				bind:iconset_text
-				bind:appState
-
-			/>
+			<div class="hider">
+				<IconsetSettings 
+					bind:loadedSave
+					bind:loadedIconsets
+					bind:iconset_text
+					bind:appState
+				/>
+			</div>
 		</div>
 	</div>
 
 	<!-- GENERATORS -->
 	<div class="setting-container">
 		<SettingHeading text="Generators" bind:toggle={hidden_settings.experimental} />
-
 		<div class="settings-hider" class:hidden={hidden_settings.experimental}>
-			<GeneratorSettings 
-				bind:show_icon_generator
-				bind:showTerrainGenerator
-				bind:showSettings
-			/>
-		</div>
-
-		
+			<div class="hider">
+				<GeneratorSettings 
+					bind:show_icon_generator
+					bind:showTerrainGenerator
+					bind:showSettings
+				/>
+			</div>
+		</div>		
 	</div>
 
 	<!-- Changelog -->
@@ -510,8 +495,19 @@
 		transition-duration: 0.2s;
 	}
 
+	.settings-hider {
+		display: grid;
+		grid-template-rows: 1fr;
+		transition: grid-template-rows 0.2s ease-in-out;
+	}
+
+	.hider {
+		/* allows for smooth hiding transition */
+        overflow-y: hidden;
+	}
+
 	.hidden {
-		display: none !important;
+		grid-template-rows: 0fr;
 	}
 
 	a {
