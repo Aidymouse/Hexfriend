@@ -151,7 +151,7 @@
 		<section>
 			<label for="textStroke">Outline</label>
 			<ColorInput bind:value={data_text.style.stroke} name="textStroke" />
-			<input type="number" bind:value={data_text.style.strokeThickness} />
+			<input type="number" min="0" step="1" bind:value={data_text.style.strokeThickness} />
 		</section>
 
 		<section>
