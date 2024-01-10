@@ -17,7 +17,7 @@
 	$: {
 		if (stringValue != oldStringValue) {
 			/* If the old and new values dont match, then the value was changed on the input, not externally */
-			value = PIXI.Color.shared.setValue(value).toNumber();
+			value = PIXI.Color.shared.setValue(stringValue).toNumber();
 		} else {
 			stringValue = PIXI.Color.shared.setValue(value).toHex();
 		}
