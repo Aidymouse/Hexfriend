@@ -13,7 +13,7 @@
     import { resize_parameters } from "../../stores/resize_parameters";
     import { store_has_unsaved_changes } from "../../stores/flags";
 
-    import { get_width_height_from_radius } from '../../helpers/hexHelpers'
+    import { get_radius_from_width_height, get_width_height_from_radius } from '../../helpers/hexHelpers'
 
     export let comp_coordsLayer;
     export let comp_terrainLayer;
@@ -151,13 +151,13 @@
 
     <label for="hex-radius">Size by Radius</label>
     <span>
-        <input
-            id="hex-radius"
-            type="number"					
-        />
+        <!-- DEPRECATED due to styling and usability issues -->
+        <!-- <input id="hex-radius" type="number" /> -->
         <button on:click={() => {
 
-                let radius = document.getElementById("hex-radius").valueAsNumber;
+                let currentRadius = get_radius_from_width_height($tfield.hexWidth, $tfield.hexHeight, $tfield.orientation)
+
+                let radius = +prompt("Enter hex radius", currentRadius.toString());
                 console.log(radius);
                 if (Number.isNaN(radius)|| radius < 1) return;	
                 
@@ -172,8 +172,6 @@
                 save_old_resize_parameters();
 
                 comp_coordsLayer.updateAllCoordPositions();
-
-                document.getElementById("hex-radius").value = ""
             }}>Set</button>
     </span>
 

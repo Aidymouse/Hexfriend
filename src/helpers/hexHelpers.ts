@@ -56,14 +56,19 @@ export function getHexPath(
 }
 
 export function get_width_height_from_radius(radius: number, orientation: hex_orientation) {
-
 	if (orientation == hex_orientation.POINTYTOP) {
 		return { width: Math.cos(Math.PI / 6) * radius * 2, height: radius * 2 }
-		
 	} else {
 		return { width:  radius * 2, height: radius / Math.tan(Math.PI / 6) }
 	}
+}
 
+export function get_radius_from_width_height(width: number, height: number, orientation: hex_orientation) {
+	if (orientation == hex_orientation.POINTYTOP) {
+		return ((width * Math.cos(Math.PI / 6) / 2) + (height / 2)) / 2
+	} else {
+		return ((width / 2) + (height * Math.tan(Math.PI / 6))) / 2
+	}
 }
 
 export function getHexPathRadius(radius: number, orientation: hex_orientation = hex_orientation.FLATTOP, centerX: number = 0, centerY: number = 0): number[] {
