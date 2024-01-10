@@ -24,6 +24,7 @@
 	$: {
 		Object.entries(coordTexts).forEach(([hexId, text]) => {
 			text.pixiText.style = $data_coordinates.style;
+			text.pixiText.resolution = 4;
 		});
 
 		cont_textContainer.visible = $data_coordinates.shown

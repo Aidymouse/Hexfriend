@@ -182,7 +182,7 @@
         spr_overlay_image.y = $data_overlay.y        
         spr_overlay_image.scale.x = $data_overlay.scale.x
         spr_overlay_image.scale.y = $data_overlay.scale.y
-        spr_overlay_image.interactive = (selected_tool == tools.OVERLAY)
+        spr_overlay_image.eventMode = (selected_tool == tools.OVERLAY) ? 'static' : 'auto'
 
 
         // Resizer
@@ -241,7 +241,7 @@
             handle.sprite.texture = handle_texture;
             handle.sprite.anchor.x = 0.5
             handle.sprite.anchor.y = 0.5
-            handle.sprite.interactive = true
+            handle.sprite.eventMode = 'static'
             handle.sprite.visible = false
             handle.sprite.on("pointerdown", () => { handle_grabbed(handle) } )
         

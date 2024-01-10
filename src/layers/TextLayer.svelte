@@ -246,9 +246,10 @@
 		for (const text of texts) {
 			if (!pixi_texts[text.id]) {
 				let new_text = new PIXI.Text()
-				new_text.interactive = true
+				new_text.eventMode = 'static'
 				new_text.on("pointerover", (e) => { hoveredText = text; } )
 				new_text.on("pointerout", (e) => { hoveredText = null} )
+				new_text.resolution = 4;
 
 				pixi_texts[text.id] = new_text
 				cont_pixi_text.addChild(new_text)
