@@ -223,6 +223,21 @@
 		ignoreIcons: false,
 	};
 
+	let ignored_keys: string[] = [
+		"F1",
+		"F2",
+		"F3",
+		"F4",
+		"F5",
+		"F6",
+		"F7",
+		"F8",
+		"F9",
+		"F10",
+		"F11",
+		"F12",
+	]
+
 	//let L = new PIXI.Loader()
 
 	// Never cleared, to stop duplicate textures being added
@@ -472,6 +487,7 @@
 	}
 
 	function keyDown(e: KeyboardEvent) {
+		if (ignored_keys.includes(e.key)) return;
 		if (appState != app_state.NORMAL) return;
 
 		// Prevent keyboard shortcuts
@@ -591,7 +607,7 @@
 	}
 
 	async function saveToDexie() {
-		console.log(loadedSave);
+		// console.log(loadedSave);
 
 		let c = JSON.stringify(loadedSave);
 
@@ -643,7 +659,14 @@
 
 	function loadInit(data: save_data, id: number | null) {
 		// Clean up
-		console.log(`Loaded ${id}`);
+		if (id) {
+			console.log(`Loading ${id}`);
+		} else if (data.title) {
+			console.log(`Loading ${data.title}`);
+		} else {
+			console.log("Loading default save data");
+		}
+		
 
 		// Deal with outdated save data
 		data = convertSaveDataToLatest(data);
@@ -749,7 +772,8 @@
 
 		/* Set up tools - would be nice to remember tool settings but this works regardless of loaded tileset */
 
-		console.log(loadedSave);
+		// console.log(loadedSave);
+		console.log("Loaded, ready")
 
 		//loadedSave = data
 		//loadedId = id

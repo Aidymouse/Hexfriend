@@ -143,7 +143,9 @@
 	}
 
 	export function deleteIcons() {
-		icons.splice(0, icons.length);
+		icons = [];
+
+		$store_has_unsaved_changes = true;
 	}
 
 	export function pointerdown() {
@@ -518,7 +520,7 @@
 			pixi_icons[icon.id].tint = icon.color
 			pixi_icons[icon.id].scale.x = icon.scale
 			pixi_icons[icon.id].scale.y = icon.scale
-			// pixi_icons[icon.id].eventMode = 'static' // !!! TODO
+			pixi_icons[icon.id].eventMode = 'static'
 
 			marked_for_saving.push(icon.id)
 		});
@@ -544,7 +546,7 @@
 			spr_floating_icon.tint = floatingIcon.color
 			spr_floating_icon.scale.x = floatingIcon.scale
 			spr_floating_icon.scale.y = floatingIcon.scale
-			//spr_floating_icon.eventMode = 'static' // !!! TODO
+			// spr_floating_icon.eventMode = 'static' // !!! TODO
 
 		}
 	})
