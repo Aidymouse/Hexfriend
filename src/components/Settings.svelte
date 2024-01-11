@@ -94,6 +94,9 @@
 	function importMap() {
 		if (!mapImportFiles[0]) return;
 
+		let confirm = window.confirm(`This will discard your currently loaded map '${loadedSave.title}' (make sure it's saved!)\nAre you sure you want to load '${mapImportFiles[0].name}'?`);
+		if (!confirm) return;
+
 		let r = new FileReader();
 		r.readAsText(mapImportFiles[0]);
 		r.onload = (eb) => {

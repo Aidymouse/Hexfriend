@@ -450,7 +450,7 @@
 		}
 	}
 
-	function icon_pointerover(e: CustomEvent<PointerEvent>, icon: IconLayerIcon) {
+	function icon_pointerover(e: PIXI.FederatedPointerEvent, icon: IconLayerIcon) {
 
 		if ($store_inputs.mouseDown[0] && shouldEraseIcons()) deleteIcon(icon)
 	}
@@ -520,7 +520,7 @@
 			pixi_icons[icon.id].tint = icon.color
 			pixi_icons[icon.id].scale.x = icon.scale
 			pixi_icons[icon.id].scale.y = icon.scale
-			pixi_icons[icon.id].eventMode = 'static'
+			pixi_icons[icon.id].eventMode = (selectedTool == tools.ICON) ? 'static' : 'auto'
 
 			marked_for_saving.push(icon.id)
 		});

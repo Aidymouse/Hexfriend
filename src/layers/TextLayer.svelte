@@ -18,6 +18,8 @@
 
 	// Helpers
 	import { coords_cubeToWorld, coords_worldToCube } from '../helpers/hexHelpers';
+    import { store_selected_tool } from '../stores/tools';
+    import { tools } from '../types/toolData';
 
 	//import { Transformer, TransformerHandle } from "@pixi-essentials/transformer"
 
@@ -246,7 +248,6 @@
 		for (const text of texts) {
 			if (!pixi_texts[text.id]) {
 				let new_text = new PIXI.Text()
-				new_text.eventMode = 'static'
 				new_text.on("pointerover", (e) => { hoveredText = text; } )
 				new_text.on("pointerout", (e) => { hoveredText = null} )
 				new_text.resolution = 4;
@@ -264,6 +265,7 @@
 			pixi_text.marked_for_death = false
 			pixi_text.alpha = text.alpha ? text.alpha : 1
 			pixi_text.rotation = text.rotation ? text.rotation : 0
+			pixi_text.eventMode = ($store_selected_tool == tools.TEXT) ? 'static' : 'auto'
 		}
 
 		for (const [text_id, pixi_text] of Object.entries(pixi_texts)) {

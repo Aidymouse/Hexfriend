@@ -9,10 +9,14 @@
 
 	export let showSavedMaps: boolean;
 	export let load: Function;
+	export let loadAndSave: Function;
 
 	export let createNewMap: Function;
 
 	async function clickedMap(id: number) {
+		let confirm = window.confirm("This will discard your currently loaded map - are you sure?");
+		if (!confirm) return;
+		
 		showSavedMaps = false;
 
 		let mapString = (await db.mapStrings.get(id)).mapString;
@@ -37,6 +41,17 @@
 
 		download(JSON.stringify(mapData), `${mapData.title ? mapData.title : 'Untitled Hexfriend'}.hexfriend`, 'appliation/json');
 	}
+
+	async function duplicateMap(id: number) {
+		let mapData = JSON.parse((await db.mapStrings.get(id)).mapString);
+
+		let title = prompt("Map Title:", `${mapData.title} Copy`);
+		if (title == null) return;
+
+		mapData.title = title;
+
+		loadAndSave(mapData);
+	}
 </script>
 
 <main class:shown={showSavedMaps}>
@@ -51,6 +66,7 @@
 
 	<div id="maps-grid-container" class="shown">
 		<h1 class="title">Maps</h1>
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div
 			id="save-map-button"
 			on:click={() => {
@@ -67,6 +83,7 @@
 			{#if $saves}
 				{#each $saves as save (save.id)}
 					<div class="map-save" class:error={save.saveVersion != LATESTSAVEDATAVERSION}>
+						<!-- svelte-ignore a11y-click-events-have-key-events -->
 						<div
 							on:click={() => {
 								clickedMap(save.id);
@@ -101,6 +118,16 @@
 							title={'Quick Export'}
 						>
 							<img src="/assets/img/ui/quick export.png" alt={'Export'} />
+						</button>
+
+						<button
+							class="delete-button"
+							style="margin-right: 70px;"
+							on:click={() => {
+								duplicateMap(save.id);
+							}}
+						>
+							<img src="/assets/img/ui/duplicate.png" alt={'Duplicate'} />
 						</button>
 					</div>
 				{/each}
