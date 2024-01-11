@@ -3,6 +3,9 @@ For Techy People
 
 # Version 1.9 - Sorting out your internals, Hexfriend
 
+## Version 1.9.12
+- Various breakages and subsequent bug fixes
+
 ## Version 1.9.11
 - Icon fixes
 

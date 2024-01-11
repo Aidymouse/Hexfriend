@@ -2,10 +2,13 @@
 	import { db } from '../lib/db';
 	import { download } from '../lib/download2';
 	import { convertSaveDataToLatest } from '../lib/saveDataConverter';
+  import { store_has_unsaved_changes } from '../stores/flags';
 	import { LATESTSAVEDATAVERSION } from '../types/savedata';
 	import { liveQuery } from 'dexie';
 
 	let saves = liveQuery(() => db.mapSaves.toArray());
+
+	// TODO the outline on the maps is really ugly cos it gets hidden by a box
 
 	export let showSavedMaps: boolean;
 	export let load: Function;
@@ -14,8 +17,10 @@
 	export let createNewMap: Function;
 
 	async function clickedMap(id: number) {
-		let confirm = window.confirm("This will discard your currently loaded map - are you sure?");
-		if (!confirm) return;
+		if ($store_has_unsaved_changes) { // Doesn't actually work because has_unsaved_changes is updated too often lol
+			let confirm = window.confirm("This will discard your currently loaded map - are you sure?");
+			if (!confirm) return;
+		}
 		
 		showSavedMaps = false;
 
@@ -126,6 +131,7 @@
 							on:click={() => {
 								duplicateMap(save.id);
 							}}
+							title="Duplicate Map"
 						>
 							<img src="/assets/img/ui/duplicate.png" alt={'Duplicate'} />
 						</button>
