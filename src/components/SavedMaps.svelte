@@ -13,6 +13,9 @@
 	export let createNewMap: Function;
 
 	async function clickedMap(id: number) {
+		let confirm = window.confirm("This will discard your currently loaded map - are you sure?");
+		if (!confirm) return;
+		
 		showSavedMaps = false;
 
 		let mapString = (await db.mapStrings.get(id)).mapString;
