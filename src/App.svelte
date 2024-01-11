@@ -162,6 +162,7 @@
 	let showSavedMaps = false;
 
 	let saving = false;
+	let loadAndSaving = false;
 
 	let loadedTilesets: Tileset[];
 	let loadedIconsets: Iconset[];
@@ -779,6 +780,24 @@
 		//loadedId = id
 	}
 
+	$: appState, andSave();
+
+	function loadAndSave(data: save_data, id: number | null) {
+		loadInit(data, id);
+		loadAndSaving = true;
+		// also triggers andSave()
+	}
+
+	function andSave() {
+		// when app_state becomes NORMAL again, then trigger save
+		if (loadAndSaving) {
+			if (appState == app_state.NORMAL) {
+				saveInit();
+				loadAndSaving = false;
+			}
+		}
+	}
+
 	createNewMap();
 
 	/* Order matters */
@@ -926,7 +945,7 @@
 			<ShortcutList bind:this={comp_shortcutList} on:mouseup={pointerup}/>
 		{/if}
 
-		<SavedMaps bind:showSavedMaps {createNewMap} load={loadInit} on:mouseup={pointerup}/>
+		<SavedMaps bind:showSavedMaps {createNewMap} load={loadInit} loadAndSave={loadAndSave} on:mouseup={pointerup}/>
 
 		<Settings
 			{loadedSave}
