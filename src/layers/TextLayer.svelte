@@ -250,13 +250,13 @@
 				let new_text = new PIXI.Text()
 				new_text.on("pointerover", (e) => { hoveredText = text; } )
 				new_text.on("pointerout", (e) => { hoveredText = null} )
-				new_text.resolution = 4;
 
 				pixi_texts[text.id] = new_text
 				cont_pixi_text.addChild(new_text)
 			}
 
 			let pixi_text = pixi_texts[text.id]
+			pixi_text.resolution = (data_text.selectedText?.id == text.id) ? 1.25 : 4
 			pixi_text.x = text.x
 			pixi_text.y = text.y
 			pixi_text.text = text.text
@@ -284,13 +284,14 @@
 		if (data_text.selectedText) {
 			let tW = getTextWidth(data_text.selectedText);
 			let tH = getTextHeight(data_text.selectedText);
+			let thickness = Math.max(data_text.selectedText.style.fontSize / 10, 4)
 
-			grph_selector.lineStyle(4, 0x333333);
+			grph_selector.lineStyle(thickness, 0x333333);
 			grph_selector.drawRect(
-				data_text.selectedText.x - tW * alignMap[data_text.selectedText.style.align].x - 5,
-				data_text.selectedText.y - 5,
-				tW + 10,
-				tH + 10
+				data_text.selectedText.x - tW * alignMap[data_text.selectedText.style.align].x - thickness,
+				data_text.selectedText.y - thickness,
+				tW + thickness + thickness,
+				tH + thickness + thickness
 			);
 
 		}
@@ -298,9 +299,15 @@
 		if (hoveredText && hoveredText != data_text.selectedText) {
 			let tW = getTextWidth(hoveredText);
 			let tH = getTextHeight(hoveredText);
+			let thickness = Math.max(hoveredText.style.fontSize / 20, 2);
 
-			grph_selector.lineStyle(2, 0x555555);
-			grph_selector.drawRect(hoveredText.x - tW * alignMap[hoveredText.style.align].x - 4, hoveredText.y - 4, tW + 8, tH + 8);
+			grph_selector.lineStyle(thickness, 0x555555);
+			grph_selector.drawRect(
+				hoveredText.x - tW * alignMap[hoveredText.style.align].x - thickness,
+				hoveredText.y - thickness,
+				tW + thickness + thickness,
+				tH + thickness + thickness
+			);
 		
 		}
 
