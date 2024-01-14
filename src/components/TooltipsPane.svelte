@@ -171,7 +171,7 @@
 
 <span>
 	<Tooltip control={"Right Mouse"} tip={"Pan"} />
-	<Tooltip control={"Scroll"} tip={"Zoom"} />
+	<Tooltip control={"Scroll Mouse"} tip={"Zoom"} />
 	
 	{#if selectedTool == tools.TERRAIN}
 		<Tooltip control={"Left Mouse"} tip={c_terrain.leftMouse} />
