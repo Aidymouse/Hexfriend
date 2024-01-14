@@ -86,32 +86,12 @@ export const handlers = {
 				pan.zoomScale /= zoomFactor;
 			}
 
-			// Control max zoom with different map shapes
-			let calcColumns;
-			let calcRows;
+			// Cap Zoom
+			let max_zoom_out = 0.1;
+			let max_zoom_in = 500;
 
-			if (get(tfield).mapShape == map_shape.SQUARE) {
-				calcColumns = get(tfield).columns;
-				calcRows = get(tfield).rows;
-			} else if (get(tfield).mapShape == map_shape.FLOWER) {
-				calcColumns = get(tfield).hexesOut * 2;
-				calcRows = get(tfield).hexesOut * 2;
-			}
-
-			// controls how far you can zoom out (smaller number is farther out)
-			let minZoom = (window.innerWidth + window.innerHeight) / 2;
-			minZoom /= ((get(tfield).hexWidth + get(tfield).hexHeight + get(tfield).grid.gap) / 2) * ((calcColumns + calcRows) / 2) * 2;
-			if (pan.zoomScale < minZoom) {
-				pan.zoomScale = minZoom;
-			}
-			// controls how far you can zoom in (bigger number is closer in)
-			let maxZoom = (window.innerWidth + window.innerHeight) / 2;
-			// TODO: use tile size
-			// maxZoom /= 100 * 2;
-			maxZoom /= ((get(tfield).hexWidth + get(tfield).hexHeight + get(tfield).grid.gap) / 2) * 4;
-			if (maxZoom < pan.zoomScale) {
-				pan.zoomScale = maxZoom;
-			}
+			pan.zoomScale = Math.max(pan.zoomScale, max_zoom_out);
+			pan.zoomScale = Math.min(pan.zoomScale, max_zoom_in);			
 
 			// Move the screen
 			let xAfterZoom = worldX(pan);
@@ -127,3 +107,40 @@ export const handlers = {
 		});
 	},
 };
+
+
+
+/*
+
+// Control max zoom with different map shapes
+let calcColumns;
+let calcRows;
+
+if (get(tfield).mapShape == map_shape.SQUARE) {
+	calcColumns = get(tfield).columns;
+	calcRows = get(tfield).rows;
+} else if (get(tfield).mapShape == map_shape.FLOWER) {
+	calcColumns = get(tfield).hexesOut * 2;
+	calcRows = get(tfield).hexesOut * 2;
+}
+
+// controls how far you can zoom out (smaller number is farther out)
+let minZoom = (window.innerWidth + window.innerHeight) / 2;
+minZoom /= ((get(tfield).hexWidth + get(tfield).hexHeight + get(tfield).grid.gap) / 2) * ((calcColumns + calcRows) / 2) * 2;
+maxZoom = 0.01;
+if (pan.zoomScale < minZoom) {
+	pan.zoomScale = minZoom;
+}
+// controls how far you can zoom in (bigger number is closer in)
+let maxZoom = (window.innerWidth + window.innerHeight) / 2;
+// TODO: use tile size
+// maxZoom /= 100 * 2;
+maxZoom /= ((get(tfield).hexWidth + get(tfield).hexHeight + get(tfield).grid.gap) / 2) * 4;
+
+maxZoom = 0.1;
+
+if (maxZoom < pan.zoomScale) {
+	pan.zoomScale = maxZoom;
+}
+
+*/

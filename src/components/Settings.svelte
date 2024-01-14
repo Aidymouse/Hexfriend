@@ -369,7 +369,7 @@
 					bind:showSettings
 				/>
 			</div>
-		</div>		
+		</div>
 	</div>
 
 	<!-- Changelog -->
