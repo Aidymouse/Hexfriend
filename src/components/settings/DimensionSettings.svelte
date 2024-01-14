@@ -139,6 +139,8 @@
 
 <div class="settings-grid">
 
+    <label class="helper-text">Hexes removed by a reduction in map size are completely erased.</label>
+
     <label for="mapShape">Map Shape</label>
 
     <select

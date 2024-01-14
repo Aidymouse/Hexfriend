@@ -147,9 +147,6 @@
 		
 		if (hexfriend_affection > 100) {
 			// Some hearts
-
-			
-
 			document.getElementById("floating-hexfriend").style.opacity = 0;
 			
 			document.getElementById("little-hexfriend").innerHTML = "⟨ ꈍ‿ꈍ ⟩"
@@ -385,7 +382,7 @@
 	<div class="setting-container">
 		<h2>About</h2>
 		<p class="helper-text">
-			Hexfriend version 1.9.12 - "Sorting out your internals, Hexfriend"
+			Hexfriend version 1.9.13 - "Sorting out your internals, Hexfriend"
 		</p>
 		
 		<p class="helper-text" style="margin-top: var(--small-radius)">

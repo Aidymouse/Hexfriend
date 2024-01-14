@@ -3,6 +3,13 @@ For Techy People
 
 # Version 1.9 - Sorting out your internals, Hexfriend
 
+## Version 1.9.13
+- Map styling UX
+- Tooltip changes
+- Remove tight zoom limit
+- Dynamic text resolution
+- Warning that reducing map size deletes hexes
+
 ## Version 1.9.12
 - Various breakages and subsequent bug fixes
 
