@@ -25,77 +25,84 @@
 	*/
 
 	// Components
-	import CanvasHolder from './components/CanvasHolder.svelte';
-	import IconGenerator from './components/IconGenerator.svelte';
-	import IconsetCreator from './components/IconsetCreator.svelte';
-	import SavedMaps from './components/SavedMaps.svelte';
-	import Settings from './components/Settings.svelte';
-	import ShortcutList from './components/ShortcutList.svelte';
-	import TerrainGenerator from './components/TerrainGenerator.svelte';
-	import TilesetCreator from './components/TilesetCreator.svelte';
-	import ToolButtons from './components/ToolButtons.svelte';
-	import TooltipsPane from './components/TooltipsPane.svelte';
-	
+	import CanvasHolder from "./components/CanvasHolder.svelte";
+	import IconGenerator from "./components/IconGenerator.svelte";
+	import IconsetCreator from "./components/IconsetCreator.svelte";
+	import SavedMaps from "./components/SavedMaps.svelte";
+	import Settings from "./components/Settings.svelte";
+	import ShortcutList from "./components/ShortcutList.svelte";
+	import TerrainGenerator from "./components/TerrainGenerator.svelte";
+	import TilesetCreator from "./components/TilesetCreator.svelte";
+	import ToolButtons from "./components/ToolButtons.svelte";
+	import TooltipsPane from "./components/TooltipsPane.svelte";
+
 	// Layers
-	import CoordsLayer from './layers/CoordsLayer.svelte';
-	import IconLayer from './layers/IconLayer.svelte';
-	import LargeHexesLayer from './layers/LargeHexesLayer.svelte';
-	import OverlayLayer from './layers/OverlayLayer.svelte';
-	import PathLayer from './layers/PathLayer.svelte';
-	import TerrainLayer from './layers/TerrainLayer.svelte';
-	import TextLayer from './layers/TextLayer.svelte';
-	import { db } from './lib/db';
-	
+	import CoordsLayer from "./layers/CoordsLayer.svelte";
+	import IconLayer from "./layers/IconLayer.svelte";
+	import LargeHexesLayer from "./layers/LargeHexesLayer.svelte";
+	import OverlayLayer from "./layers/OverlayLayer.svelte";
+	import PathLayer from "./layers/PathLayer.svelte";
+	import TerrainLayer from "./layers/TerrainLayer.svelte";
+	import TextLayer from "./layers/TextLayer.svelte";
+	import { db } from "./lib/db";
+
 	// Data
-	import DEFAULTSAVEDATA from './lib/defaultSaveData';
-	
+	import DEFAULTSAVEDATA from "./lib/defaultSaveData";
+
 	// Methods
-	import { download } from './lib/download2';
-	import { getKeyboardShortcut } from './lib/keyboardShortcuts';
-	import { convertSaveDataToLatest } from './lib/saveDataConverter';
-	
+	import { download } from "./lib/download2";
+	import { getKeyboardShortcut } from "./lib/keyboardShortcuts";
+	import { convertSaveDataToLatest } from "./lib/saveDataConverter";
+
 	// Lib
-	import * as texture_loader from './lib/texture_loader';
-	import { update_tileset_format } from './lib/tileset_updater'
-	
+	import * as texture_loader from "./lib/texture_loader";
+	import { update_tileset_format } from "./lib/tileset_updater";
+
 	// Panels
-	import IconPanel from './panels/IconPanel.svelte';
-	import OverlayPanel from './panels/OverlayPanel.svelte';
-	import PathPanel from './panels/PathPanel.svelte';
-	import TerrainPanel from './panels/TerrainPanel.svelte';
-	import TextPanel from './panels/TextPanel.svelte';
-	import EraserPanel from './panels/EraserPanel.svelte';
+	import IconPanel from "./panels/IconPanel.svelte";
+	import OverlayPanel from "./panels/OverlayPanel.svelte";
+	import PathPanel from "./panels/PathPanel.svelte";
+	import TerrainPanel from "./panels/TerrainPanel.svelte";
+	import TextPanel from "./panels/TextPanel.svelte";
+	import EraserPanel from "./panels/EraserPanel.svelte";
 
 	// Stores
-	import * as store_panning from './stores/panning';
-	import { tfield } from './stores/tfield';
-	import { store_inputs } from './stores/inputs';
-	import { store_selected_tool } from './stores/tools';
-	import { store_has_unsaved_changes } from './stores/flags';
-	import { data_path, data_icon, data_overlay, data_coordinates } from './stores/data';
-	import { resize_parameters } from './stores/resize_parameters';
-	
-	
+	import * as store_panning from "./stores/panning";
+	import { tfield } from "./stores/tfield";
+	import { store_inputs } from "./stores/inputs";
+	import { store_selected_tool } from "./stores/tools";
+	import { store_has_unsaved_changes } from "./stores/flags";
+	import {
+		data_path,
+		data_icon,
+		data_overlay,
+		data_coordinates,
+	} from "./stores/data";
+	import { resize_parameters } from "./stores/resize_parameters";
+
 	// GLOBAL STYLES
-	import './styles/inputs.css';
-	import './styles/panels.css';
-	import './styles/scrollbar.css';
-	import './styles/variables.css';
-	
+	import "./styles/inputs.css";
+	import "./styles/panels.css";
+	import "./styles/scrollbar.css";
+	import "./styles/variables.css";
+
 	// TYPES
-	import type { eraser_data, terrain_data, text_data } from './types/data';
-	import type { Iconset } from './types/icon';
-	import type { pan_state } from './types/panning';
-	import type { save_data } from './types/savedata';
+	import type { eraser_data, terrain_data, text_data } from "./types/data";
+	import type { Iconset } from "./types/icon";
+	import type { pan_state } from "./types/panning";
+	import type { save_data } from "./types/savedata";
 	// Constants
-	import { LATESTSAVEDATAVERSION, LATESTDEFAULTICONSVERSION } from './types/savedata';
-	import { map_shape } from './types/settings';
-	import type { terrain_field } from './types/terrain';
-	import { LATESTTILESETFORMATVERSION, type Tileset } from './types/tilesets';
+	import {
+		LATESTSAVEDATAVERSION,
+		LATESTDEFAULTICONSVERSION,
+	} from "./types/savedata";
+	import { map_shape } from "./types/settings";
+	import type { terrain_field } from "./types/terrain";
+	import { LATESTTILESETFORMATVERSION, type Tileset } from "./types/tilesets";
 	// Enums
-	import { tools } from './types/toolData';
-	import * as PIXI from 'pixi.js';
-	import { afterUpdate, onMount } from 'svelte';
+	import { tools } from "./types/toolData";
+	import * as PIXI from "pixi.js";
+	import { afterUpdate, onMount } from "svelte";
 
 	/* STATE */
 
@@ -108,15 +115,16 @@
 	let loadedId: number | null = null;
 
 	enum app_state {
-		NORMAL = 'normal',
-		TILESETCREATOR = 'tilesetCreator',
-		ICONSETCREATOR = 'iconsetCreator',
-		LOADINGMAP = 'loadingMap',
+		NORMAL = "normal",
+		TILESETCREATOR = "tilesetCreator",
+		ICONSETCREATOR = "iconsetCreator",
+		LOADINGMAP = "loadingMap",
 	}
 
 	let appState: app_state = app_state.TILESETCREATOR;
 
 	let showSettings = false;
+	let showHelp = false;
 	let showTerrainGenerator = false;
 	let show_icon_generator = false;
 	let showLoader: boolean = false;
@@ -154,7 +162,7 @@
 	});
 
 	// Enable PixiJS dev tools in development
-	if (process.env.NODE_ENV == 'development') {
+	if (process.env.NODE_ENV == "development") {
 		// @ts-ignore
 		globalThis.__PIXI_APP__ = app;
 	}
@@ -176,7 +184,6 @@
 	$: {
 		pan = pan;
 	}
-
 
 	let selectedTool;
 	store_selected_tool.subscribe((t) => {
@@ -201,15 +208,15 @@
 
 	let data_text: text_data = {
 		style: {
-			fontFamily: 'Segoe UI',
-			fill: '#000000',
+			fontFamily: "Segoe UI",
+			fill: "#000000",
 			fontSize: 25,
 			miterLimit: 2,
 			strokeThickness: 0,
-			stroke: '#f2f2f2',
-			align: 'left',
-			fontStyle: 'normal',
-			fontWeight: 'normal',
+			stroke: "#f2f2f2",
+			align: "left",
+			fontStyle: "normal",
+			fontWeight: "normal",
 		},
 		alpha: 1,
 		selectedText: null,
@@ -237,7 +244,7 @@
 		"F10",
 		"F11",
 		"F12",
-	]
+	];
 
 	//let L = new PIXI.Loader()
 
@@ -248,16 +255,28 @@
 		showLoader = true;
 
 		switch (exportType) {
-			case 'image/png':
+			case "image/png":
 				download(
 					await app.renderer.extract.base64(offsetContainer),
-					`${loadedSave.title ? loadedSave.title : 'Untitled Hexfriend'}`,
-					exportType
+					`${
+						loadedSave.title
+							? loadedSave.title
+							: "Untitled Hexfriend"
+					}`,
+					exportType,
 				);
 				break;
 
-			case 'application/json':
-				download(JSON.stringify(loadedSave), `${loadedSave.title ? loadedSave.title : 'Untitled Hexfriend'}.hexfriend`, exportType);
+			case "application/json":
+				download(
+					JSON.stringify(loadedSave),
+					`${
+						loadedSave.title
+							? loadedSave.title
+							: "Untitled Hexfriend"
+					}.hexfriend`,
+					exportType,
+				);
 				break;
 		}
 
@@ -272,14 +291,12 @@
 	/* TOOL METHODS */
 	function changeTool(newTool: tools) {
 		// A list of stuff that needs to happen every tool change
-		data_path.update( (n) => {
-			
-			n.contextPathId = null
-			n.selectedPath = null
+		data_path.update((n) => {
+			n.contextPathId = null;
+			n.selectedPath = null;
 
-			return n
-
-		})
+			return n;
+		});
 
 		//$data_path.contextPathId = null;
 		data_text.contextStyleId = null;
@@ -328,7 +345,7 @@
 
 	function pointerup(e: PointerEvent) {
 		//console.log(`Up: ${e.button} :: ${e.buttons}`)
-		
+
 		$store_inputs.mouseDown[e.button] = false;
 
 		if (!$store_inputs.mouseDown[2]) store_panning.handlers.endPan();
@@ -366,7 +383,8 @@
 
 			case tools.ERASER:
 				if ($store_inputs.mouseDown[0]) {
-					if (!data_eraser.ignoreTerrain) comp_terrainLayer.eraseAtMouse();
+					if (!data_eraser.ignoreTerrain)
+						comp_terrainLayer.eraseAtMouse();
 				}
 				/* Icons are handled differently in the icon handler */
 				break;
@@ -394,16 +412,16 @@
 	/* KEYBOARD EVENTS */
 	function handleShortcuts(e: KeyboardEvent) {
 		// Generate key code
-		let keycode = '';
+		let keycode = "";
 
-		if (e.ctrlKey) keycode += 'control+';
-		if (e.shiftKey) keycode += 'shift+';
-		if (e.altKey) keycode += 'alt+';
+		if (e.ctrlKey) keycode += "control+";
+		if (e.shiftKey) keycode += "shift+";
+		if (e.altKey) keycode += "alt+";
 		keycode += e.key.toLowerCase();
 
-		if (e.key == 'Alt') keycode = 'alt';
-		if (e.key == 'Shift') keycode = 'shift';
-		if (e.key == 'Control') keycode = 'control';
+		if (e.key == "Alt") keycode = "alt";
+		if (e.key == "Shift") keycode = "shift";
+		if (e.key == "Control") keycode = "control";
 
 		let shortcutData = getKeyboardShortcut(keycode, selectedTool);
 		if (!shortcutData) return;
@@ -412,27 +430,27 @@
 		switch (shortcutData.tool) {
 			case null:
 				switch (shortcutData.function) {
-					case 'save':
+					case "save":
 						saveInit();
 						break;
 
-					case 'toggleViewMaps':
+					case "toggleViewMaps":
 						showSavedMaps = !showSavedMaps;
 						break;
 
-					case 'toggleViewSettings':
+					case "toggleViewSettings":
 						showSettings = !showSettings;
 						break;
 
-					case 'toggleShortcutList':
+					case "toggleShortcutList":
 						showKeyboardShortcuts = !showKeyboardShortcuts;
 						break;
 
-					case 'toggleControls':
+					case "toggleControls":
 						showControls = !showControls;
 						break;
 
-					case 'backToMainView':
+					case "backToMainView":
 						showSavedMaps = false;
 						showSettings = false;
 						showKeyboardShortcuts = false;
@@ -440,27 +458,28 @@
 						data_text.contextStyleId = null;
 						break;
 
-					case 'changeTool_terrain':
+					case "changeTool_terrain":
 						changeTool(tools.TERRAIN);
 						break;
-					case 'changeTool_icon':
+					case "changeTool_icon":
 						changeTool(tools.ICON);
 						break;
-					case 'changeTool_path':
+					case "changeTool_path":
 						changeTool(tools.PATH);
 						break;
-					case 'changeTool_text':
+					case "changeTool_text":
 						changeTool(tools.TEXT);
 						break;
-					case 'changeTool_eraser':
+					case "changeTool_eraser":
 						changeTool(tools.ERASER);
 						break;
-					case 'changeTool_overlay':
-						if ($data_overlay.base64 != '') changeTool(tools.OVERLAY);
+					case "changeTool_overlay":
+						if ($data_overlay.base64 != "")
+							changeTool(tools.OVERLAY);
 						break;
 
-					case 'toggle_overlay':
-						if ($data_overlay.base64 != '') {
+					case "toggle_overlay":
+						if ($data_overlay.base64 != "") {
 							$data_overlay.shown = !$data_overlay.shown;
 							$store_has_unsaved_changes = true;
 						}
@@ -492,16 +511,23 @@
 		if (appState != app_state.NORMAL) return;
 
 		// Prevent keyboard shortcuts
-		if (e.target.type == 'number' || e.target.type == 'textarea' || e.target.type == 'text') {
+		if (
+			e.target.type == "number" ||
+			e.target.type == "textarea" ||
+			e.target.type == "text"
+		) {
 			return;
 		}
 
 		// Hardcoded alt code to stop alt tools getting stuck
 		if (e.altKey && e.key == "tab") {
-			
 		}
 
-		if (comp_shortcutList && e.key != 'Escape' && !(e.key == 'k' && e.ctrlKey)) {
+		if (
+			comp_shortcutList &&
+			e.key != "Escape" &&
+			!(e.key == "k" && e.ctrlKey)
+		) {
 			e.preventDefault();
 			comp_shortcutList.keydown(e);
 			return;
@@ -536,8 +562,8 @@
 			}
 
 			case tools.ERASER: {
-				if (e.key == 'Shift') data_eraser.ignoreIcons = true;
-				if (e.key == 'Control') data_eraser.ignoreTerrain = true;
+				if (e.key == "Shift") data_eraser.ignoreIcons = true;
+				if (e.key == "Control") data_eraser.ignoreTerrain = true;
 				break;
 			}
 		}
@@ -567,8 +593,8 @@
 			}
 
 			case tools.ERASER: {
-				if (e.key == 'Shift') data_eraser.ignoreIcons = false;
-				if (e.key == 'Control') data_eraser.ignoreTerrain = false;
+				if (e.key == "Shift") data_eraser.ignoreIcons = false;
+				if (e.key == "Control") data_eraser.ignoreTerrain = false;
 				break;
 			}
 		}
@@ -579,7 +605,6 @@
 		$data_icon.usingEyedropper = false;
 	}
 
-
 	/* DATA LOAD */
 	function createNewMap() {
 		/* TODO: Save Data Checking */
@@ -589,8 +614,8 @@
 
 	async function saveInit() {
 		// = asyncExtract(app, offsetContainer)
-		if (loadedSave.title == '') {
-			let t = prompt('Map Title:');
+		if (loadedSave.title == "") {
+			let t = prompt("Map Title:");
 			if (t != null) {
 				loadedSave.title = t;
 			} else {
@@ -616,9 +641,9 @@
 
 		let p1 = asyncExtract(app, offsetContainer)
 			.catch((error) => {
-				console.log('Oh no');
+				console.log("Oh no");
 
-				p = '';
+				p = "";
 			})
 			.then((r) => (p = r));
 
@@ -651,9 +676,7 @@
 			loadedId = Number(id);
 		}
 
-
-		
-		$store_has_unsaved_changes = false
+		$store_has_unsaved_changes = false;
 
 		saving = false;
 	}
@@ -667,7 +690,6 @@
 		} else {
 			console.log("Loading default save data");
 		}
-		
 
 		// Deal with outdated save data
 		data = convertSaveDataToLatest(data);
@@ -690,19 +712,22 @@
 		loadedIconsets = data.iconsets;
 
 		// Load Textures
-		loadedTilesets.forEach(async tileset => {
+		loadedTilesets.forEach(async (tileset) => {
+			if (
+				tileset.format_version == undefined ||
+				tileset.format_version < LATESTTILESETFORMATVERSION
+			) {
+				let updated_tileset = update_tileset_format(tileset);
 
-			if (tileset.format_version == undefined || tileset.format_version < LATESTTILESETFORMATVERSION) {
-
-				let updated_tileset = update_tileset_format(tileset)
-				
-				loadedTilesets = loadedTilesets.filter(ts => ts.id != tileset.id)
-				loadedTilesets.push(updated_tileset)
+				loadedTilesets = loadedTilesets.filter(
+					(ts) => ts.id != tileset.id,
+				);
+				loadedTilesets.push(updated_tileset);
 			}
-			
+
 			console.log(`Loading textures for ${tileset.name}`);
 			await texture_loader.load_tileset_textures(tileset);
-		})
+		});
 
 		// Load Icons
 		for (const iconset of loadedIconsets) {
@@ -710,12 +735,13 @@
 			await texture_loader.load_iconset_textures(iconset);
 		}
 
-		$tfield = data.TerrainField
+		$tfield = data.TerrainField;
 
 		$data_coordinates = data.coords;
 
 		$data_overlay = data.overlay;
-		if (selectedTool == tools.OVERLAY && data_overlay.base64 == '') store_selected_tool.update((n) => tools.TERRAIN);
+		if (selectedTool == tools.OVERLAY && data_overlay.base64 == "")
+			store_selected_tool.update((n) => tools.TERRAIN);
 
 		//console.log(PIXI_Assets.Assets)
 
@@ -723,7 +749,10 @@
 		loadedId = id;
 
 		let firstTile = loadedTilesets[0].tiles[0];
-		data_terrain.tile = { ...firstTile, symbol: firstTile.symbol ? { ...firstTile.symbol } : null };
+		data_terrain.tile = {
+			...firstTile,
+			symbol: firstTile.symbol ? { ...firstTile.symbol } : null,
+		};
 
 		let firstIcon = loadedIconsets[0].icons[0];
 		$data_icon.color = firstIcon.color;
@@ -736,18 +765,28 @@
 
 		store_panning.store.update((pan) => {
 			if (tf.mapShape == map_shape.SQUARE) {
-				if (tf.orientation == 'flatTop') {
-					let mapWidth = tf.columns * tf.hexWidth * 0.75 + tf.hexWidth * 0.25;
-					let mapHeight = (tf.rows - 1) * tf.hexHeight - tf.hexHeight * 0.5;
+				if (tf.orientation == "flatTop") {
+					let mapWidth =
+						tf.columns * tf.hexWidth * 0.75 + tf.hexWidth * 0.25;
+					let mapHeight =
+						(tf.rows - 1) * tf.hexHeight - tf.hexHeight * 0.5;
 
-					pan.offsetX = window.innerWidth / 2 - (mapWidth / 2) * pan.zoomScale;
-					pan.offsetY = window.innerHeight / 2 - (mapHeight / 2) * pan.zoomScale;
+					pan.offsetX =
+						window.innerWidth / 2 - (mapWidth / 2) * pan.zoomScale;
+					pan.offsetY =
+						window.innerHeight / 2 -
+						(mapHeight / 2) * pan.zoomScale;
 				} else {
-					let mapHeight = tf.rows * tf.hexHeight * 0.75 + tf.hexHeight * 0.25;
-					let mapWidth = (tf.columns - 1) * tf.hexWidth - tf.hexWidth * 0.5;
+					let mapHeight =
+						tf.rows * tf.hexHeight * 0.75 + tf.hexHeight * 0.25;
+					let mapWidth =
+						(tf.columns - 1) * tf.hexWidth - tf.hexWidth * 0.5;
 
-					pan.offsetX = window.innerWidth / 2 - (mapWidth / 2) * pan.zoomScale;
-					pan.offsetY = window.innerHeight / 2 - (mapHeight / 2) * pan.zoomScale;
+					pan.offsetX =
+						window.innerWidth / 2 - (mapWidth / 2) * pan.zoomScale;
+					pan.offsetY =
+						window.innerHeight / 2 -
+						(mapHeight / 2) * pan.zoomScale;
 				}
 			} else {
 				pan.offsetX = window.innerWidth / 2;
@@ -774,7 +813,7 @@
 		/* Set up tools - would be nice to remember tool settings but this works regardless of loaded tileset */
 
 		// console.log(loadedSave);
-		console.log("Loaded, ready")
+		console.log("Loaded, ready");
 
 		//loadedSave = data
 		//loadedId = id
@@ -827,7 +866,12 @@
 	});
 </script>
 
-<svelte:window on:keydown={keyDown} on:keyup|preventDefault={keyUp} on:blur={blur} on:beforeunload={before_unload}/>
+<svelte:window
+	on:keydown={keyDown}
+	on:keyup|preventDefault={keyUp}
+	on:blur={blur}
+	on:beforeunload={before_unload}
+/>
 
 {#if appState == app_state.NORMAL}
 	<main id="content-arranger">
@@ -840,7 +884,7 @@
 							saveToDexie();
 						}, 30);
 					}}
-					alt={'Saving...'}
+					alt={"Saving..."}
 				/>
 				<p>Saving...</p>
 			</div>
@@ -865,35 +909,84 @@
 				pointerOffLayers(e);
 			}}
 			on:blur={() => {
-				console.log("Sheeit")
+				console.log("Sheeit");
 			}}
 			on:keydown={keyDown}
 			on:keyup={keyUp}
 		>
 			<CanvasHolder {app} />
 
-			<TerrainLayer bind:cont_terrain bind:this={comp_terrainLayer} {changeTool} bind:data_terrain {comp_coordsLayer} />
-			<PathLayer bind:this={comp_pathLayer} bind:cont_all_paths bind:paths={loadedSave.paths} />
-			<IconLayer bind:this={comp_iconLayer} bind:pHex={loadedSave.icon_hex_size_percentage} bind:icons={loadedSave.icons} bind:cont_icon {data_eraser} />
+			<TerrainLayer
+				bind:cont_terrain
+				bind:this={comp_terrainLayer}
+				{changeTool}
+				bind:data_terrain
+				{comp_coordsLayer}
+			/>
+			<PathLayer
+				bind:this={comp_pathLayer}
+				bind:cont_all_paths
+				bind:paths={loadedSave.paths}
+			/>
+			<IconLayer
+				bind:this={comp_iconLayer}
+				bind:pHex={loadedSave.icon_hex_size_percentage}
+				bind:icons={loadedSave.icons}
+				bind:cont_icon
+				{data_eraser}
+			/>
 			<CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} />
 			<LargeHexesLayer bind:cont_largehexes />
-			<TextLayer bind:cont_all_text bind:this={comp_textLayer} bind:texts={loadedSave.texts} bind:data_text />
-			<OverlayLayer bind:this={comp_overlayLayer} bind:cont_overlay {app} />
+			<TextLayer
+				bind:cont_all_text
+				bind:this={comp_textLayer}
+				bind:texts={loadedSave.texts}
+				bind:data_text
+			/>
+			<OverlayLayer
+				bind:this={comp_overlayLayer}
+				bind:cont_overlay
+				{app}
+			/>
 		</section>
 
 		<!-- Panels -->
 		{#if showTerrainGenerator}
-			<TerrainGenerator {loadedTilesets} {comp_terrainLayer} bind:showTerrainGenerator />
+			<TerrainGenerator
+				{loadedTilesets}
+				{comp_terrainLayer}
+				bind:showTerrainGenerator
+			/>
 		{:else if show_icon_generator}
-			<IconGenerator {loadedIconsets} {comp_iconLayer} bind:show_icon_generator />
+			<IconGenerator
+				{loadedIconsets}
+				{comp_iconLayer}
+				bind:show_icon_generator
+			/>
 		{:else if selectedTool == tools.TERRAIN}
-			<TerrainPanel bind:this={comp_terrain_panel} {loadedTilesets} {app} bind:data_terrain />
+			<TerrainPanel
+				bind:this={comp_terrain_panel}
+				{loadedTilesets}
+				{app}
+				bind:data_terrain
+			/>
 		{:else if selectedTool == tools.ICON}
-			<IconPanel {app} {loadedIconsets} bind:pHex={loadedSave.icon_hex_size_percentage} />
+			<IconPanel
+				{app}
+				{loadedIconsets}
+				bind:pHex={loadedSave.icon_hex_size_percentage}
+			/>
 		{:else if selectedTool == tools.PATH}
-			<PathPanel {comp_pathLayer} bind:pathStyles={loadedSave.pathStyles} />
+			<PathPanel
+				{comp_pathLayer}
+				bind:pathStyles={loadedSave.pathStyles}
+			/>
 		{:else if selectedTool == tools.TEXT}
-			<TextPanel bind:data_text {comp_textLayer} bind:textStyles={loadedSave.textStyles} />
+			<TextPanel
+				bind:data_text
+				{comp_textLayer}
+				bind:textStyles={loadedSave.textStyles}
+			/>
 		{:else if selectedTool == tools.ERASER}
 			<EraserPanel bind:loaded_save={loadedSave} />
 		{:else if selectedTool == tools.OVERLAY}
@@ -901,11 +994,7 @@
 		{/if}
 
 		<div id="tool-buttons" on:mouseup={pointerup}>
-			<ToolButtons
-				bind:selectedTool
-				{changeTool}
-				bind:data_terrain
-			/>
+			<ToolButtons bind:selectedTool {changeTool} bind:data_terrain />
 		</div>
 
 		<div id="setting-buttons" on:mouseup={pointerup}>
@@ -913,39 +1002,68 @@
 				on:click={() => {
 					showSettings = true;
 				}}
-				title={'Map Settings'}><img src="assets/img/tools/settings.png" alt="Map Settings" /></button
+				title={"Map Settings"}
+				><img
+					src="assets/img/tools/settings.png"
+					alt="Map Settings"
+				/></button
 			>
 			<button
 				on:click={() => {
-					var theme = document.documentElement.getAttribute('data-theme');
-					if (theme == 'dark') {
-						theme = 'light';
+					var theme =
+						document.documentElement.getAttribute("data-theme");
+					if (theme == "dark") {
+						theme = "light";
 					} else {
-						theme = 'dark';
+						theme = "dark";
 					}
-					document.documentElement.setAttribute('data-theme', theme);
-					document.querySelector('meta[name="color-scheme"]').setAttribute("content", theme);
+					document.documentElement.setAttribute("data-theme", theme);
+					document
+						.querySelector('meta[name="color-scheme"]')
+						.setAttribute("content", theme);
 				}}
-				title={'Toggle theme'}><img src="assets/img/tools/moon-sun.svg" alt="Theme" /></button
+				title={"Toggle theme"}
+				><img src="assets/img/tools/moon-sun.svg" alt="Theme" /></button
 			>
 			<button
 				on:click={() => {
 					showSavedMaps = true;
 				}}
-				title={'Maps'}
+				title={"Maps"}
 			>
 				<img src="assets/img/tools/maps.png" alt="Maps" />
 			</button>
 			<div>
-				<button on:click={saveInit} title={'Save'}> <img src="assets/img/tools/save.png" alt="Save" /> </button>
+				<button on:click={saveInit} title={"Save"}>
+					<img src="assets/img/tools/save.png" alt="Save" />
+				</button>
 			</div>
 		</div>
 
+		<div id="help-buttons" on:mouseup={pointerup} class:show={showHelp}>
+			<button
+				on:click={() => {
+					showHelp = !showHelp;
+				}}
+				title={"Overlay Help"}
+				><img src="assets/img/ui/help/question_mark.png" alt="Help" /></button
+			>
+		</div>
+
 		{#if showKeyboardShortcuts}
-			<ShortcutList bind:this={comp_shortcutList} on:mouseup={pointerup}/>
+			<ShortcutList
+				bind:this={comp_shortcutList}
+				on:mouseup={pointerup}
+			/>
 		{/if}
 
-		<SavedMaps bind:showSavedMaps {createNewMap} load={loadInit} loadAndSave={loadAndSave} on:mouseup={pointerup}/>
+		<SavedMaps
+			bind:showSavedMaps
+			{createNewMap}
+			load={loadInit}
+			{loadAndSave}
+			on:mouseup={pointerup}
+		/>
 
 		<Settings
 			{loadedSave}
@@ -978,6 +1096,17 @@
 		{#if showControls}
 			<TooltipsPane {data_terrain} {data_text} {data_eraser} />
 		{/if}
+
+		{#if showHelp}
+			<div id="help-overlay">
+				<img id="welcome" src="assets/img/ui/help/welcome.png" alt="Welcome To Hexfriend" />
+				<img id="map" src="assets/img/ui/help/map.png" alt="This Is The Map" />
+				<img id="settings-saving" src="assets/img/ui/help/settings_saving.png" alt="Settings & Saving" />
+				<img id="tools" src="assets/img/ui/help/tools.png" alt="Choose Your Tool" />
+				<img id="configure" src="assets/img/ui/help/configure.png" alt="Configure The Tools" />
+				<img id="shortcuts" src="assets/img/ui/help/shortcuts.png" alt="Check Out The Shortcuts" />
+			</div>
+		{/if}
 	</main>
 {:else if appState == app_state.TILESETCREATOR}
 	<TilesetCreator bind:appState />
@@ -987,7 +1116,7 @@
 	<div id="loading-screen">
 		<img
 			src="../assets/img/site/hexfriend.png"
-			alt={'Loading'}
+			alt={"Loading"}
 			on:load={() => {
 				setTimeout(() => {
 					load_map(dataToLoad.data, dataToLoad.id);
@@ -1149,5 +1278,118 @@
 
 	#setting-buttons button img {
 		width: 100%;
+	}
+
+	/* HELP BUTTON */
+	#help-buttons {
+		position: fixed;
+		left: 0;
+		bottom: 0;
+		background-color: var(--world-background);
+
+		display: flex;
+		padding: 0.5em;
+		border-top-right-radius: 0.5em;
+
+		opacity: 0.5;
+		transition: all 0.2s ease-in-out;
+
+		animation: pulse 3s ease-in-out;
+	}
+
+	#help-buttons.show {
+		/* keeps it toggle-able and on top even when the help overlay is overlaid */
+		z-index: 1;
+		opacity: 1;
+		background-color: var(--hexfriend-green);
+	}
+
+	@keyframes pulse {
+		25%,
+		75% {
+			opacity: 0.85;
+			background-color: var(--hexfriend-green);
+			padding: 1em;
+		}
+
+		50% {
+			opacity: 0.5;
+			background-color: var(--world-background);
+		}
+	}
+
+	@keyframes grow {
+		25%, 75% {
+			width: 3em;
+			height: 3em;
+		}
+	}
+
+	#help-buttons button {
+		width: 3em;
+		height: 3em;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border-radius: 50%;
+
+		background-color: transparent;
+		padding: 0.25em;
+
+		animation: grow 3s ease-in-out;
+	}
+
+	#help-buttons button img {
+		width: 80%;
+	}
+
+	#help-buttons:hover {
+		opacity: 1;
+	}
+
+	#help-buttons button:hover {
+		background-color: var(--light-background);
+	}
+
+	#help-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+
+		background-color: color-mix(in srgb, var(--world-background), transparent 50%);
+	}
+
+	#help-overlay img {
+		position: absolute;
+		text-align: center;
+	}
+
+	#help-overlay #welcome {
+		top: 0;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	#help-overlay #map {
+		top: 30%;
+		left: 10%;
+	}
+
+	#help-overlay #tools {
+		bottom: 0;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	#help-overlay #configure {
+		top: 0;
+		right: 8%;
+	}
+
+	#help-overlay #shortcuts {
+		bottom: 0;
+		right: 0;
 	}
 </style>
