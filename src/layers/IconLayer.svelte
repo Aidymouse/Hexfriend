@@ -77,15 +77,12 @@
 	function getIconScale() {
 		
 		let icon_texture = get_icon_texture($data_icon.texId)
-		
-		let icon_texture_width = 100
-		let icon_texture_height = 100
 
 		let scale: number;
 		if ($tfield.hexWidth < $tfield.hexHeight) {
-			scale = ($tfield.hexWidth * (pHex / 100)) / icon_texture_width;
+			scale = ($tfield.hexWidth * (pHex / 100)) / icon_texture.width;
 		} else {
-			scale = ($tfield.hexHeight * (pHex / 100)) / icon_texture_height;
+			scale = ($tfield.hexHeight * (pHex / 100)) / icon_texture.height;
 		}
 
 		return scale;
