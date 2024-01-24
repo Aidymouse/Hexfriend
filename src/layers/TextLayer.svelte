@@ -11,6 +11,8 @@
 	import { store_has_unsaved_changes } from '../stores/flags';
 	import { tfield } from '../stores/tfield';
 	import { resize_parameters } from '../stores/resize_parameters';
+	import { data_text } from '../stores/data';
+
 	
 	// LIB
 	import * as PIXI from 'pixi.js';
@@ -39,7 +41,6 @@
 
 	export let cont_all_text;
 
-	export let data_text: text_data;
 	let hoveredText;
 
 	let dragText;
@@ -66,9 +67,9 @@
 	textId++;
 
 	$: {
-		if (data_text.selectedText) {
-			data_text.selectedText.style = { ...data_text.style }
-			data_text.selectedText.alpha = data_text.alpha;
+		if ($data_text.selectedText) {
+			$data_text.selectedText.style = { ...$data_text.style }
+			$data_text.selectedText.alpha = $data_text.alpha;
 		};
 		texts = texts;
 		hoveredText = hoveredText;
@@ -100,14 +101,14 @@
 
 	export function pointerdown() {
 
-		data_text.contextStyleId = null;
+		$data_text.contextStyleId = null;
 
-		if (data_text.selectedText && hoveredText) {
+		if ($data_text.selectedText && hoveredText) {
 			selectText();
 			setTimeout(() => {
-				data_text.editorRef.focus();
+				$data_text.editorRef.focus();
 			}, 10); /* I wish I didn't have to do this, and I'm sure it's terrible, but it doesnt work without it :/ */
-		} else if (data_text.selectedText) {
+		} else if ($data_text.selectedText) {
 			deselectText();
 		} else if (hoveredText) {
 			selectText();
@@ -117,23 +118,23 @@
 	}
 
 	function selectText() {
-		data_text.style = { ...hoveredText.style };
-		data_text.selectedText = hoveredText;
-		data_text.alpha = hoveredText.alpha;
+		$data_text.style = { ...hoveredText.style };
+		$data_text.selectedText = hoveredText;
+		$data_text.alpha = hoveredText.alpha;
 
-		dragText = data_text.selectedText;
+		dragText = $data_text.selectedText;
 		dragX = store_panning.curWorldX() - hoveredText.x;
 		dragY = store_panning.curWorldY() - hoveredText.y;
 
-		//trsfm_text.group[0] = (pixi_texts[data_text.selectedText.id])
+		//trsfm_text.group[0] = (pixi_texts[$data_text.selectedText.id])
 
 	}
 
 	function deselectText() {
-		if (!data_text.selectedText) return
+		if (!$data_text.selectedText) return
 
-		if (data_text.selectedText.text == '') deleteText(data_text.selectedText);
-		data_text.selectedText = null
+		if ($data_text.selectedText.text == '') deleteText($data_text.selectedText);
+		$data_text.selectedText = null
 
 		//trsfm_text.group = []
 	}
@@ -144,7 +145,7 @@
 	}
 
 	export function pointermove() {
-		if (!data_text.usingTextTool) return;
+		if (!$data_text.usingTextTool) return;
 
 		if (dragText) {
 			dragText.x = store_panning.curWorldX() - dragX;
@@ -158,8 +159,8 @@
 		let new_text = { 
 			id: textId,
 			text: '',
-			alpha: data_text.alpha,
-			style: { ...data_text.style },
+			alpha: $data_text.alpha,
+			style: { ...$data_text.style },
 			x: store_panning.curWorldX(),
 			y: store_panning.curWorldY(),
 			rotation: 0
@@ -173,13 +174,13 @@
 
 		textId++;
 		texts = texts;
-		data_text.selectedText = texts[texts.length - 1];
+		$data_text.selectedText = texts[texts.length - 1];
 		$store_has_unsaved_changes = true;
 	}
 
 
 	export function deleteText(text: text_layer_text) {
-		if (text == data_text.selectedText) data_text.selectedText = null;
+		if (text == $data_text.selectedText) $data_text.selectedText = null;
 		let i = texts.indexOf(text);
 		texts.splice(i, 1);
 		texts = texts;
@@ -215,17 +216,17 @@
 	export function handleKeyboardShortcut(shortcutData: shortcut_data) {
 		switch (shortcutData.function) {
 			case 'toggleItalics':
-				data_text.style.fontStyle = data_text.style.fontStyle == 'italic' ? 'normal' : 'italic';
+				$data_text.style.fontStyle = $data_text.style.fontStyle == 'italic' ? 'normal' : 'italic';
 				$store_has_unsaved_changes = true;
 				break;
 
 			case 'toggleBold':
-				data_text.style.fontWeight = data_text.style.fontWeight == 'bold' ? 'normal' : 'bold';
+				$data_text.style.fontWeight = $data_text.style.fontWeight == 'bold' ? 'normal' : 'bold';
 				$store_has_unsaved_changes = true;
 				break;
 
 			case 'deleteText':
-				if (data_text.selectedText) deleteText(data_text.selectedText);
+				if ($data_text.selectedText) deleteText($data_text.selectedText);
 				$store_has_unsaved_changes = true;
 				break;
 		}
@@ -256,7 +257,7 @@
 			}
 
 			let pixi_text = pixi_texts[text.id]
-			pixi_text.resolution = (data_text.selectedText?.id == text.id) ? 1.25 : 4
+			pixi_text.resolution = ($data_text.selectedText?.id == text.id) ? 1.25 : 4
 			pixi_text.x = text.x
 			pixi_text.y = text.y
 			pixi_text.text = text.text
@@ -278,25 +279,25 @@
 
 		/* Selector */
 		grph_selector.clear();
-		if (!data_text.usingTextTool) return;
+		if (!$data_text.usingTextTool) return;
 
 		
-		if (data_text.selectedText) {
-			let tW = getTextWidth(data_text.selectedText);
-			let tH = getTextHeight(data_text.selectedText);
-			let thickness = Math.max(data_text.selectedText.style.fontSize / 10, 4)
+		if ($data_text.selectedText) {
+			let tW = getTextWidth($data_text.selectedText);
+			let tH = getTextHeight($data_text.selectedText);
+			let thickness = Math.max($data_text.selectedText.style.fontSize / 10, 4)
 
 			grph_selector.lineStyle(thickness, 0x333333);
 			grph_selector.drawRect(
-				data_text.selectedText.x - tW * alignMap[data_text.selectedText.style.align].x - thickness,
-				data_text.selectedText.y - thickness,
+				$data_text.selectedText.x - tW * alignMap[$data_text.selectedText.style.align].x - thickness,
+				$data_text.selectedText.y - thickness,
 				tW + thickness + thickness,
 				tH + thickness + thickness
 			);
 
 		}
 
-		if (hoveredText && hoveredText != data_text.selectedText) {
+		if (hoveredText && hoveredText != $data_text.selectedText) {
 			let tW = getTextWidth(hoveredText);
 			let tH = getTextHeight(hoveredText);
 			let thickness = Math.max(hoveredText.style.fontSize / 20, 2);

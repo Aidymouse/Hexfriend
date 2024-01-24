@@ -1,17 +1,22 @@
 <script lang="ts">
-	import ColorInputPixi from '../components/ColorInputPixi.svelte';
 	import { getHexPath } from '../helpers/hexHelpers';
 	import { tiles_match } from '../helpers/tiles';
+	
 	import { get_symbol_texture } from '../lib/texture_loader';
-	import { tfield } from '../stores/tfield';
+	
 	import type { terrain_data } from '../types/data';
 	import type { terrain_field } from '../types/terrain';
 	import type { Tile, TileSymbol, Tileset } from '../types/tilesets';
+	
+	import { tfield } from '../stores/tfield';
+	import { data_terrain } from '../stores/data';
+
 	import * as PIXI from 'pixi.js';
 	import { afterUpdate, onMount } from 'svelte';
+	
+	import ColorInputPixi from '../components/ColorInputPixi.svelte';
 
 	export let loadedTilesets: Tileset[];
-	export let data_terrain: terrain_data;
 
 	export let app: PIXI.Application;
 
@@ -21,17 +26,17 @@
 	let c = new PIXI.Container();
 	c.addChild(g, s);
 
-	let tilePreview: string; //generateTilePreview(data_terrain);
+	let tilePreview: string; //generateTilePreview($data_terrain);
 
 	export function reset_tile() {
 		changeTile(loadedTilesets[0].tiles[0]);
 	}
 
 	async function changeTile(t: Tile) {
-		data_terrain.tile = { ...t, symbol: t.symbol ? { ...t.symbol } : null };
-		tilePreview = await generateTilePreview(data_terrain); // Not entirely sure why we have to await here when we already await in the function, but fuck it, it works
-		data_terrain.usingPaintbucket = false;
-		data_terrain.usingEraser = false;
+		$data_terrain.tile = { ...t, symbol: t.symbol ? { ...t.symbol } : null };
+		tilePreview = await generateTilePreview($data_terrain); // Not entirely sure why we have to await here when we already await in the function, but fuck it, it works
+		$data_terrain.usingPaintbucket = false;
+		$data_terrain.usingEraser = false;
 	}
 
 	function findSymbolScale(symbol: TileSymbol, hexWidth: number, hexHeight: number) {
@@ -80,18 +85,18 @@
 	}
 
 	function styleMatchesData(tile: Tile): boolean {
-		return tiles_match(tile, data_terrain.tile);
+		return tiles_match(tile, $data_terrain.tile);
 	}
 
 	afterUpdate(async () => {
 		loadedTilesets = loadedTilesets;
 		$tfield.orientation = $tfield.orientation;
 
-		tilePreview = await generateTilePreview(data_terrain);
+		tilePreview = await generateTilePreview($data_terrain);
 	});
 
 	onMount(async () => {
-		tilePreview = await generateTilePreview(data_terrain);
+		tilePreview = await generateTilePreview($data_terrain);
 	});
 </script>
 
@@ -107,13 +112,13 @@
 		</div>
 
 		<span class="terrain-preview-control-row">
-			<ColorInputPixi bind:value={data_terrain.tile.bgColor} id={'terrainColor'} />
+			<ColorInputPixi bind:value={$data_terrain.tile.bgColor} id={'terrainColor'} />
 			<label for="terrainColor">Terrain Color</label>
 		</span>
 
-		{#if data_terrain.tile.symbol}
+		{#if $data_terrain.tile.symbol}
 			<span class="terrain-preview-control-row">
-				<ColorInputPixi bind:value={data_terrain.tile.symbol.color} id={'symbolColor'} />
+				<ColorInputPixi bind:value={$data_terrain.tile.symbol.color} id={'symbolColor'} />
 				<label for="symbolColor">Symbol Color</label>
 			</span>
 		{/if}

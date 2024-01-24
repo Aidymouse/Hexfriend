@@ -77,6 +77,9 @@
 		data_icon,
 		data_overlay,
 		data_coordinates,
+		data_terrain,
+		data_eraser,
+		data_text,
 	} from "./stores/data";
 	import { resize_parameters } from "./stores/resize_parameters";
 
@@ -185,51 +188,16 @@
 		pan = pan;
 	}
 
-	let selectedTool;
-	store_selected_tool.subscribe((t) => {
-		selectedTool = t;
-	});
 
 	/* DATA */
 	/* Data is bound to both layer and panel of a particluar tool. It contains all the shared state they need, and is bound to both */
 	/* These should probably be stores huh */
 
-	let data_terrain: terrain_data = {
-		//bgColor: null,
-		//symbol: null,
+	store_selected_tool.subscribe(n => {
+		$data_text.usingTextTool = n == tools.TEXT;
+	})
 
-		tile: null,
 
-		usingEyedropper: false,
-		usingPaintbucket: false,
-		usingEraser: false,
-		renderOpacity: 1,
-	};
-
-	let data_text: text_data = {
-		style: {
-			fontFamily: "Segoe UI",
-			fill: "#000000",
-			fontSize: 25,
-			miterLimit: 2,
-			strokeThickness: 0,
-			stroke: "#f2f2f2",
-			align: "left",
-			fontStyle: "normal",
-			fontWeight: "normal",
-		},
-		alpha: 1,
-		selectedText: null,
-		editorRef: null,
-		usingTextTool: false,
-		contextStyleId: null,
-	};
-	$: data_text.usingTextTool = selectedTool == tools.TEXT;
-
-	let data_eraser: eraser_data = {
-		ignoreTerrain: false,
-		ignoreIcons: false,
-	};
 
 	let ignored_keys: string[] = [
 		"F1",
@@ -299,7 +267,7 @@
 		});
 
 		//$data_path.contextPathId = null;
-		data_text.contextStyleId = null;
+		$data_text.contextStyleId = null;
 
 		//$data_path.selectedPath = null;
 
@@ -316,7 +284,7 @@
 		if ($store_inputs.mouseDown[2]) store_panning.handlers.startPan(e);
 
 		if ($store_inputs.mouseDown[0]) {
-			switch (selectedTool) {
+			switch ($store_selected_tool) {
 				case tools.TERRAIN:
 					comp_terrainLayer.pointerdown();
 					break;
@@ -334,7 +302,7 @@
 					break;
 
 				case tools.ERASER:
-					if (!data_eraser.ignoreTerrain) {
+					if (!$data_eraser.ignoreTerrain) {
 						comp_terrainLayer.eraseAtMouse();
 					}
 					/* Icons are handled in the IconLayer */
@@ -350,7 +318,7 @@
 
 		if (!$store_inputs.mouseDown[2]) store_panning.handlers.endPan();
 
-		switch (selectedTool) {
+		switch ($store_selected_tool) {
 			case tools.ICON:
 				comp_iconLayer.pointerup();
 				break;
@@ -368,7 +336,7 @@
 	function pointermove(e: PointerEvent) {
 		store_panning.handlers.handle(e);
 
-		switch (selectedTool) {
+		switch ($store_selected_tool) {
 			case tools.TERRAIN:
 				if ($store_inputs.mouseDown[0]) comp_terrainLayer.pointerdown();
 				break;
@@ -383,7 +351,7 @@
 
 			case tools.ERASER:
 				if ($store_inputs.mouseDown[0]) {
-					if (!data_eraser.ignoreTerrain)
+					if (!$data_eraser.ignoreTerrain)
 						comp_terrainLayer.eraseAtMouse();
 				}
 				/* Icons are handled differently in the icon handler */
@@ -396,7 +364,7 @@
 	}
 
 	function pointerOffLayers(e: PointerEvent) {
-		switch (selectedTool) {
+		switch ($store_selected_tool) {
 			case tools.ICON:
 				comp_iconLayer.pointerout(e);
 				break;
@@ -423,7 +391,7 @@
 		if (e.key == "Shift") keycode = "shift";
 		if (e.key == "Control") keycode = "control";
 
-		let shortcutData = getKeyboardShortcut(keycode, selectedTool);
+		let shortcutData = getKeyboardShortcut(keycode, $store_selected_tool);
 		if (!shortcutData) return;
 		//console.log(keycode);
 
@@ -455,7 +423,7 @@
 						showSettings = false;
 						showKeyboardShortcuts = false;
 						$data_path.contextPathId = null;
-						data_text.contextStyleId = null;
+						$data_text.contextStyleId = null;
 						break;
 
 					case "changeTool_terrain":
@@ -534,7 +502,7 @@
 		}
 
 		// Conditions under which we don't want to prevent default
-		if (data_text.editorRef) {
+		if ($data_text.editorRef) {
 			if (e.ctrlKey) {
 				e.preventDefault();
 			}
@@ -545,7 +513,7 @@
 		handleShortcuts(e);
 
 		// Some more active keyboard listeners require these methods to be called
-		switch (selectedTool) {
+		switch ($store_selected_tool) {
 			case tools.TERRAIN: {
 				comp_terrainLayer.keydown(e);
 				break;
@@ -562,8 +530,8 @@
 			}
 
 			case tools.ERASER: {
-				if (e.key == "Shift") data_eraser.ignoreIcons = true;
-				if (e.key == "Control") data_eraser.ignoreTerrain = true;
+				if (e.key == "Shift") $data_eraser.ignoreIcons = true;
+				if (e.key == "Control") $data_eraser.ignoreTerrain = true;
 				break;
 			}
 		}
@@ -576,7 +544,7 @@
 			comp_shortcutList.keyup(e);
 		}
 
-		switch (selectedTool) {
+		switch ($store_selected_tool) {
 			case tools.TERRAIN: {
 				comp_terrainLayer.keyup(e);
 				break;
@@ -593,15 +561,15 @@
 			}
 
 			case tools.ERASER: {
-				if (e.key == "Shift") data_eraser.ignoreIcons = false;
-				if (e.key == "Control") data_eraser.ignoreTerrain = false;
+				if (e.key == "Shift") $data_eraser.ignoreIcons = false;
+				if (e.key == "Control") $data_eraser.ignoreTerrain = false;
 				break;
 			}
 		}
 	}
 
 	function blur() {
-		data_terrain.usingEyedropper = false;
+		$data_terrain.usingEyedropper = false;
 		$data_icon.usingEyedropper = false;
 	}
 
@@ -701,7 +669,7 @@
 		//await loadSave(data, id)
 
 		$data_path.selectedPath = null;
-		data_text.selectedText = null;
+		$data_text.selectedText = null;
 
 		// await tick() // The terrain field needs time to hook onto
 		//comp_terrainLayer.renderAllHexes()
@@ -740,16 +708,13 @@
 		$data_coordinates = data.coords;
 
 		$data_overlay = data.overlay;
-		if (selectedTool == tools.OVERLAY && data_overlay.base64 == "")
-			store_selected_tool.update((n) => tools.TERRAIN);
-
-		//console.log(PIXI_Assets.Assets)
+		if ($store_selected_tool == tools.OVERLAY && $data_overlay.base64 == "") $store_selected_tool = tools.TERRAIN;
 
 		loadedSave = data;
 		loadedId = id;
 
 		let firstTile = loadedTilesets[0].tiles[0];
-		data_terrain.tile = {
+		$data_terrain.tile = {
 			...firstTile,
 			symbol: firstTile.symbol ? { ...firstTile.symbol } : null,
 		};
@@ -920,7 +885,6 @@
 				bind:cont_terrain
 				bind:this={comp_terrainLayer}
 				{changeTool}
-				bind:data_terrain
 				{comp_coordsLayer}
 			/>
 			<PathLayer
@@ -933,7 +897,6 @@
 				bind:pHex={loadedSave.icon_hex_size_percentage}
 				bind:icons={loadedSave.icons}
 				bind:cont_icon
-				{data_eraser}
 			/>
 			<CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} />
 			<LargeHexesLayer bind:cont_largehexes />
@@ -941,7 +904,6 @@
 				bind:cont_all_text
 				bind:this={comp_textLayer}
 				bind:texts={loadedSave.texts}
-				bind:data_text
 			/>
 			<OverlayLayer
 				bind:this={comp_overlayLayer}
@@ -963,38 +925,36 @@
 				{comp_iconLayer}
 				bind:show_icon_generator
 			/>
-		{:else if selectedTool == tools.TERRAIN}
+		{:else if $store_selected_tool == tools.TERRAIN}
 			<TerrainPanel
 				bind:this={comp_terrain_panel}
 				{loadedTilesets}
 				{app}
-				bind:data_terrain
 			/>
-		{:else if selectedTool == tools.ICON}
+		{:else if $store_selected_tool == tools.ICON}
 			<IconPanel
 				{app}
 				{loadedIconsets}
 				bind:pHex={loadedSave.icon_hex_size_percentage}
 			/>
-		{:else if selectedTool == tools.PATH}
+		{:else if $store_selected_tool == tools.PATH}
 			<PathPanel
 				{comp_pathLayer}
 				bind:pathStyles={loadedSave.pathStyles}
 			/>
-		{:else if selectedTool == tools.TEXT}
+		{:else if $store_selected_tool == tools.TEXT}
 			<TextPanel
-				bind:data_text
 				{comp_textLayer}
 				bind:textStyles={loadedSave.textStyles}
 			/>
-		{:else if selectedTool == tools.ERASER}
+		{:else if $store_selected_tool == tools.ERASER}
 			<EraserPanel bind:loaded_save={loadedSave} />
-		{:else if selectedTool == tools.OVERLAY}
+		{:else if $store_selected_tool == tools.OVERLAY}
 			<OverlayPanel />
 		{/if}
 
 		<div id="tool-buttons" on:mouseup={pointerup}>
-			<ToolButtons bind:selectedTool {changeTool} bind:data_terrain />
+			<ToolButtons {changeTool} />
 		</div>
 
 		<div id="setting-buttons" on:mouseup={pointerup}>
@@ -1094,7 +1054,7 @@
 		/>
 
 		{#if showControls}
-			<TooltipsPane {data_terrain} {data_text} {data_eraser} />
+			<TooltipsPane />
 		{/if}
 
 		{#if showHelp}

@@ -8,19 +8,15 @@
 	import type { TileSymbol } from '../types/tilesets';
 	import type { hex_id } from '../types/toolData';
 	import { tools } from '../types/toolData'
+	import type CoordsLayer from './CoordsLayer.svelte';
+
+	import { data_terrain } from '../stores/data';
+	import { data_overlay } from '../stores/data';
+	import * as store_panning from '../stores/panning';
+	import { tfield } from '../stores/tfield';
+	import { store_inputs } from '../stores/inputs';
 
 	import {tiles_match} from '../helpers/tiles';
-
-	import type CoordsLayer from './CoordsLayer.svelte';
-	
-	// Enums
-	import { hex_orientation, hex_raised } from '../types/terrain';
-	import { map_shape } from '../types/settings';
-
-	import { data_overlay } from '../stores/data';
-
-	// There's probably some clean up to do in that different colored hexes can have the same ID...
-	// This isnt *really* an issue, because ID is only used for symbol textures and we want those to double up anyway.
 	import {
 		coords_cubeToWorld,
 		coords_qToCube,
@@ -34,9 +30,16 @@
 		getRing,
 		id_to_coords,
 	} from '../helpers/hexHelpers';
-	import * as store_panning from '../stores/panning';
-	import { tfield } from '../stores/tfield';
-	import { store_inputs } from '../stores/inputs';
+
+	
+	
+	// Enums
+	import { hex_orientation, hex_raised } from '../types/terrain';
+	import { map_shape } from '../types/settings';
+
+
+	// There's probably some clean up to do in that different colored hexes can have the same ID...
+	// This isnt *really* an issue, because ID is only used for symbol textures and we want those to double up anyway.
 	import { store_has_unsaved_changes } from '../stores/flags';
 	import * as PIXI from 'pixi.js';
 	import { onMount } from 'svelte';
@@ -64,8 +67,6 @@
 	});
 
 	export let comp_coordsLayer: CoordsLayer;
-
-	export let data_terrain: terrain_data;
 
 	export function copyHex(from: TerrainHex, to: TerrainHex) {
 		to.tile = from.tile ? { ...from.tile, preview: "", symbol: from.tile.symbol ? { ...from.tile.symbol, base64: "" } : null } : null;
@@ -772,7 +773,7 @@
 	export function placeTerrain() {
 		$store_has_unsaved_changes = true
 		
-		//data_terrain = data_terrain
+		//$data_terrain = $data_terrain
 		// Needs checking if terrain matches what we're trying to place already
 		if ($store_inputs.mouseDown[0]) {
 			let x = store_panning.curWorldX();
@@ -781,16 +782,16 @@
 
 			let clickedId = genHexId(clickedCoords.q, clickedCoords.r, clickedCoords.s);
 
-			paintFromTile(clickedId, data_terrain.tile);
+			paintFromTile(clickedId, $data_terrain.tile);
 		}
 	}
 
 	function paintHexFromData(hexId: hex_id) {
 		$store_has_unsaved_changes = true
 		
-		//data_terrain = data_terrain
+		//$data_terrain = $data_terrain
 
-		paintFromTile(hexId, data_terrain.tile);
+		paintFromTile(hexId, $data_terrain.tile);
 	}
 
 
@@ -819,7 +820,7 @@
 
 		let hex = $tfield.hexes[hexId];
 
-		return tiles_match(hex.tile, data_terrain.tile);
+		return tiles_match(hex.tile, $data_terrain.tile);
 	}
 
 
@@ -852,15 +853,15 @@
 			
 			if (cHex.tile == null) {
 				changeTool(tools.ERASER)
-				data_terrain.usingEyedropper = false;
+				$data_terrain.usingEyedropper = false;
 				return
 			}
 
 			// HACKY!!!! Needs changing
-			//data_terrain.tile = cHex.tile ? { ...cHex.tile, symbol: cHex.tile.symbol ? { ...cHex.tile.symbol } : null } : generateBlankTile();
-			data_terrain.tile = { ...cHex.tile, symbol: cHex.tile.symbol ? { ...cHex.tile.symbol } : null };
+			//$data_terrain.tile = cHex.tile ? { ...cHex.tile, symbol: cHex.tile.symbol ? { ...cHex.tile.symbol } : null } : generateBlankTile();
+			$data_terrain.tile = { ...cHex.tile, symbol: cHex.tile.symbol ? { ...cHex.tile.symbol } : null };
 
-			data_terrain.usingEyedropper = false;
+			$data_terrain.usingEyedropper = false;
 		}
 	}
 
@@ -996,13 +997,13 @@
 	}
 
 	export function pointerdown() {
-		if (data_terrain.usingEyedropper) {
+		if ($data_terrain.usingEyedropper) {
 			eyedrop();
-		} else if (data_terrain.usingPaintbucket && data_terrain.usingEraser) {
+		} else if ($data_terrain.usingPaintbucket && $data_terrain.usingEraser) {
 			erasePaintbucket();
-		} else if (data_terrain.usingPaintbucket) {
+		} else if ($data_terrain.usingPaintbucket) {
 			paintbucket();
-		} else if (data_terrain.usingEraser) {
+		} else if ($data_terrain.usingEraser) {
 			eraseAtMouse();
 		} else {
 			placeTerrain();
@@ -1022,17 +1023,17 @@
 		switch (e.key) {
 
 			case 'Alt': {
-				data_terrain.usingEyedropper = true;
+				$data_terrain.usingEyedropper = true;
 				break;
 			}
 
 			case 'Shift': {
-				data_terrain.usingEraser = true;
+				$data_terrain.usingEraser = true;
 				break;
 			}
 
 			case 'Control': {
-				data_terrain.usingPaintbucket = true;
+				$data_terrain.usingPaintbucket = true;
 				break;
 			}
 		}
@@ -1041,17 +1042,17 @@
 	export function keyup(e: KeyboardEvent) {
 		switch (e.key) {
 			case 'Alt': {
-				data_terrain.usingEyedropper = false;
+				$data_terrain.usingEyedropper = false;
 				break;
 			}
 
 			case 'Shift': {
-				data_terrain.usingEraser = false;
+				$data_terrain.usingEraser = false;
 				break;
 			}
 
 			case 'Control': {
-				data_terrain.usingPaintbucket = false;
+				$data_terrain.usingPaintbucket = false;
 				break;
 			}
 		}
@@ -1060,11 +1061,11 @@
 	export function handleKeyboardShortcut(shortcutData: shortcut_data) {
 		switch (shortcutData.function) {
 			case 'toggleEraser':
-				data_terrain.usingEraser = !data_terrain.usingEraser;
+				$data_terrain.usingEraser = !$data_terrain.usingEraser;
 				break;
 
 			case 'togglePaintbucket':
-				data_terrain.usingPaintbucket = !data_terrain.usingPaintbucket;
+				$data_terrain.usingPaintbucket = !$data_terrain.usingPaintbucket;
 				break;
 		}
 	}

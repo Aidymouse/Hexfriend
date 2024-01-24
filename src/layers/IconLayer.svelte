@@ -17,7 +17,7 @@
 	import { tfield } from '../stores/tfield';
 	import { store_inputs } from '../stores/inputs';
 	import { store_selected_tool } from '../stores/tools';
-	import { data_icon } from '../stores/data';
+	import { data_icon, data_eraser } from '../stores/data';
 	import { resize_parameters } from '../stores/resize_parameters';
 
 
@@ -49,11 +49,6 @@
 	// 	pan = newPan;
 	// });
 	
-	let selectedTool: tools;
-	store_selected_tool.subscribe(n => selectedTool = n);
-
-	export let data_eraser: eraser_data;
-
 	let floatingIcon: IconLayerIcon | null = null;
 	let draggedIcon: IconLayerIcon | null = null;
 
@@ -70,8 +65,7 @@
 	}
 
 	$: {
-		selectedTool = selectedTool
-		data_eraser = data_eraser
+		//$store_selected_tool = $store_selected_tool
 	}
 
 	function getIconScale() {
@@ -421,7 +415,7 @@
 	}
 
 	function shouldEraseIcons(): boolean {
-		return (selectedTool == 'eraser' && !data_eraser.ignoreIcons) || $data_icon.usingEraser
+		return ($store_selected_tool == tools.ERASER && !$data_eraser.ignoreIcons) || $data_icon.usingEraser
 	}
 
 	let dragOffsetX = 0;
@@ -517,7 +511,7 @@
 			pixi_icons[icon.id].tint = icon.color
 			pixi_icons[icon.id].scale.x = icon.scale
 			pixi_icons[icon.id].scale.y = icon.scale
-			pixi_icons[icon.id].eventMode = (selectedTool == tools.ICON) ? 'static' : 'auto'
+			pixi_icons[icon.id].eventMode = ($store_selected_tool == tools.ICON) ? 'static' : 'auto'
 
 			marked_for_saving.push(icon.id)
 		});
@@ -534,7 +528,7 @@
 		/* Floating Icon */
 		spr_floating_icon.visible = false
 		if (floatingIcon) {
-			spr_floating_icon.visible = !$data_icon.usingEraser && selectedTool == tools.ICON && cursorOnLayer && !$data_icon.dragMode && draggedIcon == null && !$data_icon.usingEyedropper
+			spr_floating_icon.visible = !$data_icon.usingEraser && $store_selected_tool == tools.ICON && cursorOnLayer && !$data_icon.dragMode && draggedIcon == null && !$data_icon.usingEyedropper
 			spr_floating_icon.texture = get_icon_texture(floatingIcon.texId)
 			spr_floating_icon.tint = floatingIcon.color
 
@@ -567,7 +561,7 @@
 		anchor={{ x: 0.5, y: 0.5 }}
 		scale={{ x: floatingIcon.scale, y: floatingIcon.scale }}
 		
-		visible={!$data_icon.usingEraser && selectedTool == tools.ICON && cursorOnLayer && !$data_icon.dragMode && draggedIcon == null}
+		visible={!$data_icon.usingEraser && $store_selected_tool == tools.ICON && cursorOnLayer && !$data_icon.dragMode && draggedIcon == null}
 	/>
 {/if}
 -->

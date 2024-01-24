@@ -2,12 +2,11 @@
 	import type { icon_data, overlay_data, path_data, terrain_data } from '../types/data';
   	import { hex_orientation } from '../types/terrain';
 	import { tools } from '../types/toolData';
-	import { afterUpdate } from 'svelte';
-	import { data_path, data_icon, data_overlay } from '../stores/data';
+	import { afterUpdate, onMount } from 'svelte';
+	import { data_path, data_icon, data_overlay, data_terrain } from '../stores/data';
+	import { store_selected_tool } from '../stores/tools';
 
 	import { tfield } from '../stores/tfield'
-
-	export let data_terrain: terrain_data;
 
 	/* These proxies keep the buttons responsive */
 	let data_path_proxy: path_data;
@@ -20,8 +19,13 @@
 		data_icon_proxy = n
 	})
 	
+	let data_terrain_proxy: terrain_data;
+	data_terrain.subscribe(n => {
+		data_terrain_proxy = n
+	})
+
 	$: {
-		data_terrain = data_terrain;
+		data_terrain_proxy = data_terrain_proxy;
 		data_path_proxy = data_path_proxy
 		data_icon_proxy = data_icon_proxy
 
@@ -37,29 +41,29 @@
 				{
 					display: 'Hex Paintbucket',
 					action: function () {
-						data_terrain.usingPaintbucket = !data_terrain.usingPaintbucket;
+						data_terrain.update(n => {n.usingPaintbucket = !n.usingPaintbucket; return n})
 					},
 					image: '/assets/img/tools/paintbucket.svg',
-					obj: data_terrain,
+					obj: data_terrain_proxy,
 					field: 'usingPaintbucket',
 				},
 				{
 					display: 'Hex Eraser',
 					action: function () {
-						data_terrain.usingEraser = !data_terrain.usingEraser;
+						data_terrain.update(n => {n.usingEraser = !n.usingEraser; return n})
 					},
 					image: '/assets/img/tools/mini_eraser.svg',
-					obj: data_terrain,
+					obj: data_terrain_proxy,
 					field: 'usingEraser',
 				},
-
+				
 				{
 					display: 'Hex Eyedropper',
 					action: function () {
-						data_terrain.usingEyedropper = !data_terrain.usingEyedropper;
+						data_terrain.update(n => {n.usingEyedropper = !n.usingEyedropper; return n})
 					},
 					image: '/assets/img/tools/eyedropper.svg',
-					obj: data_terrain,
+					obj: data_terrain_proxy,
 					field: 'usingEyedropper',
 				},
 
@@ -143,27 +147,31 @@
 		},
 	];
 
-	export let selectedTool: string;
-
 	export let changeTool: Function;
 
-	afterUpdate(() => {
-		let el_selected_button = document.getElementById(`tool-button-${selectedTool}`);
+	onMount(() => {
 
-		let clip_layer = document.getElementById('bottom-layer');
+		store_selected_tool.subscribe(n => {
+			let el_selected_button = document.getElementById(`tool-button-${n}`);
+		
+			let clip_layer = document.getElementById('bottom-layer');
+		
+			let new_clip_path = `circle(1.25em at ${el_selected_button.offsetLeft + el_selected_button.offsetWidth / 2}px ${
+				el_selected_button.offsetTop + el_selected_button.offsetHeight / 2
+			}px)`;
+		
+			clip_layer.style.clipPath = new_clip_path;
+	
+		})
 
-		let new_clip_path = `circle(1.25em at ${el_selected_button.offsetLeft + el_selected_button.offsetWidth / 2}px ${
-			el_selected_button.offsetTop + el_selected_button.offsetHeight / 2
-		}px)`;
+	})
 
-		clip_layer.style.clipPath = new_clip_path;
-	});
 </script>
 
 <main>
 	{#each buttons as b}
 		{#if b.miniButtons.length > 0}
-			<div class="mini-button-container" class:risen={b.toolCode == selectedTool}>
+			<div class="mini-button-container" class:risen={b.toolCode == $store_selected_tool}>
 				{#each b.miniButtons as mb}
 					<button class="mini-button" class:selected={mb.obj ? mb.obj[mb.field] : false} on:click={mb.action} title={mb.display}>
 						<span class="mini-button-bg" style="-webkit-mask: url({mb.image})" />
@@ -187,7 +195,7 @@
 				<!-- Button Image 
 				<span class="tool-img-wrapper" >
 					<img src={`/assets/img/tools/${b.toolCode}.png`} alt={`${b.display} Tool`} />
-					<img src={`/assets/img/tools/w_${b.toolCode}.png`} alt={`${b.display} Tool`} class:see-through={selectedTool != b.toolCode}/>
+					<img src={`/assets/img/tools/w_${b.toolCode}.png`} alt={`${b.display} Tool`} class:see-through={$store_selected_tool != b.toolCode}/>
 				</span>
 				-->
 
@@ -214,7 +222,7 @@
 				<!-- Button Image 
 				<span class="tool-img-wrapper" >
 					<img src={`/assets/img/tools/${b.toolCode}.png`} alt={`${b.display} Tool`} />
-					<img src={`/assets/img/tools/w_${b.toolCode}.png`} alt={`${b.display} Tool`} class:see-through={selectedTool != b.toolCode}/>
+					<img src={`/assets/img/tools/w_${b.toolCode}.png`} alt={`${b.display} Tool`} class:see-through={$store_selected_tool != b.toolCode}/>
 				</span>
 				-->
 
@@ -228,7 +236,7 @@
 	</div>
 
 	<!-- Mini Buttons 
-			{#if selectedTool == b.toolCode && b.miniButtons.length > 0}
+			{#if $store_selected_tool == b.toolCode && b.miniButtons.length > 0}
 			<div class="mini-button-container">
 				{#each b.miniButtons as mb}
 						<button 

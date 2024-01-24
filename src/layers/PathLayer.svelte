@@ -32,9 +32,6 @@
 		pan = newPan;
 	});
 
-	let selectedTool: tools;
-	store_selected_tool.subscribe(t => selectedTool = t);
-
 	export let paths: path_layer_path[] = [];
 	export let cont_all_paths: PIXI.Container;
 
@@ -475,7 +472,7 @@
 
 			let cont_path = path_containers[path.id]
 			cont_path.marked_for_death = false
-			cont_path.eventMode = (selectedTool == 'path' && !$data_path.selectedPath) ? 'static' : 'auto'
+			cont_path.eventMode = ($store_selected_tool == 'path' && !$data_path.selectedPath) ? 'static' : 'auto'
 			cont_path.hitArea = findHitArea(path)
 
 			let grph_path = cont_path.children[0]
