@@ -88,9 +88,9 @@
 	data_eraser.subscribe(n => {
 		c_eraser.leftMouse = "Erase Terrain & Icons"
 
-		if (n.ignoreIcons && n.ignoreTerrain) c_eraser.leftMouse = "Erase Nothing!";
-		else if (n.ignoreIcons) c_eraser.leftMouse = "Erase Terrain Only";
-		else if (n.ignoreTerrain) c_eraser.leftMouse = "Erase Icons Only";
+		if (!n.eraseIcons && !n.eraseTerrain) c_eraser.leftMouse = "Erase Nothing!";
+		else if (!n.eraseIcons) c_eraser.leftMouse = "Erase Terrain Only";
+		else if (!n.eraseTerrain) c_eraser.leftMouse = "Erase Icons Only";
 	})
 
 

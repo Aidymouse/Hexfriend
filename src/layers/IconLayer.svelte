@@ -409,13 +409,11 @@
 			case 'Alt':
 				$data_icon.usingEyedropper = true;
 				break
-
-
 		}
 	}
 
 	function shouldEraseIcons(): boolean {
-		return ($store_selected_tool == tools.ERASER && !$data_eraser.ignoreIcons) || $data_icon.usingEraser
+		return ($store_selected_tool == tools.ERASER && $data_eraser.eraseIcons) || $data_icon.usingEraser
 	}
 
 	let dragOffsetX = 0;
@@ -511,7 +509,7 @@
 			pixi_icons[icon.id].tint = icon.color
 			pixi_icons[icon.id].scale.x = icon.scale
 			pixi_icons[icon.id].scale.y = icon.scale
-			pixi_icons[icon.id].eventMode = ($store_selected_tool == tools.ICON) ? 'static' : 'auto'
+			pixi_icons[icon.id].eventMode = ($store_selected_tool == tools.ICON || $store_selected_tool == tools.ERASER) ? 'static' : 'auto'
 
 			marked_for_saving.push(icon.id)
 		});

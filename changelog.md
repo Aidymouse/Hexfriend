@@ -3,6 +3,14 @@ For Techy People
 
 # Version 1.9 - Sorting out your internals, Hexfriend
 
+## Version 1.9.14
+- Remove hard coded icon size limit
+- All datas now in stores
+- Turn various $: {} into subscriptions to relevat stores
+- Rename store_selected_tool to selected_tool
+- Eraser tooltip fix
+- Eraser ignore options added
+
 ## Version 1.9.13
 - Map styling UX
 - Tooltip changes

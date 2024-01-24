@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { icon_data, overlay_data, path_data, terrain_data } from '../types/data';
+	import type { eraser_data, icon_data, overlay_data, path_data, terrain_data } from '../types/data';
   	import { hex_orientation } from '../types/terrain';
 	import { tools } from '../types/toolData';
 	import { afterUpdate, onMount } from 'svelte';
-	import { data_path, data_icon, data_overlay, data_terrain } from '../stores/data';
+	import { data_path, data_icon, data_overlay, data_terrain, data_eraser } from '../stores/data';
 	import { store_selected_tool } from '../stores/tools';
 
 	import { tfield } from '../stores/tfield'
@@ -24,10 +24,16 @@
 		data_terrain_proxy = n
 	})
 
+	let data_eraser_proxy: eraser_data;
+	data_eraser.subscribe(n => {
+		data_eraser_proxy = n
+	})
+
 	$: {
 		data_terrain_proxy = data_terrain_proxy;
 		data_path_proxy = data_path_proxy
 		data_icon_proxy = data_icon_proxy
+		data_eraser_proxy = data_eraser_proxy
 
 		buttons = buttons;
 	}
@@ -138,7 +144,26 @@
 		{
 			display: 'Eraser',
 			toolCode: tools.ERASER,
-			miniButtons: []
+			miniButtons: [
+				{
+					display: 'Erase Terrain',
+					action: function () {
+						data_eraser.update(n => {n.eraseTerrain = !n.eraseTerrain; return n})
+					},
+					image: '/assets/img/tools/terrain.svg',
+					obj: data_eraser_proxy,
+					field: 'eraseTerrain',
+				},
+				{
+					display: 'Erase Icons',
+					action: function () {
+						data_eraser.update(n => {n.eraseIcons = !n.eraseIcons; return n})
+					},
+					image: '/assets/img/tools/icon.svg',
+					obj: data_eraser_proxy,
+					field: 'eraseIcons',
+				},
+			]
 		},
 		{
 			display: 'Overlay',

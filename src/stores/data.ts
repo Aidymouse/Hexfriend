@@ -73,6 +73,6 @@ export let data_coordinates: Writable<coordinates_data> = writable({
 })
 
 export let data_eraser: Writable<eraser_data> = writable({   
-    ignoreTerrain: false,
-    ignoreIcons: false,
+    eraseIcons: true,
+    eraseTerrain: true,
 })

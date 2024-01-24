@@ -302,7 +302,7 @@
 					break;
 
 				case tools.ERASER:
-					if (!$data_eraser.ignoreTerrain) {
+					if ($data_eraser.eraseTerrain) {
 						comp_terrainLayer.eraseAtMouse();
 					}
 					/* Icons are handled in the IconLayer */
@@ -351,7 +351,7 @@
 
 			case tools.ERASER:
 				if ($store_inputs.mouseDown[0]) {
-					if (!$data_eraser.ignoreTerrain)
+					if ($data_eraser.eraseTerrain)
 						comp_terrainLayer.eraseAtMouse();
 				}
 				/* Icons are handled differently in the icon handler */
@@ -530,8 +530,8 @@
 			}
 
 			case tools.ERASER: {
-				if (e.key == "Shift") $data_eraser.ignoreIcons = true;
-				if (e.key == "Control") $data_eraser.ignoreTerrain = true;
+				if (e.key == "Shift") $data_eraser.eraseTerrain = false;
+				if (e.key == "Control") $data_eraser.eraseIcons = false;
 				break;
 			}
 		}
@@ -561,8 +561,8 @@
 			}
 
 			case tools.ERASER: {
-				if (e.key == "Shift") $data_eraser.ignoreIcons = false;
-				if (e.key == "Control") $data_eraser.ignoreTerrain = false;
+				if (e.key == "Shift") $data_eraser.eraseTerrain = true;
+				if (e.key == "Control") $data_eraser.eraseIcons = true;
 				break;
 			}
 		}

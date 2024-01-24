@@ -58,8 +58,8 @@ export interface trace_data {
 }
 
 export interface eraser_data {
-	ignoreTerrain: boolean;
-	ignoreIcons: boolean;
+	eraseTerrain: boolean;
+	eraseIcons: boolean;
 }
 
 export interface overlay_data {
