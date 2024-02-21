@@ -43,6 +43,17 @@
 		return scale;
 	}
 
+	function getMaxIconScale(hexWidth: number, hexHeight: number): number {
+		let scale: number;
+		if (hexWidth < hexHeight) {
+			scale = (hexHeight * (pHex / 100)) / get_icon_texture($data_icon.texId).height;
+		} else {
+			scale = (hexWidth * (pHex / 100)) / get_icon_texture($data_icon.texId).width;
+		}
+
+		return scale;
+	}
+
 	async function getIconPreview(iconData: icon_data): Promise<string> {
 		let hW = $tfield.hexWidth * 2;
 		let hH = $tfield.hexHeight * 2;
@@ -56,8 +67,8 @@
 		spr_preview.texture = get_icon_texture($data_icon.texId);
 		spr_preview.tint = iconData.color;
 		spr_preview.anchor.set(0.5, 0.5);
-		spr_preview.scale.x = getIconScale(hW, hH);
-		spr_preview.scale.y = getIconScale(hW, hH);
+		spr_preview.scale.x = getMaxIconScale(hW, hH);
+		spr_preview.scale.y = getMaxIconScale(hW, hH);
 
 		let b64 = await app.renderer.extract.base64(cont_preview); //PIXI.autoDetectRenderer().plugins.extract.base64(c)
 
