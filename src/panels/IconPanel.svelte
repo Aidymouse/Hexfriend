@@ -1,24 +1,24 @@
 <script lang="ts">
 	// TYPES
-	import type { icon_data } from '../types/data';
-	import type { Icon, Iconset } from '../types/icon';
-	import type { terrain_field } from '../types/terrain';
-	
-	import ColorInputPixi from '../components/ColorInputPixi.svelte';
-	import { getHexPath } from '../helpers/hexHelpers';
-	import { get_icon_texture } from '../lib/texture_loader';
-	import * as PIXI from 'pixi.js';
-	import { afterUpdate, onMount } from 'svelte';
-	
+	import type { icon_data } from "../types/data";
+	import type { Icon, Iconset } from "../types/icon";
+	import type { terrain_field } from "../types/terrain";
+
+	import ColorInputPixi from "../components/ColorInputPixi.svelte";
+	import { getHexPath } from "../helpers/hexHelpers";
+	import { get_icon_texture } from "../lib/texture_loader";
+	import * as PIXI from "pixi.js";
+	import { afterUpdate, onMount } from "svelte";
+
 	// STORES
-	import { tfield } from '../stores/tfield';
-	import { data_icon } from '../stores/data';
+	import { tfield } from "../stores/tfield";
+	import { data_icon } from "../stores/data";
 
 	export let loadedIconsets: Iconset[];
 	export let app: PIXI.Application;
 	export let pHex: number;
 
-	let iconPreview = '';
+	let iconPreview = "";
 
 	function selectIcon(iconData: Icon) {
 		$data_icon.texId = iconData.texId;
@@ -43,14 +43,20 @@
 		return scale;
 	}
 
-	async function getIconPreview(iconData: icon_data): Promise<string> {
-		let hW = 50;
-		let hH = 45;
-
-		if ($tfield.orientation == 'pointyTop') {
-			hW = 45;
-			hH = 50;
+	function getMaxIconScale(hexWidth: number, hexHeight: number): number {
+		let scale: number;
+		if (hexWidth < hexHeight) {
+			scale = (hexHeight * (pHex / 100)) / get_icon_texture($data_icon.texId).height;
+		} else {
+			scale = (hexWidth * (pHex / 100)) / get_icon_texture($data_icon.texId).width;
 		}
+
+		return scale;
+	}
+
+	async function getIconPreview(iconData: icon_data): Promise<string> {
+		let hW = $tfield.hexWidth * 2;
+		let hH = $tfield.hexHeight * 2;
 
 		let path = getHexPath(hW, hH, $tfield.orientation, 0, 0);
 		grph_preview.clear();
@@ -61,8 +67,8 @@
 		spr_preview.texture = get_icon_texture($data_icon.texId);
 		spr_preview.tint = iconData.color;
 		spr_preview.anchor.set(0.5, 0.5);
-		spr_preview.scale.x = getIconScale(hW, hH);
-		spr_preview.scale.y = getIconScale(hW, hH);
+		spr_preview.scale.x = getMaxIconScale(hW, hH);
+		spr_preview.scale.y = getMaxIconScale(hW, hH);
 
 		let b64 = await app.renderer.extract.base64(cont_preview); //PIXI.autoDetectRenderer().plugins.extract.base64(c)
 
@@ -91,20 +97,34 @@
 		<div id="preview-image-centerer">
 			<img
 				src={iconPreview}
-				alt={'Icon Preview'}
-				class:flatTop={$tfield.orientation == 'flatTop'}
-				class:pointyTop={$tfield.orientation == 'pointyTop'}
+				alt={"Icon Preview"}
+				class:flatTop={$tfield.orientation == "flatTop"}
+				class:pointyTop={$tfield.orientation == "pointyTop"}
 			/>
 		</div>
 
 		<span class="icon-preview-control-row">
-			<ColorInputPixi bind:value={$data_icon.color} id={'iconPanelColor'} />
+			<ColorInputPixi
+				bind:value={$data_icon.color}
+				id={"iconPanelColor"}
+			/>
 			<label for="iconPanelColor">Icon Color</label>
 		</span>
 
 		<span class="icon-preview-control-row">
-			<input type="range" id="iconSize" min={10} max={100} bind:value={pHex} />
-			<button class="outline-button" on:click={() => {pHex = 80}}>Reset</button>
+			<input
+				type="range"
+				id="iconSize"
+				min={10}
+				max={100}
+				bind:value={pHex}
+			/>
+			<button
+				class="outline-button"
+				on:click={() => {
+					pHex = 80;
+				}}>Reset</button
+			>
 		</span>
 	</div>
 
@@ -116,7 +136,12 @@
 					<button
 						on:click={() => {
 							iconset.collapsed = !iconset.collapsed;
-						}}><img class:rotated={iconset.collapsed} alt="Toggle Iconset Visibility" src={'/assets/img/ui/arrow.png'} /></button
+						}}
+						><img
+							class:rotated={iconset.collapsed}
+							alt="Toggle Iconset Visibility"
+							src={"/assets/img/ui/arrow.png"}
+						/></button
 					>
 				</h2>
 			{/if}
