@@ -82,6 +82,7 @@
 		data_text,
 	} from "./stores/data";
 	import { resize_parameters } from "./stores/resize_parameters";
+	import { tl } from "./stores/translation";
 
 	// GLOBAL STYLES
 	import "./styles/inputs.css";
@@ -90,7 +91,11 @@
 	import "./styles/variables.css";
 
 	// TYPES
-	import type { eraser_data, terrain_data, text_data } from "./types/data";
+	import type {
+		eraser_data,
+		terrain_data,
+		text_data,
+	} from "./types/data";
 	import type { Iconset } from "./types/icon";
 	import type { pan_state } from "./types/panning";
 	import type { save_data } from "./types/savedata";
@@ -101,7 +106,10 @@
 	} from "./types/savedata";
 	import { map_shape } from "./types/settings";
 	import type { terrain_field } from "./types/terrain";
-	import { LATESTTILESETFORMATVERSION, type Tileset } from "./types/tilesets";
+	import {
+		LATESTTILESETFORMATVERSION,
+		type Tileset,
+	} from "./types/tilesets";
 	// Enums
 	import { tools } from "./types/toolData";
 	import * as PIXI from "pixi.js";
@@ -188,16 +196,13 @@
 		pan = pan;
 	}
 
-
 	/* DATA */
 	/* Data is bound to both layer and panel of a particluar tool. It contains all the shared state they need, and is bound to both */
 	/* These should probably be stores huh */
 
-	store_selected_tool.subscribe(n => {
+	store_selected_tool.subscribe((n) => {
 		$data_text.usingTextTool = n == tools.TEXT;
-	})
-
-
+	});
 
 	let ignored_keys: string[] = [
 		"F1",
@@ -225,7 +230,9 @@
 		switch (exportType) {
 			case "image/png":
 				download(
-					await app.renderer.extract.base64(offsetContainer),
+					await app.renderer.extract.base64(
+						offsetContainer,
+					),
 					`${
 						loadedSave.title
 							? loadedSave.title
@@ -281,7 +288,8 @@
 		store_panning.handlers.handle(e);
 		$store_inputs.mouseDown[e.button] = true;
 
-		if ($store_inputs.mouseDown[2]) store_panning.handlers.startPan(e);
+		if ($store_inputs.mouseDown[2])
+			store_panning.handlers.startPan(e);
 
 		if ($store_inputs.mouseDown[0]) {
 			switch ($store_selected_tool) {
@@ -316,7 +324,8 @@
 
 		$store_inputs.mouseDown[e.button] = false;
 
-		if (!$store_inputs.mouseDown[2]) store_panning.handlers.endPan();
+		if (!$store_inputs.mouseDown[2])
+			store_panning.handlers.endPan();
 
 		switch ($store_selected_tool) {
 			case tools.ICON:
@@ -338,7 +347,8 @@
 
 		switch ($store_selected_tool) {
 			case tools.TERRAIN:
-				if ($store_inputs.mouseDown[0]) comp_terrainLayer.pointerdown();
+				if ($store_inputs.mouseDown[0])
+					comp_terrainLayer.pointerdown();
 				break;
 
 			case tools.ICON:
@@ -391,7 +401,10 @@
 		if (e.key == "Shift") keycode = "shift";
 		if (e.key == "Control") keycode = "control";
 
-		let shortcutData = getKeyboardShortcut(keycode, $store_selected_tool);
+		let shortcutData = getKeyboardShortcut(
+			keycode,
+			$store_selected_tool,
+		);
 		if (!shortcutData) return;
 		//console.log(keycode);
 
@@ -411,7 +424,8 @@
 						break;
 
 					case "toggleShortcutList":
-						showKeyboardShortcuts = !showKeyboardShortcuts;
+						showKeyboardShortcuts =
+							!showKeyboardShortcuts;
 						break;
 
 					case "toggleControls":
@@ -423,7 +437,8 @@
 						showSettings = false;
 						showKeyboardShortcuts = false;
 						$data_path.contextPathId = null;
-						$data_text.contextStyleId = null;
+						$data_text.contextStyleId =
+							null;
 						break;
 
 					case "changeTool_terrain":
@@ -443,12 +458,18 @@
 						break;
 					case "changeTool_overlay":
 						if ($data_overlay.base64 != "")
-							changeTool(tools.OVERLAY);
+							changeTool(
+								tools.OVERLAY,
+							);
 						break;
 
 					case "toggle_overlay":
-						if ($data_overlay.base64 != "") {
-							$data_overlay.shown = !$data_overlay.shown;
+						if (
+							$data_overlay.base64 !=
+							""
+						) {
+							$data_overlay.shown =
+								!$data_overlay.shown;
 							$store_has_unsaved_changes = true;
 						}
 						break;
@@ -457,19 +478,27 @@
 				break;
 
 			case tools.TERRAIN:
-				comp_terrainLayer.handleKeyboardShortcut(shortcutData);
+				comp_terrainLayer.handleKeyboardShortcut(
+					shortcutData,
+				);
 				break;
 
 			case tools.ICON:
-				comp_iconLayer.handleKeyboardShortcut(shortcutData);
+				comp_iconLayer.handleKeyboardShortcut(
+					shortcutData,
+				);
 				break;
 
 			case tools.PATH:
-				comp_pathLayer.handleKeyboardShortcut(shortcutData);
+				comp_pathLayer.handleKeyboardShortcut(
+					shortcutData,
+				);
 				break;
 
 			case tools.TEXT:
-				comp_textLayer.handleKeyboardShortcut(shortcutData);
+				comp_textLayer.handleKeyboardShortcut(
+					shortcutData,
+				);
 				break;
 		}
 	}
@@ -530,8 +559,10 @@
 			}
 
 			case tools.ERASER: {
-				if (e.key == "Shift") $data_eraser.eraseTerrain = false;
-				if (e.key == "Control") $data_eraser.eraseIcons = false;
+				if (e.key == "Shift")
+					$data_eraser.eraseTerrain = false;
+				if (e.key == "Control")
+					$data_eraser.eraseIcons = false;
 				break;
 			}
 		}
@@ -561,8 +592,10 @@
 			}
 
 			case tools.ERASER: {
-				if (e.key == "Shift") $data_eraser.eraseTerrain = true;
-				if (e.key == "Control") $data_eraser.eraseIcons = true;
+				if (e.key == "Shift")
+					$data_eraser.eraseTerrain = true;
+				if (e.key == "Control")
+					$data_eraser.eraseIcons = true;
 				break;
 			}
 		}
@@ -591,13 +624,14 @@
 				return;
 			}
 		}
-		//console.log("What")
 		saving = true;
 	}
 
 	async function asyncExtract(app, container): Promise<string> {
-		await null;
-		return new Promise((r) => r(app.renderer.extract.base64(container)));
+		await null; // Why did I do this
+		return new Promise((r) =>
+			r(app.renderer.extract.base64(container)),
+		);
 	}
 
 	async function saveToDexie() {
@@ -683,9 +717,11 @@
 		loadedTilesets.forEach(async (tileset) => {
 			if (
 				tileset.format_version == undefined ||
-				tileset.format_version < LATESTTILESETFORMATVERSION
+				tileset.format_version <
+					LATESTTILESETFORMATVERSION
 			) {
-				let updated_tileset = update_tileset_format(tileset);
+				let updated_tileset =
+					update_tileset_format(tileset);
 
 				loadedTilesets = loadedTilesets.filter(
 					(ts) => ts.id != tileset.id,
@@ -699,7 +735,9 @@
 
 		// Load Icons
 		for (const iconset of loadedIconsets) {
-			console.log(`Loading icon textures for ${iconset.name}`);
+			console.log(
+				`Loading icon textures for ${iconset.name}`,
+			);
 			await texture_loader.load_iconset_textures(iconset);
 		}
 
@@ -708,7 +746,11 @@
 		$data_coordinates = data.coords;
 
 		$data_overlay = data.overlay;
-		if ($store_selected_tool == tools.OVERLAY && $data_overlay.base64 == "") $store_selected_tool = tools.TERRAIN;
+		if (
+			$store_selected_tool == tools.OVERLAY &&
+			$data_overlay.base64 == ""
+		)
+			$store_selected_tool = tools.TERRAIN;
 
 		loadedSave = data;
 		loadedId = id;
@@ -716,7 +758,9 @@
 		let firstTile = loadedTilesets[0].tiles[0];
 		$data_terrain.tile = {
 			...firstTile,
-			symbol: firstTile.symbol ? { ...firstTile.symbol } : null,
+			symbol: firstTile.symbol
+				? { ...firstTile.symbol }
+				: null,
 		};
 
 		let firstIcon = loadedIconsets[0].icons[0];
@@ -732,23 +776,31 @@
 			if (tf.mapShape == map_shape.SQUARE) {
 				if (tf.orientation == "flatTop") {
 					let mapWidth =
-						tf.columns * tf.hexWidth * 0.75 + tf.hexWidth * 0.25;
+						tf.columns *
+							tf.hexWidth *
+							0.75 +
+						tf.hexWidth * 0.25;
 					let mapHeight =
-						(tf.rows - 1) * tf.hexHeight - tf.hexHeight * 0.5;
+						(tf.rows - 1) * tf.hexHeight -
+						tf.hexHeight * 0.5;
 
 					pan.offsetX =
-						window.innerWidth / 2 - (mapWidth / 2) * pan.zoomScale;
+						window.innerWidth / 2 -
+						(mapWidth / 2) * pan.zoomScale;
 					pan.offsetY =
 						window.innerHeight / 2 -
 						(mapHeight / 2) * pan.zoomScale;
 				} else {
 					let mapHeight =
-						tf.rows * tf.hexHeight * 0.75 + tf.hexHeight * 0.25;
+						tf.rows * tf.hexHeight * 0.75 +
+						tf.hexHeight * 0.25;
 					let mapWidth =
-						(tf.columns - 1) * tf.hexWidth - tf.hexWidth * 0.5;
+						(tf.columns - 1) * tf.hexWidth -
+						tf.hexWidth * 0.5;
 
 					pan.offsetX =
-						window.innerWidth / 2 - (mapWidth / 2) * pan.zoomScale;
+						window.innerWidth / 2 -
+						(mapWidth / 2) * pan.zoomScale;
 					pan.offsetY =
 						window.innerHeight / 2 -
 						(mapHeight / 2) * pan.zoomScale;
@@ -851,7 +903,7 @@
 					}}
 					alt={"Saving..."}
 				/>
-				<p>Saving...</p>
+				<p>{$tl.save_indicator}</p>
 			</div>
 		{/if}
 
@@ -898,7 +950,10 @@
 				bind:icons={loadedSave.icons}
 				bind:cont_icon
 			/>
-			<CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} />
+			<CoordsLayer
+				bind:cont_coordinates
+				bind:this={comp_coordsLayer}
+			/>
 			<LargeHexesLayer bind:cont_largehexes />
 			<TextLayer
 				bind:cont_all_text
@@ -971,19 +1026,27 @@
 			<button
 				on:click={() => {
 					var theme =
-						document.documentElement.getAttribute("data-theme");
+						document.documentElement.getAttribute(
+							"data-theme",
+						);
 					if (theme == "dark") {
 						theme = "light";
 					} else {
 						theme = "dark";
 					}
-					document.documentElement.setAttribute("data-theme", theme);
-					document
-						.querySelector('meta[name="color-scheme"]')
-						.setAttribute("content", theme);
+					document.documentElement.setAttribute(
+						"data-theme",
+						theme,
+					);
+					document.querySelector(
+						'meta[name="color-scheme"]',
+					).setAttribute("content", theme);
 				}}
 				title={"Toggle theme"}
-				><img src="assets/img/tools/moon-sun.svg" alt="Theme" /></button
+				><img
+					src="assets/img/tools/moon-sun.svg"
+					alt="Theme"
+				/></button
 			>
 			<button
 				on:click={() => {
@@ -991,22 +1054,35 @@
 				}}
 				title={"Maps"}
 			>
-				<img src="assets/img/tools/maps.png" alt="Maps" />
+				<img
+					src="assets/img/tools/maps.png"
+					alt="Maps"
+				/>
 			</button>
 			<div>
 				<button on:click={saveInit} title={"Save"}>
-					<img src="assets/img/tools/save.png" alt="Save" />
+					<img
+						src="assets/img/tools/save.png"
+						alt="Save"
+					/>
 				</button>
 			</div>
 		</div>
 
-		<div id="help-buttons" on:mouseup={pointerup} class:show={showHelp}>
+		<div
+			id="help-buttons"
+			on:mouseup={pointerup}
+			class:show={showHelp}
+		>
 			<button
 				on:click={() => {
 					showHelp = !showHelp;
 				}}
 				title={"Overlay Help"}
-				><img src="assets/img/ui/help/question_mark.png" alt="Help" /></button
+				><img
+					src="assets/img/ui/help/question_mark.png"
+					alt="Help"
+				/></button
 			>
 		</div>
 
@@ -1059,12 +1135,36 @@
 
 		{#if showHelp}
 			<div id="help-overlay">
-				<img id="welcome" src="assets/img/ui/help/welcome.png" alt="Welcome To Hexfriend" />
-				<img id="map" src="assets/img/ui/help/map.png" alt="This Is The Map" />
-				<img id="settings-saving" src="assets/img/ui/help/settings_saving.png" alt="Settings & Saving" />
-				<img id="tools" src="assets/img/ui/help/tools.png" alt="Choose Your Tool" />
-				<img id="configure" src="assets/img/ui/help/configure.png" alt="Configure The Tools" />
-				<img id="shortcuts" src="assets/img/ui/help/shortcuts.png" alt="Check Out The Shortcuts" />
+				<img
+					id="welcome"
+					src="assets/img/ui/help/welcome.png"
+					alt="Welcome To Hexfriend"
+				/>
+				<img
+					id="map"
+					src="assets/img/ui/help/map.png"
+					alt="This Is The Map"
+				/>
+				<img
+					id="settings-saving"
+					src="assets/img/ui/help/settings_saving.png"
+					alt="Settings & Saving"
+				/>
+				<img
+					id="tools"
+					src="assets/img/ui/help/tools.png"
+					alt="Choose Your Tool"
+				/>
+				<img
+					id="configure"
+					src="assets/img/ui/help/configure.png"
+					alt="Configure The Tools"
+				/>
+				<img
+					id="shortcuts"
+					src="assets/img/ui/help/shortcuts.png"
+					alt="Check Out The Shortcuts"
+				/>
 			</div>
 		{/if}
 	</main>
@@ -1079,7 +1179,10 @@
 			alt={"Loading"}
 			on:load={() => {
 				setTimeout(() => {
-					load_map(dataToLoad.data, dataToLoad.id);
+					load_map(
+						dataToLoad.data,
+						dataToLoad.id,
+					);
 				}, 100);
 			}}
 		/>
@@ -1279,7 +1382,8 @@
 	}
 
 	@keyframes grow {
-		25%, 75% {
+		25%,
+		75% {
 			width: 3em;
 			height: 3em;
 		}
@@ -1318,7 +1422,11 @@
 		right: 0;
 		bottom: 0;
 
-		background-color: color-mix(in srgb, var(--world-background), transparent 50%);
+		background-color: color-mix(
+			in srgb,
+			var(--world-background),
+			transparent 50%
+		);
 	}
 
 	#help-overlay img {

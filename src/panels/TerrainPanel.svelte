@@ -1,20 +1,21 @@
 <script lang="ts">
-	import { getHexPath } from '../helpers/hexHelpers';
-	import { tiles_match } from '../helpers/tiles';
-	
-	import { get_symbol_texture } from '../lib/texture_loader';
-	
-	import type { terrain_data } from '../types/data';
-	import type { terrain_field } from '../types/terrain';
-	import type { Tile, TileSymbol, Tileset } from '../types/tilesets';
-	
-	import { tfield } from '../stores/tfield';
-	import { data_terrain } from '../stores/data';
+	import { getHexPath } from "../helpers/hexHelpers";
+	import { tiles_match } from "../helpers/tiles";
 
-	import * as PIXI from 'pixi.js';
-	import { afterUpdate, onMount } from 'svelte';
-	
-	import ColorInputPixi from '../components/ColorInputPixi.svelte';
+	import { get_symbol_texture } from "../lib/texture_loader";
+
+	import type { terrain_data } from "../types/data";
+	import type { terrain_field } from "../types/terrain";
+	import type { Tile, TileSymbol, Tileset } from "../types/tilesets";
+
+	import { tfield } from "../stores/tfield";
+	import { data_terrain } from "../stores/data";
+	import { tl } from "../stores/translation";
+
+	import * as PIXI from "pixi.js";
+	import { afterUpdate, onMount } from "svelte";
+
+	import ColorInputPixi from "../components/ColorInputPixi.svelte";
 
 	export let loadedTilesets: Tileset[];
 
@@ -33,21 +34,34 @@
 	}
 
 	async function changeTile(t: Tile) {
-		$data_terrain.tile = { ...t, symbol: t.symbol ? { ...t.symbol } : null };
+		$data_terrain.tile = {
+			...t,
+			symbol: t.symbol ? { ...t.symbol } : null,
+		};
 		tilePreview = await generateTilePreview($data_terrain); // Not entirely sure why we have to await here when we already await in the function, but fuck it, it works
 		$data_terrain.usingPaintbucket = false;
 		$data_terrain.usingEraser = false;
 	}
 
-	function findSymbolScale(symbol: TileSymbol, hexWidth: number, hexHeight: number) {
+	function findSymbolScale(
+		symbol: TileSymbol,
+		hexWidth: number,
+		hexHeight: number,
+	) {
 		if (hexWidth < hexHeight) {
-			let s = (hexWidth * symbol.pHex) / 100 / symbol.texWidth;
+			let s =
+				(hexWidth * symbol.pHex) /
+				100 /
+				symbol.texWidth;
 			return {
 				x: s,
 				y: s,
 			};
 		} else {
-			let s = (hexHeight * symbol.pHex) / 100 / symbol.texHeight;
+			let s =
+				(hexHeight * symbol.pHex) /
+				100 /
+				symbol.texHeight;
 			return {
 				x: s,
 				y: s,
@@ -57,23 +71,39 @@
 
 	async function generateTilePreview(data_terrain: terrain_data) {
 		g.clear();
-		g.beginFill(data_terrain.tile ? data_terrain.tile.bgColor : $tfield.blankHexColor);
+		g.beginFill(
+			data_terrain.tile
+				? data_terrain.tile.bgColor
+				: $tfield.blankHexColor,
+		);
 
 		let hexWidth = 50;
 		let hexHeight = 45;
 
-		if ($tfield.orientation == 'pointyTop') {
+		if ($tfield.orientation == "pointyTop") {
 			hexWidth = 45;
 			hexHeight = 50;
 		}
 
-		g.drawPolygon(getHexPath(hexWidth, hexHeight, $tfield.orientation, 0, 0));
+		g.drawPolygon(
+			getHexPath(
+				hexWidth,
+				hexHeight,
+				$tfield.orientation,
+				0,
+				0,
+			),
+		);
 		g.endFill();
 
 		if (data_terrain.tile && data_terrain.tile.symbol) {
 			s.texture = get_symbol_texture(data_terrain.tile);
 			s.tint = data_terrain.tile.symbol.color;
-			s.scale = findSymbolScale(data_terrain.tile.symbol, hexWidth, hexHeight);
+			s.scale = findSymbolScale(
+				data_terrain.tile.symbol,
+				hexWidth,
+				hexHeight,
+			);
 			s.anchor.set(0.5);
 		} else {
 			s.texture = null;
@@ -105,21 +135,33 @@
 		<div id="preview-image-centerer">
 			<img
 				src={tilePreview}
-				alt={'Current Tile Preview'}
-				class:flatTop={$tfield.orientation == 'flatTop'}
-				class:pointyTop={$tfield.orientation == 'pointyTop'}
+				alt={"Current Tile Preview"}
+				class:flatTop={$tfield.orientation == "flatTop"}
+				class:pointyTop={$tfield.orientation ==
+					"pointyTop"}
 			/>
 		</div>
 
 		<span class="terrain-preview-control-row">
-			<ColorInputPixi bind:value={$data_terrain.tile.bgColor} id={'terrainColor'} />
-			<label for="terrainColor">Terrain Color</label>
+			<ColorInputPixi
+				bind:value={$data_terrain.tile.bgColor}
+				id={"terrainColor"}
+			/>
+			<label for="terrainColor"
+				>{$tl.terrain_panel.terrain_color}</label
+			>
 		</span>
 
 		{#if $data_terrain.tile.symbol}
 			<span class="terrain-preview-control-row">
-				<ColorInputPixi bind:value={$data_terrain.tile.symbol.color} id={'symbolColor'} />
-				<label for="symbolColor">Symbol Color</label>
+				<ColorInputPixi
+					bind:value={$data_terrain.tile.symbol
+						.color}
+					id={"symbolColor"}
+				/>
+				<label for="symbolColor"
+					>{$tl.terrain_panel.symbol_color}</label
+				>
 			</span>
 		{/if}
 	</div>
@@ -131,12 +173,21 @@
 					{tileset.name}
 					<button
 						on:click={() => {
-							tileset.collapsed = !tileset.collapsed;
-						}}><img alt="Toggle Tileset Visibility" src={'/assets/img/ui/arrow.png'} class:rotated={tileset.collapsed} /></button
+							tileset.collapsed =
+								!tileset.collapsed;
+						}}
+						><img
+							alt="Toggle Tileset Visibility"
+							src={"/assets/img/ui/arrow.png"}
+							class:rotated={tileset.collapsed}
+						/></button
 					>
 				</h2>
 			{/if}
-			<div class="button-grid" class:hidden={tileset.collapsed}>
+			<div
+				class="button-grid"
+				class:hidden={tileset.collapsed}
+			>
 				{#each tileset.tiles as tile (tile.id)}
 					<button
 						class="tile-button"
@@ -144,7 +195,13 @@
 						on:click={async () => {
 							await changeTile(tile);
 						}}
-						class:selected={styleMatchesData(tile)}><img src={tile.preview} alt={tile.display} /></button
+						class:selected={styleMatchesData(
+							tile,
+						)}
+						><img
+							src={tile.preview}
+							alt={tile.display}
+						/></button
 					>
 				{/each}
 			</div>

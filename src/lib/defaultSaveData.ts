@@ -21,7 +21,7 @@ let DEFAULTSAVEDATA: save_data = {
 
 		rows: 20,
 		columns: 20,
-		raised: hex_raised.EVEN, // Which row / column should be higher / indented. This is implemented with an invisible hex. It's all quite messy.
+		raised: hex_raised.EVEN, // Which row / column should be higher / indented. This is implemented with an invisible hex. It's all quite messy. --Addendum 1st April 2024: I don't think this is true anymore.
 
 		hexesOut: 7,
 		mapShape: map_shape.FLOWER,

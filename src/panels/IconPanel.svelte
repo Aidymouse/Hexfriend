@@ -13,6 +13,7 @@
 	// STORES
 	import { tfield } from "../stores/tfield";
 	import { data_icon } from "../stores/data";
+	import { tl } from "../stores/translation";
 
 	export let loadedIconsets: Iconset[];
 	export let app: PIXI.Application;
@@ -35,9 +36,13 @@
 	function getIconScale(hexWidth: number, hexHeight: number): number {
 		let scale: number;
 		if (hexWidth < hexHeight) {
-			scale = (hexWidth * (pHex / 100)) / get_icon_texture($data_icon.texId).width;
+			scale =
+				(hexWidth * (pHex / 100)) /
+				get_icon_texture($data_icon.texId).width;
 		} else {
-			scale = (hexHeight * (pHex / 100)) / get_icon_texture($data_icon.texId).height;
+			scale =
+				(hexHeight * (pHex / 100)) /
+				get_icon_texture($data_icon.texId).height;
 		}
 
 		return scale;
@@ -46,9 +51,13 @@
 	function getMaxIconScale(hexWidth: number, hexHeight: number): number {
 		let scale: number;
 		if (hexWidth < hexHeight) {
-			scale = (hexHeight * (pHex / 100)) / get_icon_texture($data_icon.texId).height;
+			scale =
+				(hexHeight * (pHex / 100)) /
+				get_icon_texture($data_icon.texId).height;
 		} else {
-			scale = (hexWidth * (pHex / 100)) / get_icon_texture($data_icon.texId).width;
+			scale =
+				(hexWidth * (pHex / 100)) /
+				get_icon_texture($data_icon.texId).width;
 		}
 
 		return scale;
@@ -99,7 +108,8 @@
 				src={iconPreview}
 				alt={"Icon Preview"}
 				class:flatTop={$tfield.orientation == "flatTop"}
-				class:pointyTop={$tfield.orientation == "pointyTop"}
+				class:pointyTop={$tfield.orientation ==
+					"pointyTop"}
 			/>
 		</div>
 
@@ -108,7 +118,9 @@
 				bind:value={$data_icon.color}
 				id={"iconPanelColor"}
 			/>
-			<label for="iconPanelColor">Icon Color</label>
+			<label for="iconPanelColor"
+				>{$tl.icon_panel.icon_color}</label
+			>
 		</span>
 
 		<span class="icon-preview-control-row">
@@ -123,7 +135,7 @@
 				class="outline-button"
 				on:click={() => {
 					pHex = 80;
-				}}>Reset</button
+				}}>{$tl.icon_panel.reset}</button
 			>
 		</span>
 	</div>
@@ -135,7 +147,8 @@
 					{iconset.name}
 					<button
 						on:click={() => {
-							iconset.collapsed = !iconset.collapsed;
+							iconset.collapsed =
+								!iconset.collapsed;
 						}}
 						><img
 							class:rotated={iconset.collapsed}
@@ -146,17 +159,25 @@
 				</h2>
 			{/if}
 
-			<div class="button-grid" class:hidden={iconset.collapsed}>
+			<div
+				class="button-grid"
+				class:hidden={iconset.collapsed}
+			>
 				{#each iconset.icons as iconData}
 					<button
 						class="icon-button"
-						class:selected={iconMatchesData(iconData)}
+						class:selected={iconMatchesData(
+							iconData,
+						)}
 						on:click={() => {
 							selectIcon(iconData);
 						}}
 						title={iconData.display}
 					>
-						<img src={iconData.preview} alt={iconData.display} />
+						<img
+							src={iconData.preview}
+							alt={iconData.display}
+						/>
 					</button>
 				{/each}
 			</div>
