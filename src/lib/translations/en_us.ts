@@ -1,4 +1,4 @@
-export let nz_en = {
+export let us_en = {
 	save_indicator: "Saving...",
 
 	tools: {
