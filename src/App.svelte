@@ -164,6 +164,12 @@
 		resizeTo: window,
 	});
 
+	/* RENDERER FOR PNG EXPORT */
+	let hi_res_renderer = new PIXI.Renderer({
+		resolution: 3,
+		antialias: true
+	});
+
 	// Enable PixiJS dev tools in development
 	if (process.env.NODE_ENV == "development") {
 		// @ts-ignore
@@ -224,15 +230,18 @@
 
 		switch (exportType) {
 			case "image/png":
-				download(
-					await app.renderer.extract.base64(offsetContainer),
-					`${
-						loadedSave.title
-							? loadedSave.title
-							: "Untitled Hexfriend"
-					}`,
-					exportType,
-				);
+				hi_res_renderer.extract.canvas(offsetContainer)
+				.toBlob(function (blob) {
+					download(
+							blob,
+							`${
+									loadedSave.title
+											? loadedSave.title
+											: "Untitled Hexfriend"
+							}`,
+							exportType,
+					);
+				}, exportType);
 				break;
 
 			case "application/json":
