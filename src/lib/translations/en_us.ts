@@ -1,4 +1,5 @@
 export let en_us = {
+	language: "en_us",
 	save_indicator: "Saving...",
 
 	general: {

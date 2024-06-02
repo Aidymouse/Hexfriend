@@ -31,7 +31,7 @@
 
 	// Lib
 	import { onMount } from "svelte";
-    import SelectGrid from "./SelectGrid.svelte";
+	import SelectGrid from "./SelectGrid.svelte";
 
 	export let loadedSave: save_data;
 	export let showSettings: boolean;
@@ -272,7 +272,7 @@
 		</button>
 
 		<!-- LANGUAGE -->
-		<select class="outline" style="grid-column: 1/3" bind:value={selected_translation} on:change={e => { switch_translation(e.target.value) } } >
+		<select class="outline" style="grid-column: 1/3" value={$tl.language} on:change={e => { switch_translation(e.target.value) } } >
 			{#each Object.entries(translation_map) as [tl_code, translation] (translation.label) }
 				<option value={tl_code}>{translation.label}</option>	
 			{/each}

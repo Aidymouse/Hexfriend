@@ -12,8 +12,6 @@
 	export let comp_iconLayer;
 	export let comp_pathLayer;
 	export let comp_textLayer;
-	
-
 
 	let addOrRemoveMapDimensions: "add" | "remove" = "add";
 
@@ -26,16 +24,8 @@
 		switch (direction) {
 			case "left": {
 				if ($tfield.orientation == hex_orientation.FLATTOP) {
-					//pan.offsetX -= $tfield.hexWidth * 0.75 * pan.zoomScale * amountOfHexes
-
 					xMod = $tfield.hexWidth * 0.75 * amount;
-
-					if (amount % 2 == 1) {
-						yMod =
-							-$tfield.hexHeight *
-							0.5 *
-							($tfield.raised == "odd" ? -1 : 1);
-					}
+					if (amount % 2 == 1) yMod = -$tfield.hexHeight * 0.5 * ($tfield.raised == "odd" ? -1 : 1);
 				} else {
 					xMod = $tfield.hexWidth * amount;
 				}
@@ -47,13 +37,7 @@
 					yMod = $tfield.hexHeight * amount;
 				} else {
 					yMod = $tfield.hexHeight * 0.75 * amount;
-
-					if (amount % 2 == 1) {
-						xMod =
-							-$tfield.hexWidth *
-							0.5 *
-							($tfield.raised == "odd" ? -1 : 1);
-					}
+					if (amount % 2 == 1) xMod = -$tfield.hexWidth *	0.5 * ($tfield.raised == "odd" ? -1 : 1);
 				}
 				break;
 			}
@@ -85,8 +69,6 @@
 		switch (direction) {
 			case "left": {
 				if ($tfield.orientation == hex_orientation.FLATTOP) {
-					//pan.offsetX -= $tfield.hexWidth * 0.75 * pan.zoomScale * amountOfHexes
-
 					xMod = -$tfield.hexWidth * 0.75 * amount;
 
 					if (amount % 2 == 1) {
@@ -157,14 +139,9 @@
 
 	<label for="mapShape">{$tl.settings.shape.mapshape}</label>
 
-	<select
-		bind:value={$tfield.mapShape}
-		on:change={() => {
-			changeMapShape();
-		}}
-	>
-	<option value={map_shape.SQUARE}>{$tl.settings.shape.square}</option>
-	<option value={map_shape.FLOWER}>{$tl.settings.shape.flower}</option>
+	<select style="min-height: 30px; width: 100%" bind:value={$tfield.mapShape} on:change={() => { changeMapShape(); }} >
+		<option value={map_shape.SQUARE}>{$tl.settings.shape.square}</option>
+		<option value={map_shape.FLOWER}>{$tl.settings.shape.flower}</option>
 	</select>
 </div>
 
@@ -194,17 +171,9 @@
 	<section id="flower-dimensions-container">
 		<p>{$tl.settings.shape.hexesout}</p>
 		<div id="flower-dimensions-controls-grid">
-			<button
-				on:click={() => {
-					flower_reduceHexesOut(1);
-				}}>-</button
-			>
+			<button	on:click={() => {flower_reduceHexesOut(1);}}> - </button>
 			<div id="counter-container">{$tfield.hexesOut}</div>
-			<button
-				on:click={() => {
-					flower_expandHexesOut(1);
-				}}>+</button
-			>
+			<button	on:click={() => {flower_expandHexesOut(1);}}> + </button>
 		</div>
 	</section>
 {/if}

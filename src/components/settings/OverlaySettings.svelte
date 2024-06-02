@@ -33,7 +33,7 @@
 </script>
 
 <div class="settings-grid" style={'justify-items: start;'}>
-    <button class="file-input-button" style="width: 100%" >
+    <button class="file-input-button" style="width: 100%; grid-column: 1/3; min-height: 30px;" >
 	{#if $data_overlay.base64 == ''}{$tl.settings.overlay.load}{:else}{$tl.settings.overlay.replace}{/if}
         <input
             type="file"

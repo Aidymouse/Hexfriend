@@ -30,9 +30,8 @@
 
 	.setting-heading button {
 		width: 3em;
-		height: 2em;
+		height: 2.2em;
 		position: absolute;
-		height: 100%;
 		right: 0px;
 		border: none;
 		display: flex;

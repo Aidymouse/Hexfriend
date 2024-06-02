@@ -1,4 +1,5 @@
 export const pt_br = {
+	language: "pt_br",
 	save_indicator: "Salvando...",
 
 	general: {

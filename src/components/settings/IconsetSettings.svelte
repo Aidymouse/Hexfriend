@@ -88,12 +88,15 @@
 </div>
 
 <style>
+    button {
+	min-height: 30px;
+    }
 
     #iconsets {
 	display: grid;
 	grid-template-columns: 1fr;
 	grid-template-rows: 30px;
-	grid-auto-rows: 30px;
+	grid-auto-rows: auto;
 	row-gap: 5px;
 	margin-top: var(--large-radius);
     }

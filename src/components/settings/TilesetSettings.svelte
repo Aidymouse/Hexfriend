@@ -149,32 +149,36 @@
 </div>
 
 <style>
+    button {
+	min-height: 30px;
+    }
+
     #tilesets {
-		display: grid;
-		grid-template-columns: 1fr;
-		grid-template-rows: 30px;
-		grid-auto-rows: 30px;
-		row-gap: 5px;
-        margin-top: var(--large-radius);
-	}
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: 30px;
+	grid-auto-rows: auto;
+	row-gap: 5px;
+	margin-top: var(--large-radius);
+    }
 
     #default-tileset-update-button {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
+	display: flex;
+	justify-content: center;
+	align-items: center;
+    }
 
     .loaded-tileset:hover button.set-rollover-button {
-		opacity: 1;
-	}
+	opacity: 1;
+    }
 
-	.loaded-tileset button.set-rollover-button {
-		opacity: 0;
-	}
+    .loaded-tileset button.set-rollover-button {
+	opacity: 0;
+    }
 
     #tilesets span {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		column-gap: 5px;
-	}
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	column-gap: 5px;
+    }
 </style>
