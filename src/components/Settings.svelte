@@ -9,6 +9,7 @@
 	import type { Iconset } from "../types/icon";
 	import type { save_data } from "../types/savedata";
 	import type { Tileset } from "../types/tilesets";
+	import { Map_Exports } from "../types/export";
 
 	// Styles
 	import "../styles/settings.css";
@@ -116,8 +117,6 @@
 			load(saveData, null);
 		};
 	}
-
-	let selected_translation = "en_us";
 
 	onMount(() => {
 		save_old_resize_parameters();
@@ -244,13 +243,14 @@
 				exportType = "Export As...";
 			}}
 		>
-			<option value={"Export As..."} style="display: none"
+			<option value={Map_Exports.PLACEHOLDER} style="display: none"
 				>{$tl.settings.export_as}</option
 			>
-			<option value={"image/png"}
+			<option value={Map_Exports.PNG}
 				>{$tl.settings.exports.png}</option
 			>
-			<option value={"application/json"}
+			<option value={Map_Exports.SCALED_PNG}>{$tl.settings.exports.scaled_png}</option>
+			<option value={Map_Exports.JSON}
 				>{$tl.settings.exports.hexfriend}</option
 			>
 		</select>

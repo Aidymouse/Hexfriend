@@ -88,6 +88,8 @@ export let en_us = {
 		export_as: "Export As...",
 		exports: {
 			png: "PNG",
+			scaled_png: "Scaled PNG",
+			scale_request_dialog: "Scale by what percentage?",
 			hexfriend: "Hexfriend",
 		},
 		export: "Export",

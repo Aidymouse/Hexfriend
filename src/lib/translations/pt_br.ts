@@ -88,6 +88,8 @@ export const pt_br = {
 		export_as: "Exportar Como...",
 		exports: {
 			png: "PNG",
+			scaled_png: "PLACEHOLDER",
+			scale_request_dialog: "PLACEHOLDER",
 			hexfriend: "Hexfriend",
 		},
 		import: "Importar",
