@@ -283,10 +283,11 @@ export const pt_br = {
 		generate: "Gerar",
 		close: "Fechar",
 		clear: "Limpar",
+		clear_confirmation: "PLACEHOLDER",
 		clear_before_generation: "Limpar Antes de Gerar",
 		icon_generator: {
 			place_in_center: "Colocar no Centro do Hex",
-			generation_change: "Chance da Geração",
+			generation_chance: "Chance da Geração",
 			out_of_connector: "em"
 		},
 		terrain_generator: {

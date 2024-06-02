@@ -282,10 +282,11 @@ export let en_us = {
 		generate: "Generate",
 		close: "Close",
 		clear: "Clear",
+		clear_confirmation: "Are you sure?",
 		clear_before_generation: "Clear Before Generation",
 		icon_generator: {
 			place_in_center: "Place In Hex Center",
-			generation_change: "Generation Chance",
+			generation_chance: "Generation Chance",
 			out_of_connector: "in"
 		},
 		terrain_generator: {
