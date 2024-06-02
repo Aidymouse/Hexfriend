@@ -250,8 +250,8 @@ export const pt_br = {
 		export: "Exportar",
 		change_orientation: "Alterar Orientação do Hex",
 		duplicate: "Duplicar este Hex",
-		delete: "Apagar este Hex",
 		tileset_builder: {
+			delete: "Apagar este Hex",
 			exit: "Sair do Construtor de Conjuntos de Hexágonos",
 			name: "Nome do Conjunto de Hexánogos",
 			name_placeholder: "Nome do Conjunto",
@@ -263,6 +263,7 @@ export const pt_br = {
 			symbol_scale: "Escala dos Símbolos",
 		},
 		icon_set_builder: {
+			delete: "Apagar este Ícone",
 			exit: "Sair do Construtor de Conjunto de Ícones",
 			name: "Nome do Conjunto de Ícones",
 			name_placeholder: "Novo Conjunto de Ícones",

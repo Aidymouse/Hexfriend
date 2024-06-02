@@ -28,6 +28,8 @@
 	// HELPER
 	import { getHexPathRadius } from '../helpers/hexHelpers';
 	
+	import { tl } from '../stores/translation';
+	
 	// LIB
 	import { download } from '../lib/download2';
 	import * as PIXI from 'pixi.js';
@@ -306,24 +308,21 @@
 	<nav>
 		<div id="set-controls">
 			<div id="grid">
-				<button
-					on:click={() => {
-						appState = 'normal';
-					}}
-					style="grid-column: 1/3;">Exit Tileset Builder</button
-				>
+				<button	on:click={() => {appState = 'normal';}}	style="grid-column: 1/3;">
+					{$tl.builders.tileset_builder.exit}
+				</button>
 
-				<label for="setName">Tileset Name</label>
+				<label for="setName">{$tl.builders.tileset_builder.name}</label>
 				<input id="setName" type="text" bind:value={workingTileset.name} placeholder="Tileset Name" />
 
-				<label for="setAuthor">Author</label>
+				<label for="setAuthor">{$tl.builders.author}</label>
 				<input id="setAuthor" type="text" bind:value={workingTileset.author} placeholder="You!" />
 
-				<label for="setVersion">Version</label>
+				<label for="setVersion">{$tl.builders.version}</label>
 				<input id="setVersion" type="number" bind:value={workingTileset.version} />
 
 				<button on:click={() => importTileset()} class="file-input-button">
-					Import
+					{$tl.builders.import}
 					<input
 						type="file"
 						bind:files={importFiles}
@@ -335,7 +334,7 @@
 					/>
 				</button>
 
-				<button on:click={() => exportTileset()}>Export</button>
+				<button on:click={() => exportTileset()}>{$tl.builders.export}</button>
 			</div>
 		</div>
 
@@ -402,7 +401,7 @@
 						orientation = orientation == hex_orientation.FLATTOP ? hex_orientation.POINTYTOP : hex_orientation.FLATTOP;
 						generatePreview(selectedTile);
 					}}
-					title="Change Hex Orientation"
+					title={$tl.builders.change_orientation}
 				>
 					<img src="/assets/img/tools/changeOrientation.png" alt="Change Orientation" />
 				</button>
@@ -411,7 +410,7 @@
 					on:click={() => {
 						duplicateTile(selectedTile);
 					}}
-					title="Duplicate this Hex"
+					title={$tl.builders.duplicate}
 				>
 					<img src="/assets/img/tools/duplicate.png" alt="Hex Duplicate" />
 				</button>
@@ -421,7 +420,7 @@
 						removeTile(selectedTile);
 						selectedTile = null;
 					}}
-					title="Delete this Hex"
+					title={$tl.builders.tileset_builder.delete}
 				>
 					<img src="/assets/img/tools/trash.png" alt="Trash" />
 				</button>
@@ -442,7 +441,7 @@
 
 			<!-- File Upload Button -->
 			<button class="file-input-button outline-button">
-				Upload Symbol
+				{$tl.builders.tileset_builder.upload_symbol}
 				<input
 					type="file"
 					accept="image/*"
@@ -460,13 +459,13 @@
 					<ColorInputPixi bind:value={selectedTile.symbol.color} w={50} h={50} />
 
 					<div>
-						<p>Symbol</p>
+						<p>{$tl.builders.tileset_builder.symbol}</p>
 						<p class="color-string">{PIXI.utils.hex2string(selectedTile.symbol.color)}</p>
 					</div>
 				</div>
 
 				<div id="symbol-scale">
-					Symbol Scale
+					{$tl.builders.tileset_builder.symbol_scale}
 					<input type="range" min="5" max="100" bind:value={selectedTile.symbol.pHex} />
 					<input type="number" bind:value={selectedTile.symbol.pHex} />
 				</div>
@@ -478,9 +477,9 @@
 	{:else}
 
 		<div id="editor-placeholder">
-			<p style="color: #f2f2f2; margin-bottom: 10px;">Select a tile or make a new one!</p>
+			<p style="color: #f2f2f2; margin-bottom: 10px;">{$tl.builders.tileset_builder.helptext}</p>
 
-			<p style="font-size: 10pt">For best results, use white 100px by 100px images for symbols.</p>
+			<p style="font-size: 10pt">{$tl.builders.tileset_builder.helpsubtitle}</p>
 		</div>
 	
 	{/if}

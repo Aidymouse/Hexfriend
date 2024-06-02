@@ -249,8 +249,8 @@ export let en_us = {
 		export: "Export",
 		change_orientation: "Change Hex Orientation",
 		duplicate: "Duplicate this hex",
-		delete: "Delete this hex",
 		tileset_builder: {
+			delete: "Delete this hex",
 			exit: "Exit Tileset Builder",
 			name: "Tileset Name",
 			name_placeholder: "Tileset Name",
@@ -262,10 +262,10 @@ export let en_us = {
 			symbol_scale: "Symbol Scale",
 		},
 		icon_set_builder: {
+			delete: "Delete this icon",
 			exit: "Exit Icon Set Builder",
 			name: "Icon Set Name",
 			name_placeholder: "New Icon Set",
-			author: "Author",
 			version: "Version",
 			import: "Import",
 			export: "Export",
