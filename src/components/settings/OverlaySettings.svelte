@@ -5,6 +5,7 @@
     import { data_overlay } from "../../stores/data";
     import { store_selected_tool } from "../../stores/tools";
     import { store_has_unsaved_changes } from "../../stores/flags";
+    import { tl } from "../../stores/translation";
 
     import { tools } from "../../types/toolData";
 
@@ -32,8 +33,8 @@
 </script>
 
 <div class="settings-grid" style={'justify-items: start;'}>
-    <button class="file-input-button">
-        {#if $data_overlay.base64 == ''}Load Overlay Image{:else}Replace Overlay Image{/if}
+    <button class="file-input-button" style="width: 100%" >
+	{#if $data_overlay.base64 == ''}{$tl.settings.overlay.load}{:else}{$tl.settings.overlay.replace}{/if}
         <input
             type="file"
             accept="image/*"

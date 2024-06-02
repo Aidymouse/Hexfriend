@@ -1,5 +1,10 @@
-export let us_en = {
+export let en_us = {
 	save_indicator: "Saving...",
+
+	general: {
+		even: "Even",
+		odd: "Odd",
+	},
 
 	tools: {
 		hex_paintbucket: "Hex Paintbucket",
@@ -84,6 +89,7 @@ export let us_en = {
 			png: "PNG",
 			hexfriend: "Hexfriend",
 		},
+		export: "Export",
 		import: "Import",
 
 		grid: {
@@ -96,9 +102,12 @@ export let us_en = {
 				title: "Large Hexes",
 				size: "Size",
 				color: "Color",
+				outline_thickness: "Outline Thickness",
 				horizontal_offset: "Horizontal Offset",
 				vertical_offset: "Vertical Offset",
 				encompasedges: "Encompass Map Edges",
+				large_raised_column: "Large Raised Column",
+				large_indented_row: "Large Indented Row",
 			},
 		},
 		
@@ -109,10 +118,12 @@ export let us_en = {
 			orientation: "Hex Orientation",
 			pointytop: "Pointy Top",
 			flattop: "Flat Top",
+			raised_column: "Raised Column",
+			indented_row: "Indented Row",
 			width: "Hex Width",
 			height: "Hex Height",
 			size_by_radius: "Size by Radius",
-			radiuset: "Set",
+			radius_set: "Set",
 			retain_position: "Retain Position",
 			retain_position_explanation: "Selected objects will attempt to remain in their hex when they are resized",
 			retain_icons: "Icons",
@@ -160,26 +171,32 @@ export let us_en = {
 			space: "Space from bottom",
 			offset: {
 				row: "Row Offset",
-				column: "Column Offset"
+				column: "Column Offset",
+				q: "Q offset",
+				r: "R offset",
+				s: "S offset"
 			},
 		},
 
 		overlay: {
 			title: "Overlay",
-			overlay_load: "Load Overlay Image",
-			overlay_replace: "Replace Overlay Image",
+			load: "Load Overlay Image",
+			replace: "Replace Overlay Image",
 		},
 
 		tilesets: {
 			title: "Tilesets",
 			import: "Import Tileset",
 			builder: "Tileset Builder",
+			already_loaded: "You've already loaded this tileset :)",
+			remove_confirmation: "This will remove all tiles in use from this set. Continue?",
 		},
 		
 		icon_sets: {
 			title: "Icon Sets",
 			import: "Import Icon Set",
 			builder: "Icon Set Builder",
+			already_loaded: "You've already imported this icon set :)",
 		},
 
 

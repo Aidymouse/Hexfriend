@@ -130,6 +130,19 @@ select:hover {
 	border: solid 1px var(--lighter-background)
 }
 
+select.outline {
+	border: solid 1px var(--lighter-background);
+	border-radius: var(--small-radius);
+	background-color: var(--primary-background);
+	padding: 0.3125em;
+	transition-duration: 0.2s;
+	text-align: center;
+}
+
+select.outline:hover {
+	background-color: var(--light-background);
+}
+
 /* RANGE */
 input[type='range'] {
 	-webkit-appearance: none;

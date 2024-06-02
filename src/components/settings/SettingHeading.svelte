@@ -1,25 +1,28 @@
 <script lang="ts">
+	export let text: string;
 
-    export let text: string;
-
-    export let toggle: boolean;
-
+	export let toggle: boolean;
 </script>
 
-<h2 class="setting-heading">
-    {text}
-    <button
-        on:click={() => {
-            toggle = !toggle;
-        }}
-    >
-        <img alt={`Toggle ${{text}} Settings`} class:rotated={toggle} src={'/assets/img/ui/arrow.png'} />
-    </button>
+<h2
+	class="setting-heading"
+	on:click={() => {
+		toggle = !toggle;
+	}}
+	on:keydown={() => {}}
+>
+	{text}
+	<button>
+		<img
+			alt={`Toggle ${{ text }} Settings`}
+			class:rotated={toggle}
+			src={"/assets/img/ui/arrow.png"}
+		/>
+	</button>
 </h2>
 
 <style>
-
-    .setting-heading {
+	.setting-heading {
 		display: flex;
 		position: relative;
 		margin: 0;
@@ -37,7 +40,7 @@
 		align-items: center;
 		background-color: transparent;
 	}
-	
+
 	.setting-heading button:hover {
 		background-color: var(--lighter-background);
 	}
@@ -52,3 +55,4 @@
 		transition-duration: 0.2s;
 	}
 </style>
+

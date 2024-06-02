@@ -8,14 +8,15 @@
 
     import { store_has_unsaved_changes } from "../../stores/flags";
     import { tfield } from "../../stores/tfield";
+    import { tl } from "../../stores/translation";
 
-	import { update_map_to_new_default_tileset, update_tileset_format } from '../../lib/tileset_updater';
-	import * as texture_loader from '../../lib/texture_loader';
+    import { update_map_to_new_default_tileset, update_tileset_format } from '../../lib/tileset_updater';
+    import * as texture_loader from '../../lib/texture_loader';
 
-	import { get_tileset_id } from '../../helpers/tiles';
+    import { get_tileset_id } from '../../helpers/tiles';
 
-    export let comp_terrainLayer
-    export let comp_terrain_panel
+    export let comp_terrainLayer;
+    export let comp_terrain_panel;
 
     export let loadedSave;
     export let loadedTilesets: Tileset[];
@@ -40,7 +41,7 @@
 			/* Check that set hasn't already been imported */
 			if (set_already_imported != null) {
 
-				alert("You've already imported this tileset :)");
+				alert($tl.settings.tilesets.already_loaded);
 				return;
 				
 			} 
@@ -60,7 +61,7 @@
 	}
 
 	function removeTileset(setId: string) {
-		if (!confirm("This will remove all tiles in use from this set. Continue?")) return;
+		if (!confirm($tl.settings.tilesets.remove_confirmation)) return;
 
 		comp_terrainLayer.removeAllTilesOfSet(setId)
 		comp_terrain_panel.reset_tile();
@@ -131,7 +132,7 @@
 
     <span>
         <button class="file-input-button"
-            >Import Tileset <input
+		>{$tl.settings.tilesets.import}<input
                 type="file"
                 bind:files={tilesetFiles}
                 on:change={() => {
@@ -142,7 +143,7 @@
         <button
             on:click={() => {
                 appState = 'tilesetCreator';
-            }}>Tileset Builder</button
+	    }}>{$tl.settings.tilesets.builder}</button
         >
     </span>
 </div>

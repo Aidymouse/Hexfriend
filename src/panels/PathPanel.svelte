@@ -382,7 +382,7 @@
 
 	.path-control-grid {
 		display: grid;
-		grid-template-columns: 1fr 2fr;
+		grid-template-columns: 3fr 4fr;
 	}
 
 	.path-control-grid p {

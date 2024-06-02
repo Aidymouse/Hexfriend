@@ -1,6 +1,7 @@
 <script lang="ts">
 
     import "../../styles/settings.css";
+    import { tl } from "../../stores/translation";
 
     export let showTerrainGenerator: boolean;
     export let show_icon_generator: boolean;
@@ -15,9 +16,9 @@
             show_icon_generator = false;
             showSettings = false;
         }}
-        title={'Terrain Generator'}
+        title={$tl.settings.generators.terrain}
         >
-        Terrain Generator
+        {$tl.settings.generators.terrain}
     </button>
     
     <button
@@ -26,8 +27,8 @@
         showTerrainGenerator = false;
             showSettings = false;
         }}
-        title={'Icon Generator'}
+        title={$tl.settings.generators.icon}
     >
-        Icon Generator
+        {$tl.settings.generators.icon}
     </button>
 </div>

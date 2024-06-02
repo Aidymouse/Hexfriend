@@ -12,6 +12,7 @@
     import { tfield } from "../../stores/tfield";
     import { resize_parameters } from "../../stores/resize_parameters";
     import { store_has_unsaved_changes } from "../../stores/flags";
+    import { tl } from "../../stores/translation";
 
     import { get_radius_from_width_height, get_width_height_from_radius } from '../../helpers/hexHelpers'
 
@@ -43,7 +44,7 @@
 </script>
 
 <div class="settings-grid">
-    <label for="blankHexColor">Blank Hex Color</label>
+    <label for="blankHexColor">{$tl.settings.hexes.blank_color}</label>
     <div style="display: flex; gap: 0.25em; align-items: center;">
         <ColorInputPixi
             bind:value={$tfield.blankHexColor}
@@ -57,11 +58,11 @@
             style={'height: fit-content;'}
             on:click={() => {
                 $tfield.blankHexColor = 0xf2f2f2;
-            }}>Reset</button
+            }}>{$tl.settings.hexes.blank_color_reset}</button
         >
     </div>
 
-    <label>Hex Orientation</label>
+    <label>{$tl.settings.hexes.orientation}</label>
     <div style={'height: 100%; display: flex; align-items: center;'}>
         <SelectGrid
             options={[
@@ -83,17 +84,17 @@
     </div>
 
     {#if $tfield.mapShape == map_shape.SQUARE}
-        <label>{$tfield.orientation == hex_orientation.FLATTOP ? 'Raised Column' : 'Indented Row'}</label>
+        <label>{$tfield.orientation == hex_orientation.FLATTOP ? $tl.settings.hexes.raised_column : $tl.settings.hexes.indented_row }</label>
         <span style={'height: 100%; display: flex; align-items: center;'}>
             <SelectGrid
                 options={[
                     {
-                        title: 'Even',
+                        title: $tl.general.even,
                         value: 'even',
                         filename: `${$tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}even`,
                     },
                     {
-                        title: 'Odd',
+                        title: $tl.general.odd,
                         value: 'odd',
                         filename: `${$tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}odd`,
                     },
@@ -111,7 +112,7 @@
         </span>
     {/if}
 
-    <label for="hexWidth">Hex Width</label>
+    <label for="hexWidth">{$tl.settings.hexes.width}</label>
     <input
         id="hexWidth"
         type="number"
@@ -131,7 +132,7 @@
         }}
     />
 
-    <label for="hexHeight">Hex Height</label>
+    <label for="hexHeight">{$tl.settings.hexes.height}</label>
     <input
         id="hexHeight"
         type="number"
@@ -149,10 +150,8 @@
         }}
     />
 
-    <label for="hex-radius">Size by Radius</label>
+    <label for="hex-radius">{$tl.settings.hexes.size_by_radius}</label>
     <span>
-        <!-- DEPRECATED due to styling and usability issues -->
-        <!-- <input id="hex-radius" type="number" /> -->
         <button on:click={() => {
 
                 let currentRadius = get_radius_from_width_height($tfield.hexWidth, $tfield.hexHeight, $tfield.orientation)
@@ -183,12 +182,12 @@
     </select>
     -->
 
-    <label title="Selected objects will attempt to remain in their hex when they are resized">Retain Position<sup id="retain-position-tip" title="Selected objects will attempt to remain in their hex when they are resized">?</sup></label>
+    <label title={$tl.settings.hexes.retain_position_explanation}>{$tl.settings.hexes.retain_position}<sup id="retain-position-tip" title={$tl.settings.hexes.retain_position_explanation}>?</sup></label>
     <div id="retain-position-container">
         <div id="retain-position-grid">
-            <ImageCheckbox image_filename={ "/assets/img/tools/icon.svg" } title={"Icons"} bind:checked={ retainIconPosition } />
-            <ImageCheckbox image_filename={ "/assets/img/tools/path.svg" } title={"Paths"} bind:checked={ retainPathPosition } />
-            <ImageCheckbox image_filename={ "/assets/img/tools/text.svg" } title={"Text"} bind:checked={ retainTextPosition } />
+            <ImageCheckbox image_filename={ "/assets/img/tools/icon.svg" } title={$tl.settings.hexes.retain_icons} bind:checked={ retainIconPosition } />
+            <ImageCheckbox image_filename={ "/assets/img/tools/path.svg" } title={$tl.settings.hexes.retain_paths} bind:checked={ retainPathPosition } />
+            <ImageCheckbox image_filename={ "/assets/img/tools/text.svg" } title={$tl.settings.hexes.retain_text} bind:checked={ retainTextPosition } />
         </div>
     </div>
 </div>
@@ -196,19 +195,19 @@
 <style>
 
     #retain-position-container {
-		width: 100%;
-		height: 100%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+    }
 
-	#retain-position-grid {
-		height: 2em;
-		display: flex;
-		border-radius: var(--small-radius);
-		overflow: hidden;
-	}
+    #retain-position-grid {
+            height: 2em;
+            display: flex;
+            border-radius: var(--small-radius);
+            overflow: hidden;
+    }
 
     #retain-position-tip {
         color: var(--hexfriend-green);

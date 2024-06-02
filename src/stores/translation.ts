@@ -1,6 +1,19 @@
 
-import { get, writable } from 'svelte/store';
+import { persisted } from 'svelte-persisted-store';
 
-import { en_us } from '../lib/translations';
+import { en_us, pt_br } from '../lib/translations';
 
-export let tl = writable(en_us);
+export const tl = persisted('tl', pt_br);
+
+export const translation_map = {
+    "en_us": {translation: en_us, label: "🇺🇸 English"},
+    "pt_br": {translation: pt_br, label: "🇧🇷 Portugues do Brasil"}
+}
+
+export const switch_translation = (new_translation) => {
+    console.log(`Switching to ${new_translation}`);
+    tl.set(translation_map[new_translation].translation)
+    console.log(tl);
+}
+
+
