@@ -3,7 +3,7 @@
 
 	import { genHexId, genHexId_tfieldHex, getNeighbours } from '../helpers/hexHelpers';
 	import { download } from '../lib/download2';
-	import { rand, pick_from_weighted } from '../helpers/random';
+	import { rand, pick_from_weighted, cyrb128, sfc32, get_min_max_rand_function } from '../helpers/random';
 	
 	import { store_has_unsaved_changes } from '../stores/flags';
 	import { tfield } from '../stores/tfield';
@@ -27,6 +27,9 @@
 	let gen_config_animate = false;
 	let gen_config_center = true;
 	let gen_config_clear = false;
+	let gen_config_use_seed = false;
+	let gen_seed = "";
+	let icon_scale = 70;
 
 	interface rule {
 		item: Icon
@@ -57,6 +60,14 @@
 
 	// Wrapper for generation methods
 	function generate() {
+		
+		let rand_func = get_min_max_rand_function( Math.random );
+		let rand_0_1 = Math.random
+		if (gen_config_use_seed) {
+			const seed = cyrb128(gen_seed);
+			rand_0_1 = sfc32(seed[0], seed[1], seed[2], seed[3]);
+			rand_func = get_min_max_rand_function( rand_0_1 );
+		}
 
 		//comp_terrainLayer.renderAllHexes()
 		let icons_placed = 0
@@ -66,7 +77,7 @@
 		}
 
 		Object.keys($tfield.hexes).forEach( (hex_id, i) => {
-			let icon_chance = rand(1, current_ruleset.chance_for_icon_high)
+			let icon_chance = rand_func(1, current_ruleset.chance_for_icon_high)
 			if (icon_chance > current_ruleset.chance_for_icon) return;
 
 			let hex: TerrainHex = $tfield.hexes[hex_id]
@@ -74,8 +85,8 @@
 			let hex_pos = {q: hex.q, r: hex.r, s: hex.s}
 
 			if (!gen_config_center) {
-				let new_q = hex.q + Math.random() - 0.5
-				let new_r = hex.r +  Math.random() - 0.5
+				let new_q = hex.q + rand_0_1() - 0.5
+				let new_r = hex.r + rand_0_1() - 0.5
 
 				hex_pos = {q: new_q, r: new_r, s:-new_q-new_r }
 			}
@@ -83,9 +94,9 @@
 			let rand_icon: Icon;
 
 			if (current_ruleset.icon_chances.length > 0) {
-				rand_icon = pick_from_weighted(current_ruleset.icon_chances)
+				rand_icon = pick_from_weighted(current_ruleset.icon_chances, rand_func)
 			} else {
-				rand_icon = pick_from_weighted(random_chances)
+				rand_icon = pick_from_weighted(random_chances, rand_func)
 			}
 
 			if (gen_config_animate) {
@@ -184,22 +195,33 @@
 	
 	<div id="buttons">
 		<div id="left-side">
-			<div id="chance">
+			<div id="generator-inputs">
 				{$tl.generators.icon_generator.generation_chance}
-				<input type="number" min={1} max={current_ruleset.chance_for_icon_high} bind:value={current_ruleset.chance_for_icon}> 
-				{$tl.generators.icon_generator.out_of_connector}
-				<input type="number" min={1} bind:value={current_ruleset.chance_for_icon_high}>
+				<div id="chance">
+					<input type="number" min={1} max={current_ruleset.chance_for_icon_high} bind:value={current_ruleset.chance_for_icon}> 
+					{$tl.generators.icon_generator.out_of_connector}
+					<input type="number" min={1} bind:value={current_ruleset.chance_for_icon_high}>
+				</div>
+				{$tl.generators.icon_generator.icon_scale}
+				<input type="range" min={10} max={100} bind:value={icon_scale} />
+				{#if gen_config_use_seed}
+					{$tl.generators.seed}
+					<input bind:value={gen_seed}>
+				{/if}
 			</div>
 			<div id="clear">
 				<button class="outline-button" on:click={clear_ruleset}>{$tl.generators.clear}</button>
+				<button class="outline-button" on:click={() => {}} >{$tl.general.export}</button>
+				<button class="outline-button" on:click={() => {}} >{$tl.general.import}</button>
 			</div>
 		</div>
 		
 		<div id="right-side">
 			<div id="generate-buttons">
 				<span><Checkbox bind:checked = {gen_config_animate} id="config-animate" /> <label for="config-animate">{$tl.generators.animate}</label></span>
-					<span><Checkbox bind:checked = {gen_config_center} id="config-snap" /> <label for="config-snap">{$tl.generators.icon_generator.place_in_center}</label></span>
-						<span><Checkbox bind:checked = {gen_config_clear} id="config-clear" /> <label for="config-clear">{$tl.generators.clear_before_generation}</label></span>
+				<span><Checkbox bind:checked = {gen_config_center} id="config-snap" /> <label for="config-snap">{$tl.generators.icon_generator.place_in_center}</label></span>
+				<span><Checkbox bind:checked = {gen_config_clear} id="config-clear" /> <label for="config-clear">{$tl.generators.clear_before_generation}</label></span>
+				<span><Checkbox bind:checked = {gen_config_use_seed} id="config-use-seed" /> <label for="config-use-seed">{$tl.generators.seed_generation}</label></span>
 			</div>
 			<div id="generate">
 				<button class="evil" on:click={() => { show_icon_generator = false }}>{$tl.generators.close}</button>
@@ -321,7 +343,8 @@
 		background-color: var(--light-background);
 		padding: 0.625em;
 
-		display: flex;
+		display: grid;
+		grid-template-columns: 5fr 3fr;
 		justify-content: space-between;
 		gap: 0.5em;
 	}
@@ -335,6 +358,17 @@
 		flex-direction: column;
 		gap: 0.5em;
 		justify-content: space-between;
+	}
+
+	#generator-inputs { 
+		width: 100%;
+		display: grid;
+		grid-template-columns: 4fr 5fr;
+		gap: 0.5em;
+	}
+
+	#generator-inputs input {
+		min-height: 25px;
 	}
 
 	#right-side {

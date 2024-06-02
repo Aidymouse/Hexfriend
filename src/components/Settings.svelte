@@ -237,7 +237,7 @@
 		<select
 			class="outline"
 			bind:value={exportType}
-			title={$tl.settings.export}
+			title={$tl.general.export}
 			on:change={() => {
 				exportMap(exportType);
 				exportType = "Export As...";
@@ -260,7 +260,7 @@
 			on:click={() => {}}
 			title="Import"
 		>
-			{$tl.settings.import}
+			{$tl.general.import}
 			<input
 				type="file"
 				accept=".hexfriend"

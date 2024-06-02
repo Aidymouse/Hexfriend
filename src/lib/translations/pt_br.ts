@@ -5,6 +5,8 @@ export const pt_br = {
 	general: {
 		odd: "PLACEHOLDER",
 		even: "PLACEHOLDER",
+		export: "Exportar",
+		import: "Importar",
 	},
 
 	tools: {
@@ -92,7 +94,6 @@ export const pt_br = {
 			scale_request_dialog: "PLACEHOLDER",
 			hexfriend: "Hexfriend",
 		},
-		import: "Importar",
 
 		grid: {
 			title: "Grade",
@@ -249,8 +250,6 @@ export const pt_br = {
 		author: "Autor",
 		author_placeholder: "Você!",
 		version: "Versão",
-		import: "Importar",
-		export: "Exportar",
 		change_orientation: "Alterar Orientação do Hex",
 		duplicate: "Duplicar este Hex",
 		tileset_builder: {
@@ -272,8 +271,6 @@ export const pt_br = {
 			name_placeholder: "Novo Conjunto de Ícones",
 			author: "Autor",
 			version: "Versão",
-			import: "Importar",
-			export: "Exportar",
 			helptext: "Selecione um ícone ou crie um novo!",
 			helpsubtitle: "Para obter melhores resultados, use imagens brancas de 100 x 100 pixels.",
 			helpsubsubtitle: "Dica: você pode fazer upload de várias imagens de uma vez!",
@@ -287,17 +284,18 @@ export const pt_br = {
 		generate: "Gerar",
 		close: "Fechar",
 		clear: "Limpar",
+		seed: "PLACEHOLDER",
+		seed_generation: "PLACEHOLDER",
 		clear_confirmation: "PLACEHOLDER",
 		clear_before_generation: "Limpar Antes de Gerar",
 		icon_generator: {
 			place_in_center: "Colocar no Centro do Hex",
 			generation_chance: "Chance da Geração",
-			out_of_connector: "em"
+			out_of_connector: "em",
+			icon_scale: "PLACEHOLDER",
 		},
 		terrain_generator: {
 			preset: "Predefinição",
-			export: "Exportar",
-			import: "Importar",
 		}
 	},
 

@@ -1,10 +1,12 @@
-export let en_us = {
+export const en_us = {
 	language: "en_us",
 	save_indicator: "Saving...",
 
 	general: {
 		even: "Even",
 		odd: "Odd",
+		export: "Export",
+		import: "Import",
 	},
 
 	tools: {
@@ -92,8 +94,6 @@ export let en_us = {
 			scale_request_dialog: "Scale by what percentage?",
 			hexfriend: "Hexfriend",
 		},
-		export: "Export",
-		import: "Import",
 
 		grid: {
 			title: "Grid",
@@ -248,8 +248,6 @@ export let en_us = {
 		author: "Author",
 		author_placeholder: "You!",
 		version: "Version",
-		import: "Import",
-		export: "Export",
 		change_orientation: "Change Hex Orientation",
 		duplicate: "Duplicate this hex",
 		tileset_builder: {
@@ -270,8 +268,6 @@ export let en_us = {
 			name: "Icon Set Name",
 			name_placeholder: "New Icon Set",
 			version: "Version",
-			import: "Import",
-			export: "Export",
 			helptext: "Select an icon or make a new one!",
 			helpsubtitle: "For best results, use white 100px by 100px images.",
 			helpsubsubtitle: "Hint: You can upload multiple images at once!",
@@ -281,21 +277,22 @@ export let en_us = {
 	},
 
 	generators: {
-		animate: "Animation",
+		animate: "Animate",
 		generate: "Generate",
 		close: "Close",
 		clear: "Clear",
+		seed: "Seed",
+		seed_generation: "Seed Generation",
 		clear_confirmation: "Are you sure?",
 		clear_before_generation: "Clear Before Generation",
 		icon_generator: {
 			place_in_center: "Place In Hex Center",
 			generation_chance: "Generation Chance",
-			out_of_connector: "in"
+			out_of_connector: "in",
+			icon_scale: "Scale",
 		},
 		terrain_generator: {
 			preset: "Preset",
-			export: "Export",
-			import: "Import",
 		}
 	},
 

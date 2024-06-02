@@ -332,7 +332,7 @@
 					on:click={() => importIconset()}
 					class="file-input-button"
 				>
-					{$tl.builders.import}
+					{$tl.general.import}
 					<input
 						type="file"
 						bind:files={importFiles}
@@ -344,18 +344,14 @@
 					/>
 				</button>
 
-				<button on:click={() => exportIconset()}>{$tl.builders.export}</button>
+				<button on:click={() => exportIconset()}>{$tl.general.export}</button>
 			</div>
 		</div>
 
 		<div
 			id="icon-buttons"
-			on:dragover={(e) => {
-				e.preventDefault();
-			}}
-			on:dragenter={(e) => {
-				e.preventDefault();
-			}}
+			on:dragover={(e) => { e.preventDefault(); }}
+			on:dragenter={(e) => {	e.preventDefault(); }}
 			on:drop={dropButton}
 		>
 			{#each workingIconset.icons as icon (icon.id)}

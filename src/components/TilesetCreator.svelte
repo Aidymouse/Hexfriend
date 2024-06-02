@@ -322,7 +322,7 @@
 				<input id="setVersion" type="number" bind:value={workingTileset.version} />
 
 				<button on:click={() => importTileset()} class="file-input-button">
-					{$tl.builders.import}
+					{$tl.general.import}
 					<input
 						type="file"
 						bind:files={importFiles}
@@ -334,7 +334,7 @@
 					/>
 				</button>
 
-				<button on:click={() => exportTileset()}>{$tl.builders.export}</button>
+				<button on:click={() => exportTileset()}>{$tl.general.export}</button>
 			</div>
 		</div>
 
