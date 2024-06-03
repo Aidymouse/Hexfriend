@@ -7,6 +7,7 @@ export const pt_br = {
 		even: "PLACEHOLDER",
 		export: "Exportar",
 		import: "Importar",
+		reset: "Redefinir",
 	},
 
 	tools: {
@@ -29,7 +30,6 @@ export const pt_br = {
 
 	icon_panel: {
 		icon_color: "Cor do Ícone",	
-		reset: "Redefinir",
 	},
 
 	path_panel: {

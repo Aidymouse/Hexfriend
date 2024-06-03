@@ -135,7 +135,7 @@
 				class="outline-button"
 				on:click={() => {
 					pHex = 80;
-				}}>{$tl.icon_panel.reset}</button
+				}}>{$tl.general.reset}</button
 			>
 		</span>
 	</div>

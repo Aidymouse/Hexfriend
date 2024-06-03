@@ -89,6 +89,7 @@
 	import "./styles/panels.css";
 	import "./styles/scrollbar.css";
 	import "./styles/variables.css";
+	import "./styles/shorthand.css";
 
 	// TYPES
 	import type {

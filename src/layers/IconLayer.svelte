@@ -132,7 +132,21 @@
 		$store_has_unsaved_changes = true;
 	}
 
-	export function place_icon(icon: Icon, position: cube_coords) {
+	export function get_scale_for_icon(icon: Icon) {
+		
+		let icon_texture = get_icon_texture(icon.texId);
+
+		let scale: number;
+		if ($tfield.hexWidth < $tfield.hexHeight) {
+			scale = ($tfield.hexHeight * ( icon.pHex / 100)) / icon_texture.height;
+		} else {
+			scale = ($tfield.hexWidth * ( icon.pHex / 100)) / icon_texture.width;
+		}
+
+		return scale;
+	}
+
+	export function place_icon(icon: Icon, position: cube_coords, custom_scale: number = pHex) {
 		let icon_pos = coords_cubeToWorld(
 			position.q,
 			position.r,
@@ -147,7 +161,8 @@
 			x: icon_pos.x,
 			y: icon_pos.y,
 			color: icon.color,
-			scale: getMaxIconScale(),
+			scale: get_scale_for_icon(icon),
+			pHex: icon.pHex,
 			id: iconId,
 			texId: icon.texId,
 		});

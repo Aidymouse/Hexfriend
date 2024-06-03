@@ -29,7 +29,7 @@
 	let gen_config_clear = false;
 	let gen_config_use_seed = false;
 	let gen_seed = "";
-	let icon_scale = 70;
+	let icon_scale = 80;
 
 	interface rule {
 		item: Icon
@@ -98,6 +98,7 @@
 			} else {
 				rand_icon = pick_from_weighted(random_chances, rand_func)
 			}
+			rand_icon.pHex = icon_scale;
 
 			if (gen_config_animate) {
 
@@ -202,10 +203,10 @@
 					{$tl.generators.icon_generator.out_of_connector}
 					<input type="number" min={1} bind:value={current_ruleset.chance_for_icon_high}>
 				</div>
-				{$tl.generators.icon_generator.icon_scale}
-				<input type="range" min={10} max={100} bind:value={icon_scale} />
+				<span class="left-center-text">{$tl.generators.icon_generator.icon_scale}: {icon_scale}%</span>
+				<span><input id="icon-scale" type="range" min={10} max={100} bind:value={icon_scale} /> <button on:click={() => {icon_scale = 80} }>{$tl.general.reset}</button></span>
 				{#if gen_config_use_seed}
-					{$tl.generators.seed}
+					<span class="left-center-text">{$tl.generators.seed}</span>
 					<input bind:value={gen_seed}>
 				{/if}
 			</div>
@@ -364,11 +365,13 @@
 		width: 100%;
 		display: grid;
 		grid-template-columns: 4fr 5fr;
+		grid-auto-rows: 24px;
 		gap: 0.5em;
 	}
 
 	#generator-inputs input {
-		min-height: 25px;
+		height: 100%;
+		margin: 0;
 	}
 
 	#right-side {
@@ -389,6 +392,14 @@
 		display: flex;
 		gap: 0.5em;
 		justify-content: flex-end;
+	}
+
+	input[type='range']::-webkit-slider-runnable-track, input[type='range']::-moz-range-track {
+		background: var(--lighter-background);
+	}
+
+	input[type='range']:active::-webkit-slider-runnable-track, input[type='range']:active::-moz-range-track {
+		background: var(--hexfriend-green);
 	}
 
 </style>

@@ -7,6 +7,7 @@ export const en_us = {
 		odd: "Odd",
 		export: "Export",
 		import: "Import",
+		reset: "Reset",
 	},
 
 	tools: {
@@ -29,7 +30,6 @@ export const en_us = {
 
 	icon_panel: {
 		icon_color: "Icon Color",	
-		reset: "Reset",
 	},
 
 	path_panel: {
