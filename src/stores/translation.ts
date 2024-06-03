@@ -7,7 +7,7 @@ export const tl = persisted('tl', pt_br);
 
 export const translation_map = {
     "en_us": {translation: en_us, label: "🇺🇸 English"},
-    "pt_br": {translation: pt_br, label: "🇧🇷 Portugues do Brasil"}
+    "pt_br": {translation: pt_br, label: "🇧🇷 Portugues do Brasil (WIP)"}
 }
 
 export const switch_translation = (new_translation) => {

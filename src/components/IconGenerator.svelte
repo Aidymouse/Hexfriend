@@ -22,7 +22,7 @@
 	export let comp_iconLayer;
 	export let show_icon_generator: boolean;
 
-	let importFiles: FileList;
+	let importFiles: FileList = [];
 
 	let gen_config_animate = false;
 	let gen_config_center = true;
@@ -212,8 +212,8 @@
 			</div>
 			<div id="clear">
 				<button class="outline-button" on:click={clear_ruleset}>{$tl.generators.clear}</button>
-				<button class="outline-button" on:click={() => {}} >{$tl.general.export}</button>
-				<button class="outline-button" on:click={() => {}} >{$tl.general.import}</button>
+				<button class="outline-button" on:click={exportGenFunction} >{$tl.general.export}</button>
+				<button class="outline-button" id="import-button"><input type="file" bind:files={importFiles} on:change={() => { importGenFunction() }} />{$tl.general.import}</button>
 			</div>
 		</div>
 		
@@ -226,7 +226,7 @@
 			</div>
 			<div id="generate">
 				<button class="evil" on:click={() => { show_icon_generator = false }}>{$tl.generators.close}</button>
-				<button class="green-button" on:click={generate}>{$tl.generators.close}</button>
+				<button class="green-button" on:click={generate}>{$tl.generators.generate}</button>
 			</div>
 		</div>
 	</div>
@@ -291,6 +291,19 @@
 		grid-template-columns: repeat(6, 1fr); 
 		padding: 0.25em;
 		box-sizing: border-box;
+	}
+
+	#import-button {
+		position: relative;
+	}
+
+	#import-button input {
+		position: absolute;
+		opacity: 0;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
 	}
 
 	/* Individual Chance Items */
