@@ -1,6 +1,12 @@
 # Changelog
 For Techy People
 
+# Version 2.0 - Whole new worlds, Hexfriend!
+
+- Added translation support. You can contribute your language by providing a [translation file](https://github.com/Aidymouse/Hexfriend/tree/master/src/lib/translations)
+- Added a seed to terrain and icon generators
+- Added ability to import and export icon generation rulesets
+
 # Version 1.9 - Sorting out your internals, Hexfriend
 
 ## Version 1.9.14
