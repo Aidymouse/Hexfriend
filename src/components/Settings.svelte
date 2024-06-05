@@ -1,35 +1,38 @@
 <script lang="ts">
 	// Types
-	import type CoordsLayer from '../layers/CoordsLayer.svelte';
-	import type IconLayer from '../layers/IconLayer.svelte';
-	import type PathLayer from '../layers/PathLayer.svelte';
-	import type TerrainLayer from '../layers/TerrainLayer.svelte';
-	import type TextLayer from '../layers/TextLayer.svelte';
-	import type TerrainPanel from '../panels/TerrainPanel.svelte';
-	import type { Iconset } from '../types/icon';
-	import type { save_data } from '../types/savedata';
-	import type { Tileset } from '../types/tilesets';
-	
+	import type CoordsLayer from "../layers/CoordsLayer.svelte";
+	import type IconLayer from "../layers/IconLayer.svelte";
+	import type PathLayer from "../layers/PathLayer.svelte";
+	import type TerrainLayer from "../layers/TerrainLayer.svelte";
+	import type TextLayer from "../layers/TextLayer.svelte";
+	import type TerrainPanel from "../panels/TerrainPanel.svelte";
+	import type { Iconset } from "../types/icon";
+	import type { save_data } from "../types/savedata";
+	import type { Tileset } from "../types/tilesets";
+	import { Map_Exports } from "../types/export";
+
 	// Styles
 	import "../styles/settings.css";
 
 	// Stores
-	import { tfield } from '../stores/tfield';
-	import { resize_parameters } from '../stores/resize_parameters';
-	
+	import { tfield } from "../stores/tfield";
+	import { resize_parameters } from "../stores/resize_parameters";
+	import { tl, switch_translation, translation_map } from "../stores/translation";
+
 	// Components
-	import GridSettings from './settings/GridSettings.svelte';
-	import SettingHeading from './settings/SettingHeading.svelte';
-	import HexesSettings from './settings/HexesSettings.svelte';
-	import DimensionSettings from './settings/DimensionSettings.svelte';
-	import CoordinateSettings from './settings/CoordinateSettings.svelte';
-	import OverlaySettings from './settings/OverlaySettings.svelte';
-	import TilesetSettings from './settings/TilesetSettings.svelte';
-	import IconsetSettings from './settings/IconsetSettings.svelte';
-	import GeneratorSettings from './settings/GeneratorSettings.svelte';
+	import GridSettings from "./settings/GridSettings.svelte";
+	import SettingHeading from "./settings/SettingHeading.svelte";
+	import HexesSettings from "./settings/HexesSettings.svelte";
+	import DimensionSettings from "./settings/DimensionSettings.svelte";
+	import CoordinateSettings from "./settings/CoordinateSettings.svelte";
+	import OverlaySettings from "./settings/OverlaySettings.svelte";
+	import TilesetSettings from "./settings/TilesetSettings.svelte";
+	import IconsetSettings from "./settings/IconsetSettings.svelte";
+	import GeneratorSettings from "./settings/GeneratorSettings.svelte";
 
 	// Lib
-	import { onMount } from 'svelte';
+	import { onMount } from "svelte";
+	import SelectGrid from "./SelectGrid.svelte";
 
 	export let loadedSave: save_data;
 	export let showSettings: boolean;
@@ -47,7 +50,7 @@
 		overlay: true,
 		tilesets: true,
 		iconsets: true,
-		experimental: true
+		experimental: true,
 	};
 
 	export let renderAllHexes: Function;
@@ -57,13 +60,13 @@
 	//export let data_terrain: terrain_data
 	export let loadedTilesets: Tileset[];
 	export let loadedIconsets: Iconset[];
-	
+
 	export let comp_terrainLayer: TerrainLayer;
 	export let comp_iconLayer: IconLayer;
 	export let comp_pathLayer: PathLayer;
 	export let comp_textLayer: TextLayer;
 	export let comp_coordsLayer: CoordsLayer;
-	
+
 	export let comp_terrain_panel: TerrainPanel;
 
 	export let load: Function;
@@ -72,29 +75,38 @@
 	let retainPathPosition: boolean = true;
 	let retainTextPosition: boolean = true;
 
-	let exportType: 'Export As...' | 'image/png' | 'application/json' = 'Export As...';
+	let exportType: "Export As..." | "image/png" | "application/json" =
+		"Export As...";
 
-	let iconset_text = 'Icon Set';
+	let iconset_text = "Icon Set";
 
 	function retain_positions() {
-		if (retainIconPosition) comp_iconLayer.retain_icon_position_on_hex_resize($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap);
-		if (retainPathPosition) comp_pathLayer.retain_path_position_on_hex_resize();
-		if (retainTextPosition) comp_textLayer.retain_text_position_on_hex_resize();
+		if (retainIconPosition)
+			comp_iconLayer.retain_icon_position_on_hex_resize(
+				$tfield.hexWidth,
+				$tfield.hexHeight,
+				$tfield.grid.gap,
+			);
+		if (retainPathPosition)
+			comp_pathLayer.retain_path_position_on_hex_resize();
+		if (retainTextPosition)
+			comp_textLayer.retain_text_position_on_hex_resize();
 	}
 
 	function save_old_resize_parameters() {
-		$resize_parameters.old_hex_width = $tfield.hexWidth
-		$resize_parameters.old_hex_height = $tfield.hexHeight
-		$resize_parameters.old_gap = $tfield.grid.gap
+		$resize_parameters.old_hex_width = $tfield.hexWidth;
+		$resize_parameters.old_hex_height = $tfield.hexHeight;
+		$resize_parameters.old_gap = $tfield.grid.gap;
 	}
-	
 
 	// Imports
 	let mapImportFiles: FileList;
 	function importMap() {
 		if (!mapImportFiles[0]) return;
 
-		let confirm = window.confirm(`This will discard your currently loaded map '${loadedSave.title}' (make sure it's saved!)\nAre you sure you want to load '${mapImportFiles[0].name}'?`);
+		let confirm = window.confirm(
+			`This will discard your currently loaded map '${loadedSave.title}' (make sure it's saved!)\nAre you sure you want to load '${mapImportFiles[0].name}'?`,
+		);
 		if (!confirm) return;
 
 		let r = new FileReader();
@@ -107,81 +119,96 @@
 	}
 
 	onMount(() => {
-		save_old_resize_parameters()
+		save_old_resize_parameters();
 
 		hexfriend_blink();
-	})
-
+	});
 
 	let hexfriend_affection = 0;
 	let petting_hexfriend = false;
 	let hexfriend_hearts = false;
-	
+
 	function getRandomInt(min, max) {
 		min = Math.ceil(min);
 		max = Math.floor(max);
 		return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
 	}
 
-
 	function hexfriend_blink() {
 		// console.log(petting_hexfriend)
 		if (!(petting_hexfriend || hexfriend_hearts)) {
 			// console.log("HUH!?")
-			document.getElementById("little-hexfriend").innerHTML = "⟨ -‿- ⟩"
+			document.getElementById("little-hexfriend").innerHTML =
+				"⟨ -‿- ⟩";
 			setTimeout(() => {
 				if (!(petting_hexfriend || hexfriend_hearts)) {
-					document.getElementById("little-hexfriend").innerHTML = "⟨ •‿• ⟩"
+					document.getElementById(
+						"little-hexfriend",
+					).innerHTML = "⟨ •‿• ⟩";
 				}
-			}, 400)
-			
+			}, 400);
 		}
-		setTimeout(hexfriend_blink, getRandomInt(60, 120)*1000)
+		setTimeout(hexfriend_blink, getRandomInt(60, 120) * 1000);
 	}
 
 	function hexfriend_pet() {
 		if (!petting_hexfriend) return;
 		hexfriend_affection += 1;
-		
-		document.getElementById("floating-hexfriend").style.opacity = hexfriend_affection/100;
-		
+
+		document.getElementById("floating-hexfriend").style.opacity =
+			hexfriend_affection / 100;
+
 		if (hexfriend_affection > 100) {
 			// Some hearts
-			document.getElementById("floating-hexfriend").style.opacity = 0;
-			
-			document.getElementById("little-hexfriend").innerHTML = "⟨ ꈍ‿ꈍ ⟩"
-			document.getElementById("floating-hexfriend").innerHTML = "⟨ ꈍ‿ꈍ ⟩"
-			document.getElementById("floating-hexfriend").style.transitionDuration = "2s";
-			document.getElementById("floating-hexfriend").style.opacity = 0;
+			document.getElementById(
+				"floating-hexfriend",
+			).style.opacity = 0;
+
+			document.getElementById("little-hexfriend").innerHTML =
+				"⟨ ꈍ‿ꈍ ⟩";
+			document.getElementById(
+				"floating-hexfriend",
+			).innerHTML = "⟨ ꈍ‿ꈍ ⟩";
+			document.getElementById(
+				"floating-hexfriend",
+			).style.transitionDuration = "2s";
+			document.getElementById(
+				"floating-hexfriend",
+			).style.opacity = 0;
 
 			hexfriend_hearts = true;
 			setTimeout(() => {
-				document.getElementById("floating-hexfriend").innerHTML = "⟨ >‿• ⟩"
-				document.getElementById("floating-hexfriend").style.transitionDuration = "0s";
+				document.getElementById(
+					"floating-hexfriend",
+				).innerHTML = "⟨ >‿• ⟩";
+				document.getElementById(
+					"floating-hexfriend",
+				).style.transitionDuration = "0s";
 				hexfriend_hearts = false;
-				hexfriend_stop_petting()
+				hexfriend_stop_petting();
 			}, 2000);
-			
-		} 
+		}
 	}
-	
+
 	function hexfriend_stop_petting() {
 		if (hexfriend_hearts) return;
 		document.getElementById("floating-hexfriend").style.opacity = 0;
-		document.getElementById("little-hexfriend").innerHTML = "⟨ •‿• ⟩"
-		document.getElementById("little-hexfriend").style.cursor = "grab";
+		document.getElementById("little-hexfriend").innerHTML =
+			"⟨ •‿• ⟩";
+		document.getElementById("little-hexfriend").style.cursor =
+			"grab";
 		petting_hexfriend = false;
 		hexfriend_affection = 0;
 	}
 
 	function hexfriend_start_petting(e: MouseEvent) {
 		if (hexfriend_hearts) return;
-		document.getElementById("little-hexfriend").innerHTML = "⟨ >‿• ⟩"
-		document.getElementById("little-hexfriend").style.cursor = "grabbing";
+		document.getElementById("little-hexfriend").innerHTML =
+			"⟨ >‿• ⟩";
+		document.getElementById("little-hexfriend").style.cursor =
+			"grabbing";
 		petting_hexfriend = true;
-
 	}
-
 </script>
 
 <button
@@ -190,9 +217,9 @@
 	on:click={() => {
 		showSettings = false;
 	}}
-	title={'Close Settings'}
+	title={"Close Settings"}
 >
-	<img src="/assets/img/ui/back.png" alt={'Back'} />
+	<img src="/assets/img/ui/back.png" alt={"Back"} />
 </button>
 
 <div id="settings" class:shown={showSettings}>
@@ -204,23 +231,36 @@
 	/>
 
 	<!-- EXPORT / IMPORT -->
-	<span style="display: grid; grid-template-columns: 1fr 1fr; margin-top: 0.25em; column-gap: 0.25em;">
+	<span
+		style="display: grid; grid-template-columns: 1fr 1fr; margin-top: 0.25em; gap: 0.25em;"
+	>
 		<select
-			id="export-map-select"
+			class="outline"
 			bind:value={exportType}
-			title="Export"
+			title={$tl.settings.export}
 			on:change={() => {
 				exportMap(exportType);
-				exportType = 'Export As...';
+				exportType = "Export As...";
 			}}
 		>
-			<option value={'Export As...'} style="display: none">Export As...</option>
-			<option value={'image/png'}>PNG</option>
-			<option value={'application/json'}>Hexfriend</option>
+			<option value={Map_Exports.PLACEHOLDER} style="display: none"
+				>{$tl.settings.export_as}</option
+			>
+			<option value={Map_Exports.PNG}
+				>{$tl.settings.exports.png}</option
+			>
+			<option value={Map_Exports.SCALED_PNG}>{$tl.settings.exports.scaled_png}</option>
+			<option value={Map_Exports.JSON}
+				>{$tl.settings.exports.hexfriend}</option
+			>
 		</select>
 
-		<button class="file-input-button outline-button" on:click={() => {}} title="Import">
-			Import
+		<button
+			class="file-input-button outline-button"
+			on:click={() => {}}
+			title="Import"
+		>
+			{$tl.settings.import}
 			<input
 				type="file"
 				accept=".hexfriend"
@@ -230,20 +270,30 @@
 				}}
 			/>
 		</button>
+
+		<!-- LANGUAGE -->
+		<select class="outline" style="grid-column: 1/3" value={$tl.language} on:change={e => { switch_translation(e.target.value) } } >
+			{#each Object.entries(translation_map) as [tl_code, translation] (translation.label) }
+				<option value={tl_code}>{translation.label}</option>	
+			{/each}
+		</select>
 	</span>
+
 
 	<!-- GRID -->
 	<div class="setting-container">
-		<SettingHeading text="Grid" bind:toggle={hidden_settings.grid} />
+		<SettingHeading
+			text={$tl.settings.grid.title}
+			bind:toggle={hidden_settings.grid}
+		/>
 		<div class="settings-hider" class:hidden={hidden_settings.grid}>
 			<div class="hider">
-				<GridSettings 
+				<GridSettings
 					bind:comp_terrainLayer
-					bind:comp_coordsLayer				
-
-					renderGrid={renderGrid}
-					redrawEntireMap={redrawEntireMap}
-					retain_positions={retain_positions}
+					bind:comp_coordsLayer
+					{renderGrid}
+					{redrawEntireMap}
+					{retain_positions}
 				/>
 			</div>
 		</div>
@@ -251,21 +301,25 @@
 
 	<!-- HEXES -->
 	<div class="setting-container">
-		<SettingHeading text="Hexes" bind:toggle={hidden_settings.hexes} />
-		<div class="settings-hider" class:hidden={hidden_settings.hexes}>
+		<SettingHeading
+			text={$tl.settings.hexes.title}
+			bind:toggle={hidden_settings.hexes}
+		/>
+		<div
+			class="settings-hider"
+			class:hidden={hidden_settings.hexes}
+		>
 			<div class="hider">
 				<HexesSettings
 					bind:comp_coordsLayer
 					bind:comp_terrainLayer
-
 					bind:retainIconPosition
 					bind:retainPathPosition
 					bind:retainTextPosition
-
-					retain_positions={retain_positions}
-					save_old_resize_parameters={save_old_resize_parameters}
-					renderAllHexes={renderAllHexes}
-					redrawEntireMap={redrawEntireMap}
+					{retain_positions}
+					{save_old_resize_parameters}
+					{renderAllHexes}
+					{redrawEntireMap}
 				/>
 			</div>
 		</div>
@@ -273,10 +327,16 @@
 
 	<!-- DIMENSIONS AND SHAPE -->
 	<div class="setting-container">
-		<SettingHeading text="Shape and Size" bind:toggle={hidden_settings.dimensions} />
-		<div class="settings-hider" class:hidden={hidden_settings.dimensions}>
+		<SettingHeading
+			text={$tl.settings.shape.title}
+			bind:toggle={hidden_settings.dimensions}
+		/>
+		<div
+			class="settings-hider"
+			class:hidden={hidden_settings.dimensions}
+		>
 			<div class="hider">
-				<DimensionSettings 
+				<DimensionSettings
 					bind:comp_terrainLayer
 					bind:comp_iconLayer
 					bind:comp_textLayer
@@ -288,39 +348,52 @@
 
 	<!-- COORDINATES -->
 	<div class="setting-container">
-		<SettingHeading text="Coordinates" bind:toggle={hidden_settings.coordinates} />
-		<div class="settings-hider" class:hidden={hidden_settings.coordinates}>
+		<SettingHeading
+			text={$tl.settings.coordinates.title}
+			bind:toggle={hidden_settings.coordinates}
+		/>
+		<div
+			class="settings-hider"
+			class:hidden={hidden_settings.coordinates}
+		>
 			<div class="hider">
-				<CoordinateSettings
-					bind:comp_coordsLayer
-				/>
+				<CoordinateSettings bind:comp_coordsLayer />
 			</div>
 		</div>
 	</div>
 
 	<!-- OVERLAY -->
 	<div class="setting-container">
-		<SettingHeading text="Overlay" bind:toggle={hidden_settings.overlay} />
-		<div class="settings-hider" class:hidden={hidden_settings.overlay}>
+		<SettingHeading
+			text={$tl.settings.overlay.title}
+			bind:toggle={hidden_settings.overlay}
+		/>
+		<div
+			class="settings-hider"
+			class:hidden={hidden_settings.overlay}
+		>
 			<div class="hider">
 				<OverlaySettings bind:showSettings />
 			</div>
 		</div>
-
 	</div>
 
 	<!-- TILE SETS -->
 	<div class="setting-container">
-		<SettingHeading text="Tilesets" bind:toggle={hidden_settings.tilesets} />
-		<div class="settings-hider" class:hidden={hidden_settings.tilesets}>
+		<SettingHeading
+			text={$tl.settings.tilesets.title}
+			bind:toggle={hidden_settings.tilesets}
+		/>
+		<div
+			class="settings-hider"
+			class:hidden={hidden_settings.tilesets}
+		>
 			<div class="hider">
-				<TilesetSettings 
+				<TilesetSettings
 					bind:loadedSave
 					bind:loadedTilesets
-
 					bind:comp_terrainLayer
 					bind:comp_terrain_panel
-
 					bind:appState
 				/>
 			</div>
@@ -329,23 +402,16 @@
 
 	<!-- ICON SETS -->
 	<div class="setting-container">
-		<h2 class="setting-heading">
-			<span
-				on:click={(e) => {
-					iconset_text = iconset_text == 'Icon Set' ? 'Iconset' : 'Icon Set';
-				}}>{iconset_text}s</span
-			>
-			<button
-				on:click={() => {
-					hidden_settings.iconsets = !hidden_settings.iconsets;
-				}}
-			>
-				<img alt={'Toggle Icon Set Settings'} src={'/assets/img/ui/arrow.png'} class:rotated={hidden_settings.iconsets} />
-			</button>
-		</h2>
-		<div class="settings-hider" class:hidden={hidden_settings.iconsets}>
+		<SettingHeading
+			text={$tl.settings.icon_sets.title}
+			bind:toggle={hidden_settings.iconsets}
+		/>
+		<div
+			class="settings-hider"
+			class:hidden={hidden_settings.iconsets}
+		>
 			<div class="hider">
-				<IconsetSettings 
+				<IconsetSettings
 					bind:loadedSave
 					bind:loadedIconsets
 					bind:iconset_text
@@ -357,10 +423,16 @@
 
 	<!-- GENERATORS -->
 	<div class="setting-container">
-		<SettingHeading text="Generators" bind:toggle={hidden_settings.experimental} />
-		<div class="settings-hider" class:hidden={hidden_settings.experimental}>
+		<SettingHeading
+			text={$tl.settings.generators.title}
+			bind:toggle={hidden_settings.experimental}
+		/>
+		<div
+			class="settings-hider"
+			class:hidden={hidden_settings.experimental}
+		>
 			<div class="hider">
-				<GeneratorSettings 
+				<GeneratorSettings
 					bind:show_icon_generator
 					bind:showTerrainGenerator
 					bind:showSettings
@@ -370,40 +442,65 @@
 	</div>
 
 	<!-- Changelog -->
-	<a href="https://github.com/Aidymouse/Hexfriend/blob/master/changelog.md" target={"_blank"} style="color: var(--text);">
+	<a
+		href="https://github.com/Aidymouse/Hexfriend/blob/master/changelog.md"
+		target={"_blank"}
+		style="color: var(--text);"
+	>
 		<div class="setting-container">
 			<h2 class="setting-heading">
-				Changelog 
-				<button><img alt={'Go to Changelog'} src={'/assets/img/ui/arrow.png'} style="transform: rotate(90deg);"/></button>
+				{$tl.settings.changelog}
+				<button
+					><img
+						alt={"Go to Changelog"}
+						src={"/assets/img/ui/arrow.png"}
+						style="transform: rotate(90deg);"
+					/></button
+				>
 			</h2>
 		</div>
 	</a>
 
 	<div class="setting-container">
-		<h2>About</h2>
+		<h2>{$tl.settings.about.title}</h2>
 		<p class="helper-text">
-			Hexfriend version 1.9.14 - "Sorting out your internals, Hexfriend"
-		</p>
-		
-		<p class="helper-text" style="margin-top: var(--small-radius)">
-			By Aidymouse and all the wonderful <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors">contributors</a>
+			Hexfriend {$tl.settings.about.version} 1.9.14 - {$tl
+				.settings.about.version_tagline}
 		</p>
 
 		<p class="helper-text" style="margin-top: var(--small-radius)">
-			Hexfriend is built with Svelte, Pixi JS and Typescript. Check out the <a href="https://www.github.com/Aidymouse/Hexfriend">Github</a>
-		</p>
-	
-		<p class="helper-text" style="margin-top: var(--small-radius)">
-			Found a bug? Got ideas? Come say Hi on the <a href="https://discord.gg/Jvws27VmWR">Hexfriend Discord</a>
+			{$tl.settings.about.credits.start}
+			<a
+				href="https://github.com/Aidymouse/Hexfriend/graphs/contributors"
+				>{$tl.settings.about.credits.contributorlink}</a
+			>
 		</p>
 
 		<p class="helper-text" style="margin-top: var(--small-radius)">
-			You can give away your hard earned money on <br><a href="https://ko-fi.com/aidymouse">Ko-fi</a>.
+			{$tl.settings.about.guts.start}
+			<a href="https://www.github.com/Aidymouse/Hexfriend"
+				>{$tl.settings.about.guts.github_link}</a
+			>
+		</p>
+
+		<p class="helper-text" style="margin-top: var(--small-radius)">
+			{$tl.settings.about.socials.start}<a
+				href="https://discord.gg/Jvws27VmWR"
+				>{$tl.settings.about.socials.discord_link}</a
+			>
+		</p>
+
+		<p class="helper-text" style="margin-top: var(--small-radius)">
+			{$tl.settings.about.money.start}
+			<a href="https://ko-fi.com/aidymouse"
+				>{$tl.settings.about.money.kofi_link}</a
+			>.
 		</p>
 	</div>
 
 	<div id="hexfriends-house">
-		<p id="little-hexfriend" 
+		<p
+			id="little-hexfriend"
 			on:mousedown={hexfriend_start_petting}
 			on:mousemove={hexfriend_pet}
 			on:mouseup={hexfriend_stop_petting}
@@ -412,14 +509,11 @@
 		>
 			⟨ •‿• ⟩
 		</p>
-		<p id="floating-hexfriend" class="hexfriend-ungreen">
-			⟨ >‿• ⟩
-		</p>
+		<p id="floating-hexfriend" class="hexfriend-ungreen">⟨ >‿• ⟩</p>
 	</div>
 </div>
 
 <style>
-
 	.hexfriend-ungreen {
 		color: var(--hexfriend-green) !important;
 	}
@@ -428,7 +522,7 @@
 		display: flex;
 		justify-content: center;
 	}
-	
+
 	#floating-hexfriend,
 	#little-hexfriend {
 		text-align: center;
@@ -444,7 +538,7 @@
 	}
 
 	#floating-hexfriend {
-		position:absolute;
+		position: absolute;
 		pointer-events: none;
 		color: var(--hexfriend-green);
 		opacity: 0;
@@ -480,7 +574,7 @@
 		align-items: center;
 		background-color: transparent;
 	}
-	
+
 	.setting-heading button:hover {
 		background-color: var(--lighter-background);
 	}
@@ -503,7 +597,7 @@
 
 	.hider {
 		/* allows for smooth hiding transition */
-        overflow-y: hidden;
+		overflow-y: hidden;
 	}
 
 	.hidden {
@@ -588,6 +682,4 @@
 		margin: 0;
 		width: 100%;
 	}
-
-	
 </style>

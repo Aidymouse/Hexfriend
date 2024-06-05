@@ -6,6 +6,7 @@
 
 	import { tfield } from "../../stores/tfield";
 	import { store_has_unsaved_changes } from "../../stores/flags";
+	import { tl } from "../../stores/translation";
 
 	export let comp_terrainLayer;
 	export let comp_iconLayer;
@@ -23,16 +24,8 @@
 		switch (direction) {
 			case "left": {
 				if ($tfield.orientation == hex_orientation.FLATTOP) {
-					//pan.offsetX -= $tfield.hexWidth * 0.75 * pan.zoomScale * amountOfHexes
-
 					xMod = $tfield.hexWidth * 0.75 * amount;
-
-					if (amount % 2 == 1) {
-						yMod =
-							-$tfield.hexHeight *
-							0.5 *
-							($tfield.raised == "odd" ? -1 : 1);
-					}
+					if (amount % 2 == 1) yMod = -$tfield.hexHeight * 0.5 * ($tfield.raised == "odd" ? -1 : 1);
 				} else {
 					xMod = $tfield.hexWidth * amount;
 				}
@@ -44,13 +37,7 @@
 					yMod = $tfield.hexHeight * amount;
 				} else {
 					yMod = $tfield.hexHeight * 0.75 * amount;
-
-					if (amount % 2 == 1) {
-						xMod =
-							-$tfield.hexWidth *
-							0.5 *
-							($tfield.raised == "odd" ? -1 : 1);
-					}
+					if (amount % 2 == 1) xMod = -$tfield.hexWidth *	0.5 * ($tfield.raised == "odd" ? -1 : 1);
 				}
 				break;
 			}
@@ -82,8 +69,6 @@
 		switch (direction) {
 			case "left": {
 				if ($tfield.orientation == hex_orientation.FLATTOP) {
-					//pan.offsetX -= $tfield.hexWidth * 0.75 * pan.zoomScale * amountOfHexes
-
 					xMod = -$tfield.hexWidth * 0.75 * amount;
 
 					if (amount % 2 == 1) {
@@ -150,20 +135,13 @@
 </script>
 
 <div class="settings-grid">
-	<label class="helper-text"
-		>Hexes removed by a reduction in map size are completely erased.</label
-	>
+	<label class="helper-text">{$tl.settings.shape.disclaimer}</label>
 
-	<label for="mapShape">Map Shape</label>
+	<label for="mapShape">{$tl.settings.shape.mapshape}</label>
 
-	<select
-		bind:value={$tfield.mapShape}
-		on:change={() => {
-			changeMapShape();
-		}}
-	>
-		<option value={map_shape.SQUARE}>Square</option>
-		<option value={map_shape.FLOWER}>Hex Flower</option>
+	<select style="min-height: 30px; width: 100%" bind:value={$tfield.mapShape} on:change={() => { changeMapShape(); }} >
+		<option value={map_shape.SQUARE}>{$tl.settings.shape.square}</option>
+		<option value={map_shape.FLOWER}>{$tl.settings.shape.flower}</option>
 	</select>
 </div>
 
@@ -171,97 +149,31 @@
 	<section id="map-dimensions-container">
 		<div id="map-dimensions">
 			{#if addOrRemoveMapDimensions == "add"}
-				<button
-					style="grid-area: left;"
-					on:click={() => {
-						square_expandMapDimension("left", 1);
-					}}>Add Left</button
-				>
-				<button
-					style="grid-area: top;"
-					on:click={() => {
-						square_expandMapDimension("top", 1);
-					}}>Add Top</button
-				>
-				<button
-					style="grid-area: bottom;"
-					on:click={() => {
-						square_expandMapDimension("bottom", 1);
-					}}>Add Bottom</button
-				>
-				<button
-					style="grid-area: right;"
-					on:click={() => {
-						square_expandMapDimension("right", 1);
-					}}>Add Right</button
-				>
-				<button
-					style="grid-area: center;"
-					on:click={() => {
-						addOrRemoveMapDimensions = "remove";
-					}}
-				>
-					<img
-						src={`/assets/img/tools/addHex_${$tfield.orientation == hex_orientation.FLATTOP ? "ft" : "pt"}.png`}
-						alt={"Add Hex"}
-						title={"Add Hex"}
-					/>
+				<button style="grid-area: left;" on:click={() => {square_expandMapDimension("left", 1);}}>{$tl.settings.shape.addleft}</button>
+				<button	style="grid-area: top;"	on:click={() => {square_expandMapDimension("top", 1);}}>{$tl.settings.shape.addtop}</button>
+				<button	style="grid-area: bottom;" on:click={() => {square_expandMapDimension("bottom", 1);}}>{$tl.settings.shape.addbottom}</button>
+				<button	style="grid-area: right;" on:click={() => {square_expandMapDimension("right", 1);}}>{$tl.settings.shape.addright}</button>
+				<button	style="grid-area: center;" on:click={() => { addOrRemoveMapDimensions = "remove"; }}>
+					<img src={`/assets/img/tools/addHex_${$tfield.orientation == hex_orientation.FLATTOP ? "ft" : "pt"}.png`} alt={$tl.settings.shape.addhex} title={$tl.settings.shape.addhex} />
 				</button>
 			{:else}
-				<button
-					style="grid-area: left;"
-					on:click={() => {
-						square_reduceMapDimension("left", 1);
-					}}>Remove Left</button
-				>
-				<button
-					style="grid-area: top;"
-					on:click={() => {
-						square_reduceMapDimension("top", 1);
-					}}>Remove Top</button
-				>
-				<button
-					style="grid-area: bottom;"
-					on:click={() => {
-						square_reduceMapDimension("bottom", 1);
-					}}>Remove Bottom</button
-				>
-				<button
-					style="grid-area: right;"
-					on:click={() => {
-						square_reduceMapDimension("right", 1);
-					}}>Remove Right</button
-				>
-				<button
-					style="grid-area: center;"
-					on:click={() => {
-						addOrRemoveMapDimensions = "add";
-					}}
-				>
-					<img
-						src={`/assets/img/tools/removeHex_${$tfield.orientation == hex_orientation.FLATTOP ? "ft" : "pt"}.png`}
-						alt={"Remove Hex"}
-						title={"Remove Hex"}
-					/>
+				<button	style="grid-area: left;" on:click={() => {square_reduceMapDimension("left", 1);}}>{$tl.settings.shape.removeleft}</button>
+				<button	style="grid-area: top;"	on:click={() => {square_reduceMapDimension("top", 1);}}>{$tl.settings.shape.removetop}</button>
+				<button	style="grid-area: bottom;" on:click={() => {square_reduceMapDimension("bottom", 1);}}>{$tl.settings.shape.removebottom}</button>
+				<button	style="grid-area: right;" on:click={() => {square_reduceMapDimension("right", 1);}}>{$tl.settings.shape.removeright}</button>
+				<button	style="grid-area: center;" on:click={() => { addOrRemoveMapDimensions = "add"; }}>
+					<img src={`/assets/img/tools/removeHex_${$tfield.orientation == hex_orientation.FLATTOP ? "ft" : "pt"}.png`} alt={$tl.settings.shape.removehex}	title={$tl.settings.shape.removehex} />
 				</button>
 			{/if}
 		</div>
 	</section>
 {:else if $tfield.mapShape == map_shape.FLOWER}
 	<section id="flower-dimensions-container">
-		<p>Hexes out from center</p>
+		<p>{$tl.settings.shape.hexesout}</p>
 		<div id="flower-dimensions-controls-grid">
-			<button
-				on:click={() => {
-					flower_reduceHexesOut(1);
-				}}>-</button
-			>
+			<button	on:click={() => {flower_reduceHexesOut(1);}}> - </button>
 			<div id="counter-container">{$tfield.hexesOut}</div>
-			<button
-				on:click={() => {
-					flower_expandHexesOut(1);
-				}}>+</button
-			>
+			<button	on:click={() => {flower_expandHexesOut(1);}}> + </button>
 		</div>
 	</section>
 {/if}

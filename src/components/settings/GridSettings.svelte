@@ -8,6 +8,7 @@
     import SelectGrid from "../SelectGrid.svelte";
 
     import { tfield } from "../../stores/tfield";
+    import { tl } from "../../stores/translation";
   
     import { map_shape } from "../../types/settings";
     import { hex_orientation } from "../../types/terrain";
@@ -23,33 +24,29 @@
 
 <div class="settings-grid">
 
-    <label for="showGrid">Show Grid</label>
+    <label for="showGrid">{$tl.settings.grid.show}</label>
     <!-- Weird bug where the grid wont render if you turn it off then resize the hex flower map ?? -->
     <Checkbox bind:checked={$tfield.grid.shown} id={'showGrid'} on:change={comp_terrainLayer.renderGrid} />
     {#if $tfield.grid.shown}
-        <label for="gridThickness">Grid Thickness</label>
+        <label for="gridThickness">{$tl.settings.grid.thickness}</label>
         <input
             id="gridThickness"
             type="number"
             min="0"
             max="99"
             bind:value={$tfield.grid.thickness}
-            on:change={() => {
-                renderGrid();
-            }}
+            on:change={() => { renderGrid(); }}
         />
 
-        <label for="gridColor">Grid Color</label>
+        <label for="gridColor">{$tl.settings.grid.color}</label>
         <ColorInputPixi
             bind:value={$tfield.grid.stroke}
-            on:change={() => {
-                renderGrid();
-            }}
+            on:change={() => { renderGrid(); }}
             id={'gridColor'}
         />
     {/if}
 
-    <label for="gridGap">Gap</label>
+    <label for="gridGap">{$tl.settings.grid.gap}</label>
     <input
         id="gap"
         type="number"
@@ -58,7 +55,7 @@
         bind:value={$tfield.grid.gap}
         on:focus={() => {
         }}
-        on:change={(e) => {
+        on:change={() => {
             redrawEntireMap();
             comp_coordsLayer.updateAllCoordPositions();
             retain_positions();
@@ -66,41 +63,41 @@
     />
 
     <!-- LARGE HEXES -->
-    <label for="showOverlay">Large Hexes</label>
+    <label for="showOverlay">{$tl.settings.grid.large_hexes.title}</label>
     <Checkbox bind:checked={$tfield.largehexes.shown} id="showOverlay" />
 
     {#if $tfield.largehexes.shown}
         
-            <label for="overlayDiameter">Size</label>
+        <label for="overlayDiameter">{$tl.settings.grid.large_hexes.size}</label>
             <input type="number" id="overlayDiameter" min={2} bind:value={$tfield.largehexes.diameterInHexes} />
 
-            <label for="overlayColor">Color</label>
+            <label for="overlayColor">{$tl.settings.grid.large_hexes.color}</label>
             <ColorInputPixi id={'overlayColor'} bind:value={$tfield.largehexes.style.color} />
 
-            <label for="overlayThickness">Outline Thickness</label>
+            <label for="overlayThickness">{$tl.settings.grid.large_hexes.outline_thickness}</label>
             <input type="number" id={'overlayThickness'} bind:value={$tfield.largehexes.style.width} />
 
-            <label for="overlayOffsetX" title="Measured in Hex Widths">Horizontal Offset</label>
+            <label for="overlayOffsetX" title={$tl.settings.grid.large_hexes.horizontal_offset_tooltip}>{$tl.settings.grid.large_hexes.horizontal_offset}</label>
             <input type="number" bind:value={$tfield.largehexes.offset.x} min={0} step={0.25} />
 
-            <label for="overlayOffsetY" title="Measured in Hex Heights">Vertical Offset</label>
+            <label for="overlayOffsetY" title={$tl.settings.grid.large_hexes.vertical_offset_tooltip}>{$tl.settings.grid.large_hexes.vertical_offset}</label>
             <input type="number" bind:value={$tfield.largehexes.offset.y} min={0} step={0.25} />
 
-            <label for="overlayEncompass">Encompass Map Edges</label>
+            <label for="overlayEncompass">{$tl.settings.grid.large_hexes.encompasedges}</label>
             <Checkbox bind:checked={$tfield.largehexes.encompassEdges} id="overlayEncompass" />
 
             {#if $tfield.mapShape == map_shape.SQUARE}
-                <label>{$tfield.orientation == hex_orientation.FLATTOP ? 'Large Raised Column' : 'Large Indented Row'}</label>
+                <label>{$tfield.orientation == hex_orientation.FLATTOP ? $tl.settings.grid.large_hexes.large_raised_column : $tl.settings.grid.large_hexes.large_indented_row }</label>
                 <span style={'height: 100%; display: flex; align-items: center;'}>
                     <SelectGrid
                         options={[
                             {
-                                title: 'Even',
+                                title: $tl.general.even,
                                 value: 'even',
                                 filename: `${$tfield.orientation == hex_orientation.FLATTOP ? 'bigraisedcolumn' : 'bigindentedrow'}even`,
                             },
                             {
-                                title: 'Even',
+                                title: $tl.general.odd,
                                 value: 'odd',
                                 filename: `${$tfield.orientation == hex_orientation.FLATTOP ? 'bigraisedcolumn' : 'bigindentedrow'}odd`,
                             },

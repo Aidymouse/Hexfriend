@@ -2,12 +2,14 @@
 	import type { hex_orientation } from "../types/terrain";
 	import type { Icon, Iconset } from "../types/icon";
 
-	import { getHexPathRadius } from "../helpers/hexHelpers";
+	import { tl } from "../stores/translation";
+
 	import { download } from "../lib/download2";
+	import { getHexPathRadius } from "../helpers/hexHelpers";
 	import ColorInputPixi from "./ColorInputPixi.svelte";
+	import CanvasHolder from "./CanvasHolder.svelte";
 	import * as PIXI from "pixi.js";
 	import { afterUpdate, tick } from "svelte";
-	import CanvasHolder from "./CanvasHolder.svelte";
 
 	let app = new PIXI.Application({
 		width: 300,
@@ -211,13 +213,8 @@
 			/* Read the file */
 			let setToImport = JSON.parse(eb.target.result);
 
-			//console.log(setToImport)
-
 			/* Load textures */
-
-			setToImport.icons.forEach((icon: Icon) => {
-				loadTexture(icon.texId, icon.base64);
-			});
+			setToImport.icons.forEach((icon: Icon) => { loadTexture(icon.texId, icon.base64); });
 
 			workingIconset = { ...setToImport };
 			await tick();
@@ -232,10 +229,7 @@
 	let phantomIconButtonId;
 
 	function dragButton(e: DragEvent, icon: Icon) {
-		//console.log(icon);
-
 		phantomIconButtonId = icon.id;
-
 		e.dataTransfer.setData("text/json", JSON.stringify(icon));
 	}
 
@@ -307,14 +301,11 @@
 	<nav>
 		<div id="set-controls">
 			<div id="grid">
-				<button
-					on:click={() => {
-						appState = "normal";
-					}}
-					style="grid-column: 1/3;">Exit Iconset Builder</button
-				>
+				<button	on:click={() => {appState = "normal";}} style="grid-column: 1/3;">
+					{$tl.builders.icon_set_builder.exit}
+				</button>
 
-				<label for="setName">Iconset Name</label>
+				<label for="setName">{$tl.builders.icon_set_builder.name}</label>
 				<input
 					id="setName"
 					type="text"
@@ -322,7 +313,7 @@
 					placeholder="Iconset Name"
 				/>
 
-				<label for="setAuthor">Author</label>
+				<label for="setAuthor">{$tl.builders.author}</label>
 				<input
 					id="setAuthor"
 					type="text"
@@ -330,7 +321,7 @@
 					placeholder="You!"
 				/>
 
-				<label for="setVersion">Version</label>
+				<label for="setVersion">{$tl.builders.version}</label>
 				<input
 					id="setVersion"
 					type="number"
@@ -341,7 +332,7 @@
 					on:click={() => importIconset()}
 					class="file-input-button"
 				>
-					Import
+					{$tl.builders.import}
 					<input
 						type="file"
 						bind:files={importFiles}
@@ -353,7 +344,7 @@
 					/>
 				</button>
 
-				<button on:click={() => exportIconset()}>Export</button>
+				<button on:click={() => exportIconset()}>{$tl.builders.export}</button>
 			</div>
 		</div>
 
@@ -427,7 +418,7 @@
 						orientation =
 							orientation == "flatTop" ? "pointyTop" : "flatTop";
 					}}
-					title="Change Hex Orientation"
+					title={$tl.builders.change_orientation}
 				>
 					<img
 						src="/assets/img/tools/changeOrientation.png"
@@ -438,7 +429,7 @@
 					on:click={() => {
 						duplicateIcon(selectedIcon);
 					}}
-					title="Duplicate this Hex"
+					title={$tl.builders.duplicate}
 				>
 					<img
 						src="/assets/img/tools/duplicate.png"
@@ -450,16 +441,11 @@
 						removeIcon(selectedIcon);
 						selectedIcon = null;
 					}}
-					title="Delete this Hex"
+					title={$tl.builders.icon_set_builder.delete}
 				>
 					<img src="/assets/img/tools/trash.png" alt="Trash" />
 				</button>
 			</div>
-			<!--
-      <button on:click={() => {orientation = orientation == "flatTop" ? "pointyTop" : "flatTop"; workingIconset.icons=workingIconset.icons}}>Change Orientation</button>
-      <button on:click={() => { deleteIcon() } }>Delete Hex</button>
-      <button on:click={() => { duplicateIcon() }}> Duplicate Hex </button>
-      -->
 		</div>
 
 		<div id="icon-style">
@@ -468,7 +454,7 @@
 				<ColorInputPixi bind:value={selectedIcon.color} w={50} h={50} />
 
 				<div>
-					<p>Tint</p>
+					<p>{$tl.builders.icon_set_builder.tint}</p>
 					<p class="color-string">
 						{PIXI.utils.hex2string(selectedIcon.color)}
 					</p>
@@ -477,7 +463,7 @@
 
 			<div id="symbol-scale">
 				<div id="scale-holder">
-					<p>Icon scale</p>
+					<p>{$tl.builders.icon_set_builder.scale}</p>
 					<input type="number" bind:value={selectedIcon.pHex} />
 					<p>%</p>
 				</div>
@@ -494,14 +480,14 @@
 	{:else}
 		<div id="editor-placeholder">
 			<p style="color: var(--text); margin-bottom: 0.625em;">
-				Select a icon or make a new one!
+				{$tl.builders.icon_set_builder.helptext}
 			</p>
 
 			<p style="font-size: 10pt">
-				For best results, use white 100px by 100px images.
+				{$tl.builders.icon_set_builder.helpsubtitle}
 			</p>
 			<p style="font-size: 10pt">
-				Hint: You can upload multiple images at once!
+				{$tl.builders.icon_set_builder.helpsubsubtitle}
 			</p>
 		</div>
 	{/if}

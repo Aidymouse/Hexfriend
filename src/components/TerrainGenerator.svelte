@@ -15,6 +15,7 @@
 	// STORE
 	import { store_has_unsaved_changes } from '../stores/flags';
 	import { tfield } from '../stores/tfield';
+	import { tl } from "../stores/translation";
 
 	// COMPONENT
 	import Checkbox from '../components/Checkbox.svelte';
@@ -290,7 +291,7 @@
 	}
 
 	function clear_ruleset() {
-		if (!confirm("Are you sure?")) return;
+		if (!confirm($tl.generators.clear_confirmation)) return;
 
 		Object.keys(current_ruleset).forEach(tile_id => {
 			current_ruleset[tile_id] = []
@@ -363,8 +364,8 @@
 	<div id="buttons">
 		<div id="left-side">
 			<div id="preset">
-				Preset
-					<select bind:value={selector_ruleset} on:change={selector_ruleset_change}>
+				{$tl.generators.terrain_generator.preset}
+				<select bind:value={selector_ruleset} on:change={selector_ruleset_change}>
 					<option value={one_e_dmg_ruleset}>AD&D 1e DMG</option>
 					<option value={icy}>Icy Landscape</option>
 					<option value={jungle}>Jungle</option>
@@ -372,19 +373,19 @@
 				</select>
 			</div>
 			<div id="preset-buttons">
-				<button class="outline-button" on:click={clear_ruleset}>Clear</button>
-				<button class="outline-button" on:click={() => { exportGenFunction() }}>Export</button>
-				<button class="outline-button" id="import-button"><input type="file" bind:files={importFiles} on:change={() => { importGenFunction() }} />Import</button>
+				<button class="outline-button" on:click={clear_ruleset}>{$tl.generators.clear}</button>
+				<button class="outline-button" on:click={() => { exportGenFunction() }}>{$tl.generators.terrain_generator.export}</button>
+				<button class="outline-button" id="import-button"><input type="file" bind:files={importFiles} on:change={() => { importGenFunction() }} />{$tl.generators.terrain_generator.import}</button>
 			</div>
 		</div>
 		<div id="right-side">
 			<div id="generate-buttons">
-				<span><Checkbox bind:checked={gen_config_animate} /> Animate </span>
-				<span><Checkbox bind:checked={gen_config_clear} /> Clear Before Generation</span>
+				<span><Checkbox bind:checked={gen_config_animate} />{$tl.generators.animate}</span>
+					<span><Checkbox bind:checked={gen_config_clear} />{$tl.generators.clear_before_generation}</span>
 			</div>
 			<div id="generate">
-				<button class="evil" on:click={() => { showTerrainGenerator = false }}>Close</button>
-				<button id="generate-button" class="green-button" on:click={() => { generate() }}>Generate!</button>
+				<button class="evil" on:click={() => { showTerrainGenerator = false }}>{$tl.generators.close}</button>
+				<button id="generate-button" class="green-button" on:click={() => { generate() }}>{$tl.generators.generate}</button>
 			</div>
 		</div>
 	</div>

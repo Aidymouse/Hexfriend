@@ -1,7 +1,13 @@
-export let us_en = {
+export const pt_br = {
+	language: "pt_br",
 	save_indicator: "Salvando...",
 
-	tools: {
+	general: {
+		odd: "PLACEHOLDER",
+		even: "PLACEHOLDER",
+	},
+
+  tools: {
 		hex_paintbucket: "Balde de Tinta de Hex",
 		hex_eraser: "Apagar Hex",
 		hex_eyedropper: "Conta gotas de Hex",
@@ -61,7 +67,7 @@ export let us_en = {
 		erase_all_icons: "Apagar Todos os Ícones",
 		erase_icons_confirmation: "Realmente quer apagar todos os ícones?",
 		erase_all_paths: "Apagar Todas as Linhas",
-		erase_paths_confirmation: "Realmente quer Apagar Todas as Linhas?,
+		erase_paths_confirmation: "Realmente quer Apagar Todas as Linhas?",
 		erase_all_text: "Apagar Todo o Texto",
 		erase_text_confirmation: "Realmente Quer Apagar Todo o Texto?",
 	},
@@ -82,6 +88,8 @@ export let us_en = {
 		export_as: "Exportar Como...",
 		exports: {
 			png: "PNG",
+			scaled_png: "PLACEHOLDER",
+			scale_request_dialog: "PLACEHOLDER",
 			hexfriend: "Hexfriend",
 		},
 		import: "Importar",
@@ -96,9 +104,15 @@ export let us_en = {
 				title: "Hexágonos Grandes",
 				size: "Tamanho",
 				color: "Cor",
+
+				outline_thickness: "Espessura do Contorno",
 				horizontal_offset: "Deslocamento Horizontal",
+				horizontal_offset_tooltip: "Deslocamento Horizontal",
 				vertical_offset: "Deslocamento Vertical",
+				vertical_offset_tooltip: "Deslocamento Vertical",
 				encompasedges: "Abranger as Bordas do Mapa",
+				large_raised_column: "Elevação de Coluna Grande",
+				large_indented_row: "Identação de Linha Grande",
 			},
 		},
 		
@@ -109,12 +123,14 @@ export let us_en = {
 			orientation: "Orientação do Hex",
 			pointytop: "Topo Pontudo",
 			flattop: "Topo Reto",
+			raised_column: "Coluna Elevada",
+			indented_row: "Linha Identada",
 			width: "Largura do Hex",
 			height: "Altura do Hex",
 			size_by_radius: "Tamaho por Raio",
-			radiuset: "Definir",
+			radius_set: "Definir",
 			retain_position: "Manter Posição",
-			retain_position_explanation: "Os objetos selecionados tentarão permanecer em seu hex[agono quando forem redimensionados",
+			retain_position_explanation: "Os objetos selecionados tentarão permanecer em seu hexagono quando forem redimensionados",
 			retain_icons: "Ícones",
 			retain_paths: "Linhas",
 			retain_text: "Texto",
@@ -160,26 +176,32 @@ export let us_en = {
 			space: "Distânicia da Parte Inferior",
 			offset: {
 				row: "Deslocamento da Linha",
-				column: "Deslocamento da Coluna"
+				column: "Deslocamento da Coluna",
+				q: "Deslocamento da Q",
+				r: "Deslocamento da R",
+				s: "Deslocamento da S"
 			},
 		},
 
 		overlay: {
 			title: "Sobreposição",
-			overlay_load: "Carregar Imagem de Sobreposição",
-			overlay_replace: "Substituir Imagem de Sobreposição",
+			load: "Carregar Imagem de Sobreposição",
+			replace: "Substituir Imagem de Sobreposição",
 		},
 
 		tilesets: {
 			title: "Conjuntos de Hexágonos (Tileset)",
 			import: "Importar Conjunto",
 			builder: "Construir um Conjunto",
+			already_loaded: "Você já carregou esse conjunto de ícones :)",
+			remove_confirmation: "Isso vai remover todos os ícones deste conjunto. Confirmar?",
 		},
 		
 		icon_sets: {
 			title: "Conjunto de Ícones",
 			import: "Importar Conjunto de Ícones",
 			builder: "Construir Conjunto de Ícones",
+			already_loaded: "Você já importou esse conjunto de ícones :)",
 		},
 
 
@@ -232,8 +254,8 @@ export let us_en = {
 		export: "Exportar",
 		change_orientation: "Alterar Orientação do Hex",
 		duplicate: "Duplicar este Hex",
-		delete: "Apagar este Hex",
 		tileset_builder: {
+			delete: "Apagar este Hex",
 			exit: "Sair do Construtor de Conjuntos de Hexágonos",
 			name: "Nome do Conjunto de Hexánogos",
 			name_placeholder: "Nome do Conjunto",
@@ -245,6 +267,7 @@ export let us_en = {
 			symbol_scale: "Escala dos Símbolos",
 		},
 		icon_set_builder: {
+			delete: "Apagar este Ícone",
 			exit: "Sair do Construtor de Conjunto de Ícones",
 			name: "Nome do Conjunto de Ícones",
 			name_placeholder: "Novo Conjunto de Ícones",
@@ -265,10 +288,11 @@ export let us_en = {
 		generate: "Gerar",
 		close: "Fechar",
 		clear: "Limpar",
+		clear_confirmation: "Você tem certeza?",
 		clear_before_generation: "Limpar Antes de Gerar",
 		icon_generator: {
 			place_in_center: "Colocar no Centro do Hex",
-			generation_change: "Chance da Geração",
+			generation_chance: "Chance da Geração",
 			out_of_connector: "em"
 		},
 		terrain_generator: {

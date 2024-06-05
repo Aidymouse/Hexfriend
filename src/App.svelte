@@ -114,6 +114,7 @@
 	import { tools } from "./types/toolData";
 	import * as PIXI from "pixi.js";
 	import { afterUpdate, onMount } from "svelte";
+    import { Map_Exports } from "./types/export";
 
 	/* STATE */
 
@@ -224,25 +225,33 @@
 	// Never cleared, to stop duplicate textures being added
 	// Theoretically a memory leak... but bounded by how many unique tiles can be loaded. Shouldn't be a problem?
 
-	async function exportMap(exportType) {
+	async function exportMap(exportType: Map_Exports) {
 		showLoader = true;
 
 		switch (exportType) {
-			case "image/png":
-				download(
-					await app.renderer.extract.base64(
-						offsetContainer,
-					),
-					`${
-						loadedSave.title
-							? loadedSave.title
-							: "Untitled Hexfriend"
-					}`,
-					exportType,
+			case Map_Exports.PNG:
+				download(await app.renderer.extract.base64(offsetContainer),
+					`${loadedSave.title ? loadedSave.title : "Untitled Hexfriend"}`,
+					"image/png",
 				);
 				break;
 
-			case "application/json":
+			case Map_Exports.SCALED_PNG:
+				const scale_by = prompt($tl.settings.exports.scale_request_dialog);
+				const scale = parseInt(scale_by) / 100;
+
+				const scaled_renderer = new PIXI.Renderer({
+					resolution: scale,
+					antialias: true
+				});
+				download(await scaled_renderer.extract.base64(offsetContainer),
+					`${loadedSave.title ? loadedSave.title : "Untitled Hexfriend"}`,
+					"image/png",
+				);
+				scaled_renderer.destroy();
+				break;
+
+			case Map_Exports.JSON:
 				download(
 					JSON.stringify(loadedSave),
 					`${
@@ -250,7 +259,7 @@
 							? loadedSave.title
 							: "Untitled Hexfriend"
 					}.hexfriend`,
-					exportType,
+					"application/json",
 				);
 				break;
 		}

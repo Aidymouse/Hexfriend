@@ -1,5 +1,11 @@
-export let us_en = {
+export let en_us = {
+	language: "en_us",
 	save_indicator: "Saving...",
+
+	general: {
+		even: "Even",
+		odd: "Odd",
+	},
 
 	tools: {
 		hex_paintbucket: "Hex Paintbucket",
@@ -82,8 +88,11 @@ export let us_en = {
 		export_as: "Export As...",
 		exports: {
 			png: "PNG",
+			scaled_png: "Scaled PNG",
+			scale_request_dialog: "Scale by what percentage?",
 			hexfriend: "Hexfriend",
 		},
+		export: "Export",
 		import: "Import",
 
 		grid: {
@@ -96,9 +105,12 @@ export let us_en = {
 				title: "Large Hexes",
 				size: "Size",
 				color: "Color",
+				outline_thickness: "Outline Thickness",
 				horizontal_offset: "Horizontal Offset",
 				vertical_offset: "Vertical Offset",
 				encompasedges: "Encompass Map Edges",
+				large_raised_column: "Large Raised Column",
+				large_indented_row: "Large Indented Row",
 			},
 		},
 		
@@ -109,10 +121,12 @@ export let us_en = {
 			orientation: "Hex Orientation",
 			pointytop: "Pointy Top",
 			flattop: "Flat Top",
+			raised_column: "Raised Column",
+			indented_row: "Indented Row",
 			width: "Hex Width",
 			height: "Hex Height",
 			size_by_radius: "Size by Radius",
-			radiuset: "Set",
+			radius_set: "Set",
 			retain_position: "Retain Position",
 			retain_position_explanation: "Selected objects will attempt to remain in their hex when they are resized",
 			retain_icons: "Icons",
@@ -160,26 +174,32 @@ export let us_en = {
 			space: "Space from bottom",
 			offset: {
 				row: "Row Offset",
-				column: "Column Offset"
+				column: "Column Offset",
+				q: "Q offset",
+				r: "R offset",
+				s: "S offset"
 			},
 		},
 
 		overlay: {
 			title: "Overlay",
-			overlay_load: "Load Overlay Image",
-			overlay_replace: "Replace Overlay Image",
+			load: "Load Overlay Image",
+			replace: "Replace Overlay Image",
 		},
 
 		tilesets: {
 			title: "Tilesets",
 			import: "Import Tileset",
 			builder: "Tileset Builder",
+			already_loaded: "You've already loaded this tileset :)",
+			remove_confirmation: "This will remove all tiles in use from this set. Continue?",
 		},
 		
 		icon_sets: {
 			title: "Icon Sets",
 			import: "Import Icon Set",
 			builder: "Icon Set Builder",
+			already_loaded: "You've already imported this icon set :)",
 		},
 
 
@@ -232,8 +252,8 @@ export let us_en = {
 		export: "Export",
 		change_orientation: "Change Hex Orientation",
 		duplicate: "Duplicate this hex",
-		delete: "Delete this hex",
 		tileset_builder: {
+			delete: "Delete this hex",
 			exit: "Exit Tileset Builder",
 			name: "Tileset Name",
 			name_placeholder: "Tileset Name",
@@ -245,10 +265,10 @@ export let us_en = {
 			symbol_scale: "Symbol Scale",
 		},
 		icon_set_builder: {
+			delete: "Delete this icon",
 			exit: "Exit Icon Set Builder",
 			name: "Icon Set Name",
 			name_placeholder: "New Icon Set",
-			author: "Author",
 			version: "Version",
 			import: "Import",
 			export: "Export",
@@ -265,10 +285,11 @@ export let us_en = {
 		generate: "Generate",
 		close: "Close",
 		clear: "Clear",
+		clear_confirmation: "Are you sure?",
 		clear_before_generation: "Clear Before Generation",
 		icon_generator: {
 			place_in_center: "Place In Hex Center",
-			generation_change: "Generation Chance",
+			generation_chance: "Generation Chance",
 			out_of_connector: "in"
 		},
 		terrain_generator: {

@@ -7,6 +7,7 @@
 	
 	import { store_has_unsaved_changes } from '../stores/flags';
 	import { tfield } from '../stores/tfield';
+	import { tl } from '../stores/translation';
 
 	import type { TerrainHex, terrain_field } from '../types/terrain';
 	import type { Tile, Tileset, tile_id } from '../types/tilesets';
@@ -184,25 +185,25 @@
 	<div id="buttons">
 		<div id="left-side">
 			<div id="chance">
-				Generation Chance 
+				{$tl.generators.icon_generator.generation_chance}
 				<input type="number" min={1} max={current_ruleset.chance_for_icon_high} bind:value={current_ruleset.chance_for_icon}> 
-				in
+				{$tl.generators.icon_generator.out_of_connector}
 				<input type="number" min={1} bind:value={current_ruleset.chance_for_icon_high}>
 			</div>
 			<div id="clear">
-				<button class="outline-button" on:click={clear_ruleset}>Clear</button>
+				<button class="outline-button" on:click={clear_ruleset}>{$tl.generators.clear}</button>
 			</div>
 		</div>
 		
 		<div id="right-side">
 			<div id="generate-buttons">
-				<span><Checkbox bind:checked = {gen_config_animate} id="config-animate" /> <label for="config-animate">Animate</label></span>
-				<span><Checkbox bind:checked = {gen_config_center} id="config-snap" /> <label for="config-snap">Place In Hex Center</label></span>
-				<span><Checkbox bind:checked = {gen_config_clear} id="config-clear" /> <label for="config-clear">Clear Before Generation</label></span>
+				<span><Checkbox bind:checked = {gen_config_animate} id="config-animate" /> <label for="config-animate">{$tl.generators.animate}</label></span>
+					<span><Checkbox bind:checked = {gen_config_center} id="config-snap" /> <label for="config-snap">{$tl.generators.icon_generator.place_in_center}</label></span>
+						<span><Checkbox bind:checked = {gen_config_clear} id="config-clear" /> <label for="config-clear">{$tl.generators.clear_before_generation}</label></span>
 			</div>
 			<div id="generate">
-				<button class="evil" on:click={() => { show_icon_generator = false }}>Close</button>
-				<button class="green-button" on:click={generate}>Generate!</button>
+				<button class="evil" on:click={() => { show_icon_generator = false }}>{$tl.generators.close}</button>
+				<button class="green-button" on:click={generate}>{$tl.generators.close}</button>
 			</div>
 		</div>
 	</div>
