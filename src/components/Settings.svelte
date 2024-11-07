@@ -464,7 +464,7 @@
 	<div class="setting-container">
 		<h2>{$tl.settings.about.title}</h2>
 		<p class="helper-text">
-			Hexfriend v2.0 - {$tl
+			Hexfriend v2.1 - {$tl
 				.settings.about.version_tagline}
 		</p>
 

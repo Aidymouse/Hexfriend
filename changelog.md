@@ -3,6 +3,10 @@ For Techy People
 
 # Version 2.0 - Whole new worlds, Hexfriend!
 
+## Version 2.1
+- Updated Brazilian Portuguese translation (thanks Igor!)
+
+## Version 2.0
 - Added translation support. You can contribute your language by providing a [translation file](https://github.com/Aidymouse/Hexfriend/tree/master/src/lib/translations)
 - Added a seed to terrain and icon generators
 - Added ability to import and export icon generation rulesets
@@ -12,7 +16,7 @@ For Techy People
 ## Version 1.9.14
 - Remove hard coded icon size limit
 - All datas now in stores
-- Turn various $: {} into subscriptions to relevat stores
+- Turn various $: {} into subscriptions to relevant stores
 - Rename store_selected_tool to selected_tool
 - Eraser tooltip fix
 - Eraser ignore options added
