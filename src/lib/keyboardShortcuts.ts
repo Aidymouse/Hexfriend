@@ -56,8 +56,8 @@ export let shortcuts: shortcut_data[] = [
 	// OVERLAY
 ];
 
-export function getKeyboardShortcut(keyCode: string, selectedTool: tools) {
-	return shortcuts.find((shortcut: shortcut_data) => shortcut.keycode == keyCode && (shortcut.tool == selectedTool || shortcut.tool == null));
+export function getKeyboardShortcut(keyCode: string, $store_selected_tool: tools) {
+	return shortcuts.find((shortcut: shortcut_data) => shortcut.keycode == keyCode && (shortcut.tool == $store_selected_tool || shortcut.tool == null));
 }
 
 export default { getKeyboardShortcut };

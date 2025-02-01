@@ -13,7 +13,8 @@
 	import { data_path } from '../stores/data';
 
 	import * as store_panning from '../stores/panning';
-	import * as store_tfield from '../stores/tfield';
+	import { tfield } from '../stores/tfield';
+	import { resize_parameters } from '../stores/resize_parameters';
 	
 	import { store_inputs } from '../stores/inputs';
 	import { store_selected_tool } from '../stores/tools';
@@ -31,16 +32,37 @@
 		pan = newPan;
 	});
 
-	let selectedTool: tools;
-	store_selected_tool.subscribe(t => selectedTool = t);
-
-	let tfield: terrain_field;
-	store_tfield.store.subscribe((newTField) => {
-		tfield = newTField;
-	});
-
 	export let paths: path_layer_path[] = [];
 	export let cont_all_paths: PIXI.Container;
+
+
+	export function retain_path_position_on_hex_resize() {
+
+		paths.forEach(path => {
+			for (let pI = 0; pI < path.points.length; pI+=2) {
+
+				let path_point_x = path.points[pI]
+				let path_point_y = path.points[pI+1]
+
+				let closest_old_hex = coords_worldToCube(path_point_x, path_point_y, $tfield.orientation, $resize_parameters.old_hex_width, $resize_parameters.old_hex_height, $resize_parameters.old_gap)
+				let closest_old_hex_center = coords_cubeToWorld(closest_old_hex.q, closest_old_hex.r, closest_old_hex.s, $tfield.orientation, $resize_parameters.old_hex_width, $resize_parameters.old_hex_height, $resize_parameters.old_gap)
+
+				let vec_to_hex_center = {x: closest_old_hex_center.x - path_point_x, y: closest_old_hex_center.y - path_point_y}
+
+				let hex_pos_new = coords_cubeToWorld(closest_old_hex.q, closest_old_hex.r, closest_old_hex.s, $tfield.orientation, $tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap)
+				let pos_scale_horiz = $tfield.hexWidth / $resize_parameters.old_hex_width
+				let pos_scale_vert = $tfield.hexHeight / $resize_parameters.old_hex_height
+
+				path.points[pI] = hex_pos_new.x - vec_to_hex_center.x*pos_scale_horiz
+				path.points[pI+1] = hex_pos_new.y - vec_to_hex_center.y*pos_scale_vert
+
+			}
+		})
+
+		paths = paths;
+
+	}
+
 
 	let pathId: number = 0;
 
@@ -118,9 +140,9 @@
 
 		// Overlay a grid of smaller opposite orientation hexes and it lines up perfectly!
 
-		let snap_grid_orientation = tfield.orientation == hex_orientation.FLATTOP ? hex_orientation.POINTYTOP : hex_orientation.FLATTOP
-		let snap_grid_hexWidth = (tfield.hexWidth + tfield.grid.gap) / (tfield.orientation == hex_orientation.FLATTOP ? 2 : 1.5)
-		let snap_grid_hexHeight = (tfield.hexHeight + tfield.grid.gap) / (tfield.orientation == hex_orientation.FLATTOP ? 1.5 : 2)
+		let snap_grid_orientation = $tfield.orientation == hex_orientation.FLATTOP ? hex_orientation.POINTYTOP : hex_orientation.FLATTOP
+		let snap_grid_hexWidth = ($tfield.hexWidth + $tfield.grid.gap) / ($tfield.orientation == hex_orientation.FLATTOP ? 2 : 1.5)
+		let snap_grid_hexHeight = ($tfield.hexHeight + $tfield.grid.gap) / ($tfield.orientation == hex_orientation.FLATTOP ? 1.5 : 2)
 
 		let snap_coords = coords_worldToCube(
 			store_panning.curWorldX(),
@@ -128,7 +150,7 @@
 			snap_grid_orientation,
 			snap_grid_hexWidth,
 			snap_grid_hexHeight,
-			tfield.grid.gap,
+			$tfield.grid.gap,
 			)
 			
 		return coords_cubeToWorld(
@@ -138,7 +160,7 @@
 			snap_grid_orientation,
 			snap_grid_hexWidth,
 			snap_grid_hexHeight,
-			tfield.grid.gap,
+			$tfield.grid.gap,
 		)
 
 	}
@@ -450,7 +472,7 @@
 
 			let cont_path = path_containers[path.id]
 			cont_path.marked_for_death = false
-			cont_path.interactive = selectedTool == 'path' && !$data_path.selectedPath
+			cont_path.eventMode = ($store_selected_tool == 'path' && !$data_path.selectedPath) ? 'static' : 'auto'
 			cont_path.hitArea = findHitArea(path)
 
 			let grph_path = cont_path.children[0]

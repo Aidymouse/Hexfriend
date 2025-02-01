@@ -1,7 +1,7 @@
 import type { TerrainHex } from '../types/terrain';
 import type { hex_id } from '../types/toolData';
 import type { cube_coords } from '../types/coordinates';
-import type { hex_orientation } from '../types/terrain';
+import { hex_orientation } from '../types/terrain';
 
 const hexDirVectors: cube_coords[] = [
 	{ q: 1, r: 0, s: -1 },
@@ -15,7 +15,7 @@ const hexDirVectors: cube_coords[] = [
 export function getHexPath(
 	width: number,
 	height: number,
-	orientation: hex_orientation = 'flatTop',
+	orientation: hex_orientation = hex_orientation.FLATTOP,
 	centerX: number = 0,
 	centerY: number = 0,
 	gap: number = 0,
@@ -55,9 +55,25 @@ export function getHexPath(
 	}
 }
 
-export function getHexPathRadius(radius: number, orientation: hex_orientation = 'flatTop', centerX: number = 0, centerY: number = 0): number[] {
+export function get_width_height_from_radius(radius: number, orientation: hex_orientation) {
+	if (orientation == hex_orientation.POINTYTOP) {
+		return { width: Math.cos(Math.PI / 6) * radius * 2, height: radius * 2 }
+	} else {
+		return { width:  radius * 2, height: radius / Math.tan(Math.PI / 6) }
+	}
+}
+
+export function get_radius_from_width_height(width: number, height: number, orientation: hex_orientation) {
+	if (orientation == hex_orientation.POINTYTOP) {
+		return ((width * Math.cos(Math.PI / 6) / 2) + (height / 2)) / 2
+	} else {
+		return ((width / 2) + (height * Math.tan(Math.PI / 6))) / 2
+	}
+}
+
+export function getHexPathRadius(radius: number, orientation: hex_orientation = hex_orientation.FLATTOP, centerX: number = 0, centerY: number = 0): number[] {
 	let w: number, h: number;
-	if (orientation == 'pointyTop') {
+	if (orientation == hex_orientation.POINTYTOP) {
 		h = radius * 2;
 		w = Math.cos(Math.PI / 6) * radius * 2;
 	} else {

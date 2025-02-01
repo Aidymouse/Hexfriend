@@ -1,14 +1,15 @@
 <script lang="ts">
+	import type { hex_orientation } from "../types/terrain";
+	import type { Icon, Iconset } from "../types/icon";
 
-	import type { hex_orientation } from '../types/terrain';
-	import type { Icon, Iconset } from '../types/icon';
+	import { tl } from "../stores/translation";
 
-	import { getHexPathRadius } from '../helpers/hexHelpers';
-	import { download } from '../lib/download2';
-	import ColorInputPixi from './ColorInputPixi.svelte';
-	import * as PIXI from 'pixi.js';
-	import { afterUpdate, tick } from 'svelte';
-	import CanvasHolder from './CanvasHolder.svelte';
+	import { download } from "../lib/download2";
+	import { getHexPathRadius } from "../helpers/hexHelpers";
+	import ColorInputPixi from "./ColorInputPixi.svelte";
+	import CanvasHolder from "./CanvasHolder.svelte";
+	import * as PIXI from "pixi.js";
+	import { afterUpdate, tick } from "svelte";
 
 	let app = new PIXI.Application({
 		width: 300,
@@ -18,12 +19,12 @@
 
 	export let appState;
 
-	let orientation: hex_orientation = 'flatTop';
+	let orientation: hex_orientation = "flatTop";
 
 	let workingIconset: Iconset = {
-		name: 'New Iconset',
-		id: 'new-iconset',
-		author: '',
+		name: "New Iconset",
+		id: "new-iconset",
+		author: "",
 		version: 1,
 		icons: [],
 	};
@@ -40,11 +41,18 @@
 
 	function findID(baseId: string): string {
 		let counter = 0;
-		let proposedId = `${IDify(workingIconset.name)}_${baseId}${counter == 0 ? '' : counter}`;
+		let proposedId = `${IDify(workingIconset.name)}_${baseId}${
+			counter == 0 ? "" : counter
+		}`;
 
-		while (workingIconset.icons.find((icon: Icon) => icon.id == proposedId) != null) {
+		while (
+			workingIconset.icons.find((icon: Icon) => icon.id == proposedId) !=
+			null
+		) {
 			counter++;
-			proposedId = `${IDify(workingIconset.name)}_${baseId}${counter == 0 ? '' : counter}`;
+			proposedId = `${IDify(workingIconset.name)}_${baseId}${
+				counter == 0 ? "" : counter
+			}`;
 		}
 
 		return proposedId;
@@ -54,7 +62,7 @@
 	let iconTextureLookupTable = {}; // Tex ID -> Tex ID in loaded textures table
 
 	function IDify(name: string): string {
-		return name.toLowerCase().replace(' ', '-');
+		return name.toLowerCase().replace(" ", "-");
 	}
 
 	let newIconFiles: FileList;
@@ -62,7 +70,7 @@
 	async function loadTexture(texId, result) {
 		let newTexture = await PIXI.Assets.load(result);
 		loadedTextures[texId] = newTexture;
-		return newTexture
+		return newTexture;
 	}
 
 	async function newIcon() {
@@ -73,8 +81,7 @@
 
 			r.readAsDataURL(file);
 			r.onload = async (eb) => {
-
-				let iconName = file.name.split('.')[0];
+				let iconName = file.name.split(".")[0];
 				let texId = findID(IDify(iconName));
 
 				let newTexture = await loadTexture(texId, r.result);
@@ -100,7 +107,7 @@
 	function duplicateIcon(icon: Icon) {
 		let newIcon = { ...icon };
 
-		newIcon.display = 'Copy of ' + icon.display;
+		newIcon.display = "Copy of " + icon.display;
 		newIcon.id = findID(IDify(newIcon.display));
 
 		workingIconset.icons = [...workingIconset.icons, newIcon];
@@ -108,7 +115,9 @@
 	}
 
 	function removeIcon(icon: Icon) {
-		workingIconset.icons = workingIconset.icons.filter((t: Icon) => t.id != icon.id);
+		workingIconset.icons = workingIconset.icons.filter(
+			(t: Icon) => t.id != icon.id,
+		);
 	}
 
 	async function generatePreview(icon: Icon) {
@@ -118,7 +127,7 @@
 		//previewGraphics.endFill();
 
 		previewSprite.texture = PIXI.Texture.from(icon.base64);
-		previewSprite.scale.set(getIconScale(icon, 25).x);
+		previewSprite.scale.set(getMaxIconScale(icon, 25).x);
 		previewSprite.anchor.set(0.5);
 		previewSprite.tint = icon.color;
 
@@ -131,12 +140,11 @@
 		//if (selectedIcon) selectedIcon.preview = generatePreview(workingIconset.icons[stIndex])
 
 		orientation = orientation;
-
 	}
 
 	function getIconScale(symbol, radius = 150) {
 		let h, w;
-		if (orientation == 'pointyTop') {
+		if (orientation == "pointyTop") {
 			h = radius * 2;
 			w = Math.cos(Math.PI / 6) * radius * 2;
 		} else {
@@ -154,17 +162,42 @@
 		return { x: scale, y: scale };
 	}
 
+	function getMaxIconScale(symbol, radius = 150) {
+		let h, w;
+		if (orientation == "pointyTop") {
+			h = radius * 2;
+			w = Math.cos(Math.PI / 6) * radius * 2;
+		} else {
+			w = radius * 2;
+			h = radius / Math.tan(Math.PI / 6);
+		}
+
+		let scale;
+		if (w < h) {
+			scale = (h * symbol.pHex) / 100 / symbol.texWidth;
+		} else {
+			scale = (w * symbol.pHex) / 100 / symbol.texHeight;
+		}
+
+		return { x: scale, y: scale };
+	}
+
 	const DEFAULTBLANKHEXCOLOR = 0xf2f2f2;
 
 	function exportIconset() {
-		workingIconset.id = IDify(`${workingIconset.name}:v${workingIconset.version}`);
-		
-		workingIconset.icons.forEach(icon => {
-			icon.id = findID(icon.display)
-		})
+		workingIconset.id = IDify(
+			`${workingIconset.name}:v${workingIconset.version}`,
+		);
 
-		console.log(workingIconset)
-		download(JSON.stringify(workingIconset), workingIconset.name + `_v${workingIconset.version}` + '.hfis');
+		workingIconset.icons.forEach((icon) => {
+			icon.id = findID(icon.display);
+		});
+
+		console.log(workingIconset);
+		download(
+			JSON.stringify(workingIconset),
+			workingIconset.name + `_v${workingIconset.version}` + ".hfis",
+		);
 	}
 
 	let importFiles = [];
@@ -180,13 +213,8 @@
 			/* Read the file */
 			let setToImport = JSON.parse(eb.target.result);
 
-			//console.log(setToImport)
-
 			/* Load textures */
-
-			setToImport.icons.forEach( (icon: Icon) => {
-				loadTexture(icon.texId, icon.base64)
-			})
+			setToImport.icons.forEach((icon: Icon) => { loadTexture(icon.texId, icon.base64); });
 
 			workingIconset = { ...setToImport };
 			await tick();
@@ -201,11 +229,8 @@
 	let phantomIconButtonId;
 
 	function dragButton(e: DragEvent, icon: Icon) {
-		//console.log(icon);
-
 		phantomIconButtonId = icon.id;
-
-		e.dataTransfer.setData('text/json', JSON.stringify(icon));
+		e.dataTransfer.setData("text/json", JSON.stringify(icon));
 	}
 
 	function dropButton(e: DragEvent) {
@@ -216,13 +241,26 @@
 		if (icon.id == phantomIconButtonId) return;
 
 		let draggedOverIndex = workingIconset.icons.indexOf(icon);
-		workingIconset.icons = workingIconset.icons.filter((i) => i.id != phantomIconButtonId);
+		workingIconset.icons = workingIconset.icons.filter(
+			(i) => i.id != phantomIconButtonId,
+		);
 
 		// If phantom is on the left, switch them. Otherwise, proceed as normal
-		if (draggedOverIndex != 0 && workingIconset.icons[draggedOverIndex - 1].id == phantomIconButtonId) {
-			workingIconset.icons.splice(draggedOverIndex + 1, 0, JSON.parse(e.dataTransfer.getData('text/json')));
+		if (
+			draggedOverIndex != 0 &&
+			workingIconset.icons[draggedOverIndex - 1].id == phantomIconButtonId
+		) {
+			workingIconset.icons.splice(
+				draggedOverIndex + 1,
+				0,
+				JSON.parse(e.dataTransfer.getData("text/json")),
+			);
 		} else {
-			workingIconset.icons.splice(draggedOverIndex, 0, JSON.parse(e.dataTransfer.getData('text/json')));
+			workingIconset.icons.splice(
+				draggedOverIndex,
+				0,
+				JSON.parse(e.dataTransfer.getData("text/json")),
+			);
 		}
 
 		workingIconset = workingIconset;
@@ -231,90 +269,96 @@
 	let grph_background_hex = new PIXI.Graphics();
 	let spr_icon = new PIXI.Sprite();
 
-	app.stage.addChild(grph_background_hex, spr_icon)
+	app.stage.addChild(grph_background_hex, spr_icon);
 
 	afterUpdate(async () => {
-
 		if (selectedIcon) {
-
 			grph_background_hex.clear();
 			grph_background_hex.beginFill(DEFAULTBLANKHEXCOLOR);
-			grph_background_hex.drawPolygon(getHexPathRadius(150, orientation, 150, 150));
+			grph_background_hex.drawPolygon(
+				getHexPathRadius(150, orientation, 150, 150),
+			);
 			grph_background_hex.endFill();
-	
-			spr_icon.texture = loadedTextures[selectedIcon.texId] 
-			spr_icon.x= 150
-			spr_icon.y= 150
-			spr_icon.anchor.x = 0.5
-			spr_icon.anchor.y = 0.5
-			spr_icon.tint = selectedIcon.color 
-			spr_icon.scale = getIconScale(selectedIcon)
+
+			spr_icon.texture = loadedTextures[selectedIcon.texId];
+			spr_icon.x = 150;
+			spr_icon.y = 150;
+			spr_icon.anchor.x = 0.5;
+			spr_icon.anchor.y = 0.5;
+			spr_icon.tint = selectedIcon.color;
+			spr_icon.scale = getMaxIconScale(selectedIcon);
 
 			let new_preview = await generatePreview(selectedIcon);
 			if (selectedIcon.preview != new_preview) {
 				selectedIcon.preview = new_preview;
 				workingIconset = workingIconset;
-			} 
-		
+			}
 		}
-
-
-
-	})
+	});
 </script>
 
 <main>
 	<nav>
 		<div id="set-controls">
 			<div id="grid">
+				<button	on:click={() => {appState = "normal";}} style="grid-column: 1/3;">
+					{$tl.builders.icon_set_builder.exit}
+				</button>
+
+				<label for="setName">{$tl.builders.icon_set_builder.name}</label>
+				<input
+					id="setName"
+					type="text"
+					bind:value={workingIconset.name}
+					placeholder="Iconset Name"
+				/>
+
+				<label for="setAuthor">{$tl.builders.author}</label>
+				<input
+					id="setAuthor"
+					type="text"
+					bind:value={workingIconset.author}
+					placeholder="You!"
+				/>
+
+				<label for="setVersion">{$tl.builders.version}</label>
+				<input
+					id="setVersion"
+					type="number"
+					bind:value={workingIconset.version}
+				/>
+
 				<button
-					on:click={() => {
-						appState = 'normal';
-					}}
-					style="grid-column: 1/3;">Exit Iconset Builder</button
+					on:click={() => importIconset()}
+					class="file-input-button"
 				>
-
-				<label for="setName">Iconset Name</label>
-				<input id="setName" type="text" bind:value={workingIconset.name} placeholder="Iconset Name" />
-
-				<label for="setAuthor">Author</label>
-				<input id="setAuthor" type="text" bind:value={workingIconset.author} placeholder="You!" />
-
-				<label for="setVersion">Version</label>
-				<input id="setVersion" type="number" bind:value={workingIconset.version} />
-
-				<button on:click={() => importIconset()} class="file-input-button">
-					Import
+					{$tl.general.import}
 					<input
 						type="file"
 						bind:files={importFiles}
-						accept={'.hfis'}
+						accept={".hfis"}
 						on:change={(e) => {
 							importIconset();
-							e.target.value = '';
+							e.target.value = "";
 						}}
 					/>
 				</button>
 
-				<button on:click={() => exportIconset()}>Export</button>
+				<button on:click={() => exportIconset()}>{$tl.general.export}</button>
 			</div>
 		</div>
 
 		<div
 			id="icon-buttons"
-			on:dragover={(e) => {
-				e.preventDefault();
-			}}
-			on:dragenter={(e) => {
-				e.preventDefault();
-			}}
+			on:dragover={(e) => { e.preventDefault(); }}
+			on:dragenter={(e) => {	e.preventDefault(); }}
 			on:drop={dropButton}
 		>
 			{#each workingIconset.icons as icon (icon.id)}
 				<button
 					class="icon-button"
 					class:selected={selectedIcon == icon}
-					style={icon.id == phantomIconButtonId ? 'opacity: 0' : ''}
+					style={icon.id == phantomIconButtonId ? "opacity: 0" : ""}
 					on:click={() => {
 						selectedIcon = icon;
 					}}
@@ -327,7 +371,11 @@
 					}}
 					title={icon.display}
 				>
-					<img src={icon.preview} draggable="false" alt="Button for {icon.display}" />
+					<img
+						src={icon.preview}
+						draggable="false"
+						alt="Button for {icon.display}"
+					/>
 				</button>
 			{/each}
 
@@ -348,9 +396,7 @@
 
 	{#if selectedIcon}
 		<div id="icon-preview">
-
 			<div id="pixi-container" style="width: 18.75em; height: 18.75em;">
-
 				<CanvasHolder {app} />
 			</div>
 
@@ -365,35 +411,37 @@
 			<div id="icon-controls">
 				<button
 					on:click={() => {
-						orientation = orientation == 'flatTop' ? 'pointyTop' : 'flatTop';
+						orientation =
+							orientation == "flatTop" ? "pointyTop" : "flatTop";
 					}}
-					title="Change Hex Orientation"
+					title={$tl.builders.change_orientation}
 				>
-					<img src="/assets/img/tools/changeOrientation.png" alt="Change Orientation" />
+					<img
+						src="/assets/img/tools/changeOrientation.png"
+						alt="Change Orientation"
+					/>
 				</button>
 				<button
 					on:click={() => {
 						duplicateIcon(selectedIcon);
 					}}
-					title="Duplicate this Hex"
+					title={$tl.builders.duplicate}
 				>
-					<img src="/assets/img/tools/duplicate.png" alt="Duplicate Hex" />
+					<img
+						src="/assets/img/tools/duplicate.png"
+						alt="Duplicate Hex"
+					/>
 				</button>
 				<button
 					on:click={() => {
 						removeIcon(selectedIcon);
 						selectedIcon = null;
 					}}
-					title="Delete this Hex"
+					title={$tl.builders.icon_set_builder.delete}
 				>
 					<img src="/assets/img/tools/trash.png" alt="Trash" />
 				</button>
 			</div>
-			<!--
-      <button on:click={() => {orientation = orientation == "flatTop" ? "pointyTop" : "flatTop"; workingIconset.icons=workingIconset.icons}}>Change Orientation</button>
-      <button on:click={() => { deleteIcon() } }>Delete Hex</button>
-      <button on:click={() => { duplicateIcon() }}> Duplicate Hex </button>
-      -->
 		</div>
 
 		<div id="icon-style">
@@ -402,32 +450,46 @@
 				<ColorInputPixi bind:value={selectedIcon.color} w={50} h={50} />
 
 				<div>
-					<p>Tint</p>
-					<p class="color-string">{PIXI.utils.hex2string(selectedIcon.color)}</p>
+					<p>{$tl.builders.icon_set_builder.tint}</p>
+					<p class="color-string">
+						{PIXI.utils.hex2string(selectedIcon.color)}
+					</p>
 				</div>
 			</div>
 
 			<div id="symbol-scale">
 				<div id="scale-holder">
-					<p>Icon scale</p><input type="number" bind:value={selectedIcon.pHex} /><p>%</p>
+					<p>{$tl.builders.icon_set_builder.scale}</p>
+					<input type="number" bind:value={selectedIcon.pHex} />
+					<p>%</p>
 				</div>
 				<div>
-					<input type="range" min="5" max="100" bind:value={selectedIcon.pHex} />
+					<input
+						type="range"
+						min="5"
+						max="100"
+						bind:value={selectedIcon.pHex}
+					/>
 				</div>
 			</div>
 		</div>
 	{:else}
 		<div id="editor-placeholder">
-			<p style="color: var(--text); margin-bottom: 0.625em;">Select a icon or make a new one!</p>
+			<p style="color: var(--text); margin-bottom: 0.625em;">
+				{$tl.builders.icon_set_builder.helptext}
+			</p>
 
-			<p style="font-size: 10pt">For best results, use white 100px by 100px images.</p>
-			<p style="font-size: 10pt">Hint: You can upload multiple images at once!</p>
+			<p style="font-size: 10pt">
+				{$tl.builders.icon_set_builder.helpsubtitle}
+			</p>
+			<p style="font-size: 10pt">
+				{$tl.builders.icon_set_builder.helpsubsubtitle}
+			</p>
 		</div>
 	{/if}
 </main>
 
 <style>
-
 	main {
 		display: grid;
 		grid-template-columns: 19.375em 1fr 1fr;
@@ -466,7 +528,7 @@
 		border: solid 1px var(--lighter-background);
 	}
 
-	input[type='text'] {
+	input[type="text"] {
 		border-radius: var(--large-radius);
 	}
 

@@ -13,7 +13,7 @@ type hex_id = `${number}:${number}:${number}`;
 
 /*
 interface ToolData {
-	selectedTool: tools;
+	$store_selected_tool: tools;
 
 	terrain: {
 		tile: Tile;

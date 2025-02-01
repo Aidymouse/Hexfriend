@@ -14,28 +14,21 @@
 	
 	// STORE
 	import { store_has_unsaved_changes } from '../stores/flags';
-	import * as store_tfield from '../stores/tfield';
-
-	let tfield: terrain_field;
-	store_tfield.store.subscribe((newTField) => {
-		tfield = newTField;
-	});
+	import { tfield } from '../stores/tfield';
+	import { tl } from "../stores/translation";
 
 	// COMPONENT
 	import Checkbox from '../components/Checkbox.svelte';
 	
 	// HELPER
 	import { genHexId, genHexId_tfieldHex, getNeighbours } from '../helpers/hexHelpers';
-	import { rand, pick_from_weighted, random_choice } from '../helpers/random';
+	import { rand, pick_from_weighted, random_choice, sfc32, cyrb128, get_min_max_rand_function } from '../helpers/random';
 	import { tile_to_key } from '../helpers/tiles';
 	// LIB
 	import { download } from '../lib/download2';
 	import { one_e_dmg_ruleset } from '../lib/generation_rulesets/one_e_dmg';
 	import { icy } from '../lib/generation_rulesets/icy';
 	import { jungle } from '../lib/generation_rulesets/jungle';
-
-
-
 	
 	export let loadedTilesets: Tileset[];
 	export let comp_terrainLayer;
@@ -46,7 +39,8 @@
 
 	let gen_config_animate = false;
 	let gen_config_clear = false;
-
+	let gen_config_use_seed = false;
+	let gen_seed = ""; 
 
 	let current_ruleset: generation_ruleset = {} //JSON.parse(JSON.stringify(one_e_dmg_ruleset));
 	let selector_ruleset = null //one_e_dmg_ruleset;
@@ -55,7 +49,8 @@
 	loadedTilesets.forEach((tileset: Tileset) => {
 		tileset.tiles.forEach((tile: Tile) => {
 			let key = tile_to_key(tile)
-			current_ruleset[key] = [{ key: key, weight: 1 }];
+			//current_ruleset[key] = [{ key: key, weight: 1 }];
+			current_ruleset[key] = [];
 		});
 	});
 	
@@ -82,7 +77,7 @@
 		$store_has_unsaved_changes = true
 
 		// Get length of empty hexes
-		let blank_hexes = Object.keys(tfield.hexes).filter(hex_id => tfield.hexes[hex_id].tile == null)
+		let blank_hexes = Object.keys($tfield.hexes).filter(hex_id => $tfield.hexes[hex_id].tile == null)
 		let clear_override = false
 		if (blank_hexes.length == 0 && !gen_config_clear) {
 			clear_override = confirm("No blank hexes to generate in. Would you like to clear all hexes before generation?")
@@ -90,7 +85,7 @@
 		}
 
 		if (gen_config_clear || clear_override) {
-			Object.keys(tfield.hexes).forEach(hex_id => {
+			Object.keys($tfield.hexes).forEach(hex_id => {
 				comp_terrainLayer.eraseHex(hex_id);
 			})
 		}
@@ -104,12 +99,12 @@
 
 		if (total_weights == 0) {
 			console.log("Random!")
-			gen_completely_random(tfield.hexes)
+			gen_completely_random($tfield.hexes)
 			return;
 		}
 
-		//standardGen(tfield.hexes, current_ruleset)
-		gen_old_school_generate(tfield.hexes, current_ruleset);
+		//standardGen($tfield.hexes, current_ruleset)
+		gen_old_school_generate($tfield.hexes, current_ruleset);
 		//comp_terrainLayer.renderAllHexes()
 
 		$store_has_unsaved_changes = true
@@ -118,28 +113,37 @@
 	function gen_old_school_generate(hexes, ruleset: generation_ruleset) {
 		// Meanders through hexes on random walks
 
+		// Find the random generation function (default rand unless seeded)
+		let rand_func = get_min_max_rand_function( Math.random );
+		if (gen_config_use_seed) {
+			const seed = cyrb128(gen_seed);
+			const seeded_rand = sfc32(seed[0], seed[1], seed[2], seed[3]);
+			rand_func = get_min_max_rand_function( seeded_rand );
+		}
+
 		// Get random hex that actually has a rule
 		let valid_rule_ids: hex_key[] = Object.keys(ruleset).filter(tile_key => ruleset[tile_key].length > 0)
-		let rand_tile_key = valid_rule_ids[rand(0, valid_rule_ids.length-1)]
+		let rand_tile_key = valid_rule_ids[rand_func(0, valid_rule_ids.length-1)]
 		let rand_tile = get_tile_from_key(rand_tile_key)
 		
 		let prev_tile = rand_tile
 
 		let hexes_to_visit = Object.keys(hexes)
-		hexes_to_visit = hexes_to_visit.filter(hex_id => tfield.hexes[hex_id].tile == null)
+		hexes_to_visit = hexes_to_visit.filter(hex_id => $tfield.hexes[hex_id].tile == null)
 		let visited = []
-		let visit_hex_id = random_choice(hexes_to_visit) 
+		let visit_hex_id = random_choice(hexes_to_visit, rand_func) 
 
 		let painted_count = 0
 		let latest_length = -1
 
+		//const seeded_rand
 		// Needs: random walks
 		while (hexes_to_visit.length > 0) {
 			
 			// Find which tile to use
 			let rule = ruleset[tile_to_key(prev_tile)]
 			if (rule.length == 0) return;
-			let selected_key = pick_from_weighted(rule.map( rp => { return {item: rp.key, weight: rp.weight} }))
+			let selected_key = pick_from_weighted(rule.map( rp => { return {item: rp.key, weight: rp.weight} }), rand_func)
 			let selected_tile = get_tile_from_key(selected_key)
 			
 			// Paint the hex
@@ -163,13 +167,13 @@
 			prev_tile = selected_tile
 
 			if (neighbours.length == 0) {
-				visit_hex_id = random_choice(hexes_to_visit)
+				visit_hex_id = random_choice(hexes_to_visit, rand_func)
 				// Choose a random filled in and visited neighbour, if any, to be the previous tile
 				let next_neighbours = comp_terrainLayer.get_existant_neighbours(visit_hex_id)
 				next_neighbours = next_neighbours.filter(n_hex => n_hex.tile != null && visited.find(id => id == genHexId_tfieldHex(n_hex)))
 
 				
-				if (next_neighbours.length != 0) prev_tile = random_choice(next_neighbours).tile
+				if (next_neighbours.length != 0) prev_tile = random_choice(next_neighbours, rand_func).tile
 				
 				/*
 				console.log("== Got Stuck ==")
@@ -178,7 +182,7 @@
 				*/
 
 			} else {
-				visit_hex_id = genHexId_tfieldHex(random_choice(neighbours))
+				visit_hex_id = genHexId_tfieldHex(random_choice(neighbours, rand_func))
 			}
 			
 			
@@ -187,14 +191,21 @@
 	}
 
 	function gen_completely_random(hexes) {
+		let rand_func = get_min_max_rand_function( Math.random );
+		if (gen_config_use_seed) {
+			const seed = cyrb128(gen_seed);
+			const seeded_rand = sfc32(seed[0], seed[1], seed[2], seed[3]);
+			rand_func = get_min_max_rand_function( seeded_rand );
+		}
+
 		Object.keys(hexes).forEach( (hex_id, i) => {
 
 			if (hexes[hex_id].tile != null) return;
 
-			let rand_tileset = pick_from_weighted( loadedTilesets.map( ts => { return {item: ts, weight: Object.keys(ts.tiles).length} } ) );
+			let rand_tileset = pick_from_weighted( loadedTilesets.map( ts => { return {item: ts, weight: Object.keys(ts.tiles).length} } ), rand_func );
 
 			let ids = Object.keys(rand_tileset.tiles);
-			let rand_tile = rand_tileset.tiles[rand(0, ids.length-1)];
+			let rand_tile = rand_tileset.tiles[rand_func(0, ids.length-1)];
 
 			paint_hex(hex_id, rand_tile, i);
 		})
@@ -295,7 +306,7 @@
 	}
 
 	function clear_ruleset() {
-		if (!confirm("Are you sure?")) return;
+		if (!confirm($tl.generators.clear_confirmation)) return;
 
 		Object.keys(current_ruleset).forEach(tile_id => {
 			current_ruleset[tile_id] = []
@@ -367,29 +378,34 @@
 
 	<div id="buttons">
 		<div id="left-side">
-			<div id="preset">
-				Preset
-					<select bind:value={selector_ruleset} on:change={selector_ruleset_change}>
+			<div id="generator-inputs">
+				{$tl.generators.terrain_generator.preset}
+				<select bind:value={selector_ruleset} on:change={selector_ruleset_change}>
 					<option value={one_e_dmg_ruleset}>AD&D 1e DMG</option>
 					<option value={icy}>Icy Landscape</option>
 					<option value={jungle}>Jungle</option>
 					<option value={null}>Custom</option>
 				</select>
+				{#if gen_config_use_seed}
+					{$tl.generators.seed}
+					<input bind:value={gen_seed}>
+				{/if}
 			</div>
 			<div id="preset-buttons">
-				<button class="outline-button" on:click={clear_ruleset}>Clear</button>
-				<button class="outline-button" on:click={() => { exportGenFunction() }}>Export</button>
-				<button class="outline-button" id="import-button"><input type="file" bind:files={importFiles} on:change={() => { importGenFunction() }} />Import</button>
+				<button class="outline-button" on:click={clear_ruleset}>{$tl.generators.clear}</button>
+				<button class="outline-button" on:click={() => { exportGenFunction() }}>{$tl.general.export}</button>
+				<button class="outline-button" id="import-button"><input type="file" bind:files={importFiles} on:change={() => { importGenFunction() }} />{$tl.general.import}</button>
 			</div>
 		</div>
 		<div id="right-side">
 			<div id="generate-buttons">
-				<span><Checkbox bind:checked={gen_config_animate} /> Animate </span>
-				<span style="margin-left: 0.25em;"><Checkbox bind:checked={gen_config_clear} /> Clear Before Generation</span>
+				<span><Checkbox bind:checked={gen_config_animate} />{$tl.generators.animate}</span>
+				<span><Checkbox bind:checked={gen_config_clear} />{$tl.generators.clear_before_generation}</span>
+				<span><Checkbox bind:checked={gen_config_use_seed} />{$tl.generators.seed_generation}</span>
 			</div>
 			<div id="generate">
-				<button class="evil" on:click={() => { showTerrainGenerator = false }}>Close</button>
-				<button id="generate-button" class="green-button" on:click={() => { generate() }}>Generate!</button>
+				<button class="evil" on:click={() => { showTerrainGenerator = false }}>{$tl.generators.close}</button>
+				<button id="generate-button" class="green-button" on:click={() => { generate() }}>{$tl.generators.generate}</button>
 			</div>
 		</div>
 	</div>
@@ -581,11 +597,18 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5em;
+		justify-content: space-between;
+		width: 60%;
 	}
 
-	#preset {
-		display: flex;
+	#generator-inputs {
+		display: grid;
+		grid-template-columns: 2fr 5fr;
 		gap: 0.5em;
+		width: 100%;
+	}
+	#generator-inputs input {
+		min-height: 25px;
 	}
 
 	#preset-buttons {
@@ -601,8 +624,9 @@
 
 	#generate-buttons {
 		display: flex;
+		flex-direction: column;
 		gap: 0.5em;
-		justify-content: space-between;
+		justify-content: flex-end;
 	}
 
 	#generate-buttons span {

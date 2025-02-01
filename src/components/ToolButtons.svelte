@@ -1,161 +1,269 @@
 <script lang="ts">
-	import type { icon_data, overlay_data, path_data, terrain_data } from '../types/data';
-  	import type { hex_orientation } from '../types/terrain';
-	import { tools } from '../types/toolData';
-	import { afterUpdate } from 'svelte';
-	import { data_path, data_icon } from '../stores/data';
+	import type {
+		eraser_data,
+		icon_data,
+		overlay_data,
+		path_data,
+		terrain_data,
+	} from "../types/data";
+	import { hex_orientation } from "../types/terrain";
+	import { tools } from "../types/toolData";
+	import { afterUpdate, onMount } from "svelte";
+	import {
+		data_path,
+		data_icon,
+		data_overlay,
+		data_terrain,
+		data_eraser,
+	} from "../stores/data";
+	import { store_selected_tool } from "../stores/tools";
 
-	export let data_terrain: terrain_data;
-	export let data_overlay: overlay_data;
+	import { tfield } from "../stores/tfield";
+	import { tl } from "../stores/translation";
 
 	/* These proxies keep the buttons responsive */
 	let data_path_proxy: path_data;
-	data_path.subscribe(n => {
-		data_path_proxy = n
-	})
+	data_path.subscribe((n) => {
+		data_path_proxy = n;
+	});
 
 	let data_icon_proxy: icon_data;
-	data_icon.subscribe(n => {
-		data_icon_proxy = n
-	})
-	
+	data_icon.subscribe((n) => {
+		data_icon_proxy = n;
+	});
+
+	let data_terrain_proxy: terrain_data;
+	data_terrain.subscribe((n) => {
+		data_terrain_proxy = n;
+	});
+
+	let data_eraser_proxy: eraser_data;
+	data_eraser.subscribe((n) => {
+		data_eraser_proxy = n;
+	});
+
 	$: {
-		data_terrain = data_terrain;
-		data_path_proxy = data_path_proxy
-		data_icon_proxy = data_icon_proxy
+		data_terrain_proxy = data_terrain_proxy;
+		data_path_proxy = data_path_proxy;
+		data_icon_proxy = data_icon_proxy;
+		data_eraser_proxy = data_eraser_proxy;
 
 		buttons = buttons;
 	}
 
 	let buttons = [
 		{
-			display: 'Terrain',
+			display: "Terrain",
 			toolCode: tools.TERRAIN,
 
 			miniButtons: [
 				{
-					display: 'Hex Paintbucket',
+					display: $tl.tools.hex_paintbucket,
 					action: function () {
-						data_terrain.usingPaintbucket = !data_terrain.usingPaintbucket;
+						data_terrain.update((n) => {
+							n.usingPaintbucket =
+								!n.usingPaintbucket;
+							return n;
+						});
 					},
-					image: '/assets/img/tools/paintbucket.svg',
-					obj: data_terrain,
-					field: 'usingPaintbucket',
+					image: "/assets/img/tools/paintbucket.svg",
+					obj: data_terrain_proxy,
+					field: "usingPaintbucket",
 				},
 				{
-					display: 'Hex Eraser',
+					display: $tl.tools.hex_eraser,
 					action: function () {
-						data_terrain.usingEraser = !data_terrain.usingEraser;
+						data_terrain.update((n) => {
+							n.usingEraser =
+								!n.usingEraser;
+							return n;
+						});
 					},
-					image: '/assets/img/tools/mini_eraser.svg',
-					obj: data_terrain,
-					field: 'usingEraser',
+					image: "/assets/img/tools/mini_eraser.svg",
+					obj: data_terrain_proxy,
+					field: "usingEraser",
 				},
 
 				{
-					display: 'Hex Eyedropper',
+					display: $tl.tools.hex_eyedropper,
 					action: function () {
-						data_terrain.usingEyedropper = !data_terrain.usingEyedropper;
+						data_terrain.update((n) => {
+							n.usingEyedropper =
+								!n.usingEyedropper;
+							return n;
+						});
 					},
-					image: '/assets/img/tools/eyedropper.svg',
-					obj: data_terrain,
-					field: 'usingEyedropper',
+					image: "/assets/img/tools/eyedropper.svg",
+					obj: data_terrain_proxy,
+					field: "usingEyedropper",
 				},
-
 			],
 		},
 
 		{
-			display: 'Icon',
+			display: "Icon",
 			toolCode: tools.ICON,
 			miniButtons: [
 				{
-					display: 'Drag Icons',
+					display: $tl.tools.icon_drag,
 					action: function () {
-						data_icon.update(n => {n.dragMode = !n.dragMode; return n})
+						data_icon.update((n) => {
+							n.dragMode =
+								!n.dragMode;
+							return n;
+						});
 					},
-					image: '/assets/img/tools/drag.svg',
+					image: "/assets/img/tools/drag.svg",
 					obj: data_icon_proxy,
-					field: 'dragMode',
+					field: "dragMode",
 				},
 
 				{
-					display: 'Icon Eraser',
+					display: $tl.tools.icon_erase,
 					action: function () {
-						data_icon.update(n => {n.usingEraser = !n.usingEraser; return n})
+						data_icon.update((n) => {
+							n.usingEraser =
+								!n.usingEraser;
+							return n;
+						});
 					},
-					image: '/assets/img/tools/mini_eraser.svg',
+					image: "/assets/img/tools/mini_eraser.svg",
 					obj: data_icon_proxy,
-					field: 'usingEraser',
+					field: "usingEraser",
 				},
-				
+
 				{
-					display: 'Snap Icon',
+					display: $tl.tools.icon_snap,
 					action: function () {
-						data_icon.update(n => {n.snapToHex = !n.snapToHex; return n})
+						data_icon.update((n) => {
+							n.snapToHex =
+								!n.snapToHex;
+							return n;
+						});
 					},
-					image: '/assets/img/tools/snap_icon.svg',
+					image: "/assets/img/tools/snap_icon.svg",
 					obj: data_icon_proxy,
-					field: 'snapToHex',
+					field: "snapToHex",
 				},
 				{
-					display: 'Icon Eyedropper',
+					display: $tl.tools.icon_eyedropper,
 					action: function () {
-						data_icon.update(n => {n.usingEyedropper = !n.usingEyedropper; return n})
+						data_icon.update((n) => {
+							n.usingEyedropper =
+								!n.usingEyedropper;
+							return n;
+						});
 					},
-					image: '/assets/img/tools/eyedropper.svg',
+					image: "/assets/img/tools/eyedropper.svg",
 					obj: data_icon_proxy,
-					field: 'usingEyedropper',
+					field: "usingEyedropper",
 				},
 			],
 		},
 
 		{
-			display: 'Path',
+			display: "Path",
 			toolCode: tools.PATH,
 			miniButtons: [
 				{
-					display: 'Snap Path Point',
+					display: $tl.tools.path_snap,
 					action: function () {
-						data_path.update(n => {n.snap = !n.snap; return n} )
+						data_path.update((n) => {
+							n.snap = !n.snap;
+							return n;
+						});
 					},
-					image: '/assets/img/tools/snap_path.svg',
+					image: "/assets/img/tools/snap_path.svg",
 					obj: data_path_proxy,
-					field: 'snap',
+					field: "snap",
 				},
 			],
 		},
-		{ display: 'Text', toolCode: tools.TEXT, miniButtons: [] },
-		{ display: 'Eraser', toolCode: tools.ERASER, miniButtons: [] },
-
-		{ display: 'Overlay', toolCode: tools.OVERLAY, miniButtons: [] },
+		{
+			display: "Text",
+			toolCode: tools.TEXT,
+			miniButtons: [],
+		},
+		{
+			display: "Eraser",
+			toolCode: tools.ERASER,
+			miniButtons: [
+				{
+					display: $tl.tools.eraser_terrain,
+					action: function () {
+						data_eraser.update((n) => {
+							n.eraseTerrain =
+								!n.eraseTerrain;
+							return n;
+						});
+					},
+					image: "/assets/img/tools/terrain.svg",
+					obj: data_eraser_proxy,
+					field: "eraseTerrain",
+				},
+				{
+					display: $tl.tools.eraser_icon,
+					action: function () {
+						data_eraser.update((n) => {
+							n.eraseIcons =
+								!n.eraseIcons;
+							return n;
+						});
+					},
+					image: "/assets/img/tools/icon.svg",
+					obj: data_eraser_proxy,
+					field: "eraseIcons",
+				},
+			],
+		},
+		{
+			display: "Overlay",
+			toolCode: tools.OVERLAY,
+			miniButtons: [],
+		},
 	];
-
-	export let selectedTool: string;
-	export let hexOrientation: hex_orientation;
 
 	export let changeTool: Function;
 
-	afterUpdate(() => {
-		let el_selected_button = document.getElementById(`tool-button-${selectedTool}`);
+	onMount(() => {
+		store_selected_tool.subscribe((n) => {
+			let el_selected_button = document.getElementById(
+				`tool-button-${n}`,
+			);
 
-		let clip_layer = document.getElementById('bottom-layer');
+			let clip_layer =
+				document.getElementById("bottom-layer");
 
-		let new_clip_path = `circle(1.25em at ${el_selected_button.offsetLeft + el_selected_button.offsetWidth / 2}px ${
-			el_selected_button.offsetTop + el_selected_button.offsetHeight / 2
-		}px)`;
+			let new_clip_path = `circle(1.25em at ${el_selected_button.offsetLeft + el_selected_button.offsetWidth / 2}px ${
+				el_selected_button.offsetTop +
+				el_selected_button.offsetHeight / 2
+			}px)`;
 
-		clip_layer.style.clipPath = new_clip_path;
+			clip_layer.style.clipPath = new_clip_path;
+		});
 	});
 </script>
 
 <main>
 	{#each buttons as b}
 		{#if b.miniButtons.length > 0}
-			<div class="mini-button-container" class:risen={b.toolCode == selectedTool}>
+			<div
+				class="mini-button-container"
+				class:risen={b.toolCode == $store_selected_tool}
+			>
 				{#each b.miniButtons as mb}
-					<button class="mini-button" class:selected={mb.obj ? mb.obj[mb.field] : false} on:click={mb.action} title={mb.display}>
-						<span class="mini-button-bg" style="-webkit-mask: url({mb.image})" />
+					<button
+						class="mini-button"
+						class:selected={mb.obj
+							? mb.obj[mb.field]
+							: false}
+						on:click={mb.action}
+						title={mb.display}
+					>
+						<span
+							class="mini-button-bg"
+							style="-webkit-mask: url({mb.image})"
+						/>
 					</button>
 				{/each}
 			</div>
@@ -170,19 +278,24 @@
 				}}
 				title={`${b.display} Tool`}
 				class="tool-button"
-				class:hidden={b.toolCode == tools.OVERLAY && data_overlay.base64 == ''}
+				class:hidden={b.toolCode == tools.OVERLAY &&
+					$data_overlay.base64 == ""}
 				id={`tool-button-${b.toolCode}`}
 			>
 				<!-- Button Image 
 				<span class="tool-img-wrapper" >
 					<img src={`/assets/img/tools/${b.toolCode}.png`} alt={`${b.display} Tool`} />
-					<img src={`/assets/img/tools/w_${b.toolCode}.png`} alt={`${b.display} Tool`} class:see-through={selectedTool != b.toolCode}/>
+					<img src={`/assets/img/tools/w_${b.toolCode}.png`} alt={`${b.display} Tool`} class:see-through={$store_selected_tool != b.toolCode}/>
 				</span>
 				-->
 
 				<div
 					class="tool-icon"
-					class:rotated90={(b.toolCode == tools.TERRAIN || b.toolCode == tools.OVERLAY) && hexOrientation == 'pointyTop'}
+					class:rotated90={(b.toolCode ==
+						tools.TERRAIN ||
+						b.toolCode == tools.OVERLAY) &&
+						$tfield.orientation ==
+							hex_orientation.POINTYTOP}
 					style={`-webkit-mask: url(/assets/img/tools/${b.toolCode}.svg) no-repeat center`}
 				/>
 			</button>
@@ -197,19 +310,24 @@
 				}}
 				title={`${b.display} Tool`}
 				class="tool-button"
-				class:hidden={b.toolCode == tools.OVERLAY && data_overlay.base64 == ''}
+				class:hidden={b.toolCode == tools.OVERLAY &&
+					$data_overlay.base64 == ""}
 				id={`b-tool-button-${b.toolCode}`}
 			>
 				<!-- Button Image 
 				<span class="tool-img-wrapper" >
 					<img src={`/assets/img/tools/${b.toolCode}.png`} alt={`${b.display} Tool`} />
-					<img src={`/assets/img/tools/w_${b.toolCode}.png`} alt={`${b.display} Tool`} class:see-through={selectedTool != b.toolCode}/>
+					<img src={`/assets/img/tools/w_${b.toolCode}.png`} alt={`${b.display} Tool`} class:see-through={$store_selected_tool != b.toolCode}/>
 				</span>
 				-->
 
 				<div
 					class="tool-icon"
-					class:rotated90={(b.toolCode == tools.TERRAIN || b.toolCode == tools.OVERLAY) && hexOrientation == 'pointyTop'}
+					class:rotated90={(b.toolCode ==
+						tools.TERRAIN ||
+						b.toolCode == tools.OVERLAY) &&
+						$tfield.orientation ==
+							hex_orientation.POINTYTOP}
 					style={`-webkit-mask: url(/assets/img/tools/${b.toolCode}.svg) no-repeat center`}
 				/>
 			</button>
@@ -217,7 +335,7 @@
 	</div>
 
 	<!-- Mini Buttons 
-			{#if selectedTool == b.toolCode && b.miniButtons.length > 0}
+			{#if $store_selected_tool == b.toolCode && b.miniButtons.length > 0}
 			<div class="mini-button-container">
 				{#each b.miniButtons as mb}
 						<button 
@@ -265,7 +383,12 @@
 		background-color: var(--hexfriend-green);
 		clip-path: circle(3.125em at 0.5em 0.5em);
 		transition-duration: 0.2s;
-		transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1.2);
+		transition-timing-function: cubic-bezier(
+			0.075,
+			0.82,
+			0.165,
+			1.2
+		);
 	}
 	#bottom-layer .tool-icon {
 		background-color: var(--primary-background);

@@ -4,7 +4,7 @@ import type { path_style } from './path'
 import type { terrain_field } from './terrain';
 import type { Tileset } from './tilesets';
 
-const LATESTSAVEDATAVERSION = 10;
+const LATESTSAVEDATAVERSION = 11;
 const LATESTDEFAULTICONSVERSION = 5;
 
 interface save_data {
@@ -30,4 +30,4 @@ interface save_data {
 }
 
 export type { save_data }
-export { LATESTDEFAULTICONSVERSION, LATESTDEFAULTTILESVERSION, LATESTSAVEDATAVERSION }
+export { LATESTDEFAULTICONSVERSION, LATESTSAVEDATAVERSION }

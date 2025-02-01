@@ -1,12 +1,13 @@
 <script lang="ts">
-import type { hex_id } from 'src/types/toolData';
+	import type { hex_id } from '../types/toolData';
 
 	import { genHexId, genHexId_tfieldHex, getNeighbours } from '../helpers/hexHelpers';
 	import { download } from '../lib/download2';
-	import * as store_tfield from '../stores/tfield';
-	import { rand, pick_from_weighted } from '../helpers/random';
+	import { rand, pick_from_weighted, cyrb128, sfc32, get_min_max_rand_function } from '../helpers/random';
 	
 	import { store_has_unsaved_changes } from '../stores/flags';
+	import { tfield } from '../stores/tfield';
+	import { tl } from '../stores/translation';
 
 	import type { TerrainHex, terrain_field } from '../types/terrain';
 	import type { Tile, Tileset, tile_id } from '../types/tilesets';
@@ -16,18 +17,19 @@ import type { hex_id } from 'src/types/toolData';
 
 
 	export let loadedIconsets: Iconset[];
-	let tfield: terrain_field;
-	store_tfield.store.subscribe((newTField) => {
-		tfield = newTField;
-	});
+
 	
 	export let comp_iconLayer;
 	export let show_icon_generator: boolean;
 
-	let importFiles: FileList;
+	let importFiles: FileList = [];
 
-	let gen_config_center = true;
 	let gen_config_animate = false;
+	let gen_config_center = true;
+	let gen_config_clear = false;
+	let gen_config_use_seed = false;
+	let gen_seed = "";
+	let icon_scale = 80;
 
 	interface rule {
 		item: Icon
@@ -58,21 +60,33 @@ import type { hex_id } from 'src/types/toolData';
 
 	// Wrapper for generation methods
 	function generate() {
+		
+		let rand_func = get_min_max_rand_function( Math.random );
+		let rand_0_1 = Math.random
+		if (gen_config_use_seed) {
+			const seed = cyrb128(gen_seed);
+			rand_0_1 = sfc32(seed[0], seed[1], seed[2], seed[3]);
+			rand_func = get_min_max_rand_function( rand_0_1 );
+		}
 
 		//comp_terrainLayer.renderAllHexes()
 		let icons_placed = 0
 
-		Object.keys(tfield.hexes).forEach( (hex_id, i) => {
-			let icon_chance = rand(1, current_ruleset.chance_for_icon_high)
+		if (gen_config_clear) {
+			comp_iconLayer.deleteIcons();
+		}
+
+		Object.keys($tfield.hexes).forEach( (hex_id, i) => {
+			let icon_chance = rand_func(1, current_ruleset.chance_for_icon_high)
 			if (icon_chance > current_ruleset.chance_for_icon) return;
 
-			let hex: TerrainHex = tfield.hexes[hex_id]
+			let hex: TerrainHex = $tfield.hexes[hex_id]
 
 			let hex_pos = {q: hex.q, r: hex.r, s: hex.s}
 
 			if (!gen_config_center) {
-				let new_q = hex.q + Math.random() - 0.5
-				let new_r = hex.r +  Math.random() - 0.5
+				let new_q = hex.q + rand_0_1() - 0.5
+				let new_r = hex.r + rand_0_1() - 0.5
 
 				hex_pos = {q: new_q, r: new_r, s:-new_q-new_r }
 			}
@@ -80,10 +94,11 @@ import type { hex_id } from 'src/types/toolData';
 			let rand_icon: Icon;
 
 			if (current_ruleset.icon_chances.length > 0) {
-				rand_icon = pick_from_weighted(current_ruleset.icon_chances)
+				rand_icon = pick_from_weighted(current_ruleset.icon_chances, rand_func)
 			} else {
-				rand_icon = pick_from_weighted(random_chances)
+				rand_icon = pick_from_weighted(random_chances, rand_func)
 			}
+			rand_icon.pHex = icon_scale;
 
 			if (gen_config_animate) {
 
@@ -181,25 +196,37 @@ import type { hex_id } from 'src/types/toolData';
 	
 	<div id="buttons">
 		<div id="left-side">
-			<div id="chance">
-				Generation Chance 
-				<input type="number" min={1} max={current_ruleset.chance_for_icon_high} bind:value={current_ruleset.chance_for_icon}> 
-				in
-				<input type="number" min={1} bind:value={current_ruleset.chance_for_icon_high}>
+			<div id="generator-inputs">
+				{$tl.generators.icon_generator.generation_chance}
+				<div id="chance">
+					<input type="number" min={1} max={current_ruleset.chance_for_icon_high} bind:value={current_ruleset.chance_for_icon}> 
+					{$tl.generators.icon_generator.out_of_connector}
+					<input type="number" min={1} bind:value={current_ruleset.chance_for_icon_high}>
+				</div>
+				<span class="left-center-text">{$tl.generators.icon_generator.icon_scale}: {icon_scale}%</span>
+				<span><input id="icon-scale" type="range" min={10} max={100} bind:value={icon_scale} /> <button on:click={() => {icon_scale = 80} }>{$tl.general.reset}</button></span>
+				{#if gen_config_use_seed}
+					<span class="left-center-text">{$tl.generators.seed}</span>
+					<input bind:value={gen_seed}>
+				{/if}
 			</div>
 			<div id="clear">
-				<button class="outline-button" on:click={clear_ruleset}>Clear</button>
+				<button class="outline-button" on:click={clear_ruleset}>{$tl.generators.clear}</button>
+				<button class="outline-button" on:click={exportGenFunction} >{$tl.general.export}</button>
+				<button class="outline-button" id="import-button"><input type="file" bind:files={importFiles} on:change={() => { importGenFunction() }} />{$tl.general.import}</button>
 			</div>
 		</div>
 		
 		<div id="right-side">
 			<div id="generate-buttons">
-				<span><Checkbox bind:checked = {gen_config_animate} id="config-animate" /> <label for="config-animate">Animate</label></span>
-				<span style="margin-right: 0.5em"><Checkbox bind:checked = {gen_config_center} id="config-snap" /> <label for="config-snap">Place In Hex Center</label></span>
+				<span><Checkbox bind:checked = {gen_config_animate} id="config-animate" /> <label for="config-animate">{$tl.generators.animate}</label></span>
+				<span><Checkbox bind:checked = {gen_config_center} id="config-snap" /> <label for="config-snap">{$tl.generators.icon_generator.place_in_center}</label></span>
+				<span><Checkbox bind:checked = {gen_config_clear} id="config-clear" /> <label for="config-clear">{$tl.generators.clear_before_generation}</label></span>
+				<span><Checkbox bind:checked = {gen_config_use_seed} id="config-use-seed" /> <label for="config-use-seed">{$tl.generators.seed_generation}</label></span>
 			</div>
 			<div id="generate">
-				<button class="evil" on:click={() => { show_icon_generator = false }}>Close</button>
-				<button class="green-button" on:click={generate}>Generate!</button>
+				<button class="evil" on:click={() => { show_icon_generator = false }}>{$tl.generators.close}</button>
+				<button class="green-button" on:click={generate}>{$tl.generators.generate}</button>
 			</div>
 		</div>
 	</div>
@@ -266,6 +293,19 @@ import type { hex_id } from 'src/types/toolData';
 		box-sizing: border-box;
 	}
 
+	#import-button {
+		position: relative;
+	}
+
+	#import-button input {
+		position: absolute;
+		opacity: 0;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+	}
+
 	/* Individual Chance Items */
 	.icon-chance {
 		width: 100%;
@@ -317,7 +357,8 @@ import type { hex_id } from 'src/types/toolData';
 		background-color: var(--light-background);
 		padding: 0.625em;
 
-		display: flex;
+		display: grid;
+		grid-template-columns: 5fr 3fr;
 		justify-content: space-between;
 		gap: 0.5em;
 	}
@@ -333,6 +374,19 @@ import type { hex_id } from 'src/types/toolData';
 		justify-content: space-between;
 	}
 
+	#generator-inputs { 
+		width: 100%;
+		display: grid;
+		grid-template-columns: 4fr 5fr;
+		grid-auto-rows: 24px;
+		gap: 0.5em;
+	}
+
+	#generator-inputs input {
+		height: 100%;
+		margin: 0;
+	}
+
 	#right-side {
 		display: flex;
 		flex-direction: column;
@@ -342,6 +396,7 @@ import type { hex_id } from 'src/types/toolData';
 
 	#generate-buttons {
 		display: flex;
+		flex-direction: column;
 		gap: 0.5em;
 		justify-content: flex-end;
 	}
@@ -350,6 +405,14 @@ import type { hex_id } from 'src/types/toolData';
 		display: flex;
 		gap: 0.5em;
 		justify-content: flex-end;
+	}
+
+	input[type='range']::-webkit-slider-runnable-track, input[type='range']::-moz-range-track {
+		background: var(--lighter-background);
+	}
+
+	input[type='range']:active::-webkit-slider-runnable-track, input[type='range']:active::-moz-range-track {
+		background: var(--hexfriend-green);
 	}
 
 </style>

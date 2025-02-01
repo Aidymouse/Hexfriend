@@ -2,17 +2,26 @@
 	import { db } from '../lib/db';
 	import { download } from '../lib/download2';
 	import { convertSaveDataToLatest } from '../lib/saveDataConverter';
+  import { store_has_unsaved_changes } from '../stores/flags';
 	import { LATESTSAVEDATAVERSION } from '../types/savedata';
 	import { liveQuery } from 'dexie';
 
 	let saves = liveQuery(() => db.mapSaves.toArray());
 
+	// TODO the outline on the maps is really ugly cos it gets hidden by a box
+
 	export let showSavedMaps: boolean;
 	export let load: Function;
+	export let loadAndSave: Function;
 
 	export let createNewMap: Function;
 
 	async function clickedMap(id: number) {
+		if ($store_has_unsaved_changes) { // Doesn't actually work because has_unsaved_changes is updated too often lol
+			let confirm = window.confirm("This will discard your currently loaded map - are you sure?");
+			if (!confirm) return;
+		}
+		
 		showSavedMaps = false;
 
 		let mapString = (await db.mapStrings.get(id)).mapString;
@@ -37,6 +46,17 @@
 
 		download(JSON.stringify(mapData), `${mapData.title ? mapData.title : 'Untitled Hexfriend'}.hexfriend`, 'appliation/json');
 	}
+
+	async function duplicateMap(id: number) {
+		let mapData = JSON.parse((await db.mapStrings.get(id)).mapString);
+
+		let title = prompt("Map Title:", `${mapData.title} Copy`);
+		if (title == null) return;
+
+		mapData.title = title;
+
+		loadAndSave(mapData);
+	}
 </script>
 
 <main class:shown={showSavedMaps}>
@@ -49,8 +69,9 @@
 		<img src="/assets/img/ui/back.png" alt={'Close Maps'} />
 	</button>
 
-	<div id="maps-grid-container" class="shown">
+	<div id="maps-grid-container">
 		<h1 class="title">Maps</h1>
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div
 			id="save-map-button"
 			on:click={() => {
@@ -67,6 +88,7 @@
 			{#if $saves}
 				{#each $saves as save (save.id)}
 					<div class="map-save" class:error={save.saveVersion != LATESTSAVEDATAVERSION}>
+						<!-- svelte-ignore a11y-click-events-have-key-events -->
 						<div
 							on:click={() => {
 								clickedMap(save.id);
@@ -80,28 +102,37 @@
 						</div>
 
 						{#if save.saveVersion != LATESTSAVEDATAVERSION}
-							<div class="error-notification" title={'This save data is on an old version. It may fail to load.'}>!</div>
+							<div class="error-notification" title={'This save data is on an old version - you can still load it and it will try to update itself'}>Old version!</div>
 						{/if}
 
-						<button
-							class="delete-button"
-							on:click={() => {
-								deleteMap(save.id);
-							}}
-						>
-							<img src="/assets/img/tools/trash.png" alt={'Delete Map'} />
-						</button>
+						<div class="buttons">
+							<button
+								on:click={() => {
+									deleteMap(save.id);
+								}}
+							>
+								<img src="/assets/img/tools/trash.png" alt={'Delete Map'} />
+							</button>
 
-						<button
-							class="delete-button"
-							style="margin-right: 35px;"
-							on:click={() => {
-								exportAsHexfriend(save.id);
-							}}
-							title={'Quick Export'}
-						>
-							<img src="/assets/img/ui/quick export.png" alt={'Export'} />
-						</button>
+							<button
+								on:click={() => {
+									exportAsHexfriend(save.id);
+								}}
+								title={'Quick Export'}
+							>
+								<img src="/assets/img/ui/quick export.png" alt={'Export'} />
+							</button>
+
+							<button
+								on:click={() => {
+									duplicateMap(save.id);
+								}}
+							title="Duplicate Map"
+							>
+								<img src="/assets/img/ui/duplicate.png" alt={'Duplicate'} />
+							</button>
+						</div>
+						
 					</div>
 				{/each}
 			{:else}
@@ -128,9 +159,9 @@
 	}
 
 	#maps-grid-container {
-		top: 0;
 		width: 100%;
 		padding: 1em;
+		padding-bottom: 0;
 		max-height: 100%;
 		background-color: var(--primary-background);
 		display: flex;
@@ -138,11 +169,6 @@
 		flex-direction: column;
 		box-sizing: border-box;
 		overflow-y: hidden;
-		padding-bottom: 0;
-	}
-
-	#maps-grid-container.shown {
-		left: 0em;
 	}
 
 	.title {
@@ -199,9 +225,9 @@
 		height: auto;
 		background: var(--primary-background);
 
-		position: relative;
-
+		/* leave space for map hover border effects */
 		box-sizing: border-box;
+		padding: 2px;
 
 		display: grid;
 		grid-template-columns: 1fr 1fr;
@@ -242,22 +268,29 @@
 	}
 
 	.map-save.error {
-		outline: red 1px solid;
+		outline: yellow 1px solid;
 	}
 
 	.map-save .error-notification {
 		position: absolute;
 		top: 0.5em;
 		left: 0.5em;
-		color: red;
-		width: 25px;
+		right: 0.5em;
+		color: yellow;
+		width: auto;
 		height: 25px;
-		border: solid 1px red;
-		border-radius: 4px;
-		background-color: rgba(255, 102, 102, 0.5);
+		border: solid 1px yellow;
+		border-radius: 0.5em;
+		background-color: var(--primary-background);
 		display: flex;
 		justify-content: center;
 		align-items: center;
+
+		transition: top 0.15s ease-in-out;
+	}
+
+	.map-save:hover .error-notification {
+		top: calc(0.5em + 25px + 0.5em);
 	}
 
 	#close-button {
@@ -292,28 +325,35 @@
 		background: var(--light-background);
 	}
 
-	.delete-button {
+	.buttons {
 		position: absolute;
-		top: 0.5em;
-		right: 0.5em;
-		display: none;
+		top: -2em;
+		left: 0.5em;
+		right: 0.5em;;
+		width: auto;
+		height: 2em;
+		display: flex;
+		justify-content: space-around;
+		gap: 0.5em;
 
+		transition: top 0.15s ease-in-out;
+	}
+
+	.buttons button {
 		width: 2em;
 		height: 2em;
-		padding: 0px;
+		padding: 0;
 
 		justify-content: center;
 		align-items: center;
-
-		transition-duration: 0.2s;
 	}
 
-	.delete-button img {
+	.buttons button img {
 		width: 70%;
 	}
 
-	.map-save:hover .delete-button {
-		display: flex;
+	.map-save:hover .buttons {
+		top: 0.5em;
 	}
 
 	.map-save:hover {

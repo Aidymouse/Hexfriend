@@ -1,6 +1,6 @@
 import type { coord_system } from './coordinates';
 import type { path_layer_path } from './path';
-import type { text_layer_text, path_style } from './text';
+import type { text_layer_text } from './text';
 import type { Tile } from './tilesets';
 import type * as PIXI from 'pixi.js';
 
@@ -18,19 +18,24 @@ export interface icon_data {
 	pHex: number;
 	snapToHex: boolean;
 	usingEraser: boolean;
+	usingEyedropper: boolean;
 	dragMode: boolean;
 }
 
 export interface coordinates_data {
 	shown: boolean;
-	style: PIXI.Text['style'];
+	style: Partial<PIXI.Text['style']>;
 	system: coord_system;
 	seperator: string;
 	gap: number;
+	offsets: {
+		row_col: {row: number, col: number},
+		cube: {q: number, r: number, s: number}
+	}
 }
 
 export interface text_data {
-	style: PIXI.Text['style'];
+	style: Partial<PIXI.Text['style']>;
 	selectedText?: text_layer_text;
 	alpha: number;
 	editorRef: any;
@@ -43,7 +48,7 @@ export interface path_data {
 	hoveredPath?: path_layer_path;
 	dontSelectPaths: boolean;
 	snap: boolean;
-	style: path_style;
+	style: Partial<PIXI.LineStyle>;
 	contextPathId?: number;
 }
 
@@ -53,8 +58,8 @@ export interface trace_data {
 }
 
 export interface eraser_data {
-	ignoreTerrain: boolean;
-	ignoreIcons: boolean;
+	eraseTerrain: boolean;
+	eraseIcons: boolean;
 }
 
 export interface overlay_data {

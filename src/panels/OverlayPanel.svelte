@@ -1,51 +1,69 @@
 <script lang="ts">
-	import Checkbox from "../components/Checkbox.svelte";
+    import Checkbox from "../components/Checkbox.svelte";
     import { store_selected_tool } from "../stores/tools";
-    
-    import { store_has_unsaved_changes } from '../stores/flags';
+
+    import { store_has_unsaved_changes } from "../stores/flags";
+    import { tl } from "../stores/translation";
 
     import type { overlay_data } from "../types/data";
-	import { tools } from "../types/toolData";
+    import { tools } from "../types/toolData";
 
-    export let data_overlay: overlay_data;
+    import { data_overlay } from "../stores/data";
 
     function remove_overlay() {
-        
-        if (confirm("Remove overlay?")) {
-            data_overlay.base64 = ""
-            store_selected_tool.update(n => tools.TERRAIN)
-            $store_has_unsaved_changes = true
+        if (confirm($tl.overlay_panel.remove_confirmation)) {
+            $data_overlay.base64 = "";
+            store_selected_tool.update((n) => tools.TERRAIN);
+            $store_has_unsaved_changes = true;
         }
-
     }
 
     function reset_scale() {
-        data_overlay.scale.x = 1
-        data_overlay.scale.y = 1
+        $data_overlay.scale.x = 1;
+        $data_overlay.scale.y = 1;
         $store_has_unsaved_changes = true;
     }
 
     function reset_positon() {
-        data_overlay.x = 0
-        data_overlay.y = 0
+        $data_overlay.x = 0;
+        $data_overlay.y = 0;
         $store_has_unsaved_changes = true;
     }
-
 </script>
 
 <div class="panel panel-grid">
-
-    <label for="ov_shown">Show</label><Checkbox id={"ov_shown"} bind:checked={data_overlay.shown} />
-    <label for="ov_opacity">Opacity</label><input id="ov_opacity" type="range" min={0.05} max={1} step={0.05} bind:value={data_overlay.opacity} />
-    <span class="col-span"><button on:click={reset_scale}>Reset Scale</button></span>
-    <span class="col-span"><button on:click={reset_positon}>Reset Position</button></span>
-    <span class="col-span"><button class="evil" on:click={remove_overlay}>Remove Overlay</button></span>
-
+    <label for="ov_shown">{$tl.overlay_panel.show}</label><Checkbox
+        id={"ov_shown"}
+        bind:checked={$data_overlay.shown}
+    />
+    <label for="ov_opacity">{$tl.overlay_panel.opacity}</label><input
+        id="ov_opacity"
+        type="range"
+        min={0.05}
+        max={1}
+        step={0.05}
+        bind:value={$data_overlay.opacity}
+    />
+    <span class="col-span"
+        ><button class="outline-button" on:click={reset_scale}
+            >{$tl.overlay_panel.reset_scale}</button
+        ></span
+    >
+    <span class="col-span"
+        ><button class="outline-button" on:click={reset_positon}
+            >{$tl.overlay_panel.reset_position}</button
+        ></span
+    >
+    <span class="col-span"
+        ><button class="evil" on:click={remove_overlay}
+            >{$tl.overlay_panel.remove}</button
+        ></span
+    >
 </div>
 
 <style>
     .panel {
-        padding: 0.625em;;
+        padding: 0.625em;
     }
 
     .panel-grid {
@@ -67,3 +85,4 @@
         width: 100%;
     }
 </style>
+
