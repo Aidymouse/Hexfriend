@@ -34,7 +34,7 @@ function convert_v1_to_v5(oldData: save_data): save_data {
 			shown: true,
 			x: 0,
 			y: 0,
-			scale: {x: 1, y: 1}, 
+			scale: { x: 1, y: 1 },
 			opacity: 0.5
 		}
 	}
@@ -52,7 +52,7 @@ function convert_v1_to_v5(oldData: save_data): save_data {
 		tId++;
 	});
 
-	
+
 	oldData.saveVersion = 5;
 
 	return oldData
@@ -65,8 +65,8 @@ function convert_v5_to_v6(oldData: save_data): save_data {
 	//  - symbol ID is not the same as tile ID anymore, rather they are sorted out by the tilesetcreator
 	let new_data: save_data = JSON.parse(JSON.stringify(oldData));
 
-	
-	
+
+
 	new_data.saveVersion = 6
 	return new_data;
 
@@ -76,58 +76,58 @@ function convert_v6_to_v7(oldData: save_data): save_data {
 	console.log("Converting save: v6 to v7")
 
 	let new_data: save_data = JSON.parse(JSON.stringify(oldData));
-	
-	new_data.pathStyles = new_data.pathStyles.map(ps => {return {...ps, style: {...ps.style, dashed: false, dash_length: 15, dash_gap: 10}} })
+
+	new_data.pathStyles = new_data.pathStyles.map(ps => { return { ...ps, style: { ...ps.style, dashed: false, dash_length: 15, dash_gap: 10 } } })
 	new_data.paths.forEach(p => {
 		p.style.dashed = false
 		p.style.dash_gap = 10
 		p.style.dash_length = 15
 	})
 	console.log(new_data.pathStyles)
-	
+
 	new_data.saveVersion = 7
 	return new_data;
 }
 
 function convert_v7_to_v8(old_data: save_data): save_data {
 	console.log("Converting save: v7 to v8")
-	
+
 	let new_data: save_data = JSON.parse(JSON.stringify(old_data))
-	
+
 	new_data.TerrainField.grid.gap = 0
-	
+
 	new_data.saveVersion = 8
 	return new_data;
 }
 
 function convert_v8_to_v9(old_data: save_data): save_data {
 	console.log("Converting save: v8 to v9")
-	
+
 	let new_data: save_data = JSON.parse(JSON.stringify(old_data))
-	
+
 	new_data.icon_hex_size_percentage = 80
-	
+
 	new_data.icons = new_data.icons.map(i => {
 		if (i.pHex == undefined) {
-			return {...i, pHex: 80}
+			return { ...i, pHex: 80 }
 		}
-		
+
 		return i
 	})
-	
+
 	new_data.saveVersion = 9
-	
+
 	return new_data
 }
 
 function convert_v9_to_v10(old_data: save_data): save_data {
 	console.log("Converting save: v9 to v10")
 	let new_data: save_data = JSON.parse(JSON.stringify(old_data))
-	
+
 	Object.keys(new_data.TerrainField.hexes).forEach(hex_id => {
 		let hex = new_data.TerrainField.hexes[hex_id]
 		if (hex.tile == null) return
-		
+
 		// Find tileset ID
 		if (hex.tile.tileset_id == undefined) {
 
@@ -143,10 +143,10 @@ function convert_v9_to_v10(old_data: save_data): save_data {
 					if (hex.tile.tileset_id == tileset.id) break
 				}
 			}
-			
+
 			// Fallback to default
 			if (!hex.tile.tileset_id) hex.tile.tileset_id = "default"
-			
+
 		}
 
 
@@ -159,25 +159,35 @@ function convert_v9_to_v10(old_data: save_data): save_data {
 	})
 
 	new_data.saveVersion = 10
-	
+
 	return new_data
 }
 
 function convert_v10_to_v11(old_data: save_data): save_data {
 
 	if (old_data.coords.offsets == null) {
-	
+
 		old_data.coords.offsets = {
-			row_col: {row: 0, col: 0},
-			cube: {q: 0, r: 0, s: 0}
+			row_col: { row: 0, col: 0 },
+			cube: { q: 0, r: 0, s: 0 }
 		}
-	
+
 	}
 
 	old_data.saveVersion = 11
-	
+
 	return old_data
 
+}
+
+function convert_v11_to_v12(old_data: save_data): save_data {
+	Object.entries(old_data.TerrainField.hexes).forEach(([hex_id, hex]) => {
+		if (hex.tile && hex.tile.symbol) hex.tile.symbol.rotation = 0;
+	})
+
+	old_data.saveVersion = 12
+
+	return old_data;
 }
 
 export function convertSaveDataToLatest(oldData: save_data): save_data {
@@ -191,6 +201,7 @@ export function convertSaveDataToLatest(oldData: save_data): save_data {
 	if (newData.saveVersion == 8) { newData = convert_v8_to_v9(newData) }
 	if (newData.saveVersion == 9) { newData = convert_v9_to_v10(newData) }
 	if (newData.saveVersion == 10) { newData = convert_v10_to_v11(newData) }
+	if (newData.saveVersion == 11) { newData = convert_v11_to_v12(newData) }
 
 	return newData;
 }
