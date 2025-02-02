@@ -17,7 +17,11 @@
 	// Stores
 	import { tfield } from "../stores/tfield";
 	import { resize_parameters } from "../stores/resize_parameters";
-	import { tl, switch_translation, translation_map } from "../stores/translation";
+	import {
+		tl,
+		switch_translation,
+		translation_map,
+	} from "../stores/translation";
 
 	// Components
 	import GridSettings from "./settings/GridSettings.svelte";
@@ -243,13 +247,17 @@
 				exportType = "Export As...";
 			}}
 		>
-			<option value={Map_Exports.PLACEHOLDER} style="display: none"
+			<option
+				value={Map_Exports.PLACEHOLDER}
+				style="display: none"
 				>{$tl.settings.export_as}</option
 			>
 			<option value={Map_Exports.PNG}
 				>{$tl.settings.exports.png}</option
 			>
-			<option value={Map_Exports.SCALED_PNG}>{$tl.settings.exports.scaled_png}</option>
+			<option value={Map_Exports.SCALED_PNG}
+				>{$tl.settings.exports.scaled_png}</option
+			>
 			<option value={Map_Exports.JSON}
 				>{$tl.settings.exports.hexfriend}</option
 			>
@@ -272,13 +280,21 @@
 		</button>
 
 		<!-- LANGUAGE -->
-		<select class="outline" style="grid-column: 1/3" value={$tl.language} on:change={e => { switch_translation(e.target.value) } } >
-			{#each Object.entries(translation_map) as [tl_code, translation] (translation.label) }
-				<option value={tl_code}>{translation.label}</option>	
+		<select
+			class="outline"
+			style="grid-column: 1/3"
+			value={$tl.language}
+			on:change={(e) => {
+				switch_translation(e.target.value);
+			}}
+		>
+			{#each Object.entries(translation_map) as [tl_code, translation] (translation.label)}
+				<option value={tl_code}
+					>{translation.label}</option
+				>
 			{/each}
 		</select>
 	</span>
-
 
 	<!-- GRID -->
 	<div class="setting-container">
@@ -464,8 +480,7 @@
 	<div class="setting-container">
 		<h2>{$tl.settings.about.title}</h2>
 		<p class="helper-text">
-			Hexfriend v2.1 - {$tl
-				.settings.about.version_tagline}
+			Hexfriend v2.2 - {$tl.settings.about.version_tagline}
 		</p>
 
 		<p class="helper-text" style="margin-top: var(--small-radius)">
