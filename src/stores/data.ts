@@ -30,6 +30,7 @@ export let data_icon: Writable<icon_data> = writable({
     usingEraser: false,
     dragMode: false,
     usingEyedropper: false,
+    rotation: 0
 })
 
 export let data_text: Writable<text_data> = writable({
@@ -67,12 +68,12 @@ export let data_coordinates: Writable<coordinates_data> = writable({
     seperator: '.',
     gap: 4,
     offsets: {
-        row_col: {row: 0, col: 0},
-        cube: {q: 0, r: 0, s: 0}
+        row_col: { row: 0, col: 0 },
+        cube: { q: 0, r: 0, s: 0 }
     }
 })
 
-export let data_eraser: Writable<eraser_data> = writable({   
+export let data_eraser: Writable<eraser_data> = writable({
     eraseIcons: true,
     eraseTerrain: true,
 })

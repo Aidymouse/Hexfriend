@@ -78,6 +78,7 @@
 		spr_preview.anchor.set(0.5, 0.5);
 		spr_preview.scale.x = getMaxIconScale(hW, hH);
 		spr_preview.scale.y = getMaxIconScale(hW, hH);
+		spr_preview.rotation = PIXI.DEG_TO_RAD * iconData.rotation;
 
 		let b64 = await app.renderer.extract.base64(cont_preview); //PIXI.autoDetectRenderer().plugins.extract.base64(c)
 
@@ -138,6 +139,23 @@
 				}}>{$tl.general.reset}</button
 			>
 		</span>
+
+		<div id="rotation-slider">
+			<input
+				type="range"
+				id="icon-rotation"
+				min={0}
+				max={359}
+				bind:value={$data_icon.rotation}
+			/>
+			<input
+				type="number"
+				id="icon-rotation-num"
+				min={0}
+				max={359}
+				bind:value={$data_icon.rotation}
+			/>
+		</div>
 	</div>
 
 	<div id="buttons" class="scroll-container">
@@ -254,6 +272,13 @@
 
 	div {
 		color: var(--text);
+	}
+
+	#rotation-slider {
+		width: 100%;
+		grid-column: 1/3;
+		display: flex;
+		gap: var(--large-radius);
 	}
 
 	#icon-preview {

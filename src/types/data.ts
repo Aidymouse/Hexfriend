@@ -20,6 +20,7 @@ export interface icon_data {
 	usingEraser: boolean;
 	usingEyedropper: boolean;
 	dragMode: boolean;
+	rotation: number;
 }
 
 export interface coordinates_data {
@@ -29,8 +30,8 @@ export interface coordinates_data {
 	seperator: string;
 	gap: number;
 	offsets: {
-		row_col: {row: number, col: number},
-		cube: {q: number, r: number, s: number}
+		row_col: { row: number, col: number },
+		cube: { q: number, r: number, s: number }
 	}
 }
 
@@ -67,7 +68,7 @@ export interface overlay_data {
 	base64: string,
 	x: number,
 	y: number,
-	scale: {x: number, y: number},
+	scale: { x: number, y: number },
 	opacity: number,
 }
 
