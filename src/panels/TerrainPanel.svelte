@@ -34,11 +34,15 @@
 	}
 
 	async function changeTile(t: Tile) {
+		const old_rotation = $data_terrain.tile.symbol?.rotation ?? 0;
+
 		$data_terrain.tile = {
 			...t,
-			symbol: t.symbol ? { ...t.symbol } : null,
+			symbol: t.symbol
+				? { ...t.symbol, rotation: old_rotation }
+				: null,
 		};
-		tilePreview = await generateTilePreview($data_terrain); // Not entirely sure why we have to await here when we already await in the function, but fuck it, it works
+		tilePreview = await generateTilePreview($data_terrain);
 		$data_terrain.usingPaintbucket = false;
 		$data_terrain.usingEraser = false;
 	}
@@ -105,6 +109,9 @@
 				hexHeight,
 			);
 			s.anchor.set(0.5);
+			s.rotation =
+				PIXI.DEG_TO_RAD *
+				data_terrain.tile.symbol.rotation;
 		} else {
 			s.texture = null;
 		}
@@ -155,14 +162,38 @@
 		{#if $data_terrain.tile.symbol}
 			<span class="terrain-preview-control-row">
 				<ColorInputPixi
-					bind:value={$data_terrain.tile.symbol
-						.color}
+					bind:value={
+						$data_terrain.tile.symbol.color
+					}
 					id={"symbolColor"}
 				/>
 				<label for="symbolColor"
 					>{$tl.terrain_panel.symbol_color}</label
 				>
 			</span>
+
+			<div id="rotation-slider">
+				<input
+					type="range"
+					id="symbol-rotation"
+					min={0}
+					max={359}
+					bind:value={
+						$data_terrain.tile.symbol
+							.rotation
+					}
+				/>
+				<input
+					type="number"
+					id="symbol-rotation-num"
+					min={0}
+					max={359}
+					bind:value={
+						$data_terrain.tile.symbol
+							.rotation
+					}
+				/>
+			</div>
 		{/if}
 	</div>
 
@@ -278,6 +309,12 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+	}
+
+	#rotation-slider {
+		display: flex;
+		gap: var(--large-radius);
+		grid-column: 1/3;
 	}
 
 	#terrain-preview img.flatTop {
