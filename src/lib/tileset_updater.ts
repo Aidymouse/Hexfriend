@@ -9,14 +9,32 @@ function tileset_format_1_to_2(old_tileset: Tileset): Tileset {
         tile.tileset_id = old_tileset.id
     })
 
+    // Collapsed
+    old_tileset.collapsed = false
+
     old_tileset.format_version = 2
 
     return old_tileset
 
 }
 
+function tileset_format_2_to_3(old_tileset: Tileset): Tileset {
+
+    console.log(`Updating tileset (${old_tileset.name}) format: 2 -> 3`)
+
+    // Tile Symbol Rotation
+    old_tileset.tiles.forEach(tile => {
+        if (tile.symbol) tile.symbol.rotation = 0;
+    })
+
+    old_tileset.format_version = 3
+
+    return old_tileset
+
+}
+
 export function update_tileset_format(tileset: Tileset) {
-    
+
     switch (tileset.format_version) {
 
         case undefined:
@@ -24,9 +42,12 @@ export function update_tileset_format(tileset: Tileset) {
 
         case null:
             tileset = tileset_format_1_to_2(tileset)
-            
+
         case 1:
             tileset = tileset_format_1_to_2(tileset)
+
+        case 2:
+            tileset = tileset_format_2_to_3(tileset)
 
     }
 
@@ -196,7 +217,7 @@ const tile_id_map = {
     "dead-tree-hills": "dead-tree-hills",
     "dead-tree-mountains": "dead-tree-mountains",
 
-    
+
 
 }
 
@@ -206,21 +227,21 @@ export function update_map_to_new_default_tileset(tfield: terrain_field) {
     // Check to make sure all hexes have a substitute in the map, if they don't ax em.
     for (const hex_id of Object.keys(tfield.hexes)) {
         let hex = tfield.hexes[hex_id]
-    
+
         if (hex.tile == null) continue;
         if (hex.tile.tileset_id != "default") continue;
 
         if (!tile_id_map[hex.tile.id]) {
             console.log(`Couldn't find ${hex.tile.id} in map`)
             covered_in_map = false;
-        } 
-    } 
+        }
+    }
 
     if (!covered_in_map) {
         alert("Default tiles could not be updated. You are on an as-of-yet unaccounted for version of the old tileset. Please export your map as a .hexfriend and upload it to https://github.com/Aidymouse/Hexfriend/issues/25.")
         return false;
     }
-    
+
 
     Object.keys(tfield.hexes).forEach(hex_id => {
         let hex = tfield.hexes[hex_id]
@@ -234,6 +255,6 @@ export function update_map_to_new_default_tileset(tfield: terrain_field) {
     })
 
     alert("Successfully updated default tileset!")
-    return true;    
+    return true;
 
 }
