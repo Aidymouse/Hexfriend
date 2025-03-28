@@ -9,6 +9,7 @@ export interface Icon {
 	preview: string;
 	texWidth: number;
 	texHeight: number;
+	rotation: number;
 }
 
 export interface Iconset {
@@ -29,4 +30,5 @@ export interface IconLayerIcon {
 	pHex: number;
 	id: number;
 	texId: string;
+	rotation: number;
 }

@@ -1228,7 +1228,7 @@
 			$tfield.grid.gap,
 		);
 
-		if (!hex.tile) {
+		if (hex.tile === null) {
 			terrainGraphics.beginFill($tfield.blankHexColor);
 			terrainGraphics.drawPolygon(
 				getHexPath(
@@ -1264,7 +1264,7 @@
 		);
 		terrainGraphics.endFill();
 
-		if (hex.tile.symbol == null) {
+		if (hex.tile.symbol === null) {
 			if (terrainSprites[hexId]) {
 				symbolsContainer.removeChild(
 					terrainSprites[hexId],
@@ -1276,28 +1276,24 @@
 			return;
 		}
 
+		let ns: PIXI.Sprite;
+
 		if (terrainSprites[hexId]) {
 			// Re-use the sprite that already exists
-			let ns = terrainSprites[hexId];
-
-			ns.texture = get_symbol_texture(hex.tile);
-			ns.scale = findSymbolScale(hex.tile.symbol);
-			ns.tint = hex.tile.symbol.color;
-			ns.position.set(hexWorldCoords.x, hexWorldCoords.y); // Position is updated even though it's usually the same, but if hex has been resized since last draw the symbol position will be different
+			ns = terrainSprites[hexId];
 		} else {
 			// Make a new sprite
-			let ns = new PIXI.Sprite();
+			ns = new PIXI.Sprite();
 			ns.anchor.set(0.5);
-			let hc = hexWorldCoords;
-			ns.position.set(hc.x, hc.y);
-
-			ns.texture = get_symbol_texture(hex.tile);
-			ns.tint = hex.tile.symbol.color;
-			ns.scale = findSymbolScale(hex.tile.symbol);
-
 			symbolsContainer.addChild(ns);
 			terrainSprites[hexId] = ns;
 		}
+
+		ns.texture = get_symbol_texture(hex.tile);
+		ns.scale = findSymbolScale(hex.tile.symbol);
+		ns.tint = hex.tile.symbol.color;
+		ns.position.set(hexWorldCoords.x, hexWorldCoords.y); // Position is updated even though it's usually the same, but if hex has been resized since last draw the symbol position will be different
+		ns.rotation = PIXI.DEG_TO_RAD * (hex.tile.symbol.rotation ?? 0);
 	}
 
 	/* PAINT */

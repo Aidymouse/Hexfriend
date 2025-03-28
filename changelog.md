@@ -3,6 +3,11 @@ For Techy People
 
 # Version 2.0 - Whole new worlds, Hexfriend!
 
+## Version 2.2
+_Doesn't require any translation updates_
+- Added ability to rotate Terrain symbols and Icons aribtrarily (thanks FuzzyBunny on the Discord for the great idea)
+- Updated default tileset to v8 to store rotation on tile symbols
+
 ## Version 2.1
 - Updated Brazilian Portuguese translation (thanks Igor!)
 

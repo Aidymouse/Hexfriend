@@ -70,9 +70,13 @@
 
 		let scale: number;
 		if ($tfield.hexWidth < $tfield.hexHeight) {
-			scale = ($tfield.hexWidth * (pHex / 100)) / icon_texture.width;
+			scale =
+				($tfield.hexWidth * (pHex / 100)) /
+				icon_texture.width;
 		} else {
-			scale = ($tfield.hexHeight * (pHex / 100)) / icon_texture.height;
+			scale =
+				($tfield.hexHeight * (pHex / 100)) /
+				icon_texture.height;
 		}
 
 		return scale;
@@ -83,9 +87,13 @@
 
 		let scale: number;
 		if ($tfield.hexWidth < $tfield.hexHeight) {
-			scale = ($tfield.hexHeight * (pHex / 100)) / icon_texture.height;
+			scale =
+				($tfield.hexHeight * (pHex / 100)) /
+				icon_texture.height;
 		} else {
-			scale = ($tfield.hexWidth * (pHex / 100)) / icon_texture.width;
+			scale =
+				($tfield.hexWidth * (pHex / 100)) /
+				icon_texture.width;
 		}
 
 		return scale;
@@ -125,6 +133,7 @@
 			pHex: pHex,
 			id: iconId,
 			texId: $data_icon.texId,
+			rotation: $data_icon.rotation,
 		});
 		iconId++;
 		icons = icons;
@@ -133,20 +142,27 @@
 	}
 
 	export function get_scale_for_icon(icon: Icon) {
-		
 		let icon_texture = get_icon_texture(icon.texId);
 
 		let scale: number;
 		if ($tfield.hexWidth < $tfield.hexHeight) {
-			scale = ($tfield.hexHeight * ( icon.pHex / 100)) / icon_texture.height;
+			scale =
+				($tfield.hexHeight * (icon.pHex / 100)) /
+				icon_texture.height;
 		} else {
-			scale = ($tfield.hexWidth * ( icon.pHex / 100)) / icon_texture.width;
+			scale =
+				($tfield.hexWidth * (icon.pHex / 100)) /
+				icon_texture.width;
 		}
 
 		return scale;
 	}
 
-	export function place_icon(icon: Icon, position: cube_coords, custom_scale: number = pHex) {
+	export function place_icon(
+		icon: Icon,
+		position: cube_coords,
+		custom_scale: number = pHex,
+	) {
 		let icon_pos = coords_cubeToWorld(
 			position.q,
 			position.r,
@@ -165,6 +181,7 @@
 			pHex: icon.pHex,
 			id: iconId,
 			texId: icon.texId,
+			rotation: icon.rotation,
 		});
 		iconId++;
 		icons = icons;
@@ -284,6 +301,7 @@
 
 		floatingIcon.color = $data_icon.color;
 		floatingIcon.texId = $data_icon.texId;
+		floatingIcon.rotation = $data_icon.rotation;
 	}
 
 	export function moveAllIcons(xMod: number, yMod: number) {
@@ -330,7 +348,8 @@
 			let hex_horiz_scale =
 				newHexWidth / $resize_parameters.old_hex_width;
 			let hex_vert_scale =
-				newHexHeight / $resize_parameters.old_hex_height;
+				newHexHeight /
+				$resize_parameters.old_hex_height;
 
 			let closestHexPosNew = coords_cubeToWorld(
 				closestHexCubeCoords.q,
@@ -343,9 +362,11 @@
 			);
 
 			icon.x =
-				closestHexPosNew.x - vector_from_hex_center.x * hex_horiz_scale;
+				closestHexPosNew.x -
+				vector_from_hex_center.x * hex_horiz_scale;
 			icon.y =
-				closestHexPosNew.y - vector_from_hex_center.y * hex_vert_scale;
+				closestHexPosNew.y -
+				vector_from_hex_center.y * hex_vert_scale;
 		});
 
 		icons = icons;
@@ -356,11 +377,15 @@
 	) {
 		switch ($tfield.mapShape) {
 			case map_shape.SQUARE:
-				square_retainIconPositionOnOrientationChange(newOrientation);
+				square_retainIconPositionOnOrientationChange(
+					newOrientation,
+				);
 				break;
 
 			case map_shape.FLOWER:
-				flower_retainIconPositionOnOrientationChange(newOrientation);
+				flower_retainIconPositionOnOrientationChange(
+					newOrientation,
+				);
 				break;
 		}
 	}
@@ -373,7 +398,9 @@
 
 		icons.forEach((icon: IconLayerIcon) => {
 			let oldOrientation: hex_orientation =
-				newOrientation == "flatTop" ? "pointyTop" : "flatTop";
+				newOrientation == "flatTop"
+					? "pointyTop"
+					: "flatTop";
 
 			// Find the center coordinates of the hex the icon wants to stay in
 			let oldClosestHexCubeCoords = coords_worldToCube(
@@ -450,11 +477,13 @@
 			icon.x =
 				newHexPos.x -
 				$tfield.hexWidth / 2 +
-				$tfield.hexWidth * proportionalHorizontalDistance;
+				$tfield.hexWidth *
+					proportionalHorizontalDistance;
 			icon.y =
 				newHexPos.y -
 				$tfield.hexHeight / 2 +
-				$tfield.hexHeight * proportionalVerticalDistance;
+				$tfield.hexHeight *
+					proportionalVerticalDistance;
 		});
 
 		icons = icons;
@@ -478,7 +507,8 @@
 			}
 
 			case "toggleEraser": {
-				$data_icon.usingEraser = !$data_icon.usingEraser;
+				$data_icon.usingEraser =
+					!$data_icon.usingEraser;
 				break;
 			}
 
@@ -520,7 +550,8 @@
 
 	function shouldEraseIcons(): boolean {
 		return (
-			($store_selected_tool == tools.ERASER && $data_eraser.eraseIcons) ||
+			($store_selected_tool == tools.ERASER &&
+				$data_eraser.eraseIcons) ||
 			$data_icon.usingEraser
 		);
 	}
@@ -539,6 +570,7 @@
 			pHex = icon.pHex;
 			$data_icon.color = icon.color;
 			$data_icon.texId = icon.texId;
+			$data_icon.rotation = icon.rotation;
 
 			updateFloatingIcon();
 		}
@@ -548,7 +580,8 @@
 		e: PIXI.FederatedPointerEvent,
 		icon: IconLayerIcon,
 	) {
-		if ($store_inputs.mouseDown[0] && shouldEraseIcons()) deleteIcon(icon);
+		if ($store_inputs.mouseDown[0] && shouldEraseIcons())
+			deleteIcon(icon);
 	}
 
 	function updateDraggedIcon() {
@@ -598,7 +631,9 @@
 			// if the icon doesn't exist
 			if (!pixi_icons[icon.id]) {
 				// Create icon
-				let new_icon = new PIXI.Sprite(get_icon_texture(icon.texId));
+				let new_icon = new PIXI.Sprite(
+					get_icon_texture(icon.texId),
+				);
 				new_icon.anchor.x = 0.5;
 				new_icon.anchor.y = 0.5;
 				// register icon events
@@ -623,6 +658,8 @@
 				$store_selected_tool == tools.ERASER
 					? "static"
 					: "auto";
+			pixi_icons[icon.id].rotation =
+				PIXI.DEG_TO_RAD * (icon.rotation ?? 0);
 
 			marked_for_saving.push(icon.id);
 		});
@@ -646,7 +683,9 @@
 				!$data_icon.dragMode &&
 				draggedIcon == null &&
 				!$data_icon.usingEyedropper;
-			spr_floating_icon.texture = get_icon_texture(floatingIcon.texId);
+			spr_floating_icon.texture = get_icon_texture(
+				floatingIcon.texId,
+			);
 			spr_floating_icon.tint = floatingIcon.color;
 
 			spr_floating_icon.x = floatingIcon.x;
@@ -654,6 +693,8 @@
 			spr_floating_icon.tint = floatingIcon.color;
 			spr_floating_icon.scale.x = floatingIcon.scale;
 			spr_floating_icon.scale.y = floatingIcon.scale;
+			spr_floating_icon.rotation =
+				PIXI.DEG_TO_RAD * (floatingIcon.rotation ?? 0);
 			// spr_floating_icon.eventMode = 'static' // !!! TODO
 		}
 	});

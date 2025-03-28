@@ -15,6 +15,7 @@ interface TileSymbol {
 	pHex: number;
 	base64: string;
 	preview: string;
+	rotation?: number; // Added in format v3
 }
 
 interface Tileset {
@@ -27,8 +28,8 @@ interface Tileset {
 	format_version: number; // Internal ID of tileset format. 
 }
 
-export const LATESTDEFAULTTILESETVERSION = 7
+export const LATESTDEFAULTTILESETVERSION = 8
 
-export const LATESTTILESETFORMATVERSION = 2
+export const LATESTTILESETFORMATVERSION = 3
 
 export type { Tile, TileSymbol, Tileset };

@@ -1,12 +1,11 @@
 <script lang="ts">
-	
 	// TYPES
-	import type { Tile, TileSymbol, Tileset } from '../types/tilesets';
-	
+	import type { Tile, TileSymbol, Tileset } from "../types/tilesets";
+
 	interface working_tile {
 		display: string;
 		bgColor: number;
-		id: string; 
+		id: string;
 		symbol: TileSymbol | null;
 	}
 
@@ -19,22 +18,22 @@
 	}
 
 	// ENUMS
-	import { hex_orientation } from '../types/terrain';
-	
+	import { hex_orientation } from "../types/terrain";
+
 	// COMPONENTS
-	import ColorInputPixi from './ColorInputPixi.svelte';
-	import CanvasHolder from './CanvasHolder.svelte';
+	import ColorInputPixi from "./ColorInputPixi.svelte";
+	import CanvasHolder from "./CanvasHolder.svelte";
 
 	// HELPER
-	import { getHexPathRadius } from '../helpers/hexHelpers';
-	
-	import { tl } from '../stores/translation';
-	
+	import { getHexPathRadius } from "../helpers/hexHelpers";
+
+	import { tl } from "../stores/translation";
+
 	// LIB
-	import { download } from '../lib/download2';
-	import * as PIXI from 'pixi.js';
-	import { afterUpdate, tick } from 'svelte';
-	
+	import { download } from "../lib/download2";
+	import * as PIXI from "pixi.js";
+	import { afterUpdate, tick } from "svelte";
+	import { update_tileset_format } from "../lib/tileset_updater";
 
 	let app = new PIXI.Application({
 		height: 300,
@@ -44,19 +43,17 @@
 
 	export let appState;
 
-	let texture_register = {} // texture_id: texture
+	let texture_register = {}; // texture_id: texture
 
 	let orientation: hex_orientation = hex_orientation.FLATTOP;
 
 	let workingTileset: working_tileset = {
-		name: 'New Tileset',
-		id: 'new-tileset',
-		author: '',
+		name: "New Tileset",
+		id: "new-tileset",
+		author: "",
 		version: 1,
 		tiles: [],
 	};
-
-	
 
 	let selectedTile: working_tile | null = null;
 
@@ -66,15 +63,19 @@
 	previewContainer.addChild(previewGraphics, previewSprite);
 
 	function findID(baseId: string): tile_id {
-		baseId = IDify(baseId)
-		
+		baseId = IDify(baseId);
+
 		let counter = 0;
-		let counter_suffix = counter == 0 ? '' : counter
+		let counter_suffix = counter === 0 ? "" : counter;
 		let proposedId = `${baseId}${counter_suffix}`;
-		
-		while (workingTileset.tiles.find((tile: working_tile) => tile.id == proposedId) != null) {
+
+		while (
+			workingTileset.tiles.find(
+				(tile: working_tile) => tile.id == proposedId,
+			) != null
+		) {
 			counter++;
-			counter_suffix = counter == 0 ? '' : counter
+			counter_suffix = counter === 0 ? "" : counter;
 			proposedId = `${baseId}${counter_suffix}`;
 		}
 
@@ -83,8 +84,8 @@
 
 	async function newTile() {
 		let newTile: working_tile = {
-			display: 'New Hex',
-			id: findID('New Hex'),
+			display: "New Hex",
+			id: findID("New Hex"),
 			symbol: null,
 			bgColor: DEFAULTBLANKHEXCOLOR,
 		};
@@ -93,42 +94,57 @@
 
 		workingTileset.tiles = [...workingTileset.tiles, newTile];
 
-		selectedTile = workingTileset.tiles[workingTileset.tiles.length - 1];
+		selectedTile =
+			workingTileset.tiles[workingTileset.tiles.length - 1];
 	}
 
 	function duplicateTile(tile: working_tile) {
-		let newTile = { ...tile, symbol: tile.symbol ? { ...tile.symbol } : null };
+		let newTile = {
+			...tile,
+			symbol: tile.symbol ? { ...tile.symbol } : null,
+		};
 
-		newTile.display = 'Copy of ' + tile.display;
+		newTile.display = "Copy of " + tile.display;
 		newTile.id = findID(newTile.display);
 
 		workingTileset.tiles = [...workingTileset.tiles, newTile];
-		selectedTile = workingTileset.tiles[workingTileset.tiles.length - 1];
+		selectedTile =
+			workingTileset.tiles[workingTileset.tiles.length - 1];
 	}
 
 	function removeTile(tile: working_tile) {
-		workingTileset.tiles = workingTileset.tiles.filter((t: Tile) => t.id != tile.id);
+		workingTileset.tiles = workingTileset.tiles.filter(
+			(t: Tile) => t.id != tile.id,
+		);
 	}
 
 	async function generatePreview(tile: working_tile) {
 		previewGraphics.clear();
 		previewGraphics.beginFill(tile.bgColor);
-		previewGraphics.drawPolygon(getHexPathRadius(25, orientation, 0, 0));
+		previewGraphics.drawPolygon(
+			getHexPathRadius(25, orientation, 0, 0),
+		);
 		previewGraphics.endFill();
 
 		previewSprite.texture = null;
 		if (tile.symbol) {
-			previewSprite.texture = await PIXI.Assets.load(tile.symbol.base64);
-			previewSprite.scale.set(getSymbolScale(tile.symbol, 25).x);
+			previewSprite.texture = await PIXI.Assets.load(
+				tile.symbol.base64,
+			);
+			previewSprite.scale.set(
+				getSymbolScale(tile.symbol, 25).x,
+			);
 			previewSprite.anchor.set(0.5);
 			previewSprite.tint = tile.symbol.color;
+			previewSprite.rotation =
+				PIXI.DEG_TO_RAD * tile.symbol.rotation;
 		}
 
 		return await app.renderer.extract.base64(previewContainer);
 	}
 
 	function IDify(name: string): string {
-		return name.toLowerCase().replaceAll(' ', '-');
+		return name.toLowerCase().replaceAll(" ", "-");
 	}
 
 	/*
@@ -148,27 +164,29 @@
 	let symbolFiles = [];
 
 	async function updateSymbolFile() {
-
 		let r = new FileReader();
 		r.readAsDataURL(symbolFiles[0]);
 		r.onload = async (eb) => {
+			let new_texture = await PIXI.Assets.load(
+				r.result as string,
+			);
 
-				let new_texture = await PIXI.Assets.load(r.result as string);
-
-				selectedTile.symbol = {
-					color: selectedTile.symbol ? selectedTile.symbol.color : 0xffffff,
-					texWidth: new_texture.width,
-					texHeight: new_texture.height,
-					pHex: 80,
-					base64: r.result as string,
-				};
-
+			selectedTile.symbol = {
+				color: selectedTile.symbol
+					? selectedTile.symbol.color
+					: 0xffffff,
+				texWidth: new_texture.width,
+				texHeight: new_texture.height,
+				pHex: 80,
+				base64: r.result as string,
+				rotation: 0,
+			};
 		};
 	}
 
 	function getSymbolScale(symbol: TileSymbol, radius = 150) {
 		let h, w;
-		if (orientation == 'pointyTop') {
+		if (orientation == "pointyTop") {
 			h = radius * 2;
 			w = Math.cos(Math.PI / 6) * radius * 2;
 		} else {
@@ -189,18 +207,27 @@
 	const DEFAULTBLANKHEXCOLOR = 0xf2f2f2;
 
 	function exportTileset() {
-		let export_tileset: Tileset = workingTileset as Tileset
+		let export_tileset: Tileset = workingTileset as Tileset;
 
 		// Transformations into real tile and tileset data structures
 		export_tileset.id = IDify(workingTileset.name);
-		
-		export_tileset.tiles.forEach(tile => {
-			tile.id = findID(tile.display)
-			tile.tileset_id = export_tileset.id
-		})
 
-		console.log(export_tileset)
-		download(JSON.stringify(export_tileset),  `${export_tileset.id}.hfts`, 'application/json');
+		// Reset IDs, which will be found immediately after
+		export_tileset.tiles.forEach((t) => {
+			t.id = "";
+		});
+
+		export_tileset.tiles.forEach((tile) => {
+			tile.id = findID(tile.display);
+			tile.tileset_id = export_tileset.id;
+		});
+
+		console.log(export_tileset);
+		download(
+			JSON.stringify(export_tileset),
+			`${export_tileset.id}.hfts`,
+			"application/json",
+		);
 	}
 
 	let importFiles = [];
@@ -214,20 +241,22 @@
 		r.readAsText(importFile);
 		r.onload = async (eb) => {
 			/* Read the file */
-			let setToImport = JSON.parse(eb.target.result as string);
+			let setToImport = JSON.parse(
+				eb.target.result as string,
+			);
 
 			//console.log(setToImport)
 
 			/* Load textures */
 
 			workingTileset = { ...setToImport };
+			update_tileset_format(workingTileset as Tileset);
 			selectedTile = null;
 
 			await tick();
 			//workingTileset.tiles = workingTileset.tiles;
 		};
 	}
-
 
 	// Dragging Code
 	// Has a problem where the tile is deselected after dropping. What???
@@ -238,7 +267,7 @@
 
 		phantomTileButtonId = tile.id;
 
-		e.dataTransfer.setData('text/json', JSON.stringify(tile));
+		e.dataTransfer.setData("text/json", JSON.stringify(tile));
 	}
 
 	function dropButton(e: DragEvent) {
@@ -249,13 +278,27 @@
 		if (tile.id == phantomTileButtonId) return;
 
 		let draggedOverIndex = workingTileset.tiles.indexOf(tile);
-		workingTileset.tiles = workingTileset.tiles.filter((i) => i.id != phantomTileButtonId);
+		workingTileset.tiles = workingTileset.tiles.filter(
+			(i) => i.id != phantomTileButtonId,
+		);
 
 		// If phantom is on the left, switch them. Otherwise, proceed as normal
-		if (draggedOverIndex != 0 && workingTileset.tiles[draggedOverIndex - 1].id == phantomTileButtonId) {
-			workingTileset.tiles.splice(draggedOverIndex + 1, 0, JSON.parse(e.dataTransfer.getData('text/json')));
+		if (
+			draggedOverIndex != 0 &&
+			workingTileset.tiles[draggedOverIndex - 1].id ==
+				phantomTileButtonId
+		) {
+			workingTileset.tiles.splice(
+				draggedOverIndex + 1,
+				0,
+				JSON.parse(e.dataTransfer.getData("text/json")),
+			);
 		} else {
-			workingTileset.tiles.splice(draggedOverIndex, 0, JSON.parse(e.dataTransfer.getData('text/json')));
+			workingTileset.tiles.splice(
+				draggedOverIndex,
+				0,
+				JSON.parse(e.dataTransfer.getData("text/json")),
+			);
 		}
 
 		workingTileset = workingTileset;
@@ -266,79 +309,116 @@
 	let grph_hex = new PIXI.Graphics();
 	let spr_hex_symbol = new PIXI.Sprite();
 
-	app.stage.addChild(grph_hex, spr_hex_symbol)
+	app.stage.addChild(grph_hex, spr_hex_symbol);
 
 	afterUpdate(async () => {
 		if (selectedTile) {
-			let new_preview = await generatePreview(selectedTile)
+			let new_preview = await generatePreview(selectedTile);
 			if (selectedTile.preview != new_preview) {
-				selectedTile.preview = new_preview
-				workingTileset = workingTileset
+				selectedTile.preview = new_preview;
+				workingTileset = workingTileset;
 			}
 
 			grph_hex.clear();
 			grph_hex.beginFill(selectedTile.bgColor);
-			grph_hex.drawPolygon(getHexPathRadius(150, orientation, 150, 150));
+			grph_hex.drawPolygon(
+				getHexPathRadius(150, orientation, 150, 150),
+			);
 			grph_hex.endFill();
 
-			
-			let spr_symbol = spr_hex_symbol
-			spr_symbol.visible = false
-			
+			let spr_symbol = spr_hex_symbol;
+			spr_symbol.visible = false;
+
 			if (selectedTile.symbol) {
-				spr_symbol.visible = true
-				let symbol_texture = await PIXI.Assets.load(selectedTile.symbol.base64) 
-				
-				spr_symbol.texture = symbol_texture
-				spr_symbol.x = 150
-				spr_symbol.y = 150
-				spr_symbol.anchor.x = 0.5
-				spr_symbol.tint = selectedTile.symbol.color 
-				spr_symbol.anchor.y = 0.5
-				spr_symbol.scale = getSymbolScale(selectedTile.symbol)
+				spr_symbol.visible = true;
+				let symbol_texture = await PIXI.Assets.load(
+					selectedTile.symbol.base64,
+				);
+
+				spr_symbol.texture = symbol_texture;
+				spr_symbol.x = 150;
+				spr_symbol.y = 150;
+				spr_symbol.anchor.x = 0.5;
+				spr_symbol.tint = selectedTile.symbol.color;
+				spr_symbol.anchor.y = 0.5;
+				spr_symbol.scale = getSymbolScale(
+					selectedTile.symbol,
+				);
+				spr_symbol.rotation =
+					PIXI.DEG_TO_RAD *
+					selectedTile.symbol.rotation;
 			}
 		}
-
-
-		
-	})
+	});
 </script>
 
 <main>
 	<nav>
 		<div id="set-controls">
 			<div id="grid">
-				<button	on:click={() => {appState = 'normal';}}	style="grid-column: 1/3;">
+				<button
+					on:click={() => {
+						appState = "normal";
+					}}
+					style="grid-column: 1/3;"
+				>
 					{$tl.builders.tileset_builder.exit}
 				</button>
 
-				<label for="setName">{$tl.builders.tileset_builder.name}</label>
-				<input id="setName" type="text" bind:value={workingTileset.name} placeholder="Tileset Name" />
+				<label for="setName"
+					>{$tl.builders.tileset_builder
+						.name}</label
+				>
+				<input
+					id="setName"
+					type="text"
+					bind:value={workingTileset.name}
+					placeholder="Tileset Name"
+				/>
 
-				<label for="setAuthor">{$tl.builders.author}</label>
-				<input id="setAuthor" type="text" bind:value={workingTileset.author} placeholder="You!" />
+				<label for="setAuthor"
+					>{$tl.builders.author}</label
+				>
+				<input
+					id="setAuthor"
+					type="text"
+					bind:value={workingTileset.author}
+					placeholder="You!"
+				/>
 
-				<label for="setVersion">{$tl.builders.version}</label>
-				<input id="setVersion" type="number" bind:value={workingTileset.version} />
+				<label for="setVersion"
+					>{$tl.builders.version}</label
+				>
+				<input
+					id="setVersion"
+					type="number"
+					bind:value={workingTileset.version}
+				/>
 
-				<button on:click={() => importTileset()} class="file-input-button">
+				<button
+					on:click={() => importTileset()}
+					class="file-input-button"
+				>
 					{$tl.general.import}
 					<input
 						type="file"
 						bind:files={importFiles}
-						accept={'.hfts'}
+						accept={".hfts"}
 						on:change={(e) => {
 							importTileset();
-							e.target.value = '';
+							e.target.value = "";
 						}}
 					/>
 				</button>
 
-				<button on:click={() => exportTileset()}>{$tl.general.export}</button>
+				<button on:click={() => exportTileset()}
+					>{$tl.general.export}</button
+				>
 			</div>
 		</div>
 
-		<div id="tile-buttons"
+		<div
+			id="tile-buttons"
 			on:dragover={(e) => {
 				e.preventDefault();
 			}}
@@ -351,7 +431,9 @@
 				<button
 					class="tile-button"
 					class:selected={selectedTile == tile}
-					style={tile.id == phantomTileButtonId ? 'opacity: 0' : ''}
+					style={tile.id == phantomTileButtonId
+						? "opacity: 0"
+						: ""}
 					on:click={() => {
 						selectedTile = tile;
 					}}
@@ -364,7 +446,10 @@
 					}}
 					title={tile.display}
 				>
-					<img src={tile.preview} alt="Button for {tile.display}" />
+					<img
+						src={tile.preview}
+						alt="Button for {tile.display}"
+					/>
 				</button>
 			{/each}
 
@@ -379,18 +464,19 @@
 
 	{#if selectedTile}
 		<div id="tile-preview">
-			<div id="pixi-container" style="height: 300px; width: 300px;">
-
+			<div
+				id="pixi-container"
+				style="height: 300px; width: 300px;"
+			>
 				<CanvasHolder {app} />
-				
-
 			</div>
 
 			<input
 				type="text"
 				bind:value={selectedTile.display}
 				on:change={() => {
-					workingTileset.tiles = workingTileset.tiles;
+					workingTileset.tiles =
+						workingTileset.tiles;
 				}}
 			/>
 
@@ -398,12 +484,19 @@
 				<button
 					class="outline-button"
 					on:click={() => {
-						orientation = orientation == hex_orientation.FLATTOP ? hex_orientation.POINTYTOP : hex_orientation.FLATTOP;
+						orientation =
+							orientation ==
+							hex_orientation.FLATTOP
+								? hex_orientation.POINTYTOP
+								: hex_orientation.FLATTOP;
 						generatePreview(selectedTile);
 					}}
 					title={$tl.builders.change_orientation}
 				>
-					<img src="/assets/img/tools/changeOrientation.png" alt="Change Orientation" />
+					<img
+						src="/assets/img/tools/changeOrientation.png"
+						alt="Change Orientation"
+					/>
 				</button>
 				<button
 					class="outline-button"
@@ -412,7 +505,10 @@
 					}}
 					title={$tl.builders.duplicate}
 				>
-					<img src="/assets/img/tools/duplicate.png" alt="Hex Duplicate" />
+					<img
+						src="/assets/img/tools/duplicate.png"
+						alt="Hex Duplicate"
+					/>
 				</button>
 				<button
 					class="outline-button"
@@ -420,22 +516,33 @@
 						removeTile(selectedTile);
 						selectedTile = null;
 					}}
-					title={$tl.builders.tileset_builder.delete}
+					title={$tl.builders.tileset_builder
+						.delete}
 				>
-					<img src="/assets/img/tools/trash.png" alt="Trash" />
+					<img
+						src="/assets/img/tools/trash.png"
+						alt="Trash"
+					/>
 				</button>
 			</div>
-
 		</div>
 
 		<div id="tile-style">
 			<!-- Background Color -->
 			<div class="color" style="margin-bottom: 10px">
-				<ColorInputPixi bind:value={selectedTile.bgColor} w={50} h={50} />
+				<ColorInputPixi
+					bind:value={selectedTile.bgColor}
+					w={50}
+					h={50}
+				/>
 
 				<div>
 					<p>Background</p>
-					<p class="color-string">{PIXI.utils.hex2string(selectedTile.bgColor)}</p>
+					<p class="color-string">
+						{PIXI.utils.hex2string(
+							selectedTile.bgColor,
+						)}
+					</p>
 				</div>
 			</div>
 
@@ -448,7 +555,8 @@
 					bind:files={symbolFiles}
 					on:change={(e) => {
 						updateSymbolFile();
-						e.target.value = ''; /*Hacky, but necessary*/
+						e.target.value =
+							""; /*Hacky, but necessary*/
 					}}
 				/>
 			</button>
@@ -456,32 +564,61 @@
 			<!-- Symbol Input Controls -->
 			{#if selectedTile.symbol}
 				<div class="color" style="margin-top: 10px">
-					<ColorInputPixi bind:value={selectedTile.symbol.color} w={50} h={50} />
+					<ColorInputPixi
+						bind:value={
+							selectedTile.symbol
+								.color
+						}
+						w={50}
+						h={50}
+					/>
 
 					<div>
-						<p>{$tl.builders.tileset_builder.symbol}</p>
-						<p class="color-string">{PIXI.utils.hex2string(selectedTile.symbol.color)}</p>
+						<p>
+							{$tl.builders
+								.tileset_builder
+								.symbol}
+						</p>
+						<p class="color-string">
+							{PIXI.utils.hex2string(
+								selectedTile
+									.symbol
+									.color,
+							)}
+						</p>
 					</div>
 				</div>
 
 				<div id="symbol-scale">
-					{$tl.builders.tileset_builder.symbol_scale}
-					<input type="range" min="5" max="100" bind:value={selectedTile.symbol.pHex} />
-					<input type="number" bind:value={selectedTile.symbol.pHex} />
+					{$tl.builders.tileset_builder
+						.symbol_scale}
+					<input
+						type="range"
+						min="5"
+						max="100"
+						bind:value={
+							selectedTile.symbol.pHex
+						}
+					/>
+					<input
+						type="number"
+						bind:value={
+							selectedTile.symbol.pHex
+						}
+					/>
 				</div>
 			{/if}
 		</div>
-	
-	
-	
 	{:else}
-
 		<div id="editor-placeholder">
-			<p style="color: #f2f2f2; margin-bottom: 10px;">{$tl.builders.tileset_builder.helptext}</p>
+			<p style="color: #f2f2f2; margin-bottom: 10px;">
+				{$tl.builders.tileset_builder.helptext}
+			</p>
 
-			<p style="font-size: 10pt">{$tl.builders.tileset_builder.helpsubtitle}</p>
+			<p style="font-size: 10pt">
+				{$tl.builders.tileset_builder.helpsubtitle}
+			</p>
 		</div>
-	
 	{/if}
 </main>
 
