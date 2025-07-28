@@ -3,12 +3,9 @@
 	import CustomValueToggle from "../components/CustomValueToggle.svelte";
 	import SelectGrid from "../components/SelectGrid.svelte";
 	import type TextLayer from "../layers/TextLayer.svelte";
-	import type { text_data } from "../types/data";
 	import { data_text } from "../stores/data";
-	import type { listed_text_style } from "../types/text";
+	import type { listed_text_style, text_style } from "../types/text";
 	import { store_has_unsaved_changes } from "../stores/flags";
-	import * as PIXI from "pixi.js";
-	import { text } from "svelte/internal";
 
 	import { tl } from "../stores/translation";
 
@@ -34,43 +31,37 @@
 		"Merriweather",
 	];
 
-	export let textStyles: listed_text_style[];
+	export let loaded_text_styles: listed_text_style[];
 	let styleId = 0;
-	textStyles.forEach((ts) => {
-		styleId = Math.max(ts.id, styleId);
-	});
+	loaded_text_styles.forEach((ts) => { styleId = Math.max(ts.id, styleId) });
 
-	function selectedMatches(style: listed_text_style): boolean {
-		return (
-			JSON.stringify(style) ==
-			JSON.stringify($data_text.style)
-		);
+	function selectedMatches(style: text_style): boolean {
+		return ( JSON.stringify(style) == JSON.stringify($data_text.style));
 	}
 
 	$: {
 		//$data_text.selectedText =
 		//$data_text.selectedText; /* If this line isn't here the textstyles dont update and the selected button gets stuck. Svelte weirdness?  */
-		textStyles = textStyles;
+		loaded_text_styles = loaded_text_styles;
 	}
 
-	function changeTextStyle(style: PIXI.Text["style"]) {
+	function changeTextStyle(style: text_style) {
 		$data_text.style = { ...style };
 		//$data_text = $data_text
-		textStyles = textStyles; /* Updates the selected button */
+		loaded_text_styles = loaded_text_styles; /* Updates the selected button */
 		$store_has_unsaved_changes = true;
 	}
 
 	function newTextStyle() {
-		let name = prompt(
-			"What would you like to name this text style?",
-		);
+		let name = prompt($tl.text_panel.rename_text_style_prompt);
 		if (name == null) return;
 
 		styleId += 1;
-		textStyles = [
-			...textStyles,
+		loaded_text_styles = [
+			...loaded_text_styles,
 			{
 				display: name,
+                alpha: $data_text.alpha,
 				style: { ...$data_text.style },
 				id: styleId,
 			},
@@ -84,12 +75,12 @@
 	function updateStyle() {
 		if ($data_text.contextStyleId == null) return;
 
-		let styleToUpdate = textStyles.find(
+		let styleToUpdate = loaded_text_styles.find(
 			(ts) => ts.id == $data_text.contextStyleId,
 		);
 		styleToUpdate.style = { ...$data_text.style };
 
-		textStyles = textStyles;
+		loaded_text_styles = loaded_text_styles;
 		$data_text.contextStyleId = null;
 		$store_has_unsaved_changes = true;
 	}
@@ -97,32 +88,31 @@
 	function renameStyle() {
 		if ($data_text.contextStyleId == null) return;
 
-		let styleToEdit: listed_text_style = textStyles.find(
+		let styleToEdit: listed_text_style = loaded_text_styles.find(
 			(ps) => ps.id == $data_text.contextStyleId,
 		);
 		$data_text.contextStyleId = null;
 
-		let styleName = prompt(
-			"What would you like this text style to be called?",
-		);
+		let styleName = prompt($tl.text_panel.rename_text_style_prompt);
 		if (!styleName) return;
 
 		styleToEdit.display = styleName;
-		textStyles = textStyles;
+		loaded_text_styles = loaded_text_styles;
 		$store_has_unsaved_changes = true;
 	}
 
 	function duplicateStyle() {
 		if ($data_text.contextStyleId == null) return;
 
-		let styleToDupe = textStyles.find(
+		let styleToDupe = loaded_text_styles.find(
 			(ts) => ts.id == $data_text.contextStyleId,
 		);
 		styleId += 1;
-		textStyles = [
-			...textStyles,
+		loaded_text_styles = [
+			...loaded_text_styles,
 			{
 				display: styleToDupe.display,
+                alpha: styleToDupe.alpha,
 				style: { ...styleToDupe.style },
 				id: styleId,
 			},
@@ -133,15 +123,9 @@
 	}
 
 	function deleteStyle() {
-		if (
-			!confirm(
-				"Are you sure you would like to delete this text style?",
-			)
-		)
-			return;
-		textStyles = textStyles.filter(
-			(ts) => ts.id != $data_text.contextStyleId,
-		);
+		if ( !confirm($tl.text_panel.delete_text_style_prompt)) return;
+
+		loaded_text_styles = loaded_text_styles.filter( (ts) => ts.id != $data_text.contextStyleId);
 		$data_text.contextStyleId = null;
 		$store_has_unsaved_changes = true;
 	}
@@ -242,8 +226,9 @@
 		</section>
 
 		<section>
-			<label>{$tl.text_panel.opacity}</label>
+			<label for="text-alpha">{$tl.text_panel.opacity}</label>
 			<input
+                id="text-alpha"
 				type="range"
 				max="1"
 				min="0.05"
@@ -257,35 +242,25 @@
 		<div id="selected-text-controls">
 			<div id="text-area-wrapper">
 				<textarea
-					bind:value={$data_text.selectedText
-						.text}
+					bind:value={$data_text.selectedText .text}
 					use:focus
 					bind:this={$data_text.editorRef}
-					on:change={() => {
-						$store_has_unsaved_changes = true;
-					}}
+					on:change={() => { $store_has_unsaved_changes = true; }}
 				/>
 				<!-- The editor ref is literally jsut used to let us focus the text area by clicking on the text. -->
 				<button
-					on:click={() => {
-						comp_textLayer.deleteText(
-							$data_text.selectedText,
-						);
-					}}
-					class="evil"
-					>{$tl.text_panel.delete_text}
+					on:click={() => { comp_textLayer.deleteText( $data_text.selectedText,) }}
+					class="evil" >
+                    {$tl.text_panel.delete_text}
 				</button>
 			</div>
 		</div>
 	{/if}
 
 	<!-- TEXT STYLES -->
-	<div
-		id="text-styles"
-		style={$data_text.selectedText ? "padding-top: 0" : ""}
-	>
+	<div id="text-styles" style={$data_text.selectedText ? "padding-top: 0" : ""} >
 		<div style="display: flex; gap: 0.3125em; flex-wrap: wrap">
-			{#each textStyles as ts (ts.id)}
+			{#each loaded_text_styles as ts (ts.id)}
 				<button
 					on:click={() => {
 						changeTextStyle(ts.style);
@@ -297,9 +272,7 @@
 						$data_text.contextStyleId =
 							ts.id;
 					}}
-					class:selected={selectedMatches(
-						ts.style,
-					)}>{ts.display}</button
+					class:selected={selectedMatches( ts.style)}>{ts.display}</button
 				>
 			{/each}
 			<button

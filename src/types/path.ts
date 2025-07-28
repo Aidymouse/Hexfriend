@@ -1,14 +1,6 @@
 import type * as PIXI from 'pixi.js';
 
-export interface path_layer_path {
-	id: number;
-	style: path_style;
-	points: number[];
-	hitboxes: PIXI.Rectangle[];
-	dashes?: number[];
-}
-
-export interface path_style {
+export type path_style = {
 	color: number;
 	width: number;
 	cap: PIXI.LINE_CAP;
@@ -18,8 +10,18 @@ export interface path_style {
 	dash_gap: number
 }
 
-export interface listed_path_style {
+// The actual path object drawn on the screen
+export type path_layer_path = {
+	id: number;
+	style: path_style,
+	points: number[];
+	hitboxes: PIXI.Rectangle[];
+	dashes?: number[];
+}
+
+
+export type listed_path_style = {
 	id: number;
 	display: string;
-	style: PIXI.LineStyle;
+	style: path_style;
 }

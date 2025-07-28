@@ -1,3 +1,4 @@
+import { type ITextStyle } from "pixi.js";
 /*
 export interface text_style {
 	fontFamily: string;
@@ -12,20 +13,23 @@ export interface text_style {
 }
 */
 
-/* HF stands for Hexfriend */
-export interface text_layer_text {
+/** Same as pixi text style but only has the stuff I let you actually control */
+export type text_style = Pick<ITextStyle, 'fontFamily' | 'fill' | 'fontSize' | 'strokeThickness' | 'stroke' | 'align' | 'fontStyle' | 'fontWeight'>
+
+/* The text object that sits on the text layer */
+export type text_layer_text = {
 	id: number;
 	text: string;
-	style: PIXI.Text['style'];
+	style: text_style;
 	alpha: number;
 	x: number;
 	y: number;
 	rotation: number;
 }
 
-export interface listed_text_style {
+export type listed_text_style = {
 	display: string;
 	alpha: number;
-	style: PIXI.Text['style'];
+	style: text_style;
 	id: number;
 }

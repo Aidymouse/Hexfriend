@@ -329,7 +329,7 @@
 		}
 	}
 
-	function pointerup(e: PointerEvent) {
+	function pointerup(e: MouseEvent) {
 		//console.log(`Up: ${e.button} :: ${e.buttons}`)
 
 		$store_inputs.mouseDown[e.button] = false;
@@ -1005,12 +1005,12 @@
 		{:else if $store_selected_tool == tools.PATH}
 			<PathPanel
 				{comp_pathLayer}
-				bind:pathStyles={loadedSave.pathStyles}
+				bind:loaded_path_styles={loadedSave.path_styles}
 			/>
 		{:else if $store_selected_tool == tools.TEXT}
 			<TextPanel
 				{comp_textLayer}
-				bind:textStyles={loadedSave.textStyles}
+				bind:loaded_text_styles={loadedSave.text_styles}
 			/>
 		{:else if $store_selected_tool == tools.ERASER}
 			<EraserPanel bind:loaded_save={loadedSave} />
@@ -1023,77 +1023,39 @@
 		</div>
 
 		<div id="setting-buttons" on:mouseup={pointerup}>
+			<button on:click={() => { showSettings = true; }} title={"Map Settings"}>
+                <img src="assets/img/tools/settings.png" alt="Map Settings" />
+            </button>
 			<button
 				on:click={() => {
-					showSettings = true;
-				}}
-				title={"Map Settings"}
-				><img
-					src="assets/img/tools/settings.png"
-					alt="Map Settings"
-				/></button
-			>
-			<button
-				on:click={() => {
-					var theme =
-						document.documentElement.getAttribute(
-							"data-theme",
-						);
-					if (theme == "dark") {
-						theme = "light";
-					} else {
-						theme = "dark";
-					}
+					var theme = document.documentElement.getAttribute( "data-theme",);
+                    theme = theme === 'dark' ? 'light' : 'dark'
 					document.documentElement.setAttribute(
 						"data-theme",
 						theme,
 					);
-					document.querySelector(
-						'meta[name="color-scheme"]',
-					).setAttribute("content", theme);
+					document.querySelector( 'meta[name="color-scheme"]').setAttribute("content", theme);
 				}}
-				title={"Toggle theme"}
-				><img
-					src="assets/img/tools/moon-sun.svg"
-					alt="Theme"
-				/></button
-			>
+				title={"Toggle theme"} >
+                    <img src="assets/img/tools/moon-sun.svg" alt="Theme" />
+                </button >
 			<button
-				on:click={() => {
-					showSavedMaps = true;
-				}}
+				on:click={() => { showSavedMaps = true; }}
 				title={"Maps"}
 			>
-				<img
-					src="assets/img/tools/maps.png"
-					alt="Maps"
-				/>
+				<img src="assets/img/tools/maps.png" alt="Maps" />
 			</button>
-			<div>
-				<button on:click={saveInit} title={"Save"}>
-					<img
-						src="assets/img/tools/save.png"
-						alt="Save"
-					/>
-				</button>
-			</div>
+            <button on:click={saveInit} title={"Save"}>
+                <img src="assets/img/tools/save.png" alt="Save" />
+            </button>
 		</div>
 
-		<div
-			id="help-buttons"
-			on:mouseup={pointerup}
-			class:show={showHelp}
-		>
+		<div id="help-buttons" on:mouseup={pointerup} class:show={showHelp} >
 			<button
-				on:click={() => {
-					showHelp = !showHelp;
-				}}
-				title={"Overlay Help"}
-				><img
-					src="assets/img/ui/help/question_mark.png"
-					alt="Help"
-				/></button
-			>
+				on:click={() => { showHelp = !showHelp; }}
+				title={"Overlay Help"} >
+                <img src="assets/img/ui/help/question_mark.png" alt="Help" />
+            </button>
 		</div>
 
 		{#if showKeyboardShortcuts}
@@ -1103,13 +1065,7 @@
 			/>
 		{/if}
 
-		<SavedMaps
-			bind:showSavedMaps
-			{createNewMap}
-			load={loadInit}
-			{loadAndSave}
-			on:mouseup={pointerup}
-		/>
+		<SavedMaps bind:showSavedMaps {createNewMap} load={loadInit} {loadAndSave} on:mouseup={pointerup} />
 
 		<Settings
 			{loadedSave}
@@ -1145,36 +1101,13 @@
 
 		{#if showHelp}
 			<div id="help-overlay">
-				<img
-					id="welcome"
-					src="assets/img/ui/help/welcome.png"
-					alt="Welcome To Hexfriend"
-				/>
-				<img
-					id="map"
-					src="assets/img/ui/help/map.png"
-					alt="This Is The Map"
-				/>
-				<img
-					id="settings-saving"
-					src="assets/img/ui/help/settings_saving.png"
-					alt="Settings & Saving"
-				/>
-				<img
-					id="tools"
-					src="assets/img/ui/help/tools.png"
-					alt="Choose Your Tool"
-				/>
-				<img
-					id="configure"
-					src="assets/img/ui/help/configure.png"
-					alt="Configure The Tools"
-				/>
-				<img
-					id="shortcuts"
-					src="assets/img/ui/help/shortcuts.png"
-					alt="Check Out The Shortcuts"
-				/>
+                <!-- TODO: translate!!! -->
+				<img id="welcome" src="assets/img/ui/help/welcome.png" alt="Welcome To Hexfriend" />
+				<img id="map" src="assets/img/ui/help/map.png" alt="This Is The Map" />
+				<img id="settings-saving" src="assets/img/ui/help/settings_saving.png" alt="Settings & Saving" />
+				<img id="tools" src="assets/img/ui/help/tools.png" alt="Choose Your Tool" />
+				<img id="configure" src="assets/img/ui/help/configure.png" alt="Configure The Tools" />
+				<img id="shortcuts" src="assets/img/ui/help/shortcuts.png" alt="Check Out The Shortcuts" />
 			</div>
 		{/if}
 	</main>
@@ -1188,6 +1121,7 @@
 			src="../assets/img/site/hexfriend.png"
 			alt={"Loading"}
 			on:load={() => {
+                // Bro ;-;
 				setTimeout(() => {
 					load_map(
 						dataToLoad.data,

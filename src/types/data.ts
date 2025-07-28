@@ -1,6 +1,6 @@
 import type { coord_system } from './coordinates';
-import type { path_layer_path } from './path';
-import type { text_layer_text } from './text';
+import type { path_layer_path, path_style } from './path';
+import type { text_layer_text, text_style } from './text';
 import type { Tile } from './tilesets';
 import type * as PIXI from 'pixi.js';
 
@@ -35,22 +35,23 @@ export interface coordinates_data {
 	}
 }
 
-export interface text_data {
-	style: Partial<PIXI.Text['style']>;
+export type text_data = {
+	style: text_style;
 	selectedText?: text_layer_text;
-	alpha: number;
+    alpha: number;
 	editorRef: any;
 	usingTextTool: boolean;
 	contextStyleId?: number;
 }
 
-export interface path_data {
+export type path_data = {
 	selectedPath?: path_layer_path;
 	hoveredPath?: path_layer_path;
 	dontSelectPaths: boolean;
 	snap: boolean;
-	style: Partial<PIXI.LineStyle>;
+	style: path_style;
 	contextPathId?: number;
+    add_to: 'start' | 'end'; // Which side of the path to add to
 }
 
 export interface trace_data {

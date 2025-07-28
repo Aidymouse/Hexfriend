@@ -5,10 +5,11 @@ import type { Iconset } from '../types/icon';
 import type { save_data } from '../types/savedata';
 import { LATESTSAVEDATAVERSION } from '../types/savedata';
 import { map_shape } from '../types/settings';
-import { hex_orientation, hex_raised, terrain_field } from '../types/terrain';
+import { hex_orientation, hex_raised } from '../types/terrain';
 import type { Tile, Tileset } from '../types/tilesets';
 import { DEFAULTICONSET } from './defaultIconset';
 import { DEFAULTTILESET } from './defaultTileset';
+import { LINE_CAP, LINE_JOIN } from 'pixi.js';
 
 let DEFAULTSAVEDATA: save_data = {
 	saveVersion: LATESTSAVEDATAVERSION,
@@ -73,119 +74,56 @@ let DEFAULTSAVEDATA: save_data = {
 	icons: [],
 	texts: [],
 
-	pathStyles: [
-		{ display: 'River', style: { color: 10742015, width: 6, cap: 'round', join: 'round', dashed: false, dash_length: 10, dash_gap: 5 }, id: 1 },
-		{ display: 'Path', style: { color: 16774327, width: 4, cap: 'round', join: 'round', dashed: false, dash_length: 10, dash_gap: 5 }, id: 2 },
-		{ display: 'Trail', style: { color: 16367733, width: 3, cap: 'round', join: 'round', dashed: false, dash_length: 10, dash_gap: 5 }, id: 3 },
-		{ display: 'Pass', style: { color: 12632256, width: 5, cap: 'round', join: 'round', dashed: false, dash_length: 10, dash_gap: 5 }, id: 4 },
-		{ display: 'Border', style: { color: 16711680, width: 5, cap: 'round', join: 'round', dashed: false, dash_length: 10, dash_gap: 5 }, id: 5 },
-		{ display: 'Minor Border', style: { color: 16711680, width: 4, cap: 'round', join: 'round', dashed: true, dash_length: 15, dash_gap: 10 }, id: 6 },
+	path_styles: [
+		{ display: 'River', style: { color: 10742015, width: 6, cap: LINE_CAP.ROUND, join: LINE_JOIN.ROUND, dashed: false, dash_length: 10, dash_gap: 5 }, id: 1 },
+		{ display: 'Path', style: { color: 16774327, width: 4, cap: LINE_CAP.ROUND, join: LINE_JOIN.ROUND, dashed: false, dash_length: 10, dash_gap: 5 }, id: 2 },
+		{ display: 'Trail', style: { color: 16367733, width: 3, cap: LINE_CAP.ROUND, join: LINE_JOIN.ROUND, dashed: false, dash_length: 10, dash_gap: 5 }, id: 3 },
+		{ display: 'Pass', style: { color: 12632256, width: 5, cap: LINE_CAP.ROUND, join: LINE_JOIN.ROUND, dashed: false, dash_length: 10, dash_gap: 5 }, id: 4 },
+		{ display: 'Border', style: { color: 16711680, width: 5, cap: LINE_CAP.ROUND, join: LINE_JOIN.ROUND, dashed: false, dash_length: 10, dash_gap: 5 }, id: 5 },
+		{ display: 'Minor Border', style: { color: 16711680, width: 4, cap: LINE_CAP.ROUND, join: LINE_JOIN.ROUND, dashed: true, dash_length: 15, dash_gap: 10 }, id: 6 },
 	],
 
-	textStyles: [
+	text_styles: [
 		{
 			display: 'Region',
-			style: {
-				fontFamily: 'Times New Roman',
-				fill: '#ffffff',
-				fontSize: 50,
-				miterLimit: 2,
-				strokeThickness: 10,
-				stroke: '#000000',
-				align: 'left',
-				fontStyle: 'normal',
-				fontWeight: 'normal',
-			},
+            alpha: 1,
+			style: { fontFamily: 'Times New Roman', fill: '#ffffff', fontSize: 50, strokeThickness: 10, stroke: '#000000', align: 'left', fontStyle: 'normal', fontWeight: 'normal', },
 			id: 0,
 		},
 		{
 			display: 'Barony',
-			style: {
-				fontFamily: 'Times New Roman',
-				fill: '#ffffff',
-				fontSize: 40,
-				miterLimit: 2,
-				strokeThickness: 8,
-				stroke: '#713800',
-				align: 'left',
-				fontStyle: 'normal',
-				fontWeight: 'normal',
-			},
+            alpha: 1,
+			style: { fontFamily: 'Times New Roman', fill: '#ffffff', fontSize: 40, strokeThickness: 8, stroke: '#713800', align: 'left', fontStyle: 'normal', fontWeight: 'normal', },
 			id: 1,
 		},
 		{
 			display: 'City',
-			style: {
-				fontFamily: 'Segoe UI',
-				fill: '#ffffff',
-				fontSize: 30,
-				miterLimit: 2,
-				strokeThickness: 5,
-				stroke: '#800000',
-				align: 'left',
-				fontStyle: 'normal',
-				fontWeight: 'normal',
-			},
+            alpha: 1,
+			style: { fontFamily: 'Segoe UI', fill: '#ffffff', fontSize: 30, strokeThickness: 5, stroke: '#800000', align: 'left', fontStyle: 'normal', fontWeight: 'normal', },
 			id: 2,
 		},
 		{
 			display: 'Town',
-			style: {
-				fontFamily: 'Segoe UI',
-				fill: '#ffffff',
-				fontSize: 25,
-				miterLimit: 2,
-				strokeThickness: 5,
-				stroke: '#000066',
-				align: 'left',
-				fontStyle: 'normal',
-				fontWeight: 'normal',
-			},
+            alpha: 1,
+			style: { fontFamily: 'Segoe UI', fill: '#ffffff', fontSize: 25, strokeThickness: 5, stroke: '#000066', align: 'left', fontStyle: 'normal', fontWeight: 'normal', },
 			id: 3,
 		},
 		{
 			display: 'Village',
-			style: {
-				fontFamily: 'Segoe UI',
-				fill: '#000000',
-				fontSize: 20,
-				miterLimit: 2,
-				strokeThickness: 0,
-				stroke: '#ffffff',
-				align: 'left',
-				fontStyle: 'normal',
-				fontWeight: 'normal',
-			},
+            alpha: 1,
+			style: { fontFamily: 'Segoe UI', fill: '#000000', fontSize: 20, strokeThickness: 0, stroke: '#ffffff', align: 'left', fontStyle: 'normal', fontWeight: 'normal', },
 			id: 4,
 		},
 		{
 			display: 'River',
-			style: {
-				fontFamily: 'Segoe UI',
-				fill: '#000000',
-				fontSize: 17,
-				miterLimit: 2,
-				strokeThickness: 3,
-				stroke: '#ffffff',
-				align: 'left',
-				fontStyle: 'italic',
-				fontWeight: 'normal',
-			},
+            alpha: 1,
+			style: { fontFamily: 'Segoe UI', fill: '#000000', fontSize: 17, strokeThickness: 3, stroke: '#ffffff', align: 'left', fontStyle: 'italic', fontWeight: 'normal', },
 			id: 5,
 		},
 		{
 			display: 'Dungeon',
-			style: {
-				fontFamily: 'Segoe UI',
-				fill: '#ffffff',
-				fontSize: 20,
-				miterLimit: 2,
-				strokeThickness: 6,
-				stroke: '#aa0000',
-				align: 'left',
-				fontStyle: 'normal',
-				fontWeight: 'bold',
-			},
+            alpha: 1,
+			style: { fontFamily: 'Segoe UI', fill: '#ffffff', fontSize: 20, strokeThickness: 6, stroke: '#aa0000', align: 'left', fontStyle: 'normal', fontWeight: 'bold', },
 			id: 6,
 		},
 	],

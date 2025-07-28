@@ -6,7 +6,10 @@ function convert_v1_to_v5(oldData: save_data): save_data {
 	console.log("Converting save: v4- to v5")
 
 	if (!oldData.TerrainField.largehexes) {
+
+        //@ts-ignore - Largehexes used to be called overlay
 		if (oldData.TerrainField.overlay) {
+            //@ts-ignore - Largehexes used to be called overlay
 			oldData.TerrainField.largehexes = JSON.parse(JSON.stringify(oldData.TerrainField.overlay))
 		} else {
 			oldData.TerrainField.largehexes = {
@@ -41,12 +44,14 @@ function convert_v1_to_v5(oldData: save_data): save_data {
 
 	// PATH STYLE AND TEXT STYLE IDS // Missing in some map version 2's (yeah, ok, I'm shit with version numbers)
 	let pId = 0;
+    //@ts-ignore - Pre v13 it was pathStyles
 	oldData.pathStyles.forEach((pathStyle) => {
 		pathStyle.id = pId;
 		pId++;
 	});
 
 	let tId = 0;
+    //@ts-ignore - Pre v13 it was called textStyles
 	oldData.textStyles.forEach((textStyle) => {
 		textStyle.id = tId;
 		tId++;
@@ -77,13 +82,17 @@ function convert_v6_to_v7(oldData: save_data): save_data {
 
 	let new_data: save_data = JSON.parse(JSON.stringify(oldData));
 
+    //@ts-ignore - Pre v13 it was called pathStyles
 	new_data.pathStyles = new_data.pathStyles.map(ps => { return { ...ps, style: { ...ps.style, dashed: false, dash_length: 15, dash_gap: 10 } } })
 	new_data.paths.forEach(p => {
+        //@ts-ignore - 
 		p.style.dashed = false
+        //@ts-ignore - 
 		p.style.dash_gap = 10
+        //@ts-ignore - 
 		p.style.dash_length = 15
 	})
-	console.log(new_data.pathStyles)
+	console.log(new_data.path_styles)
 
 	new_data.saveVersion = 7
 	return new_data;
@@ -190,6 +199,25 @@ function convert_v11_to_v12(old_data: save_data): save_data {
 	return old_data;
 }
 
+function convert_v12_to_v13(old_data: save_data): save_data {
+    console.log("Coverting save: v12 -> v13")
+ 
+    /** Path Styles become Listed Path Styles */
+    //@ts-ignore - Pre v13 it was called pathStyles. ALso the type got updated but they were compatible. The old version was an error but it makes conversion easier
+    old_data.path_styles = [...old_data.pathStyles]
+    //@ts-ignore - Pre v13 it was called pathStyles
+    delete old_data.pathStyles
+
+
+    /** Text style rename + alpha */
+    //@ts-ignore - Pre v13 it was called textStyles
+    old_data.text_styles = old_data.textStyles.map(ts => ({...ts, alpha: 1}))
+
+	old_data.saveVersion = 13
+
+	return old_data;
+}
+
 export function convertSaveDataToLatest(oldData: save_data): save_data {
 	// Update to latest version
 	let newData: save_data = JSON.parse(JSON.stringify(oldData));
@@ -202,6 +230,7 @@ export function convertSaveDataToLatest(oldData: save_data): save_data {
 	if (newData.saveVersion == 9) { newData = convert_v9_to_v10(newData) }
 	if (newData.saveVersion == 10) { newData = convert_v10_to_v11(newData) }
 	if (newData.saveVersion == 11) { newData = convert_v11_to_v12(newData) }
+	if (newData.saveVersion == 12) { newData = convert_v12_to_v13(newData) }
 
 	return newData;
 }

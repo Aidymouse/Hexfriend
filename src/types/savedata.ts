@@ -1,10 +1,11 @@
 import type { coordinates_data, overlay_data } from './data';
 import type { IconLayerIcon, Iconset } from './icon';
-import type { path_style } from './path'
+import type { listed_path_style, path_style } from './path'
 import type { terrain_field } from './terrain';
+import type { listed_text_style } from './text';
 import type { Tileset } from './tilesets';
 
-const LATESTSAVEDATAVERSION = 12;
+const LATESTSAVEDATAVERSION = 13;
 const LATESTDEFAULTICONSVERSION = 5;
 
 interface save_data {
@@ -25,8 +26,8 @@ interface save_data {
 	texts: [];
 	icons: IconLayerIcon[];
 
-	pathStyles: path_style[];
-	textStyles: any[];
+	path_styles: listed_path_style[];
+	text_styles: listed_text_style[];
 }
 
 export type { save_data }

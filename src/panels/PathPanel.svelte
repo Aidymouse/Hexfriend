@@ -3,10 +3,8 @@
 	import ColorInputPixi from "../components/ColorInputPixi.svelte";
 	import SelectGrid from "../components/SelectGrid.svelte";
 	import type PathLayer from "../layers/PathLayer.svelte";
-	import type { path_data } from "../types/data";
-	import type { listed_path_style } from "../types/path";
+	import type { listed_path_style, path_style } from "../types/path";
 	import * as PIXI from "pixi.js";
-	import { onMount, afterUpdate } from "svelte";
 	import { tl } from "../stores/translation";
 
 	import { store_has_unsaved_changes } from "../stores/flags";
@@ -16,36 +14,29 @@
 
 	/* Path Style Management */
 
-	export let pathStyles: listed_path_style[];
+	export let loaded_path_styles: listed_path_style[] = [];
 
+    // Idk why this makes the matching fn update but it does
 	data_path.subscribe((n) => {
-		pathStyles = pathStyles;
+		loaded_path_styles = loaded_path_styles;
 	});
 
-	$: {
-		pathStyles = pathStyles;
-	}
-
 	let pathID = 0;
-	pathStyles.forEach((pathStyle) => {
+	loaded_path_styles.forEach((pathStyle) => {
 		pathID = Math.max(pathID, pathStyle.id + 1);
 	});
 
-	function styleMatchesData(pathStyle: PIXI.LineStyle) {
-		return (
-			JSON.stringify(pathStyle) ==
-			JSON.stringify($data_path.style)
-		);
+	function styleMatchesData(pathStyle: path_style): boolean {
+        console.log(pathStyle, $data_path.style)
+		return ( JSON.stringify(pathStyle) == JSON.stringify($data_path.style));
 	}
 
 	function newPathStyle() {
-		let name = prompt(
-			"What would you like to name this path style?",
-		);
+		let name = prompt( "What would you like to name this path style?");
 		if (name == null) return;
 
-		pathStyles = [
-			...pathStyles,
+		loaded_path_styles = [
+			...loaded_path_styles,
 			{
 				display: name,
 				style: { ...$data_path.style },
@@ -63,27 +54,20 @@
 	function updateStyleToMatch() {
 		if ($data_path.contextPathId == null) return;
 
-		let styleToEdit: listed_path_style = pathStyles.find(
-			(ps) => ps.id == $data_path.contextPathId,
-		);
+		let styleToEdit: listed_path_style = loaded_path_styles.find( (ps) => ps.id == $data_path.contextPathId);
 
 		styleToEdit.style = { ...$data_path.style };
 		//styleToEdit = styleToEdit
-		pathStyles = pathStyles;
+		loaded_path_styles = loaded_path_styles;
 
 		$data_path.contextPathId = null;
 	}
 
 	function deletePathStyle() {
 		if ($data_path.contextPathId == null) return;
-		if (
-			!confirm(
-				"Are you sure you would like to delete this path style?",
-			)
-		)
-			return;
+		if ( !confirm($tl.path_panel.delete_path_style_prompt)) return;
 
-		pathStyles = pathStyles.filter(
+		loaded_path_styles = loaded_path_styles.filter(
 			(ps) => ps.id != $data_path.contextPathId,
 		);
 
@@ -95,37 +79,34 @@
 	function renameStyle() {
 		if ($data_path.contextPathId == null) return;
 
-		let styleToEdit: listed_path_style = pathStyles.find(
+		let styleToEdit: listed_path_style = loaded_path_styles.find(
 			(ps) => ps.id == $data_path.contextPathId,
 		);
 		$data_path.contextPathId = null;
 
-		let styleName = prompt(
-			"What would you like this path style to be called?",
-		);
+		let styleName = prompt($tl.path_panel.rename_path_style_prompt);
 		if (!styleName) return;
 
 		styleToEdit.display = styleName;
-		pathStyles = pathStyles;
+		loaded_path_styles = loaded_path_styles;
 
 		$store_has_unsaved_changes = true;
 	}
 
 	// Path Controls
 	function deselectPath() {
-		if ($data_path.selectedPath.points.length == 2)
-			comp_pathLayer.deletePath($data_path.selectedPath);
+		if ($data_path.selectedPath.points.length <= 2) comp_pathLayer.deletePath($data_path.selectedPath);
 		$data_path.selectedPath = null;
 	}
 
 	function duplicateStyle() {
-		let contextPathStyle: listed_path_style = pathStyles.find(
+		let contextPathStyle: listed_path_style = loaded_path_styles.find(
 			(ps) => ps.id == $data_path.contextPathId,
 		);
 
 		pathID += 1;
-		pathStyles = [
-			...pathStyles,
+		loaded_path_styles = [
+			...loaded_path_styles,
 			{
 				display: contextPathStyle.display,
 				style: { ...contextPathStyle.style },
@@ -195,20 +176,17 @@
 					options={[
 						{
 							title: "Round Corners",
-							value: PIXI.LINE_JOIN
-								.ROUND,
+							value: PIXI.LINE_JOIN.ROUND,
 							filename: "linecornerround",
 						},
 						{
 							title: "Miter Corners",
-							value: PIXI.LINE_JOIN
-								.MITER,
+							value: PIXI.LINE_JOIN.MITER,
 							filename: "linecornermiter",
 						},
 						{
 							title: "Bevel Corners",
-							value: PIXI.LINE_JOIN
-								.BEVEL,
+							value: PIXI.LINE_JOIN.BEVEL,
 							filename: "linecornerbevel",
 						},
 					]}
@@ -254,16 +232,13 @@
 		<div id="selected-path-controls">
 			<button
 				on:click={() => {
-					$data_path.add_to =
-						$data_path.add_to == "start"
-							? "end"
-							: "start";
+					$data_path.add_to = $data_path.add_to == "start" ? "end" : "start";
 				}}>{$tl.path_panel.switch_end}</button
 			>
 			<button
-				on:click={() => {
-					deselectPath();
-				}}>{$tl.path_panel.deselect}</button
+				on:click={() => { deselectPath(); }}>
+                    {$tl.path_panel.deselect}
+                </button
 			>
 			<button
 				on:click={() => {
@@ -284,22 +259,18 @@
 	{/if}
 
 	<!-- PATH STYLES -->
-	<div
-		id="path-styles"
-		style={$data_path.selectedPath ? "padding-top: 0;" : ""}
+	<div id="path-styles" style={$data_path.selectedPath ? "padding-top: 0;" : ""}
 	>
 		<!-- Path Style Listing -->
 		<div style="display: flex; gap: 5px; flex-wrap: wrap">
-			{#each pathStyles as pb (pb.id)}
+			{#each loaded_path_styles as pb (pb.id)}
 				<button
 					on:click={() => {
 						$data_path.style = {
 							...pb.style,
 						};
 					}}
-					class:selected={styleMatchesData(
-						pb.style,
-					)}
+					class:selected={styleMatchesData( pb.style )}
 					on:contextmenu={(e) => {
 						e.preventDefault();
 						menuX = e.clientX;
@@ -328,11 +299,9 @@
 <!-- Path Style Context Menu -->
 {#if $data_path.contextPathId != null}
 	<div class={"context-menu"} style={`top: ${menuY}px; left: ${menuX}px`}>
-		<button
-			on:click={updateStyleToMatch}
-			title={$tl.path_panel.update_style_title}
-			>{$tl.path_panel.update_style}</button
-		>
+		<button on:click={updateStyleToMatch} title={$tl.path_panel.update_style_title}>
+            {$tl.path_panel.update_style}
+        </button>
 		<button on:click={renameStyle}
 			>{$tl.path_panel.rename_style}</button
 		>
