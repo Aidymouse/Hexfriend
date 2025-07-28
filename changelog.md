@@ -3,6 +3,12 @@ For Techy People
 
 # Version 2.0 - Whole new worlds, Hexfriend!
 
+## Version 2.3
+_Some tooltips need translating. Translations now have a typescript type so it should be pretty easy to figure out what needs translating._
+- Updated save data format to v13, changing a couple names to snake_case
+- Tileset import dialog looks for .hfts files now
+- Overhauled many of the types, they were so messy
+
 ## Version 2.2
 _Doesn't require any translation updates_
 - Added ability to rotate Terrain symbols and Icons aribtrarily (thanks FuzzyBunny on the Discord for the great idea)
