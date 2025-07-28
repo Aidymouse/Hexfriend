@@ -1,4 +1,6 @@
-export const pt_br = {
+import type { Translation } from "./types";
+
+export const pt_br: Translation = {
 	language: "pt_br",
 	save_indicator: "Salvando...",
 

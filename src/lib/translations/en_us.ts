@@ -1,4 +1,6 @@
-export const en_us = {
+import type { Translation } from "./types";
+
+export const en_us: Translation = {
 	language: "en_us",
 	save_indicator: "Saving...",
 
@@ -44,6 +46,8 @@ export const en_us = {
 
 		save_current_style: "Save current path style",
 		update_style_title: "Update this path style to match what is currently set above.",
+        rename_path_style_prompt: "What would you like to call this path?",
+        delete_path_style_prompt: "Delete this path style?",
 		update_style: "Update Style",
 		rename_style: "Rename",
 		duplicate_style: "Duplicate",
@@ -63,6 +67,8 @@ export const en_us = {
 		rename_style: "Rename",
 		duplicate_style: "Duplicate",
 		delete_style: "Delete",
+        rename_text_style_prompt: "What would you like this text style to be called?",
+        delete_text_style_prompt: "Are you sure you would like to delete this text style?",
 	},
 
 	eraser_panel: {
