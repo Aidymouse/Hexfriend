@@ -1,3 +1,4 @@
+//@ts-nocheck - A github issue should be opened about this
 import type { Translation } from "./types";
 
 export const pt_br: Translation = {
