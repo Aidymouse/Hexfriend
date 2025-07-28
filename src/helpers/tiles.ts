@@ -22,8 +22,9 @@ export function tiles_match(tile1: Tile, tile2: Tile) {
     if (tile1.bgColor != tile2.bgColor) return false;
 
     if (tile1.symbol && tile2.symbol) {
-        if (tile1.symbol.color != tile2.symbol.color) return false;
-        if (get_symbol_texture(tile1) != get_symbol_texture(tile2)) return false;
+        if (tile1.symbol.color != tile2.symbol.color) return false
+        if (get_symbol_texture(tile1) != get_symbol_texture(tile2)) return false
+        if (tile1.symbol.rotation !== tile2.symbol.rotation) return false
     }
 
     return true;
