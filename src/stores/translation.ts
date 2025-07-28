@@ -10,7 +10,7 @@ export const translation_map = {
     "pt_br": {translation: pt_br, label: "🇧🇷 Portugues do Brasil"}
 }
 
-export const switch_translation = (new_translation) => {
+export const switch_translation = (new_translation: string) => {
     console.log(`Switching to ${new_translation}`);
     tl.set(translation_map[new_translation].translation)
     console.log(tl);
