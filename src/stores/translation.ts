@@ -1,11 +1,11 @@
 
 import { persisted } from 'svelte-persisted-store';
 
-import { en_us, pt_br } from '../lib/translations';
+import { type Translation, en_us, pt_br } from '../lib/translations';
 
 export const tl = persisted('tl', en_us);
 
-export const translation_map = {
+export const translation_map: {[key: string]: { translation: Translation, label: string }} = {
     "en_us": {translation: en_us, label: "🇺🇸 English"},
     "pt_br": {translation: pt_br, label: "🇧🇷 Portugues do Brasil"}
 }

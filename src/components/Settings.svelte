@@ -369,22 +369,31 @@
       <a href="https://github.com/Aidymouse/Hexfriend/graphs/contributors"
         >{$tl.settings.about.credits.contributorlink}</a
       >
+      {$tl.settings.about.credits.end}
+    </p>
+
+    <p class="helper-text" style="margin-top: var(--small-radius)">
+      {$tl.settings.about.wiki.start}
+      <a href="https://github.com/Aidymouse/Hexfriend/wiki">{$tl.settings.about.wiki.wiki_link_text}</a>.
+      {$tl.settings.about.wiki.end}
     </p>
 
     <p class="helper-text" style="margin-top: var(--small-radius)">
       {$tl.settings.about.guts.start}
       <a href="https://www.github.com/Aidymouse/Hexfriend">{$tl.settings.about.guts.github_link}</a>
+      {$tl.settings.about.guts.end}
     </p>
 
     <p class="helper-text" style="margin-top: var(--small-radius)">
-      {$tl.settings.about.socials.start}<a href="https://discord.gg/Jvws27VmWR"
-        >{$tl.settings.about.socials.discord_link}</a
-      >
+      {$tl.settings.about.socials.start}
+      <a href="https://discord.gg/Jvws27VmWR">{$tl.settings.about.socials.discord_link}</a>
+      {$tl.settings.about.socials.end}
     </p>
 
     <p class="helper-text" style="margin-top: var(--small-radius)">
       {$tl.settings.about.money.start}
       <a href="https://ko-fi.com/aidymouse">{$tl.settings.about.money.kofi_link}</a>.
+      {$tl.settings.about.money.end}
     </p>
   </div>
 

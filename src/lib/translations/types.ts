@@ -227,22 +227,27 @@ export type Translation = {
 			credits: { 
 				start: string,
 				contributorlink: string,
-				end: ""
+				end: string
 			},
 			guts: {
 				start: string,
 				github_link: string,
-				end: ""
+				end: string
 			},
 			socials: {
 				start: string,
 				discord_link: string,
-				end: ""
+				end: string
+			},
+			wiki: {
+				start: string,
+				wiki_link_text: string,
+				end: string
 			},
 			money: {
 				start: string,
 				kofi_link: string,
-				end: ""
+				end: string
 			},
 		},
 

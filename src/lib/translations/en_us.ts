@@ -231,6 +231,11 @@ export const en_us: Translation = {
 				contributorlink: "contributors",
 				end: ""
 			},
+            wiki: {
+                start: "Learn more about Hexfriends advanced features on ",
+                wiki_link_text: "the wiki",
+                end: ""
+            },
 			guts: {
 				start: "Hexfriend is built with Svelte, Pixi JS and Typescript. Check out the ",
 				github_link: "Github",
