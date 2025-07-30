@@ -9,6 +9,8 @@ _Some tooltips + the new wiki entry in the about will need translation. Translat
 - Tileset import dialog looks for .hfts files now
 - Overhauled many of the types, they were so messy
 - Added wiki link in about
+- Tile Symbols and icons are now one type. Because, like, duh
+- Hexfriend no longer relies on the loading of the hexfriend loading graphic to initiate the initial map load
 
 ## Version 2.2
 _Doesn't require any translation updates_
