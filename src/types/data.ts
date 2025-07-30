@@ -12,7 +12,7 @@ export interface terrain_data {
 	renderOpacity: number;
 }
 
-export interface icon_data {
+export type icon_data = {
 	color: number;
 	texId?: string;
 	pHex: number;
