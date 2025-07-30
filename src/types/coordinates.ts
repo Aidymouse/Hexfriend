@@ -1,4 +1,4 @@
-import type { hex_orientation } from "./terrain";
+import type { HexOrientation } from "./terrain";
 
 export enum coord_system {
 	CUBE,
@@ -14,7 +14,7 @@ export interface cube_coords {
 }
 
 export interface hex_world_attributes {
-	orientation: hex_orientation;
+	orientation: HexOrientation;
 	hex_width: number;
 	hex_height: number;
 	grid_gap: number;

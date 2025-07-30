@@ -1,6 +1,6 @@
 <script lang="ts">
   // TYPES
-  import { LATESTTILESETFORMATVERSION, type Tile, type TileSymbol, type Tileset } from '../types/tilesets'
+  import { LATEST_TILESET_FORMAT_VERSION, type Tile, type TileSymbol, type Tileset } from '../types/tilesets'
 
   interface working_tile {
     display: string
@@ -18,7 +18,7 @@
   }
 
   // ENUMS
-  import { hex_orientation } from '../types/terrain'
+  import { HexOrientation } from '../types/terrain'
 
   // COMPONENTS
   import ColorInputPixi from './ColorInputPixi.svelte'
@@ -45,7 +45,7 @@
 
   let texture_register = {} // texture_id: texture
 
-  let orientation: hex_orientation = hex_orientation.FLATTOP
+  let orientation: HexOrientation = HexOrientation.FLATTOP
 
   let workingTileset: Tileset = {
     name: 'New Tileset',
@@ -53,7 +53,7 @@
     author: '',
     version: 1,
     tiles: [],
-    format_version: LATESTTILESETFORMATVERSION,
+    format_version: LATEST_TILESET_FORMAT_VERSION,
     collapsed: false,
   }
 
@@ -404,7 +404,7 @@
         <button
           class="outline-button"
           on:click={() => {
-            orientation = orientation == hex_orientation.FLATTOP ? hex_orientation.POINTYTOP : hex_orientation.FLATTOP
+            orientation = orientation == HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP
             generatePreview(selectedTile)
           }}
           title={$tl.builders.change_orientation}

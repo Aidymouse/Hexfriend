@@ -3,7 +3,8 @@ import type { Tile } from './tilesets';
 import type { hex_id } from './toolData';
 import type * as PIXI from 'pixi.js';
 
-export enum hex_orientation {
+
+export enum HexOrientation {
 	FLATTOP = 'flatTop',
 	POINTYTOP = 'pointyTop',
 }
@@ -47,7 +48,7 @@ export interface terrain_field {
 	columns: number;
 	raised: hex_raised;
 
-	orientation: hex_orientation;
+	orientation: HexOrientation;
 	blankHexColor: number;
 
 	hexes: { [key: hex_id]: TerrainHex };

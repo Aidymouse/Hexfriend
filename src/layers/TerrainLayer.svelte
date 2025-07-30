@@ -34,7 +34,7 @@
   import { tl } from '../stores/translation'
 
   // Enums
-  import { hex_orientation, hex_raised } from '../types/terrain'
+  import { HexOrientation, hex_raised } from '../types/terrain'
   import { map_shape } from '../types/settings'
 
   // There's probably some clean up to do in that different colored hexes can have the same ID...
@@ -680,7 +680,7 @@
     for (let col = 0; col < $tfield.columns; col++) {
       for (let row = 0; row < $tfield.rows; row++) {
         let cubeCoords =
-          $tfield.orientation == hex_orientation.FLATTOP
+          $tfield.orientation == HexOrientation.FLATTOP
             ? coords_qToCube($tfield.raised, col, row)
             : coords_rToCube($tfield.raised, col, row)
 

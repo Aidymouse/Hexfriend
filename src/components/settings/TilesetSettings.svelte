@@ -3,7 +3,7 @@
 
   import type { Tileset } from '../../types/tilesets'
 
-  import { LATESTTILESETFORMATVERSION, LATESTDEFAULTTILESETVERSION } from '../../types/tilesets'
+  import { LATEST_TILESET_FORMAT_VERSION, LATEST_DEFAULT_TILESET_VERSION } from '../../types/tilesets'
 
   import { store_has_unsaved_changes } from '../../stores/flags'
   import { tfield } from '../../stores/tfield'
@@ -44,7 +44,7 @@
         return
       }
 
-      if (setToImport.format_version < LATESTTILESETFORMATVERSION) {
+      if (setToImport.format_version < LATEST_TILESET_FORMAT_VERSION) {
         setToImport = update_tileset_format(setToImport)
       }
 
@@ -113,15 +113,15 @@
       {/if}
 
       <!-- Update Default Tileset Button -->
-      {#if get_tileset_id(tileset) == 'default' && tileset.version < LATESTDEFAULTTILESETVERSION}
+      {#if get_tileset_id(tileset) == 'default' && tileset.version < LATEST_DEFAULT_TILESET_VERSION}
         <button
           id="default-tileset-update-button"
           on:click={() => {
             update_default_tileset()
           }}
-          title={`Update Tileset to v${LATESTDEFAULTTILESETVERSION}`}
+          title={`Update Tileset to v${LATEST_DEFAULT_TILESET_VERSION}`}
         >
-          <img src="/assets/img/ui/arrow.png" alt={''} title={`Update Tileset to v${LATESTDEFAULTTILESETVERSION}`} />
+          <img src="/assets/img/ui/arrow.png" alt={''} title={`Update Tileset to v${LATEST_DEFAULT_TILESET_VERSION}`} />
         </button>
       {/if}
     </div>

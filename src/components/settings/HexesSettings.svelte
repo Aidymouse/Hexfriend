@@ -5,7 +5,7 @@
   import SelectGrid from '../SelectGrid.svelte'
   import ImageCheckbox from '../ImageCheckbox.svelte'
 
-  import { hex_orientation } from '../../types/terrain'
+  import { HexOrientation } from '../../types/terrain'
   import { map_shape } from '../../types/settings'
 
   import { tfield } from '../../stores/tfield'
@@ -64,8 +64,8 @@
   <div style={'height: 100%; display: flex; align-items: center;'}>
     <SelectGrid
       options={[
-        { title: 'Flat Top', value: hex_orientation.FLATTOP, filename: 'flatTop' },
-        { title: 'Pointy Top', value: hex_orientation.POINTYTOP, filename: 'pointyTop' },
+        { title: 'Flat Top', value: HexOrientation.FLATTOP, filename: 'flatTop' },
+        { title: 'Pointy Top', value: HexOrientation.POINTYTOP, filename: 'pointyTop' },
       ]}
       bind:value={$tfield.orientation}
       on:change={() => {
@@ -83,7 +83,7 @@
 
   {#if $tfield.mapShape == map_shape.SQUARE}
     <label>
-      {$tfield.orientation == hex_orientation.FLATTOP
+      {$tfield.orientation == HexOrientation.FLATTOP
         ? $tl.settings.hexes.raised_column
         : $tl.settings.hexes.indented_row}
     </label>
@@ -93,17 +93,17 @@
           {
             title: $tl.general.even,
             value: 'even',
-            filename: `${$tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}even`,
+            filename: `${$tfield.orientation == HexOrientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}even`,
           },
           {
             title: $tl.general.odd,
             value: 'odd',
-            filename: `${$tfield.orientation == hex_orientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}odd`,
+            filename: `${$tfield.orientation == HexOrientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}odd`,
           },
         ]}
         bind:value={$tfield.raised}
         on:change={() => {
-          if ($tfield.orientation == hex_orientation.FLATTOP) {
+          if ($tfield.orientation == HexOrientation.FLATTOP) {
             comp_terrainLayer.square_updateRaisedColumn()
           } else {
             comp_terrainLayer.square_changeIndentedRow()

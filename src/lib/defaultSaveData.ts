@@ -5,7 +5,7 @@ import type { Iconset } from '../types/icon';
 import type { save_data } from '../types/savedata';
 import { LATESTSAVEDATAVERSION } from '../types/savedata';
 import { map_shape } from '../types/settings';
-import { hex_orientation, hex_raised } from '../types/terrain';
+import { HexOrientation, hex_raised } from '../types/terrain';
 import type { Tile, Tileset } from '../types/tilesets';
 import { DEFAULTICONSET } from './defaultIconset';
 import { DEFAULTTILESET } from './defaultTileset';
@@ -18,7 +18,7 @@ let DEFAULTSAVEDATA: save_data = {
 	TerrainField: {
 		hexWidth: 50,
 		hexHeight: 45,
-		orientation: hex_orientation.FLATTOP,
+		orientation: HexOrientation.FLATTOP,
 
 		rows: 20,
 		columns: 20,
