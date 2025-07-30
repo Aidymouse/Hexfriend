@@ -1,15 +1,18 @@
 <script lang="ts">
-  import { hex_orientation } from '../types/terrain'
+  import { HexOrientation } from '../types/terrain'
   import type { Icon, Iconset } from '../types/icon'
 
   import { tl } from '../stores/translation'
 
   import { download } from '../lib/download2'
-  import { getHexPathRadius } from '../helpers/hexHelpers'
+  import { get_radius_from_width_height, getHexPath, getHexPathRadius } from '../helpers/hexHelpers'
   import ColorInputPixi from './ColorInputPixi.svelte'
   import CanvasHolder from './CanvasHolder.svelte'
   import * as PIXI from 'pixi.js'
   import { afterUpdate, tick } from 'svelte'
+  import { generate_icon_preview, type PreviewHexInfo } from '../helpers/iconFns'
+  import { get_image_scaled_for_hex, get_image_scaled_for_hex_relative, ScaleMode } from '../helpers/imageSizing'
+  import { DEFAULT_BLANK_HEX_COLOR } from '../types/defaults'
 
   let app = new PIXI.Application({
     width: 300,
@@ -19,7 +22,12 @@
 
   export let appState
 
-  let orientation: hex_orientation = hex_orientation.FLATTOP
+  let preview_hex_info: PreviewHexInfo = {
+    hexWidth: 50 * 6,
+    hexHeight: 45 * 6,
+    orientation: HexOrientation.FLATTOP,
+    color: '#f2f2f2',
+  }
 
   let workingIconset: Iconset = {
     name: 'New Iconset',
@@ -35,10 +43,10 @@
   //const l: PIXI.Loader = new PIXI.Loader();
   let texId: number = 0
 
-  let previewSprite = new PIXI.Sprite()
-  //let previewGraphics = new PIXI.Graphics()
-  let previewContainer = new PIXI.Container()
-  previewContainer.addChild(previewSprite)
+  let spr_icon_preview = new PIXI.Sprite()
+  let grph_icon_preview = new PIXI.Graphics()
+  let cont_icon_preview = new PIXI.Container()
+  cont_icon_preview.addChild(spr_icon_preview)
 
   function findID(baseId: string): string {
     let counter = 0
@@ -52,8 +60,8 @@
     return proposedId
   }
 
-  let loadedTextures = {} // Tex ID -> texture
-  let iconTextureLookupTable = {} // Tex ID -> Tex ID in loaded textures table
+  let loadedTextures: { [tex_id: string]: PIXI.Texture } = {}
+  let iconTextureLookupTable = {} // Tex ID -> Tex ID in loaded textures table. I think pixi does this in the back end as of v7 or so
 
   function IDify(name: string): string {
     return name.toLowerCase().replace(' ', '-')
@@ -75,23 +83,23 @@
 
       r.readAsDataURL(file)
       r.onload = async (eb) => {
-        let iconName = file.name.split('.')[0]
-        let texId = findID(IDify(iconName))
+        const iconName = file.name.split('.')[0]
+        const texId = findID(IDify(iconName))
 
-        let newTexture = await loadTexture(texId, r.result)
-        console.log(newTexture)
+        const newTexture = await loadTexture(texId, r.result)
 
-        let newIcon: Icon = {
+        const newIcon: Icon = {
           display: iconName,
           texId: texId,
           id: findID(IDify(iconName)),
           color: 0xffffff,
-          pHex: 80,
           rotation: 0,
           base64: r.result as string,
           preview: r.result as string,
           texWidth: newTexture.width,
           texHeight: newTexture.height,
+          scaleMode: ScaleMode.RELATIVE,
+          pHex: 80,
         }
 
         workingIconset.icons = [...workingIconset.icons, newIcon]
@@ -113,69 +121,9 @@
     workingIconset.icons = workingIconset.icons.filter((t: Icon) => t.id != icon.id)
   }
 
-  async function generatePreview(icon: Icon) {
-    //previewGraphics.clear();
-    //previewGraphics.beginFill(DEFAULTBLANKHEXCOLOR);
-    //previewGraphics.drawPolygon( getHexPathRadius(25, orientation, 0, 0) );
-    //previewGraphics.endFill();
-
-    previewSprite.texture = PIXI.Texture.from(icon.base64)
-    previewSprite.scale.set(getMaxIconScale(icon, 25).x)
-    previewSprite.anchor.set(0.5)
-    previewSprite.tint = icon.color
-
-    let p = await app.renderer.extract.base64(previewSprite)
-
-    return p
+  async function get_icon_generator_preview(icon: Icon) {
+    return generate_icon_preview(icon, preview_hex_info, grph_icon_preview, spr_icon_preview, cont_icon_preview, app)
   }
-
-  $: {
-    //if (selectedIcon) selectedIcon.preview = generatePreview(workingIconset.icons[stIndex])
-
-    orientation = orientation
-  }
-
-  function getIconScale(symbol, radius = 150) {
-    let h, w
-    if (orientation == 'pointyTop') {
-      h = radius * 2
-      w = Math.cos(Math.PI / 6) * radius * 2
-    } else {
-      w = radius * 2
-      h = radius / Math.tan(Math.PI / 6)
-    }
-
-    let scale
-    if (w < h) {
-      scale = (w * symbol.pHex) / 100 / symbol.texWidth
-    } else {
-      scale = (h * symbol.pHex) / 100 / symbol.texHeight
-    }
-
-    return { x: scale, y: scale }
-  }
-
-  function getMaxIconScale(symbol, radius = 150) {
-    let h, w
-    if (orientation == 'pointyTop') {
-      h = radius * 2
-      w = Math.cos(Math.PI / 6) * radius * 2
-    } else {
-      w = radius * 2
-      h = radius / Math.tan(Math.PI / 6)
-    }
-
-    let scale
-    if (w < h) {
-      scale = (h * symbol.pHex) / 100 / symbol.texWidth
-    } else {
-      scale = (w * symbol.pHex) / 100 / symbol.texHeight
-    }
-
-    return { x: scale, y: scale }
-  }
-
-  const DEFAULTBLANKHEXCOLOR = 0xf2f2f2
 
   function exportIconset() {
     workingIconset.id = IDify(`${workingIconset.name}:v${workingIconset.version}`)
@@ -251,8 +199,10 @@
   afterUpdate(async () => {
     if (selectedIcon) {
       grph_background_hex.clear()
-      grph_background_hex.beginFill(DEFAULTBLANKHEXCOLOR)
-      grph_background_hex.drawPolygon(getHexPathRadius(150, orientation, 150, 150))
+      grph_background_hex.beginFill(DEFAULT_BLANK_HEX_COLOR)
+      grph_background_hex.drawPolygon(
+        getHexPath(preview_hex_info.hexWidth, preview_hex_info.hexHeight, preview_hex_info.orientation, 150, 150),
+      )
       grph_background_hex.endFill()
 
       spr_icon.texture = loadedTextures[selectedIcon.texId]
@@ -261,15 +211,57 @@
       spr_icon.anchor.x = 0.5
       spr_icon.anchor.y = 0.5
       spr_icon.tint = selectedIcon.color
-      spr_icon.scale = getMaxIconScale(selectedIcon)
+      if (selectedIcon.scaleMode === ScaleMode.BYDIMENSION) {
+        spr_icon.scale = get_image_scaled_for_hex(
+          selectedIcon.texWidth,
+          selectedIcon.texHeight,
+          preview_hex_info.hexWidth,
+          preview_hex_info.hexHeight,
+          selectedIcon.pWidth,
+          selectedIcon.pHeight,
+        )
+      } else {
+        spr_icon.scale = get_image_scaled_for_hex_relative(
+          selectedIcon.texWidth,
+          selectedIcon.texHeight,
+          preview_hex_info.hexWidth,
+          preview_hex_info.hexHeight,
+          selectedIcon.pHex,
+        )
+      }
 
-      let new_preview = await generatePreview(selectedIcon)
+      let new_preview = await get_icon_generator_preview(selectedIcon)
       if (selectedIcon.preview != new_preview) {
         selectedIcon.preview = new_preview
         workingIconset = workingIconset
       }
     }
   })
+
+  const change_scale_mode = (new_scale_mode: ScaleMode) => {
+    let newIcon: Icon = {
+      ...selectedIcon,
+      scaleMode: new_scale_mode,
+    } as Icon // I know it is!!! I just know!!!
+
+    delete newIcon.pHex
+    delete newIcon.pWidth
+    delete newIcon.pHeight
+
+    switch (newIcon.scaleMode) {
+      case ScaleMode.RELATIVE: {
+        newIcon.pHex = 80
+        break
+      }
+      case ScaleMode.BYDIMENSION: {
+        newIcon.pWidth = 80
+        newIcon.pHeight = 80
+        break
+      }
+    }
+
+    selectedIcon = newIcon
+  }
 </script>
 
 <main>
@@ -295,7 +287,7 @@
         <input id="setVersion" type="number" bind:value={workingIconset.version} />
 
         <button on:click={() => importIconset()} class="file-input-button">
-          {$tl.general.import}
+          {$tl.builders.icon_set_builder.import_iconset}
           <input
             type="file"
             bind:files={importFiles}
@@ -307,7 +299,7 @@
           />
         </button>
 
-        <button on:click={() => exportIconset()}>{$tl.general.export}</button>
+        <button on:click={() => exportIconset()}>{$tl.builders.icon_set_builder.export_iconset}</button>
       </div>
     </div>
 
@@ -365,6 +357,7 @@
 
       <input
         type="text"
+        style="height: 2em"
         bind:value={selectedIcon.display}
         on:change={() => {
           workingIconset.icons = workingIconset.icons
@@ -374,7 +367,15 @@
       <div id="icon-controls">
         <button
           on:click={() => {
-            orientation = orientation == hex_orientation.FLATTOP ? hex_orientation.POINTYTOP : hex_orientation.FLATTOP
+            preview_hex_info = {
+              ...preview_hex_info,
+              hexWidth: preview_hex_info.hexHeight,
+              hexHeight: preview_hex_info.hexWidth,
+              orientation:
+                preview_hex_info.orientation === HexOrientation.FLATTOP
+                  ? HexOrientation.POINTYTOP
+                  : HexOrientation.FLATTOP,
+            }
           }}
           title={$tl.builders.change_orientation}
         >
@@ -401,27 +402,61 @@
     </div>
 
     <div id="icon-style">
-      <!-- Background Color -->
+      <!-- Icon Tint -->
       <div class="color" style="margin-bottom: 0.625em">
         <ColorInputPixi bind:value={selectedIcon.color} w={'50'} h={'50'} />
 
         <div>
           <p>{$tl.builders.icon_set_builder.tint}</p>
-          <p class="color-string">
+          <input type="string" bind:value={selectedIcon.color} />
+          <!-- <p class="color-string">
             {PIXI.utils.hex2string(selectedIcon.color)}
-          </p>
+          </p> -->
         </div>
       </div>
 
+      <!-- Scale -->
       <div id="symbol-scale">
         <div id="scale-holder">
-          <p>{$tl.builders.icon_set_builder.scale}</p>
-          <input type="number" bind:value={selectedIcon.pHex} />
-          <p>%</p>
+          <label for="icon-scale-mode">Scale Mode</label>
+          <select
+            id="icon-scale-mode"
+            on:change={(e) => {
+              change_scale_mode(ScaleMode[e.currentTarget.value])
+            }}
+          >
+            {#each Object.keys(ScaleMode) as S}
+              <option value={S}>{$tl.builders.icon_set_builder.scale_mode_options[ScaleMode[S]] ?? S}</option>
+            {/each}
+          </select>
         </div>
-        <div>
-          <input type="range" min="5" max="100" bind:value={selectedIcon.pHex} />
-        </div>
+        {#if selectedIcon.scaleMode === ScaleMode.RELATIVE}
+          <div id="scale-holder">
+            <label for="icon-builder-scale-relative">{$tl.builders.icon_set_builder.scale_relative}</label>
+            <input id="icon-builder-scale-relative" type="number" bind:value={selectedIcon.pHex} />
+            <p>%</p>
+          </div>
+          <div>
+            <input type="range" min="5" max="100" bind:value={selectedIcon.pHex} />
+          </div>
+        {:else if selectedIcon.scaleMode === ScaleMode.BYDIMENSION}
+          <div id="scale-holder">
+            <label for="icon-builder-scale-2d-width">{$tl.builders.icon_set_builder.scale_bydimension.width}</label>
+            <input id="icon-builder-scale-2d-width" type="number" bind:value={selectedIcon.pWidth} />
+            <p>%</p>
+          </div>
+          <div>
+            <input type="range" min="5" max="100" bind:value={selectedIcon.pWidth} />
+          </div>
+          <div id="scale-holder">
+            <label for="icon-builder-scale-2d-height">{$tl.builders.icon_set_builder.scale_bydimension.height}</label>
+            <input id="icon-builder-scale-2d-height" type="number" bind:value={selectedIcon.pHeight} />
+            <p>%</p>
+          </div>
+          <div>
+            <input type="range" min="5" max="100" bind:value={selectedIcon.pHeight} />
+          </div>
+        {/if}
       </div>
     </div>
   {:else}
@@ -436,6 +471,11 @@
       <p style="font-size: 10pt">
         {$tl.builders.icon_set_builder.helpsubsubtitle}
       </p>
+      <p style="font-size: 10pt">
+        <a target="_blank" href="https://github.com/Aidymouse/Hexfriend/wiki/Making-Icon-Sets">
+          {$tl.builders.icon_set_builder.help_wiki_mention}
+        </a>
+      </p>
     </div>
   {/if}
 </main>
@@ -449,6 +489,12 @@
     height: 100%;
     color: var(--text);
     background-color: var(--dark-background);
+  }
+
+  #symbol-scale {
+    display: flex;
+    flex-direction: column;
+    gap: var(--small-radius);
   }
 
   nav {
