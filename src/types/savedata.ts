@@ -18,7 +18,7 @@ interface save_data {
 	tilesets: Tileset[];
 	iconsets: Iconset[];
 
-	icon_hex_size_percentage: number;
+	icon_hex_size_percentage: number; // wtf is this ????
 
 	overlay: overlay_data;
 
