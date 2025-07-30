@@ -1,3 +1,5 @@
+import type { ScaleMode } from "../../helpers/imageSizing"
+
 export type Translation = {
 	language: string,
 	save_indicator: string,
@@ -274,6 +276,8 @@ export type Translation = {
 			symbol_scale: string,
 		},
 		icon_set_builder: {
+            import_iconset: string,
+            export_iconset: string,
 			delete: string,
 			exit: string,
 			name: string,
@@ -282,8 +286,16 @@ export type Translation = {
 			helptext: string,
 			helpsubtitle: string,
 			helpsubsubtitle: string,
+            help_wiki_mention: string,
 			tint: string,
-			scale: string,
+            scale_mode: string,
+            scale_mode_options: { [opt in ScaleMode]: string }
+			scale_relative: string,
+			scale_bydimension: {
+                width: string,
+                height: string,
+                
+            }
 		}
 	},
 
