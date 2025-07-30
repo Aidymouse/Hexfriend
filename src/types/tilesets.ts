@@ -1,14 +1,15 @@
+import { type Icon } from "./icon";
 // Tiles get loaded by the loader. The symbol texture gets loaded under the id
-interface Tile {
+export type Tile = {
 	display: string;
-	bgColor: number;
+	bgColor: number; // Some tiles don't really need a bg color, but, whatever
 	id: string; // Local to the tileset
-	symbol: TileSymbol | null;
+	symbol: TileSymbol | null; // TODO: make this Icon
 	tileset_id: string;
 	preview: string // Just the background
 }
 
-interface TileSymbol {
+export type TileSymbol = {
 	color: number;
 	texWidth: number;
 	texHeight: number;
@@ -18,7 +19,7 @@ interface TileSymbol {
 	rotation?: number; // Added in format v3
 }
 
-interface Tileset {
+export type Tileset = {
 	name: string;
 	id: string;
 	author: string;
@@ -28,8 +29,7 @@ interface Tileset {
 	format_version: number; // Internal ID of tileset format. 
 }
 
-export const LATESTDEFAULTTILESETVERSION = 8
+export const LATEST_TILESET_FORMAT_VERSION = 3
+export const LATEST_DEFAULT_TILESET_VERSION = 8
 
-export const LATESTTILESETFORMATVERSION = 3
 
-export type { Tile, TileSymbol, Tileset };
