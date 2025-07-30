@@ -1,7 +1,9 @@
 import { LATESTSAVEDATAVERSION } from '../types/savedata';
 import type { save_data } from '../types/savedata';
 import { hex_raised } from '../types/terrain';
+import { ScaleMode } from '../helpers/imageSizing';
 
+/** I better make sure I like these names because they can NEVER CHANGE! Or old save versions will need to know what they used to be */
 function convert_v1_to_v5(oldData: save_data): save_data {
 	console.log("Converting save: v4- to v5")
 
@@ -213,7 +215,15 @@ function convert_v12_to_v13(old_data: save_data): save_data {
     //@ts-ignore - Pre v13 it was called textStyles
     old_data.text_styles = old_data.textStyles.map(ts => ({...ts, alpha: 1}))
 
+
+    /** Icon Scale Modes */
 	old_data.saveVersion = 13
+    const newIcons = old_data.icons.map(i => {
+        // @ts-ignore  - Icons pre v13 had pHex just on them rather than in a scale mode
+        if (!i.scaleMode && i.pHex) {
+            return {...i, scaleMode: ScaleMode.RELATIVE}
+        }
+    })
 
 	return old_data;
 }
