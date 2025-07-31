@@ -1,5 +1,7 @@
 import type { coordinates_data, eraser_data, icon_data, overlay_data, path_data, terrain_data, text_data } from "../types/data";
 import { coord_system } from "../types/coordinates";
+import { type Icon } from "../types/icon";
+import { DEFAULTICONSET } from "../lib/defaultIconset";
 
 import * as PIXI from 'pixi.js'
 import { get, writable, type Writable } from 'svelte/store';
@@ -23,9 +25,7 @@ export let data_path: Writable<path_data> = writable({
 })
 
 export let data_icon: Writable<icon_data> = writable({
-    color: null,
-    texId: null,
-    pHex: 80,
+    icon: DEFAULTICONSET.icons[0],
     snapToHex: true,
     usingEraser: false,
     dragMode: false,

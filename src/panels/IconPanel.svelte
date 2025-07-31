@@ -1,92 +1,64 @@
 <script lang="ts">
-  // TYPES
   import type { icon_data } from '../types/data'
   import type { Icon, Iconset } from '../types/icon'
   import type { terrain_field } from '../types/terrain'
+  import type { PreviewHexInfo } from '../helpers/iconFns'
+  import { ScaleMode } from '../helpers/imageSizing'
 
   import ColorInputPixi from '../components/ColorInputPixi.svelte'
   import { getHexPath } from '../helpers/hexHelpers'
   import { get_icon_texture } from '../lib/texture_loader'
   import * as PIXI from 'pixi.js'
   import { afterUpdate, onMount } from 'svelte'
+  import { generate_icon_preview } from '../helpers/iconFns'
 
-  // STORES
   import { tfield } from '../stores/tfield'
-  import { data_icon } from '../stores/data'
+  import { data_icon, data_terrain } from '../stores/data'
   import { tl } from '../stores/translation'
 
   export let loadedIconsets: Iconset[]
   export let app: PIXI.Application
-  export let pHex: number
 
-  let iconPreview = ''
-
-  function selectIcon(iconData: Icon) {
-    $data_icon.texId = iconData.texId
-    $data_icon.color = iconData.color
-
-    $data_icon.usingEraser = false
-  }
+  let iconPreview: string 
 
   let spr_preview = new PIXI.Sprite()
   let grph_preview = new PIXI.Graphics()
   let cont_preview = new PIXI.Container()
   cont_preview.addChild(grph_preview, spr_preview)
 
-  function getIconScale(hexWidth: number, hexHeight: number): number {
-    let scale: number
-    if (hexWidth < hexHeight) {
-      scale = (hexWidth * (pHex / 100)) / get_icon_texture($data_icon.texId).width
-    } else {
-      scale = (hexHeight * (pHex / 100)) / get_icon_texture($data_icon.texId).height
+  function get_icon_preview(icon: Icon) {
+    return generate_icon_preview(icon, hex_info, grph_preview, spr_preview, cont_preview, app)
+  }
+
+  let hex_info: PreviewHexInfo
+  tfield.subscribe((n) => {
+    hex_info = {
+      color: PIXI.utils.hex2string(n.blankHexColor),
+      hexHeight: n.hexHeight,
+      hexWidth: n.hexWidth,
+      orientation: n.orientation
     }
 
-    return scale
+    get_icon_preview($data_icon.icon).then(p => iconPreview = p); // Needed?
+  })
+
+  function selectIcon(iconData: Icon) {
+    $data_icon.icon = {...iconData}
+    $data_icon.usingEraser = false
   }
 
-  function getMaxIconScale(hexWidth: number, hexHeight: number): number {
-    let scale: number
-    if (hexWidth < hexHeight) {
-      scale = (hexHeight * (pHex / 100)) / get_icon_texture($data_icon.texId).height
-    } else {
-      scale = (hexWidth * (pHex / 100)) / get_icon_texture($data_icon.texId).width
-    }
-
-    return scale
-  }
-
-  async function getIconPreview(iconData: icon_data): Promise<string> {
-    let hW = $tfield.hexWidth * 2
-    let hH = $tfield.hexHeight * 2
-
-    let path = getHexPath(hW, hH, $tfield.orientation, 0, 0)
-    grph_preview.clear()
-    grph_preview.beginFill($tfield.blankHexColor)
-    grph_preview.drawPolygon(path)
-    grph_preview.endFill()
-
-    spr_preview.texture = get_icon_texture($data_icon.texId)
-    spr_preview.tint = iconData.color
-    spr_preview.anchor.set(0.5, 0.5)
-    spr_preview.scale.x = getMaxIconScale(hW, hH)
-    spr_preview.scale.y = getMaxIconScale(hW, hH)
-    spr_preview.rotation = PIXI.DEG_TO_RAD * iconData.rotation
-
-    let b64 = await app.renderer.extract.base64(cont_preview) //PIXI.autoDetectRenderer().plugins.extract.base64(c)
-
-    return b64
-  }
 
   function iconMatchesData(icon: Icon): boolean {
-    if ($data_icon.color != icon.color) return false
-    if ($data_icon.texId != icon.texId) return false
+    if ($data_icon.icon.color != icon.color) return false
+    if ($data_icon.icon.texId != icon.texId) return false
+    // TODO: rotation?
     return true
   }
 
-  afterUpdate(async () => {
+  afterUpdate(() => {
     loadedIconsets = loadedIconsets
     $tfield.orientation = $tfield.orientation
-    iconPreview = await getIconPreview($data_icon)
+    get_icon_preview($data_icon.icon).then(p => iconPreview = p)
   })
 
   onMount(async () => {
@@ -106,23 +78,37 @@
     </div>
 
     <span class="icon-preview-control-row">
-      <ColorInputPixi bind:value={$data_icon.color} id={'iconPanelColor'} />
+      <ColorInputPixi bind:value={$data_icon.icon.color} id={'iconPanelColor'} />
       <label for="iconPanelColor">{$tl.icon_panel.icon_color}</label>
     </span>
 
     <span class="icon-preview-control-row">
-      <input type="range" id="iconSize" min={10} max={100} bind:value={pHex} />
-      <button
-        class="outline-button"
-        on:click={() => {
-          pHex = 80
-        }}>{$tl.general.reset}</button
-      >
+      {#if ($data_icon.icon.scaleMode ?? ScaleMode.RELATIVE) === ScaleMode.RELATIVE}
+	<input type="range" id="iconSize" min={10} max={100} bind:value={$data_icon.icon.pHex} />
+	<button class="outline-button">{$tl.general.reset}</button >
+      {/if}
     </span>
 
     <div id="rotation-slider">
-      <input type="range" id="icon-rotation" min={0} max={359} bind:value={$data_icon.rotation} />
-      <input type="number" id="icon-rotation-num" min={0} max={359} bind:value={$data_icon.rotation} />
+      <div style="display: flex; align-items: center;">
+	<button class="img-button" style="height: 2em" on:click={() => { $data_icon.icon.rotation = (360 + $data_icon.icon.rotation-60) % 360 }}>
+	  <img src={`/assets/img/ui/rotate60_left_${'ft'}.png`} alt="<-" title={$tl.icon_panel.rotate60_left}>
+	</button>
+      </div>
+      <input type="range" id="icon-rotation" min={0} max={359} bind:value={$data_icon.icon.rotation} />
+      <div style="display: flex; align-items: center;">
+	<button class="img-button" style="height: 2em" on:click={() => { $data_icon.icon.rotation = ($data_icon.icon.rotation+60)%360 }}>
+	  <img src={`/assets/img/ui/rotate60_right_${'ft'}.png`} alt="->" title={$tl.icon_panel.rotate60_right}>
+	</button>
+      </div>
+      <input 
+	type="number"
+	id="icon-rotation-num"
+	min={0}
+	max={359}
+	bind:value={$data_icon.icon.rotation}
+	on:change={() => $data_icon.icon.rotation = $data_icon.icon.rotation % 360}
+      />
     </div>
   </div>
 

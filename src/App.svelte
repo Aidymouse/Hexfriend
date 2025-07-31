@@ -874,7 +874,7 @@
     {:else if $store_selected_tool == tools.TERRAIN}
       <TerrainPanel bind:this={comp_terrain_panel} {loadedTilesets} {app} />
     {:else if $store_selected_tool == tools.ICON}
-      <IconPanel {app} {loadedIconsets} bind:pHex={loadedSave.icon_hex_size_percentage} />
+      <IconPanel {app} {loadedIconsets} />
     {:else if $store_selected_tool == tools.PATH}
       <PathPanel {comp_pathLayer} bind:loaded_path_styles={loadedSave.path_styles} />
     {:else if $store_selected_tool == tools.TEXT}

@@ -1,3 +1,4 @@
+import { type Icon } from './icon';
 import type { coord_system } from './coordinates';
 import type { path_layer_path, path_style } from './path';
 import type { text_layer_text, text_style } from './text';
@@ -13,14 +14,11 @@ export interface terrain_data {
 }
 
 export type icon_data = {
-	color: number;
-	texId?: string;
-	pHex: number;
+	icon: Icon;
 	snapToHex: boolean;
 	usingEraser: boolean;
 	usingEyedropper: boolean;
 	dragMode: boolean;
-	rotation: number;
 }
 
 export interface coordinates_data {
