@@ -26,12 +26,14 @@ export type Translation = {
 	},
 	
 	terrain_panel: {
-		terrain_color: string,
-		symbol_color: string,
+		terrain_color: string, // Label for terrain color control
+		symbol_color: string, // Label for symbol color control
 	},
 
 	icon_panel: {
-		icon_color: string,	
+		icon_color: string, // Label for icon color control
+		rotate60_left: string, // Rotate button on icon panel
+		rotate60_right: string // Rotate buttonon icon panel
 	},
 
 	path_panel: {

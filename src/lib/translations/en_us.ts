@@ -33,6 +33,8 @@ export const en_us: Translation = {
 
 	icon_panel: {
 		icon_color: "Icon Color",	
+		rotate60_left: "Rotate 60 degrees left",	
+		rotate60_right: "Rotate 60 degrees right",	
 	},
 
 	path_panel: {
