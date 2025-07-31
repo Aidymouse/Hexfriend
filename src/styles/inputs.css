@@ -11,6 +11,7 @@ button {
 	transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
+
 button:hover {
 	background-color: var(--lighter-background);
 }
@@ -35,6 +36,19 @@ button.evil {
 
 button:hover.evil {
 	background-color: #885555;
+}
+
+button.img-button {
+	aspect-ratio: 1 / 1;
+    	padding: 0;
+    	display: flex;
+    	justify-content: center;
+    	align-items: center;
+
+}
+
+button.img-button img {
+	width: 80%; /* Use square images please */
 }
 
 
