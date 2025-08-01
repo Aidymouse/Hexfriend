@@ -1,22 +1,17 @@
 import type { ScaleMode } from "../helpers/imageSizing";
 
-/* SAVE DATA */
 export type Icon = {
-	display: string;
-	texId: string;
-	id: string;
-	color: number;
-	//pHex: number; 
-	base64: string;
-	preview: string; // Preview is set to nothing on the icon layer itself
-	texWidth: number;
-	texHeight: number;
-	rotation: number;
+    display: string;
+    id: string; // Within iconset id
+    texId: string; // Id of loaded texture
+    color: number;
+    //pHex: number; 
+    base64: string;
+    preview: string; // Preview is set to nothing on the icon layer itself
+    texWidth: number;
+    texHeight: number;
+    rotation: number;
     scaleMode: ScaleMode // Needed?
-    // scale: {
-    //     percent_of_hex: number
-
-    // } |  'percent_of_hex' | 'seperate_scales'
 } & ({
     scaleMode: ScaleMode.RELATIVE,
     pHex: number // percent of total hex taken up, where 1 = 100% of hexes shortest dimension
@@ -27,7 +22,14 @@ export type Icon = {
 
 })
 
-export type IconLayerIcon = Exclude<Icon, 'id'> & {id: number}
+
+/* SAVE DATA */
+export type IconLayerIcon = Icon & {
+  onLayerId: number,
+  x: number,
+  y: number
+  scale: {x: number, y: number}
+}
 
 export type Iconset = {
 	name: string;
