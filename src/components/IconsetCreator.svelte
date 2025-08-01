@@ -1,6 +1,6 @@
 <script lang="ts">
   import { HexOrientation } from '../types/terrain'
-  import type { Icon, Iconset } from '../types/icon'
+  import { LATEST_ICONSET_FORMAT_VERSION, type Icon, type Iconset } from '../types/icon'
 
   import { tl } from '../stores/translation'
 
@@ -31,11 +31,13 @@
 
   let workingIconset: Iconset = {
     name: 'New Iconset',
+    supported_orientations: 'both',
     id: 'new-iconset',
     author: '',
     version: 1,
     collapsed: false,
     icons: [],
+    format_version: LATEST_ICONSET_FORMAT_VERSION
   }
 
   let selectedIcon: Icon | null = null
@@ -235,6 +237,7 @@
       spr_icon.anchor.y = 0.5
       spr_icon.tint = selectedIcon.color
       spr_icon.scale = get_icon_scale_for_hex( selectedIcon, preview_hex_info,)
+      spr_icon.rotation = PIXI.DEG_TO_RAD * selectedIcon.rotation
 
       let new_preview = await get_icon_generator_preview(selectedIcon)
       if (selectedIcon.preview != new_preview) {
@@ -267,7 +270,7 @@
 <main on:dragend={dropButton}>
   <nav>
     <div id="set-controls">
-      <div id="grid">
+      <div id="iconset-attr-grid">
         <button
           on:click={() => {
             appState = 'normal'
@@ -285,6 +288,13 @@
 
         <label for="setVersion">{$tl.builders.version}</label>
         <input id="setVersion" type="number" bind:value={workingIconset.version} />
+
+        <label for="supported-orientations">{$tl.builders.supported_orientations}</label>
+        <select id="supported-orientations" bind:value={workingIconset.supported_orientations}>
+	  <option value={HexOrientation.FLATTOP}>{$tl.builders.supported_orientations_options[HexOrientation.FLATTOP]}</option>
+	  <option value={HexOrientation.POINTYTOP}>{$tl.builders.supported_orientations_options[HexOrientation.POINTYTOP]}</option>
+	  <option value={'both'}>{$tl.builders.supported_orientations_options['both']}</option>
+	</select>
 
         <button on:click={() => importIconset()} class="file-input-button">
           {$tl.builders.icon_set_builder.import_iconset}
@@ -404,7 +414,7 @@
 
       <!-- Scale -->
       <div id="symbol-scale">
-        <div id="scale-holder">
+        <div class="scale-holder">
           <label for="icon-scale-mode">Scale Mode</label>
           <select
             id="icon-scale-mode"
@@ -416,7 +426,7 @@
           </select>
         </div>
         {#if selectedIcon.scaleMode === ScaleMode.RELATIVE}
-          <div id="scale-holder">
+          <div class="scale-holder">
             <label for="icon-builder-scale-relative">{$tl.builders.icon_set_builder.scale_relative}</label>
             <input id="icon-builder-scale-relative" type="number" bind:value={selectedIcon.pHex} />
             <p>%</p>
@@ -424,8 +434,9 @@
           <div>
             <input type="range" min="5" max="100" bind:value={selectedIcon.pHex} />
           </div>
+
         {:else if selectedIcon.scaleMode === ScaleMode.BYDIMENSION}
-          <div id="scale-holder">
+          <div class="scale-holder">
             <label for="icon-builder-scale-2d-width">{$tl.builders.icon_set_builder.scale_bydimension.width}</label>
             <input id="icon-builder-scale-2d-width" type="number" bind:value={selectedIcon.pWidth} />
             <p>%</p>
@@ -433,15 +444,37 @@
           <div>
             <input type="range" min="5" max="100" bind:value={selectedIcon.pWidth} />
           </div>
-          <div id="scale-holder">
+          <div class="scale-holder">
             <label for="icon-builder-scale-2d-height">{$tl.builders.icon_set_builder.scale_bydimension.height}</label>
+          </div>
+          <div style="display: flex; gap: 0.5em; align-items: center;">
+            <input type="range" min="5" max="100" bind:value={selectedIcon.pHeight} />
             <input id="icon-builder-scale-2d-height" type="number" bind:value={selectedIcon.pHeight} />
             <p>%</p>
           </div>
-          <div>
-            <input type="range" min="5" max="100" bind:value={selectedIcon.pHeight} />
-          </div>
         {/if}
+          <div class="scale-holder">
+	    <label for="icon-builder-rotation">{$tl.builders.rotation}</label>
+            <input id="icon-builder-rotation" type="number" bind:value={selectedIcon.rotation} />
+            <p>deg</p>
+	  </div>
+          <div style="display: flex; gap: 0.5em; align-items: center;">
+	    <button class="img-button" style="height: 2em" on:click={() => selectedIcon.rotation = (360 + selectedIcon.rotation-60)%360}>
+	      <img 
+		src={`/assets/img/ui/rotate60_left_${preview_hex_info.orientation}.png`}
+		alt={$tl.icon_panel.rotate60_left}
+		title={$tl.icon_panel.rotate60_left}
+	      >
+	    </button>
+            <input type="range" min="0" max="359" bind:value={selectedIcon.rotation} />
+	    <button class="img-button" style="height: 2em" on:click={() => selectedIcon.rotation = (selectedIcon.rotation+60)%360}>
+	      <img 
+		src={`/assets/img/ui/rotate60_right_${preview_hex_info.orientation}.png`}
+		alt={$tl.icon_panel.rotate60_right}
+		title={$tl.icon_panel.rotate60_right}
+	      >
+	    </button>
+          </div>
       </div>
     </div>
   {:else}
@@ -493,7 +526,7 @@
     box-sizing: border-box;
   }
 
-  #set-controls #grid {
+  #set-controls #iconset-attr-grid {
     width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -501,7 +534,7 @@
     gap: 0.3125em;
   }
 
-  #grid input {
+  #iconset-attr-grid input {
     width: 100%;
     box-sizing: border-box;
   }
@@ -617,27 +650,27 @@
     color: var(--lightest-background);
   }
 
-  #scale-holder {
+  .scale-holder {
     display: flex;
     align-items: baseline;
     justify-content: flex-end;
   }
 
-  #scale-holder p {
+  .scale-holder p {
     margin: 0;
   }
 
-  #scale-holder :first-child {
+  .scale-holder :first-child {
     flex-grow: 1;
   }
 
-  #scale-holder input {
+  .scale-holder input {
     flex-shrink: 1;
     width: 6ch;
     height: 2em;
   }
 
-  #scale-holder :last-child {
+  .scale-holder :last-child {
     margin-inline-start: 0.5em;
   }
 </style>
