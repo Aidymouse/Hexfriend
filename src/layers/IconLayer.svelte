@@ -5,14 +5,12 @@
   import type { pan_state } from '../types/panning'
   import type { terrain_field } from '../types/terrain'
   import type { cube_coords } from '../types/coordinates'
-  import type { HexOrientation } from '../types/terrain'
+  import { HexOrientation } from '../types/terrain'
 
-  // Enums
   import { tools } from '../types/toolData'
   import { map_shape } from '../types/settings'
   import { store_has_unsaved_changes } from '../stores/flags'
 
-  // Stores
   import * as store_panning from '../stores/panning'
   import { tfield } from '../stores/tfield'
   import { store_inputs } from '../stores/inputs'
@@ -20,7 +18,6 @@
   import { data_icon, data_eraser } from '../stores/data'
   import { resize_parameters } from '../stores/resize_parameters'
 
-  // Lib
   import {
     coords_cubeToWorld,
     coords_cubeToq,
@@ -33,10 +30,9 @@
   import { get_icon_texture } from '../lib/texture_loader'
   import { afterUpdate, onMount } from 'svelte'
 
-  export let pHex: number
-
+  import { get_icon_scale_for_hex } from '../helpers/imageSizing'
   export let icons: IconLayerIcon[] = []
-  let pixi_icons: { [key: number]: PIXI.Sprite } = {} // keeps up to date with icons
+  let pixi_icons: { [icon_id: number]: PIXI.Sprite } = {} // keeps up to date with icons
 
   export let cont_icon: PIXI.Container
 
@@ -46,39 +42,30 @@
   // 	pan = newPan;
   // });
 
-  let floatingIcon: IconLayerIcon | null = null
+  //let floatingIcon: IconLayerIcon | null = null
   let draggedIcon: IconLayerIcon | null = null
 
   let iconId: number = 0
-  icons.forEach((i) => (iconId = Math.max(iconId, i.id)))
+  icons.forEach((i) => (iconId = Math.max(iconId, i.onLayerId)))
   iconId++
+
+  let spr_floating_icon = new PIXI.Sprite()
+  spr_floating_icon.anchor.x = 0.5
+  spr_floating_icon.anchor.y = 0.5
+  spr_floating_icon.alpha = 0.5
 
   $: {
     // Ideally, this would only trigger on a load. It can trigger on any update for now though...
-    icons.forEach((i) => (iconId = Math.max(iconId, i.id)))
+    icons.forEach((i) => (iconId = Math.max(iconId, i.onLayerId)))
     iconId++
 
-    if (floatingIcon) floatingIcon.scale = getMaxIconScale()
   }
 
   $: {
     //$store_selected_tool = $store_selected_tool
   }
 
-  function getMaxIconScale() {
-    let icon_texture = get_icon_texture($data_icon.texId)
-
-    let scale: number
-    if ($tfield.hexWidth < $tfield.hexHeight) {
-      scale = ($tfield.hexHeight * (pHex / 100)) / icon_texture.height
-    } else {
-      scale = ($tfield.hexWidth * (pHex / 100)) / icon_texture.width
-    }
-
-    return scale
-  }
-
-  export function placeIcon() {
+  function get_icon_position(): {iconX: number, iconY: number} {
     let iconX = store_panning.curWorldX()
     let iconY = store_panning.curWorldY()
 
@@ -104,56 +91,25 @@
       iconY = iconCoords.y
     }
 
-    icons.push({
+    return { iconX, iconY }
+  }
+
+
+  export function placeIcon() {
+
+    const { iconX, iconY } = get_icon_position()
+
+    let newIcon: IconLayerIcon = {
+      ...($data_icon.icon),
       x: iconX,
       y: iconY,
-      color: $data_icon.color,
-      scale: getMaxIconScale(),
-      pHex: pHex,
-      id: iconId,
-      texId: $data_icon.texId,
-      rotation: $data_icon.rotation,
-    })
-    iconId++
-    icons = icons
-
-    $store_has_unsaved_changes = true
-  }
-
-  export function get_scale_for_icon(icon: Icon) {
-    let icon_texture = get_icon_texture(icon.texId)
-
-    let scale: number
-    if ($tfield.hexWidth < $tfield.hexHeight) {
-      scale = ($tfield.hexHeight * (icon.pHex / 100)) / icon_texture.height
-    } else {
-      scale = ($tfield.hexWidth * (icon.pHex / 100)) / icon_texture.width
+      onLayerId: iconId,
+      texId: $data_icon.icon.texId,
+      rotation: $data_icon.icon.rotation,
+      scale: get_icon_scale_for_hex($data_icon.icon, {hexWidth: $tfield.hexWidth, hexHeight: $tfield.hexHeight})
     }
 
-    return scale
-  }
-
-  export function place_icon(icon: Icon, position: cube_coords, custom_scale: number = pHex) {
-    let icon_pos = coords_cubeToWorld(
-      position.q,
-      position.r,
-      position.s,
-      $tfield.orientation,
-      $tfield.hexWidth,
-      $tfield.hexHeight,
-      $tfield.grid.gap,
-    )
-
-    icons.push({
-      x: icon_pos.x,
-      y: icon_pos.y,
-      color: icon.color,
-      scale: get_scale_for_icon(icon),
-      pHex: icon.pHex,
-      id: iconId,
-      texId: icon.texId,
-      rotation: icon.rotation,
-    })
+    icons.push(newIcon)
     iconId++
     icons = icons
 
@@ -192,9 +148,10 @@
   }
 
   export function pointermove() {
-    if (floatingIcon) updateFloatingIcon()
+    //if (floatingIcon) 
     if (draggedIcon) updateDraggedIcon()
 
+    updateFloatingIcon()
     cursorOnLayer = true
   }
 
@@ -205,75 +162,42 @@
   }
 
   // Floating icons have a few bugs / polish requried:
-  // - Icon appears weirdly when icon layer is switched too, will need to update when layer is switched to
-  function createFloatingIcon() {
-    let iconX = store_panning.curWorldX()
-    let iconY = store_panning.curWorldY()
+  // - Icon appears weirdly when icon layer is switched too, will need to update when layer is switched to - still true?
 
-    if ($data_icon.snapToHex) {
-      let mouseHexCoords = coords_worldToCube(
-        store_panning.curWorldX(),
-        store_panning.curWorldY(),
-        $tfield.orientation,
-        $tfield.hexWidth,
-        $tfield.hexHeight,
-        $tfield.grid.gap,
-      )
-      let iconCoords = coords_cubeToWorld(
-        mouseHexCoords.q,
-        mouseHexCoords.r,
-        mouseHexCoords.s,
-        $tfield.orientation,
-        $tfield.hexWidth,
-        $tfield.hexHeight,
-        $tfield.grid.gap,
-      )
-
-      iconX = iconCoords.x
-      iconY = iconCoords.y
-    }
-
-    floatingIcon = {
-      x: iconX,
-      y: iconY,
-      color: $data_icon.color,
-      scale: getMaxIconScale(),
-      id: iconId,
-      texId: $data_icon.texId,
-    }
-  }
 
   function updateFloatingIcon() {
-    if ($data_icon.snapToHex) {
-      let mouseHexCoords = coords_worldToCube(
-        store_panning.curWorldX(),
-        store_panning.curWorldY(),
-        $tfield.orientation,
-        $tfield.hexWidth,
-        $tfield.hexHeight,
-        $tfield.grid.gap,
-      )
-      let iconCoords = coords_cubeToWorld(
-        mouseHexCoords.q,
-        mouseHexCoords.r,
-        mouseHexCoords.s,
-        $tfield.orientation,
-        $tfield.hexWidth,
-        $tfield.hexHeight,
-        $tfield.grid.gap,
-      )
+    const {iconX, iconY} = get_icon_position();
+    const iconScale = get_icon_scale_for_hex($data_icon.icon, $tfield);
 
-      floatingIcon.x = iconCoords.x
-      floatingIcon.y = iconCoords.y
-    } else {
-      floatingIcon.x = store_panning.curWorldX()
-      floatingIcon.y = store_panning.curWorldY()
-    }
+    spr_floating_icon.visible = false
+      console.log("Updating floating icon")
+      spr_floating_icon.visible =
+        !$data_icon.usingEraser &&
+        $store_selected_tool == tools.ICON &&
+        cursorOnLayer &&
+        !$data_icon.dragMode &&
+        draggedIcon == null &&
+        !$data_icon.usingEyedropper
+      spr_floating_icon.texture = get_icon_texture($data_icon.icon.texId)
+      spr_floating_icon.tint = $data_icon.icon.color
 
-    floatingIcon.color = $data_icon.color
-    floatingIcon.texId = $data_icon.texId
-    floatingIcon.rotation = $data_icon.rotation
+      spr_floating_icon.x = iconX
+      spr_floating_icon.y = iconY
+      spr_floating_icon.tint = $data_icon.icon.color
+      spr_floating_icon.scale.x = iconScale.x
+      spr_floating_icon.scale.y = iconScale.y
+      spr_floating_icon.rotation = PIXI.DEG_TO_RAD * ($data_icon.icon.rotation ?? 0)
+      // spr_floating_icon.eventMode = 'static' // !!! TODO
   }
+
+  /** Hide floating icon when tool is changed */
+  store_selected_tool.subscribe((n) => {
+    if (n !== tools.ICON) {
+	spr_floating_icon.visible = false;
+    } else {
+	spr_floating_icon.visible = true;
+    }
+  })
 
   export function moveAllIcons(xMod: number, yMod: number) {
     icons.forEach((icon) => {
@@ -349,7 +273,7 @@
     // Because it relies on row/col coords
 
     icons.forEach((icon: IconLayerIcon) => {
-      let oldOrientation: HexOrientation = newOrientation == 'flatTop' ? 'pointyTop' : 'flatTop'
+      let oldOrientation: HexOrientation = newOrientation === HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP
 
       // Find the center coordinates of the hex the icon wants to stay in
       let oldClosestHexCubeCoords = coords_worldToCube(
@@ -480,19 +404,16 @@
 
   let dragOffsetX = 0
   let dragOffsetY = 0
-  function icon_pointerdown(e: PointerEvent, icon: IconLayerIcon) {
+  function icon_pointerdown(e: PIXI.FederatedPointerEvent, clicked_icon: IconLayerIcon) {
     if (shouldEraseIcons()) {
-      deleteIcon(icon)
+      deleteIcon(clicked_icon)
       $store_has_unsaved_changes = true
     } else if ($data_icon.dragMode && draggedIcon == null) {
-      draggedIcon = icon
-      dragOffsetX = store_panning.curWorldX() - icon.x
-      dragOffsetY = store_panning.curWorldY() - icon.y
+      draggedIcon = clicked_icon
+      dragOffsetX = store_panning.curWorldX() - clicked_icon.x
+      dragOffsetY = store_panning.curWorldY() - clicked_icon.y
     } else if ($data_icon.usingEyedropper) {
-      pHex = icon.pHex
-      $data_icon.color = icon.color
-      $data_icon.texId = icon.texId
-      $data_icon.rotation = icon.rotation
+      $data_icon.icon = {...clicked_icon}
 
       updateFloatingIcon()
     }
@@ -503,51 +424,21 @@
   }
 
   function updateDraggedIcon() {
-    if ($data_icon.snapToHex) {
-      let mouseHexCoords = coords_worldToCube(
-        store_panning.curWorldX(),
-        store_panning.curWorldY(),
-        $tfield.orientation,
-        $tfield.hexWidth,
-        $tfield.hexHeight,
-        $tfield.grid.gap,
-      )
-      let iconCoords = coords_cubeToWorld(
-        mouseHexCoords.q,
-        mouseHexCoords.r,
-        mouseHexCoords.s,
-        $tfield.orientation,
-        $tfield.hexWidth,
-        $tfield.hexHeight,
-        $tfield.grid.gap,
-      )
-
-      draggedIcon.x = iconCoords.x
-      draggedIcon.y = iconCoords.y
-    } else {
-      draggedIcon.x = store_panning.curWorldX() - dragOffsetX
-      draggedIcon.y = store_panning.curWorldY() - dragOffsetY
-    }
+    const {iconX, iconY} = get_icon_position()
 
     icons = icons
     $store_has_unsaved_changes = true
   }
 
-  createFloatingIcon()
 
-  let spr_floating_icon = new PIXI.Sprite()
-  spr_floating_icon.anchor.x = 0.5
-  spr_floating_icon.anchor.y = 0.5
-  spr_floating_icon.alpha = 0.5
 
-  // TODO: This could use a bit of cleanup...
   afterUpdate(() => {
     let marked_for_saving: number[] = []
 
     // Update icons to be in line with state
     icons.forEach((icon) => {
       // if the icon doesn't exist
-      if (!pixi_icons[icon.id]) {
+      if (!pixi_icons[icon.onLayerId]) {
         // Create icon
         let new_icon = new PIXI.Sprite(get_icon_texture(icon.texId))
         new_icon.anchor.x = 0.5
@@ -560,20 +451,19 @@
           icon_pointerover(e, icon)
         })
         // add the icon
-        pixi_icons[icon.id] = new_icon
+        pixi_icons[icon.onLayerId] = new_icon
         cont_icon.addChild(new_icon)
       }
 
-      pixi_icons[icon.id].x = icon.x
-      pixi_icons[icon.id].y = icon.y
-      pixi_icons[icon.id].tint = icon.color
-      pixi_icons[icon.id].scale.x = icon.scale
-      pixi_icons[icon.id].scale.y = icon.scale
-      pixi_icons[icon.id].eventMode =
-        $store_selected_tool == tools.ICON || $store_selected_tool == tools.ERASER ? 'static' : 'auto'
-      pixi_icons[icon.id].rotation = PIXI.DEG_TO_RAD * (icon.rotation ?? 0)
+      pixi_icons[icon.onLayerId].x = icon.x
+      pixi_icons[icon.onLayerId].y = icon.y
+      pixi_icons[icon.onLayerId].tint = icon.color
+      pixi_icons[icon.onLayerId].scale.x = icon.scale.x
+      pixi_icons[icon.onLayerId].scale.y = icon.scale.y
+      pixi_icons[icon.onLayerId].eventMode = $store_selected_tool == tools.ICON || $store_selected_tool == tools.ERASER ? 'static' : 'auto'
+      pixi_icons[icon.onLayerId].rotation = PIXI.DEG_TO_RAD * (icon.rotation ?? 0)
 
-      marked_for_saving.push(icon.id)
+      marked_for_saving.push(icon.onLayerId)
     })
 
     Object.keys(pixi_icons).forEach((icon_id) => {
@@ -585,27 +475,6 @@
       }
     })
 
-    /* Floating Icon */
-    spr_floating_icon.visible = false
-    if (floatingIcon) {
-      spr_floating_icon.visible =
-        !$data_icon.usingEraser &&
-        $store_selected_tool == tools.ICON &&
-        cursorOnLayer &&
-        !$data_icon.dragMode &&
-        draggedIcon == null &&
-        !$data_icon.usingEyedropper
-      spr_floating_icon.texture = get_icon_texture(floatingIcon.texId)
-      spr_floating_icon.tint = floatingIcon.color
-
-      spr_floating_icon.x = floatingIcon.x
-      spr_floating_icon.y = floatingIcon.y
-      spr_floating_icon.tint = floatingIcon.color
-      spr_floating_icon.scale.x = floatingIcon.scale
-      spr_floating_icon.scale.y = floatingIcon.scale
-      spr_floating_icon.rotation = PIXI.DEG_TO_RAD * (floatingIcon.rotation ?? 0)
-      // spr_floating_icon.eventMode = 'static' // !!! TODO
-    }
   })
 
   onMount(() => {
@@ -613,41 +482,3 @@
     cont_icon.addChild(spr_floating_icon)
   })
 </script>
-
-<!--
-
-{#if floatingIcon}
-	<Sprite
-		texture={get_icon_texture(floatingIcon.texId)}
-		x={floatingIcon.x}
-		y={floatingIcon.y}
-		tint={$data_icon.color}
-		anchor={{ x: 0.5, y: 0.5 }}
-		scale={{ x: floatingIcon.scale, y: floatingIcon.scale }}
-		
-		visible={!$data_icon.usingEraser && $store_selected_tool == tools.ICON && cursorOnLayer && !$data_icon.dragMode && draggedIcon == null}
-	/>
-{/if}
--->
-
-<!--
-	<Container instance={cont_icon}></Container>
-{#each icons as icon (icon.id)}
-	<Sprite
-		texture={get_icon_texture(icon.texId)}
-		x={icon.x}
-		y={icon.y}
-		tint={icon.color}
-		anchor={{ x: 0.5, y: 0.5 }}
-		scale={{ x: icon.scale, y: icon.scale }}
-		interactive={ true }
-		on:pointerdown={(e) => {
-			icon_pointerdown(e, icon);
-		}}
-		on:pointerover={(e) => {
-			icon_pointerover(e, icon);
-		}}
-		
-	/>
-{/each}
--->
