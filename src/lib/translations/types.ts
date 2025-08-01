@@ -1,4 +1,5 @@
 import type { ScaleMode } from "../../helpers/imageSizing"
+import { HexOrientation } from "../../types/terrain"
 
 export type Translation = {
 	language: string,
@@ -48,8 +49,8 @@ export type Translation = {
 
 		save_current_style: string,
 		update_style_title: string,
-        rename_path_style_prompt: string,
-        delete_path_style_prompt: string,
+		rename_path_style_prompt: string,
+		delete_path_style_prompt: string,
 		update_style: string,
 		rename_style: string,
 		duplicate_style: string,
@@ -69,8 +70,8 @@ export type Translation = {
 		rename_style: string,
 		duplicate_style: string,
 		delete_style: string,
-        rename_text_style_prompt: string,
-        delete_text_style_prompt: string,
+		rename_text_style_prompt: string,
+		delete_text_style_prompt: string,
 	},
 
 	eraser_panel: {
@@ -265,6 +266,9 @@ export type Translation = {
 		version: string,
 		change_orientation: string,
 		duplicate: string,
+		supported_orientations: string, // Label for supported orientations dropdown
+		supported_orientations_options: {[o in HexOrientation]: string} & {both: string},
+		rotation: string // Label for icon and tile symbol rotation controls
 		tileset_builder: {
 			delete: string,
 			exit: string,
@@ -278,8 +282,8 @@ export type Translation = {
 			symbol_scale: string,
 		},
 		icon_set_builder: {
-            import_iconset: string,
-            export_iconset: string,
+      import_iconset: string,
+      export_iconset: string,
 			delete: string,
 			exit: string,
 			name: string,
@@ -288,16 +292,16 @@ export type Translation = {
 			helptext: string,
 			helpsubtitle: string,
 			helpsubsubtitle: string,
-            help_wiki_mention: string,
+      help_wiki_mention: string,
 			tint: string,
-            scale_mode: string,
-            scale_mode_options: { [opt in ScaleMode]: string }
+      scale_mode: string,
+      scale_mode_options: { [opt in ScaleMode]: string }
 			scale_relative: string,
 			scale_bydimension: {
-                width: string,
-                height: string,
-                
-            }
+        width: string,
+        height: string,
+        
+      }
 		}
 	},
 

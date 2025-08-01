@@ -1,4 +1,5 @@
 import { ScaleMode } from "../../helpers/imageSizing";
+import { HexOrientation } from "../../types/terrain";
 import type { Translation } from "./types";
 
 export const en_us: Translation = {
@@ -266,6 +267,13 @@ export const en_us: Translation = {
 		version: "Version",
 		change_orientation: "Change Hex Orientation",
 		duplicate: "Duplicate this hex",
+		supported_orientations: "Supports",
+		supported_orientations_options: {
+		  [HexOrientation.FLATTOP]: "Flat Top",
+		  [HexOrientation.POINTYTOP]: "Pointy Top",
+		  'both': 'Both'
+		},
+		rotation: 'Rotation',
 		tileset_builder: {
 			delete: "Delete this hex",
 			exit: "Exit Tileset Builder",
@@ -279,8 +287,8 @@ export const en_us: Translation = {
 			symbol_scale: "Symbol Scale",
 		},
 		icon_set_builder: {
-            import_iconset: "Import Iconset",
-            export_iconset: "Export Iconset",
+			import_iconset: "Import Iconset",
+			export_iconset: "Export Iconset",
 			delete: "Delete this icon",
 			exit: "Exit Icon Set Builder",
 			name: "Icon Set Name",
@@ -289,18 +297,18 @@ export const en_us: Translation = {
 			helptext: "Select an icon or make a new one!",
 			helpsubtitle: "For best results, use white 100px by 100px images.",
 			helpsubsubtitle: "Hint: You can upload multiple images at once!",
-            help_wiki_mention: "Help available on the wiki",
+			help_wiki_mention: "Help available on the wiki",
 			tint: "Tint",
-            scale_mode: "Scale Mode",
-            scale_mode_options: {
-                [ScaleMode.RELATIVE]: 'Relative',
-                [ScaleMode.BYDIMENSION]: 'By Dimension',
-            },
+			scale_mode: "Scale Mode",
+			scale_mode_options: {
+			  [ScaleMode.RELATIVE]: 'Relative',
+			  [ScaleMode.BYDIMENSION]: 'By Dimension',
+			},
 			scale_relative: "Icon Scale",
 			scale_bydimension: {
-                width: "Percent of Width",
-                height: "Percent of Height",
-            }
+			  width: "Percent of Width",
+			  height: "Percent of Height",
+			}
 		}
 	},
 
