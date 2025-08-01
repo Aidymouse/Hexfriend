@@ -41,6 +41,10 @@
   let selectedIcon: Icon | null = null
   let icon_previews: { [iconId: string]: string } = {}
 
+  $: {
+    get_icon_generator_preview(selectedIcon).then(p => icon_previews[selectedIcon.id] = p)
+  }
+
   //const l: PIXI.Loader = new PIXI.Loader();
   let texId: number = 0
 
@@ -89,10 +93,7 @@
 
         const newTexture = await loadTexture(texId, r.result)
 
-        const newIcon: Icon = {
-          display: iconName,
-          texId: texId,
-          id: findID(IDify(iconName)),
+	const stockIcon: Icon = {
           color: 0xffffff,
           rotation: 0,
           base64: r.result as string,
@@ -101,6 +102,16 @@
           texHeight: newTexture.height,
           scaleMode: ScaleMode.RELATIVE,
           pHex: 80,
+	  display: "",
+	  texId: "",
+	  id: ""
+	}
+
+        const newIcon: Icon = {
+	  ...(selectedIcon ?? stockIcon),
+          display: iconName,
+          texId: texId,
+          id: findID(IDify(iconName)),
         }
 
         workingIconset.icons = [...workingIconset.icons, newIcon]
@@ -133,8 +144,15 @@
   function exportIconset() {
     workingIconset.id = IDify(`${workingIconset.name}:v${workingIconset.version}`)
 
+    // Generate IDs for all icons
     workingIconset.icons.forEach((icon) => {
+      // Update previews
+      const oldId = icon.id
+
       icon.id = findID(icon.display)
+
+      icon_previews[icon.id] = icon_previews[oldId]
+      delete icon_previews[oldId]
     })
 
     console.log(workingIconset)
@@ -169,7 +187,7 @@
 
   /* DRAG FUNCTIONS */
   let dragIcon: Icon
-  let phantomIconButtonId
+  let phantomIconButtonId: string
 
   function dragButton(e: DragEvent, icon: Icon) {
     phantomIconButtonId = icon.id
@@ -226,15 +244,7 @@
     }
   })
 
-  const change_scale_mode = (new_scale_mode: ScaleMode) => {
-    /*
-    let newIcon: Icon = {
-      ...selectedIcon,
-      scaleMode: new_scale_mode,
-    } as Icon // I know it is!!! I just know!!!
-
-    */
-
+  const change_scale_mode = (new_scale_mode: string) => {
     delete selectedIcon.pHex
     delete selectedIcon.pWidth
     delete selectedIcon.pHeight
@@ -254,7 +264,7 @@
   }
 </script>
 
-<main>
+<main on:dragend={dropButton}>
   <nav>
     <div id="set-controls">
       <div id="grid">
@@ -293,7 +303,7 @@
       </div>
     </div>
 
-      <!-- BUTTONS -->
+    <!-- ICON BUTTONS -->
     <div id="icon-buttons"
       on:dragover={(e) => { e.preventDefault() }}
       on:dragenter={(e) => { e.preventDefault() }}
@@ -351,10 +361,7 @@
               ...preview_hex_info,
               hexWidth: preview_hex_info.hexHeight,
               hexHeight: preview_hex_info.hexWidth,
-              orientation:
-                preview_hex_info.orientation === HexOrientation.FLATTOP
-                  ? HexOrientation.POINTYTOP
-                  : HexOrientation.FLATTOP,
+              orientation: preview_hex_info.orientation === HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP,
             }
           }}
           title={$tl.builders.change_orientation}
