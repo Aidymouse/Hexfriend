@@ -251,6 +251,7 @@
   }
 
   /* TOOL METHODS */
+  /** TODO: refactor this into seperate tool store subscribes in respective layers */
   function changeTool(newTool: tools) {
     // A list of stuff that needs to happen every tool change
     data_path.update((n) => {
@@ -705,9 +706,7 @@
       symbol: firstTile.symbol ? { ...firstTile.symbol } : null,
     }
 
-    let firstIcon = loadedIconsets[0].icons[0]
-    $data_icon.color = firstIcon.color
-    $data_icon.texId = firstIcon.texId
+    $data_icon.icon = {...loadedIconsets[0].icons[0]}
 
     // Center the map
     let tf = loadedSave.TerrainField
@@ -751,13 +750,7 @@
     // Jolt all the layers that respond to the data into place. Without this the text, icons and paths kinda get stuck. It's odd. Warrants further investigation.
     loadedSave = loadedSave
 
-    /* Set up tools - would be nice to remember tool settings but this works regardless of loaded tileset */
-
-    // console.log(loadedSave);
     console.log('Loaded, ready')
-
-    //loadedSave = data
-    //loadedId = id
   }
 
   $: appState, andSave()
