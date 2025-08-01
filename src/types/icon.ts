@@ -1,4 +1,7 @@
-import type { ScaleMode } from "../helpers/imageSizing";
+import type { ScaleMode } from "../helpers/imageSizing"
+import { HexOrientation } from "./terrain"
+
+export const LATEST_ICONSET_FORMAT_VERSION = 2
 
 export type Icon = {
     display: string;
@@ -33,11 +36,13 @@ export type IconLayerIcon = Icon & {
 
 export type Iconset = {
 	name: string;
+	supported_orientations: HexOrientation.FLATTOP | HexOrientation.POINTYTOP | 'both';
 	id: string;
 	author: string;
 	version: number;
 	collapsed: boolean;
 	icons: Icon[];
+	format_version: number;
 }
 
 /* Used during program and also saved in list to keep track of icons */
