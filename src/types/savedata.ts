@@ -6,7 +6,7 @@ import type { listed_text_style } from './text';
 import type { Tileset } from './tilesets';
 
 const LATESTSAVEDATAVERSION = 13;
-const LATESTDEFAULTICONSVERSION = 5;
+const LATEST_DEFAULT_ICONS_VERSION = 5;
 
 interface save_data {
 	saveVersion: number;
@@ -31,4 +31,4 @@ interface save_data {
 }
 
 export type { save_data }
-export { LATESTDEFAULTICONSVERSION, LATESTSAVEDATAVERSION }
+export { LATEST_DEFAULT_ICONS_VERSION, LATESTSAVEDATAVERSION }

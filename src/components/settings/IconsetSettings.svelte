@@ -1,7 +1,7 @@
 <script lang="ts">
   import '../../styles/settings.css'
 
-  import { LATESTDEFAULTICONSVERSION } from '../../types/savedata'
+  import { LATEST_DEFAULT_ICONS_VERSION } from '../../types/savedata'
   import { type Iconset } from '../../types/icon'
 
   import { store_has_unsaved_changes } from '../../stores/flags'
@@ -58,7 +58,7 @@
     <div class="loaded-tileset">
       {iconset.name}
 
-      {#if iconset.id.split(':')[0] != 'default' && iconset.version != LATESTDEFAULTICONSVERSION}
+      {#if iconset.id.split(':')[0] != 'default' && iconset.version != LATEST_DEFAULT_ICONS_VERSION}
         <button
           on:click={() => {
             removeIconset(iconset.id)

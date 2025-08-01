@@ -97,7 +97,6 @@
   import type { pan_state } from './types/panning'
   import type { save_data } from './types/savedata'
   // Constants
-  import { LATESTSAVEDATAVERSION, LATESTDEFAULTICONSVERSION } from './types/savedata'
   import { map_shape } from './types/settings'
   import type { terrain_field } from './types/terrain'
   import { LATEST_TILESET_FORMAT_VERSION, type Tileset } from './types/tilesets'
