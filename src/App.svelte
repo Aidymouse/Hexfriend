@@ -90,6 +90,7 @@
   import './styles/scrollbar.css'
   import './styles/variables.css'
   import './styles/shorthand.css'
+  import './styles/details.css'
 
   // TYPES
   import type { eraser_data, terrain_data, text_data } from './types/data'
