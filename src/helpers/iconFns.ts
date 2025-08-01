@@ -14,7 +14,7 @@ export type PreviewHexInfo = {
 }
 
 /** Generates an icon preview by drawing a specified hex, then an icon on top, turning it into base 64, and returning the base 64. */
-export async function generate_icon_preview(icon: Icon, hexInfo: PreviewHexInfo, grph: PIXI.Graphics, spr: PIXI.Sprite, cont: PIXI.Container, app: PIXI.Application): Promise<string> {
+export async function generate_icon_preview(icon: Icon, hexInfo: PreviewHexInfo, grph: PIXI.Graphics, spr: PIXI.Sprite, cont: PIXI.Container, app: PIXI.Application, customTexture?: PIXI.Texture): Promise<string> {
 
 		let path = getHexPath(hexInfo.hexWidth, hexInfo.hexHeight, hexInfo.orientation, 0, 0);
 		grph.clear();
@@ -22,7 +22,7 @@ export async function generate_icon_preview(icon: Icon, hexInfo: PreviewHexInfo,
 		grph.drawPolygon(path);
 		grph.endFill();
 
-		spr.texture = get_icon_texture(icon.texId);
+		spr.texture = customTexture ?? get_icon_texture(icon.texId);
 		spr.tint = icon.color;
 		spr.anchor.set(0.5, 0.5);
 		const icon_scale = get_icon_scale_for_hex(icon, hexInfo)
