@@ -24,6 +24,7 @@
 		oldStringValue = stringValue;
 
 		dispatch('change', {});
+		dispatch('input', {string: stringValue, number: value});
 	}
 </script>
 
