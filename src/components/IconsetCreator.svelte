@@ -11,7 +11,7 @@
   import * as PIXI from 'pixi.js'
   import { afterUpdate, tick } from 'svelte'
   import { generate_icon_preview, type PreviewHexInfo } from '../helpers/iconFns'
-  import { get_image_scaled_for_hex, get_image_scaled_for_hex_relative, ScaleMode } from '../helpers/imageSizing'
+  import { get_icon_scale_for_hex, ScaleMode } from '../helpers/imageSizing'
   import { DEFAULT_BLANK_HEX_COLOR } from '../types/defaults'
 
   let app = new PIXI.Application({
@@ -211,24 +211,7 @@
       spr_icon.anchor.x = 0.5
       spr_icon.anchor.y = 0.5
       spr_icon.tint = selectedIcon.color
-      if (selectedIcon.scaleMode === ScaleMode.BYDIMENSION) {
-        spr_icon.scale = get_image_scaled_for_hex(
-          selectedIcon.texWidth,
-          selectedIcon.texHeight,
-          preview_hex_info.hexWidth,
-          preview_hex_info.hexHeight,
-          selectedIcon.pWidth,
-          selectedIcon.pHeight,
-        )
-      } else {
-        spr_icon.scale = get_image_scaled_for_hex_relative(
-          selectedIcon.texWidth,
-          selectedIcon.texHeight,
-          preview_hex_info.hexWidth,
-          preview_hex_info.hexHeight,
-          selectedIcon.pHex,
-        )
-      }
+      spr_icon.scale = get_icon_scale_for_hex( selectedIcon, preview_hex_info,)
 
       let new_preview = await get_icon_generator_preview(selectedIcon)
       if (selectedIcon.preview != new_preview) {
