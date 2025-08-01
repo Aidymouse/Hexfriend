@@ -39,6 +39,7 @@
   }
 
   let selectedIcon: Icon | null = null
+  let icon_previews: { [iconId: string]: string } = {}
 
   //const l: PIXI.Loader = new PIXI.Loader();
   let texId: number = 0
@@ -103,6 +104,10 @@
         }
 
         workingIconset.icons = [...workingIconset.icons, newIcon]
+	const preview = await get_icon_generator_preview(newIcon)
+	get_icon_generator_preview(newIcon).then((res) => {
+	  icon_previews = {...icon_previews, [newIcon.id]: res }
+	})
       }
     })
   }
@@ -122,7 +127,7 @@
   }
 
   async function get_icon_generator_preview(icon: Icon) {
-    return generate_icon_preview(icon, preview_hex_info, grph_icon_preview, spr_icon_preview, cont_icon_preview, app)
+    return generate_icon_preview(icon, preview_hex_info, grph_icon_preview, spr_icon_preview, cont_icon_preview, app, loadedTextures[icon.texId])
   }
 
   function exportIconset() {
@@ -222,28 +227,30 @@
   })
 
   const change_scale_mode = (new_scale_mode: ScaleMode) => {
+    /*
     let newIcon: Icon = {
       ...selectedIcon,
       scaleMode: new_scale_mode,
     } as Icon // I know it is!!! I just know!!!
 
-    delete newIcon.pHex
-    delete newIcon.pWidth
-    delete newIcon.pHeight
+    */
 
-    switch (newIcon.scaleMode) {
+    delete selectedIcon.pHex
+    delete selectedIcon.pWidth
+    delete selectedIcon.pHeight
+
+    switch (selectedIcon.scaleMode) {
       case ScaleMode.RELATIVE: {
-        newIcon.pHex = 80
+        selectedIcon.pHex = 80
         break
       }
       case ScaleMode.BYDIMENSION: {
-        newIcon.pWidth = 80
-        newIcon.pHeight = 80
+        selectedIcon.pWidth = 80
+        selectedIcon.pHeight = 80
         break
       }
     }
 
-    selectedIcon = newIcon
   }
 </script>
 
@@ -286,14 +293,10 @@
       </div>
     </div>
 
-    <div
-      id="icon-buttons"
-      on:dragover={(e) => {
-        e.preventDefault()
-      }}
-      on:dragenter={(e) => {
-        e.preventDefault()
-      }}
+      <!-- BUTTONS -->
+    <div id="icon-buttons"
+      on:dragover={(e) => { e.preventDefault() }}
+      on:dragenter={(e) => { e.preventDefault() }}
       on:drop={dropButton}
     >
       {#each workingIconset.icons as icon (icon.id)}
@@ -301,19 +304,13 @@
           class="icon-button"
           class:selected={selectedIcon == icon}
           style={icon.id == phantomIconButtonId ? 'opacity: 0' : ''}
-          on:click={() => {
-            selectedIcon = icon
-          }}
+          on:click={() => { selectedIcon = icon }}
           draggable={true}
-          on:dragstart={(e) => {
-            dragButton(e, icon)
-          }}
-          on:dragenter={(e) => {
-            draggedOverButton(e, icon)
-          }}
+          on:dragstart={(e) => { dragButton(e, icon) }}
+          on:dragenter={(e) => { draggedOverButton(e, icon) }}
           title={icon.display}
         >
-          <img src={icon.preview} draggable="false" alt="Button for {icon.display}" />
+          <img src={icon_previews[icon.id]} draggable="false" alt="Button for {icon.display}" />
         </button>
       {/each}
 
@@ -404,13 +401,11 @@
           <label for="icon-scale-mode">Scale Mode</label>
           <select
             id="icon-scale-mode"
-            on:change={(e) => {
-              change_scale_mode(ScaleMode[e.currentTarget.value])
-            }}
+	    bind:value={selectedIcon.scaleMode}
+            on:change={(e) => { change_scale_mode(e.currentTarget.value) }}
           >
-            {#each Object.keys(ScaleMode) as S}
-              <option value={S}>{$tl.builders.icon_set_builder.scale_mode_options[ScaleMode[S]] ?? S}</option>
-            {/each}
+              <option value={ScaleMode.RELATIVE}>{$tl.builders.icon_set_builder.scale_mode_options[ScaleMode.RELATIVE]}</option>
+              <option value={ScaleMode.BYDIMENSION}>{$tl.builders.icon_set_builder.scale_mode_options[ScaleMode.BYDIMENSION]}</option>
           </select>
         </div>
         {#if selectedIcon.scaleMode === ScaleMode.RELATIVE}
