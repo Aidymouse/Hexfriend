@@ -18,5 +18,6 @@
     "moduleResolution": "node"
   },
   "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],
+  "exclude": ["src/components/scratchpad/**/*"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
