@@ -57,6 +57,27 @@
 
   let selectedTile: Tile | null = null
 
+  /** Keep local color copies so you can edit the text boxes */
+  let local_tile_color: string = new PIXI.Color(DEFAULT_BLANK_HEX_COLOR).toHex();
+  $: {
+    if (selectedTile) {
+      try {
+	let c = new PIXI.Color(local_tile_color).toNumber();
+	selectedTile.bgColor = c;
+      } catch {}
+    }
+  }
+
+  let local_symbol_color: string = "#ffffff";
+  $: {
+    if (selectedTile?.symbol) {
+      try {
+	let c = new PIXI.Color(local_symbol_color).toNumber();
+	selectedTile.symbol.color = c;
+      } catch {}
+    }
+  }
+
   let previewSprite = new PIXI.Sprite()
   previewSprite.anchor.set(0.5);
   let previewGraphics = new PIXI.Graphics()
@@ -84,12 +105,13 @@
       id: findID('New Hex'),
       symbol: null,
       bgColor: DEFAULT_BLANK_HEX_COLOR,
-      preview: '',
+      preview_flatTop: '',
+      preview_pointyTop: '',
     }
 
     newTile.id = findID(newTile.id)
 
-    newTile.preview = await generate_tile_preview(newTile)
+    newTile.preview_flatTop = await generate_tile_preview(newTile)
 
     workingTileset.tiles = [...workingTileset.tiles, newTile]
 
@@ -314,7 +336,7 @@
         <input id="setVersion" type="number" bind:value={workingTileset.version} />
 
         <button on:click={() => importTileset()} class="file-input-button">
-          {$tl.general.import}
+          {$tl.builders.tileset_builder.import_tileset}
           <input
             type="file"
             bind:files={importFiles}
@@ -326,7 +348,7 @@
           />
         </button>
 
-        <button on:click={() => exportTileset()}>{$tl.general.export}</button>
+        <button on:click={() => exportTileset()}>{$tl.builders.tileset_builder.export_tileset}</button>
       </div>
     </div>
 
@@ -420,11 +442,11 @@
 
 	  <!-- Background Color -->
 	  <div class="color" style="margin-bottom: 0.5em">
-	    <ColorInputPixi bind:value={selectedTile.bgColor} w={'50'} h={'50'} />
+	    <ColorInputPixi bind:value={selectedTile.bgColor} on:input={(e) => {local_tile_color = e.detail.string}} w={'50'} h={'50'} />
 
 	    <div>
-	      <p>Background</p>
-	      <p class="color-string">{PIXI.utils.hex2string(selectedTile.bgColor)}</p>
+	      <label for="bg-input">Background</label>
+	      <input style="border-radius: var(--small-radius)" type="string" class="color-string" bind:value={local_tile_color} />
 	    </div>
 	  </div>
 
@@ -453,15 +475,11 @@
 	  {#if selectedTile.symbol}
 	      <!-- Symbol Color -->
 	      <div class="color" style="margin-top: 10px">
-		<ColorInputPixi bind:value={selectedTile.symbol.color} w={'50'} h={'50'} />
+		<ColorInputPixi bind:value={selectedTile.symbol.color} on:input={(e) => local_symbol_color = e.detail.string} w={'50'} h={'50'} />
 
 		<div>
-		  <p>
-		    {$tl.builders.tileset_builder.symbol}
-		  </p>
-		  <p class="color-string">
-		    {PIXI.utils.hex2string(selectedTile.symbol.color)}
-		  </p>
+		  <label for="symbol-color">{$tl.builders.tileset_builder.symbol}</label>
+		  <input id="symbol-color" bind:value={local_symbol_color} /> 
 		</div>
 	      </div>
 
