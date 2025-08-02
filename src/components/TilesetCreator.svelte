@@ -8,7 +8,7 @@
     hexWidth: 50 * 6,
     hexHeight: 43.3 * 6,
     orientation: HexOrientation.FLATTOP,
-    color: '#f2f2f2',
+    color: new PIXI.Color(DEFAULT_BLANK_HEX_COLOR).toHex(),
   }
 
   import { HexOrientation } from '../types/terrain'
@@ -26,6 +26,7 @@
   import { update_tileset_format } from '../lib/tileset_updater'
   import { ScaleMode } from '../helpers/imageSizing'
 
+  import { convert_tileset_to_latest } from '../lib/tilesetConverter'
   let app = new PIXI.Application({
     height: 300,
     width: 300,
@@ -35,8 +36,6 @@
   export let appState
 
   let texture_register = {} // texture_id: texture
-
-  let orientation: HexOrientation = HexOrientation.FLATTOP
 
   let workingTileset: Tileset = {
     name: 'New Tileset',
@@ -153,6 +152,18 @@
     return await app.renderer.extract.base64(previewContainer)
   }
 
+  $: {
+    if (selectedTile) {
+      generate_tile_preview(selectedTile).then(p => {
+	if (preview_hex_info.orientation === HexOrientation.FLATTOP) {
+	  selectedTile.preview_flatTop = p;
+	} else {
+	  selectedTile.preview_pointyTop = p;
+	}
+      })
+    }
+  }
+
   function IDify(name: string): string {
     return name.toLowerCase().replaceAll(' ', '-')
   }
@@ -213,6 +224,8 @@
     r.onload = async (eb) => {
       /* Read the file */
       let setToImport = JSON.parse(eb.target.result as string)
+
+      setToImport = convert_tileset_to_latest(setToImport)
 
       //console.log(setToImport)
 
@@ -277,14 +290,12 @@
   afterUpdate(async () => {
     if (selectedTile) {
       let new_preview = await generate_tile_preview(selectedTile)
-      if (selectedTile.preview != new_preview) {
-        selectedTile.preview = new_preview
-        workingTileset = workingTileset
-      }
+
+      selectedTile[`preview_${preview_hex_info.orientation}`] = new_preview
 
       grph_hex.clear()
       grph_hex.beginFill(selectedTile.bgColor)
-      grph_hex.drawPolygon(getHexPathRadius(150, orientation, 150, 150))
+      grph_hex.drawPolygon(getHexPathRadius(150, preview_hex_info.orientation, 150, 150))
       grph_hex.endFill()
 
       let spr_symbol = spr_hex_symbol
@@ -367,7 +378,11 @@
           class="tile-button"
           class:selected={selectedTile == tile}
           style={tile.id == phantomTileButtonId ? 'opacity: 0' : ''}
-          on:click={() => { selectedTile = tile }}
+          on:click={() => { 
+	    selectedTile = tile
+	    local_tile_color = new PIXI.Color(tile.bgColor).toHex()
+	    if (tile.symbol) local_symbol_color = new PIXI.Color(tile.symbol.color).toHex()
+	  }}
           draggable={true}
           on:dragstart={(e) => {
             dragButton(e, tile)
@@ -377,7 +392,7 @@
           }}
           title={tile.display}
         >
-          <img src={tile.preview} alt="Button for {tile.display}" />
+          <img src={tile[`preview_${preview_hex_info.orientation}`]} alt="{tile.display}" />
         </button>
       {/each}
 
@@ -408,7 +423,7 @@
         <button
           class="outline-button"
           on:click={() => {
-            orientation = orientation == HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP
+            preview_hex_info.orientation = preview_hex_info.orientation == HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP
             generate_tile_preview(selectedTile)
           }}
           title={$tl.builders.change_orientation}
