@@ -12,6 +12,18 @@ export type Translation = {
 		import: string,
 		reset: string,
 	},
+	
+	icons: {
+	  scale_mode: string, // Header for scale mode
+	  scale_mode_options: {
+	    [k in ScaleMode]: string // Label for scale mode options in a dropdown
+	  }
+	  scale_relative: string // Label for pHex attribute
+	  scale_bydimension: { // Label for pHex attribute
+	    width: string,
+	    height: string,
+	  } 
+	}
 
 	tools: {
 		hex_paintbucket: string,
@@ -284,12 +296,13 @@ export type Translation = {
 			helpsubtitle: string,
 			background: string,
 			upload_symbol: string,
+			replace_symbol: string, // Button text for symbol replace button
 			symbol: string,
-			symbol_scale: string,
+			scale: string, // Header for symbol scale
 		},
 		icon_set_builder: {
-      import_iconset: string,
-      export_iconset: string,
+			import_iconset: string,
+			export_iconset: string,
 			delete: string,
 			exit: string,
 			name: string,
@@ -298,16 +311,9 @@ export type Translation = {
 			helptext: string,
 			helpsubtitle: string,
 			helpsubsubtitle: string,
-      help_wiki_mention: string,
+			help_wiki_mention: string,
 			tint: string,
-      scale_mode: string,
-      scale_mode_options: { [opt in ScaleMode]: string }
-			scale_relative: string,
-			scale_bydimension: {
-        width: string,
-        height: string,
-        
-      }
+			scale: string, // Header for icon scale
 		}
 	},
 

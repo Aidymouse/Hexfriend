@@ -14,6 +14,19 @@ export const en_us: Translation = {
 		reset: "Reset",
 	},
 
+	icons: {
+		scale_mode: "Scale Mode",
+		scale_mode_options: {
+			[ScaleMode.RELATIVE]: "Relative",
+			[ScaleMode.BYDIMENSION]: "By Dimension"
+		},
+		scale_relative: "Proportion of Hex",
+		scale_bydimension: {
+		  width: "Percent of Width",
+		  height: "Percent of Height",
+		}
+	},
+
 	tools: {
 		hex_paintbucket: "Hex Paintbucket",
 		hex_eraser: "Hex Eraser",
@@ -282,6 +295,7 @@ export const en_us: Translation = {
 		  'both': 'Both'
 		},
 		rotation: 'Rotation',
+
 		tileset_builder: {
 			delete: "Delete this hex",
 			exit: "Exit Tileset Builder",
@@ -291,8 +305,9 @@ export const en_us: Translation = {
 			helpsubtitle: "For best results, use white 100px by 100px images for symbols.",
 			background: "Background",
 			upload_symbol: "Upload Symbol",
+			replace_symbol: "Replace Symbol",
 			symbol: "Symbol",
-			symbol_scale: "Symbol Scale",
+			scale: "Symbol Scale",
 		},
 		icon_set_builder: {
 			import_iconset: "Import Iconset",
@@ -307,16 +322,7 @@ export const en_us: Translation = {
 			helpsubsubtitle: "Hint: You can upload multiple images at once!",
 			help_wiki_mention: "Help available on the wiki",
 			tint: "Tint",
-			scale_mode: "Scale Mode",
-			scale_mode_options: {
-			  [ScaleMode.RELATIVE]: 'Relative',
-			  [ScaleMode.BYDIMENSION]: 'By Dimension',
-			},
-			scale_relative: "Icon Scale",
-			scale_bydimension: {
-			  width: "Percent of Width",
-			  height: "Percent of Height",
-			}
+			scale: "Icon Scale",
 		}
 	},
 
