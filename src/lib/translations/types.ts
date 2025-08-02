@@ -288,6 +288,8 @@ export type Translation = {
 		supported_orientations_options: {[o in HexOrientation]: string} & {both: string},
 		rotation: string // Label for icon and tile symbol rotation controls
 		tileset_builder: {
+			import_tileset: string,
+			export_tileset: string,
 			delete: string,
 			exit: string,
 			name: string,

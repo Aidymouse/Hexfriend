@@ -297,6 +297,8 @@ export const en_us: Translation = {
 		rotation: 'Rotation',
 
 		tileset_builder: {
+			import_tileset: "Import Tileset",
+			export_tileset: "Export Tileset",
 			delete: "Delete this hex",
 			exit: "Exit Tileset Builder",
 			name: "Tileset Name",
