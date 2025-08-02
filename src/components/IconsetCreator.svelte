@@ -315,15 +315,16 @@
         <label for="setAuthor">{$tl.builders.author}</label>
         <input id="setAuthor" type="text" bind:value={workingIconset.author} placeholder="You!" />
 
-        <label for="setVersion">{$tl.builders.version}</label>
-        <input id="setVersion" type="number" bind:value={workingIconset.version} />
-
         <label for="supported-orientations">{$tl.builders.supported_orientations}</label>
         <select id="supported-orientations" bind:value={workingIconset.supported_orientations}>
 	  <option value={HexOrientation.FLATTOP}>{$tl.builders.supported_orientations_options[HexOrientation.FLATTOP]}</option>
 	  <option value={HexOrientation.POINTYTOP}>{$tl.builders.supported_orientations_options[HexOrientation.POINTYTOP]}</option>
 	  <option value={'both'}>{$tl.builders.supported_orientations_options['both']}</option>
 	</select>
+
+        <label for="setVersion">{$tl.builders.version}</label>
+        <input id="setVersion" type="number" bind:value={workingIconset.version} />
+
 
         <button on:click={() => importIconset()} class="file-input-button">
           {$tl.builders.icon_set_builder.import_iconset}
@@ -482,21 +483,21 @@
 
       <!-- Scale -->
       <div id="symbol-scale">
-        <div class="scale-holder">
-          <label for="icon-scale-mode">Scale Mode</label>
-          <select
-            id="icon-scale-mode"
+        <div class="builder-control-row">
+          <label for="icon-scale-mode">{$tl.builders.icon_set_builder.scale}</label>
+          <select id="icon-scale-mode"
 	    bind:value={selectedIcon.scaleMode}
             on:change={(e) => { change_scale_mode(e.currentTarget.value) }}
           >
-              <option value={ScaleMode.RELATIVE}>{$tl.builders.icon_set_builder.scale_mode_options[ScaleMode.RELATIVE]}</option>
-              <option value={ScaleMode.BYDIMENSION}>{$tl.builders.icon_set_builder.scale_mode_options[ScaleMode.BYDIMENSION]}</option>
+              <option value={ScaleMode.RELATIVE}>{$tl.icons.scale_mode_options[ScaleMode.RELATIVE]}</option>
+              <option value={ScaleMode.BYDIMENSION}>{$tl.icons.scale_mode_options[ScaleMode.BYDIMENSION]}</option>
           </select>
         </div>
       </div>
+
       {#if selectedIcon.scaleMode === ScaleMode.RELATIVE}
 	<div class="scale-holder">
-	  <label for="icon-builder-scale-relative">{$tl.builders.icon_set_builder.scale_relative}</label>
+	  <label for="icon-builder-scale-relative">{$tl.icons.scale_relative}</label>
 	  <input id="icon-builder-scale-relative" type="number" bind:value={selectedIcon.pHex} />
 	  <p>%</p>
 	</div>
@@ -507,7 +508,7 @@
       {:else if selectedIcon.scaleMode === ScaleMode.BYDIMENSION}
 	<div>
 	<div class="scale-holder">
-	  <label for="icon-builder-scale-2d-width">{$tl.builders.icon_set_builder.scale_bydimension.width}</label>
+	  <label for="icon-builder-scale-2d-width">{$tl.icons.scale_bydimension.width}</label>
 	  <input id="icon-builder-scale-2d-width" type="number" bind:value={selectedIcon.pWidth} />
 	  <p>%</p>
 	</div>
@@ -515,7 +516,7 @@
 	  <input type="range" min="5" max="100" bind:value={selectedIcon.pWidth} />
 	</div>
 	<div class="scale-holder">
-	  <label for="icon-builder-scale-2d-height">{$tl.builders.icon_set_builder.scale_bydimension.height}</label>
+	  <label for="icon-builder-scale-2d-height">{$tl.icons.scale_bydimension.height}</label>
 	  <input id="icon-builder-scale-2d-height" type="number" bind:value={selectedIcon.pHeight} />
 	  <p>%</p>
 	</div>
@@ -604,6 +605,21 @@
   #iconset-attr-grid input {
     width: 100%;
     box-sizing: border-box;
+  }
+
+  .builder-control-row {
+    display: flex;
+    gap: 0.25em;
+    height: 2em;
+    align-items: center;
+  }
+  .builder-control-row :first-child {
+    flex-grow: 1;
+  }
+
+  .builder-control-row input[type="number"] {
+    width: 4em;
+    height: 2em;
   }
 
   button {
