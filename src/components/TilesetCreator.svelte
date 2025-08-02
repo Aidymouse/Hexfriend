@@ -484,16 +484,16 @@
 
 	      <!-- Symbol Scale -->
 	      <div class="builder-control-row">
-		<label for="tile-scalemode">{$tl.builders.tileset_builder.symbol_scale}</label>
+		<label for="tile-scalemode">{$tl.builders.tileset_builder.scale}</label>
 		<select id="tile-scalemode" value={selectedTile.symbol.scaleMode} on:input={(e) => update_symbol_scalemode(e.currentTarget.value)}>
-		  <option value={ScaleMode.RELATIVE}>Relative</option>
-		  <option value={ScaleMode.BYDIMENSION}>By Dimension</option>
+		  <option value={ScaleMode.RELATIVE}>{$tl.icons.scale_mode_options[ScaleMode.RELATIVE]}</option>
+		  <option value={ScaleMode.BYDIMENSION}>{$tl.icons.scale_mode_options[ScaleMode.BYDIMENSION]}</option>
 		</select>
 	      </div>
 	    {#if selectedTile.symbol.scaleMode === ScaleMode.RELATIVE}
 
 	      <div class="builder-control-row">
-		<label for="tile-scale-relative">{$tl.builders.tileset_builder.scale_relative}</label>
+		<label for="tile-scale-relative">{$tl.icons.scale_relative}</label>
 		<input id="tile-scale-relative" type="number" bind:value={selectedTile.symbol.pHex} />
 		%
 	      </div>
@@ -502,7 +502,7 @@
 	      </div>
 	    {:else if selectedTile.symbol.scaleMode === ScaleMode.BYDIMENSION}
 	      <div class="builder-control-row">
-		<label for="tile-scale-relative">{$tl.builders.tileset_builder.scale_bydimension.width}</label>
+		<label for="tile-scale-relative">{$tl.icons.scale_bydimension.width}</label>
 		<input id="tile-scale-relative" type="number" bind:value={selectedTile.symbol.pWidth} />
 		%
 	      </div>
@@ -511,7 +511,7 @@
 	      </div>
 
 	      <div class="builder-control-row">
-		<label for="tile-scale-relative">{$tl.builders.tileset_builder.scale_bydimension.height}</label>
+		<label for="tile-scale-relative">{$tl.icons.scale_bydimension.height}</label>
 		<input id="tile-scale-relative" type="number" bind:value={selectedTile.symbol.pHeight} />
 		%
 	      </div>
