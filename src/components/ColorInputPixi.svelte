@@ -18,13 +18,13 @@
 		if (stringValue != oldStringValue) {
 			/* If the old and new values dont match, then the value was changed on the input, not externally */
 			value = PIXI.Color.shared.setValue(stringValue).toNumber();
+			dispatch('input', {string: stringValue, number: value});
 		} else {
 			stringValue = PIXI.Color.shared.setValue(value).toHex();
 		}
 		oldStringValue = stringValue;
 
 		dispatch('change', {});
-		dispatch('input', {string: stringValue, number: value});
 	}
 </script>
 
