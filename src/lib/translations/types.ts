@@ -29,12 +29,18 @@ export type Translation = {
 	terrain_panel: {
 		terrain_color: string, // Label for terrain color control
 		symbol_color: string, // Label for symbol color control
+		support_warnings: { // Warnings for icon sets that only support certain hex orientations
+		  [k in HexOrientation]: string
+		}
 	},
 
 	icon_panel: {
 		icon_color: string, // Label for icon color control
 		rotate60_left: string, // Rotate button on icon panel
 		rotate60_right: string // Rotate buttonon icon panel
+		support_warnings: { // Warnings for icon sets that only support certain hex orientations
+		  [k in HexOrientation]: string
+		}
 	},
 
 	path_panel: {
