@@ -2,6 +2,7 @@
   import { HexOrientation } from '../types/terrain'
   import { LATEST_ICONSET_FORMAT_VERSION, type Icon, type Iconset } from '../types/icon'
   import ColorInput from './ColorInput.svelte'
+  import { convert_iconset_to_latest } from '../lib/iconsetConverter'
 
   import { tl } from '../stores/translation'
 
@@ -205,6 +206,7 @@
       })
 
       workingIconset = { ...setToImport }
+      workingIconset = convert_iconset_to_latest(workingIconset)
       await tick()
       //workingIconset.icons = workingIconset.icons;
 

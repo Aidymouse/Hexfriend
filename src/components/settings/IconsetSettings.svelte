@@ -9,6 +9,7 @@
 
   import * as texture_loader from '../../lib/texture_loader'
 
+  import { convert_iconset_to_latest } from '../../lib/iconsetConverter'
   export let loadedSave
   export let loadedIconsets
   export let iconset_text
@@ -40,6 +41,8 @@
         alert($tl.settings.icon_sets.already_loaded)
         return
       }
+
+      setToImport = convert_iconset_to_latest(setToImport)
 
       loadedIconsets.push(setToImport)
       loadedIconsets = loadedIconsets
