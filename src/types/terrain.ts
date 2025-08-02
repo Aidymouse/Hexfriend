@@ -15,7 +15,7 @@ export enum hex_raised {
 }
 
 // Hexes are the data that get drawn as terrain
-export interface TerrainHex {
+export type TerrainHex = {
 	// If no tile, the hex is blank
 	tile: Tile | null;
 
@@ -24,7 +24,7 @@ export interface TerrainHex {
 	s: number;
 }
 
-export interface terrain_field {
+export type terrain_field = {
 	hexWidth: number;
 	hexHeight: number;
 

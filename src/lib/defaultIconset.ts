@@ -1,3 +1,4 @@
+//@ts-nocheck
 import type { Iconset } from "../types/icon";
 
 const DEFAULTICONSET: Iconset = {

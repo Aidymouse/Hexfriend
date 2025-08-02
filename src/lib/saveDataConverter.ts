@@ -119,6 +119,7 @@ function convert_v8_to_v9(old_data: save_data): save_data {
 	new_data.icon_hex_size_percentage = 80
 
 	new_data.icons = new_data.icons.map(i => {
+		//@ts-ignore - As of v13 icons don't necessarily have phex, but they did in v9
 		if (i.pHex == undefined) {
 			return { ...i, pHex: 80 }
 		}
