@@ -27,7 +27,7 @@
 
   let preview_hex_info: PreviewHexInfo = {
     hexWidth: 50 * 6,
-    hexHeight: 45 * 6,
+    hexHeight: 43.3 * 6,
     orientation: HexOrientation.FLATTOP,
     color: '#f2f2f2',
   }
@@ -257,14 +257,16 @@
       )
       grph_background_hex.endFill()
 
+      const icon_scale = get_icon_scale_for_hex( selectedIcon, preview_hex_info,)
+
+      const mtrx = new PIXI.Matrix().rotate(PIXI.DEG_TO_RAD * selectedIcon.rotation).scale(icon_scale.x, icon_scale.y)
+      spr_icon.transform.setFromMatrix(mtrx);
       spr_icon.texture = loadedTextures[selectedIcon.texId]
       spr_icon.x = 150
       spr_icon.y = 150
       spr_icon.anchor.x = 0.5
       spr_icon.anchor.y = 0.5
       spr_icon.tint = selectedIcon.color
-      spr_icon.scale = get_icon_scale_for_hex( selectedIcon, preview_hex_info,)
-      spr_icon.rotation = PIXI.DEG_TO_RAD * selectedIcon.rotation
 
       let new_preview = await get_icon_generator_preview(selectedIcon)
       if (selectedIcon.preview != new_preview) {
@@ -377,7 +379,7 @@
   </nav>
 
   {#if selectedIcon}
-    <main id="icon-preview">
+    <section id="icon-preview">
       <div id="pixi-container" style="width: 18.75em; height: 18.75em;">
         <CanvasHolder {app} />
       </div>
@@ -441,7 +443,7 @@
 	 </div>
 	</div>
       </details>
-    </main>
+    </section>
 
     <aside id="icon-style">
       <!-- Icon Tint -->
