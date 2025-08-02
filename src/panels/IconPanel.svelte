@@ -93,13 +93,13 @@
     <div id="rotation-slider">
       <div style="display: flex; align-items: center;">
 	<button class="img-button" style="height: 2em" on:click={() => { $data_icon.icon.rotation = (360 + $data_icon.icon.rotation-60) % 360 }}>
-	  <img src={`/assets/img/ui/rotate60_left_${'ft'}.png`} alt="<-" title={$tl.icon_panel.rotate60_left}>
+	  <img src={`/assets/img/ui/rotate60_left_${$tfield.orientation}.png`} alt="<-" title={$tl.icon_panel.rotate60_left}>
 	</button>
       </div>
       <input type="range" id="icon-rotation" min={0} max={359} bind:value={$data_icon.icon.rotation} />
       <div style="display: flex; align-items: center;">
 	<button class="img-button" style="height: 2em" on:click={() => { $data_icon.icon.rotation = ($data_icon.icon.rotation+60)%360 }}>
-	  <img src={`/assets/img/ui/rotate60_right_${'ft'}.png`} alt="->" title={$tl.icon_panel.rotate60_right}>
+	  <img src={`/assets/img/ui/rotate60_right_${$tfield.orientation}.png`} alt="->" title={$tl.icon_panel.rotate60_right}>
 	</button>
       </div>
       <input 

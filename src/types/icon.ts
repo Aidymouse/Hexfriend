@@ -2,6 +2,7 @@ import type { ScaleMode } from "../helpers/imageSizing"
 import { HexOrientation } from "./terrain"
 
 export const LATEST_ICONSET_FORMAT_VERSION = 2
+export const LATEST_DEFAULT_ICONSET_VERSION = 6
 
 export type Icon = {
     display: string;
@@ -10,7 +11,7 @@ export type Icon = {
     color: number;
     //pHex: number; 
     base64: string;
-    preview: string; // Preview is set to nothing on the icon layer itself
+    preview: string; // Preview is set to nothing on the icon layer itself TODO: true?
     texWidth: number;
     texHeight: number;
     rotation: number;

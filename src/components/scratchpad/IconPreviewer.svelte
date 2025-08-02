@@ -47,9 +47,13 @@
     const dualPromises = testIconset.icons.map(
       (i) =>
         new Promise(async (res, rej) => {
-          const preview = await generate_ordered_icon_preview(
+          const preview = await generate_icon_preview(
             { ...i, scaleMode: ScaleMode.BYDIMENSION, pWidth: pHor, pHeight: pVert, rotation: rot },
             hexInfo,
+	    grph,
+	    spr,
+	    cont,
+	    app
           )
           res(preview)
         }),

@@ -167,7 +167,7 @@
 
   function updateFloatingIcon() {
     const {iconX, iconY} = get_icon_position();
-    const iconScale = get_icon_scale_for_hex($data_icon.icon, $tfield);
+    const icon_scale = get_icon_scale_for_hex($data_icon.icon, $tfield);
 
     spr_floating_icon.visible = false
       console.log("Updating floating icon")
@@ -181,12 +181,11 @@
       spr_floating_icon.texture = get_icon_texture($data_icon.icon.texId)
       spr_floating_icon.tint = $data_icon.icon.color
 
+      const matrix = new PIXI.Matrix().rotate(PIXI.DEG_TO_RAD * $data_icon.icon.rotation).scale(icon_scale.x, icon_scale.y)
+      spr_floating_icon.transform.setFromMatrix(matrix);
       spr_floating_icon.x = iconX
       spr_floating_icon.y = iconY
       spr_floating_icon.tint = $data_icon.icon.color
-      spr_floating_icon.scale.x = iconScale.x
-      spr_floating_icon.scale.y = iconScale.y
-      spr_floating_icon.rotation = PIXI.DEG_TO_RAD * ($data_icon.icon.rotation ?? 0)
       // spr_floating_icon.eventMode = 'static' // !!! TODO
   }
 
@@ -455,13 +454,17 @@
         cont_icon.addChild(new_icon)
       }
 
+      /** We use a matrix because to scale bydimension in the desired way rotation must happen first. Setting scale and rotation does scale first */
+      const rotate_scale_matrix = new PIXI.Matrix().rotate(PIXI.DEG_TO_RAD * (icon.rotation ?? 0)).scale(icon.scale.x, icon.scale.y);
+
+      pixi_icons[icon.onLayerId].transform.setFromMatrix(rotate_scale_matrix); // Do this first or the other stuff you set is wrong
       pixi_icons[icon.onLayerId].x = icon.x
       pixi_icons[icon.onLayerId].y = icon.y
       pixi_icons[icon.onLayerId].tint = icon.color
-      pixi_icons[icon.onLayerId].scale.x = icon.scale.x
-      pixi_icons[icon.onLayerId].scale.y = icon.scale.y
+      //pixi_icons[icon.onLayerId].scale.x = icon.scale.x
+      //pixi_icons[icon.onLayerId].scale.y = icon.scale.y
+      //pixi_icons[icon.onLayerId].rotation = PIXI.DEG_TO_RAD * (icon.rotation ?? 0)
       pixi_icons[icon.onLayerId].eventMode = $store_selected_tool == tools.ICON || $store_selected_tool == tools.ERASER ? 'static' : 'auto'
-      pixi_icons[icon.onLayerId].rotation = PIXI.DEG_TO_RAD * (icon.rotation ?? 0)
 
       marked_for_saving.push(icon.onLayerId)
     })
