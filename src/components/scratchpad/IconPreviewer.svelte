@@ -1,6 +1,6 @@
 <script lang="ts">
   import * as PIXI from 'pixi.js'
-  import { generate_icon_preview } from '../../helpers/iconFns'
+  import { generate_icon_preview, generate_ordered_icon_preview } from '../../helpers/iconFns'
   import { HexOrientation } from '../../types/terrain'
   import { load_icon_texture } from '../../lib/texture_loader'
   import { type Iconset } from '../../types/icon'
@@ -19,6 +19,7 @@
   cont.addChild(spr)
 
   let phex: number = 100
+  let rot: number = 0
   let hexInfo = { hexHeight: 45 * 2, hexWidth: 50 * 2, orientation: HexOrientation.FLATTOP, color: '#f2f2f2' }
   let imgs = []
   let dualImgs = []
@@ -30,7 +31,7 @@
     const previewPromises = testIconset.icons.map(
       (i) =>
         new Promise(async (res, rej) => {
-          const preview = await generate_icon_preview({ ...i, pHex: phex }, hexInfo, grph, spr, cont, app)
+          const preview = await generate_icon_preview({ ...i, pHex: phex, rotation: rot }, hexInfo, grph, spr, cont, app)
           res(preview)
         }),
     )
@@ -46,13 +47,9 @@
     const dualPromises = testIconset.icons.map(
       (i) =>
         new Promise(async (res, rej) => {
-          const preview = await generate_icon_preview(
-            { ...i, scaleMode: ScaleMode.BYDIMENSION, pWidth: pHor, pHeight: pVert },
+          const preview = await generate_ordered_icon_preview(
+            { ...i, scaleMode: ScaleMode.BYDIMENSION, pWidth: pHor, pHeight: pVert, rotation: rot },
             hexInfo,
-            grph,
-            spr,
-            cont,
-            app,
           )
           res(preview)
         }),
@@ -95,19 +92,61 @@
 >
   <div style="width: 300px">
     <div style="display: flex">
+      Rotation
+      <input type="range" id="icon-rotation" min={0} max={359} bind:value={rot} on:input={genPreviews} />
+      <input type="number" bind:value={rot} on:input={genPreviews} style="width: 4em" /> deg
+    </div>
+
+	<hr />
+
+    <div style="display: flex">
       Phex
-      <input type="range" id="icon-rotation" min={0} max={100} bind:value={phex} on:input={genPreviews} />
+      <input type="range" id="icon-phex" min={0} max={100} bind:value={phex} on:input={genPreviews} />
       {phex}%
     </div>
+
+    <hr />
+
+    <div style="display: flex">
+      Icon P Width
+      <input
+        type="range"
+        id="icon-pwidth"
+        min={0}
+        max={100}
+        bind:value={pHor}
+        on:input={(e) => {
+          genPreviews()
+        }}
+      />
+      {pHor}%
+    </div>
+
+    <div style="display: flex">
+      Icon P Height
+      <input
+        type="range"
+        id="icon-pheight"
+        min={0}
+        max={100}
+        bind:value={pVert}
+        on:input={(e) => {
+          genPreviews()
+        }}
+      />
+      {pVert}%
+    </div>
+	<hr />
+
     <div style="display: flex">
       Hex Width
-      <input type="range" id="icon-rotation" min={0} max={100} bind:value={hexInfo.hexWidth} on:input={genPreviews} />
+      <input type="range" id="icon-hexwidth" min={0} max={100} bind:value={hexInfo.hexWidth} on:input={genPreviews} />
       {hexInfo.hexWidth}
     </div>
 
     <div style="display: flex">
       Hex Height
-      <input type="range" id="icon-rotation" min={0} max={100} bind:value={hexInfo.hexHeight} on:input={genPreviews} />
+      <input type="range" id="icon-hexheight" min={0} max={100} bind:value={hexInfo.hexHeight} on:input={genPreviews} />
       {hexInfo.hexHeight}
     </div>
 
@@ -141,36 +180,5 @@
       }}>Turn to Perfect Hex</button
     >
 
-    <hr />
-
-    <div style="display: flex">
-      Icon P Width
-      <input
-        type="range"
-        id="icon-rotation"
-        min={0}
-        max={100}
-        bind:value={pHor}
-        on:input={(e) => {
-          genPreviews()
-        }}
-      />
-      {pHor}%
-    </div>
-
-    <div style="display: flex">
-      Icon P Height
-      <input
-        type="range"
-        id="icon-rotation"
-        min={0}
-        max={100}
-        bind:value={pVert}
-        on:input={(e) => {
-          genPreviews()
-        }}
-      />
-      {pVert}%
-    </div>
   </div>
 </div>
