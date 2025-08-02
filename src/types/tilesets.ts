@@ -1,13 +1,15 @@
 import { type Icon } from "./icon";
 import type { HexOrientation } from "./terrain";
 // Tiles get loaded by the loader. The symbol texture gets loaded under the id
+
 export type Tile = {
 	display: string;
 	bgColor: number; // Some tiles won't *really* need a bg color, if they're all icon cos they're images, but, whatever
 	id: string; // Local to the tileset
 	symbol: Icon | null; // Picture to draw on the hex. This also implicitly sets the tile type as dynamic or bydimension
 	tileset_id: string; // Idk why we store a reference to this TODO
-	preview: string // Just the background TODO: find out why this is needed too. I think for buttons ?
+	preview_flatTop: string; // Just the background TODO: find out why this is needed too. I think for buttons ?
+	preview_pointyTop: string; 
 }
 
 // export type TileSymbol = {
