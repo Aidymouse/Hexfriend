@@ -4,13 +4,18 @@ import type { Iconset } from '../types/icon'
 const convert_v1_to_v2 = (old: Iconset): Iconset => {
   let new_iconset = {...old}
   
-  // Icons have scalemode now
+  // Icon Updates
   new_iconset.icons.forEach(icon => {
+    // Scale Mode
     if (!icon.scaleMode) { icon.scaleMode = ScaleMode.RELATIVE }
+    // Rotatoin
+    if (!icon.rotation) { icon.rotation = 0 }
   })
 
   // Supported orientations
   new_iconset.supported_orientations = 'both'
+
+
 
   // Format version
   new_iconset.format_version = 2;
