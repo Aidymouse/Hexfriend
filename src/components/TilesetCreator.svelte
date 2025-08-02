@@ -1,39 +1,30 @@
 <script lang="ts">
-  // TYPES
-  import { LATEST_TILESET_FORMAT_VERSION, type Tile, type TileSymbol, type Tileset } from '../types/tilesets'
+  import { LATEST_TILESET_FORMAT_VERSION, type Tile, type Tileset } from '../types/tilesets'
+  import { DEFAULT_BLANK_HEX_COLOR } from '../types/defaults'
+  import { get_icon_scale_for_hex } from '../helpers/imageSizing'
+  import { generate_icon_preview, type PreviewHexInfo } from '../helpers/iconFns'
 
-  interface working_tile {
-    display: string
-    bgColor: number
-    id: string
-    symbol: TileSymbol | null
+  let preview_hex_info: PreviewHexInfo = {
+    hexWidth: 50 * 6,
+    hexHeight: 43.3 * 6,
+    orientation: HexOrientation.FLATTOP,
+    color: '#f2f2f2',
   }
 
-  interface working_tileset {
-    name: string
-    id: string
-    author: string
-    version: number
-    tiles: working_tile[]
-  }
-
-  // ENUMS
   import { HexOrientation } from '../types/terrain'
 
-  // COMPONENTS
   import ColorInputPixi from './ColorInputPixi.svelte'
   import CanvasHolder from './CanvasHolder.svelte'
 
-  // HELPER
   import { getHexPathRadius } from '../helpers/hexHelpers'
 
   import { tl } from '../stores/translation'
 
-  // LIB
   import { download } from '../lib/download2'
   import * as PIXI from 'pixi.js'
   import { afterUpdate, tick } from 'svelte'
   import { update_tileset_format } from '../lib/tileset_updater'
+  import { ScaleMode } from '../helpers/imageSizing'
 
   let app = new PIXI.Application({
     height: 300,
@@ -54,12 +45,20 @@
     version: 1,
     tiles: [],
     format_version: LATEST_TILESET_FORMAT_VERSION,
+    supported_orientations: 'both',
     collapsed: false,
   }
+
+  let grph_hex = new PIXI.Graphics()
+  let spr_hex_symbol = new PIXI.Sprite()
+  spr_hex_symbol.anchor.set(0.5);
+  
+  app.stage.addChild(grph_hex, spr_hex_symbol)
 
   let selectedTile: Tile | null = null
 
   let previewSprite = new PIXI.Sprite()
+  previewSprite.anchor.set(0.5);
   let previewGraphics = new PIXI.Graphics()
   let previewContainer = new PIXI.Container()
   previewContainer.addChild(previewGraphics, previewSprite)
@@ -68,29 +67,29 @@
     baseId = IDify(baseId)
 
     let counter = 0
-    let counter_suffix = counter === 0 ? '' : counter
-    let proposedId = `${baseId}${counter_suffix}`
+    let proposedId = `${baseId}${counter === 0 ? '' : counter}`
 
-    while (workingTileset.tiles.find((tile: working_tile) => tile.id == proposedId) != null) {
+    while (workingTileset.tiles.find((tile: Tile) => tile.id === proposedId)) {
       counter++
-      counter_suffix = counter === 0 ? '' : counter
-      proposedId = `${baseId}${counter_suffix}`
+      proposedId = `${baseId}${counter === 0 ? '' : counter}`
     }
 
     return proposedId
   }
 
   async function newTile() {
-    let newTile: Tile = {
+    let newTile: Tile = selectedTile ? structuredClone(selectedTile) : {
       tileset_id: '', // Will be filled in on export
       display: 'New Hex',
       id: findID('New Hex'),
       symbol: null,
-      bgColor: DEFAULTBLANKHEXCOLOR,
+      bgColor: DEFAULT_BLANK_HEX_COLOR,
       preview: '',
     }
 
-    newTile.preview = await generatePreview(newTile)
+    newTile.id = findID(newTile.id)
+
+    newTile.preview = await generate_tile_preview(newTile)
 
     workingTileset.tiles = [...workingTileset.tiles, newTile]
 
@@ -107,23 +106,26 @@
     selectedTile = workingTileset.tiles[workingTileset.tiles.length - 1]
   }
 
-  function removeTile(tile: working_tile) {
+  function removeTile(tile: Tile) {
     workingTileset.tiles = workingTileset.tiles.filter((t: Tile) => t.id != tile.id)
   }
 
-  async function generatePreview(tile: working_tile) {
+  async function generate_tile_preview(tile: Tile) {
     previewGraphics.clear()
     previewGraphics.beginFill(tile.bgColor)
-    previewGraphics.drawPolygon(getHexPathRadius(25, orientation, 0, 0))
+    previewGraphics.drawPolygon(getHexPathRadius(preview_hex_info.hexWidth/2, preview_hex_info.orientation, 0, 0))
     previewGraphics.endFill()
 
     previewSprite.texture = null
     if (tile.symbol) {
       previewSprite.texture = await PIXI.Assets.load(tile.symbol.base64)
-      previewSprite.scale.set(getSymbolScale(tile.symbol, 25).x)
-      previewSprite.anchor.set(0.5)
+
+      const symbol_scale = get_icon_scale_for_hex(tile.symbol, preview_hex_info)
+
+      const mtrx = new PIXI.Matrix().rotate(PIXI.DEG_TO_RAD * tile.symbol.rotation).scale(symbol_scale.x, symbol_scale.y)
+      previewSprite.transform.setFromMatrix(mtrx);
+
       previewSprite.tint = tile.symbol.color
-      previewSprite.rotation = PIXI.DEG_TO_RAD * tile.symbol.rotation
     }
 
     return await app.renderer.extract.base64(previewContainer)
@@ -132,20 +134,6 @@
   function IDify(name: string): string {
     return name.toLowerCase().replaceAll(' ', '-')
   }
-
-  /*
-	$: {
-		//if (selectedTile) selectedTile.preview = generatePreview(workingTileset.tiles[stIndex])
-
-		orientation = orientation; // This line ensures the preview gets updated
-
-		if (oldOrientation == orientation) {
-			oldOrientation = orientation == 'flatTop' ? 'pointyTop' : 'flatTop';
-			workingTileset.tiles.forEach((tile) => (tile.preview = generatePreview(tile)));
-		}
-
-	}
-	*/
 
   let symbolFiles: FileList
 
@@ -157,37 +145,19 @@
 
       selectedTile.symbol = {
         color: selectedTile.symbol ? selectedTile.symbol.color : 0xffffff,
+	id: "",
         texWidth: new_texture.width,
         texHeight: new_texture.height,
-        pHex: 80,
         base64: r.result as string,
         rotation: 0,
         preview: '',
+	display: 'tilesymbol',
+	texId: '', // Will be set equal to tiles id
+	scaleMode: ScaleMode.RELATIVE,
+        pHex: 80,
       }
     }
   }
-
-  function getSymbolScale(symbol: TileSymbol, radius = 150) {
-    let h, w
-    if (orientation == 'pointyTop') {
-      h = radius * 2
-      w = Math.cos(Math.PI / 6) * radius * 2
-    } else {
-      w = radius * 2
-      h = radius / Math.tan(Math.PI / 6)
-    }
-
-    let scale
-    if (w < h) {
-      scale = (w * symbol.pHex) / 100 / symbol.texWidth
-    } else {
-      scale = (h * symbol.pHex) / 100 / symbol.texHeight
-    }
-
-    return { x: scale, y: scale }
-  }
-
-  const DEFAULTBLANKHEXCOLOR = 0xf2f2f2
 
   function exportTileset() {
     let export_tileset: Tileset = workingTileset as Tileset
@@ -248,7 +218,7 @@
   }
 
   function dropButton(e: DragEvent) {
-    phantomTileButtonId = null
+  	phantomTileButtonId = null
   }
 
   function draggedOverButton(e: DragEvent, tile: Tile) {
@@ -267,16 +237,24 @@
     workingTileset = workingTileset
   }
 
-  let pixi_tiles = {}
+  const update_symbol_scalemode = (new_mode: string) => {
+    delete selectedTile.symbol.pHex
+    delete selectedTile.symbol.pWidth
+    delete selectedTile.symbol.pHeight
 
-  let grph_hex = new PIXI.Graphics()
-  let spr_hex_symbol = new PIXI.Sprite()
-
-  app.stage.addChild(grph_hex, spr_hex_symbol)
+    if (new_mode === ScaleMode.RELATIVE) {
+      selectedTile.symbol.scaleMode = new_mode;
+      selectedTile.symbol.pHex = 80;
+    } else {
+      selectedTile.symbol.scaleMode = new_mode as ScaleMode;
+      selectedTile.symbol.pWidth = 100;
+      selectedTile.symbol.pHeight = 100;
+    }
+  }
 
   afterUpdate(async () => {
     if (selectedTile) {
-      let new_preview = await generatePreview(selectedTile)
+      let new_preview = await generate_tile_preview(selectedTile)
       if (selectedTile.preview != new_preview) {
         selectedTile.preview = new_preview
         workingTileset = workingTileset
@@ -295,13 +273,12 @@
         let symbol_texture = await PIXI.Assets.load(selectedTile.symbol.base64)
 
         spr_symbol.texture = symbol_texture
+	const symbol_scale = get_icon_scale_for_hex(selectedTile.symbol, preview_hex_info);
+	const mtrx = new PIXI.Matrix().rotate(PIXI.DEG_TO_RAD * selectedTile.symbol.rotation).scale(symbol_scale.x, symbol_scale.y)
+	spr_symbol.transform.setFromMatrix(mtrx);
         spr_symbol.x = 150
         spr_symbol.y = 150
-        spr_symbol.anchor.x = 0.5
         spr_symbol.tint = selectedTile.symbol.color
-        spr_symbol.anchor.y = 0.5
-        spr_symbol.scale = getSymbolScale(selectedTile.symbol)
-        spr_symbol.rotation = PIXI.DEG_TO_RAD * selectedTile.symbol.rotation
       }
     }
   })
@@ -310,7 +287,7 @@
 <main>
   <nav>
     <div id="set-controls">
-      <div id="grid">
+      <div id="tileset-attr-grid">
         <button
           on:click={() => {
             appState = 'normal'
@@ -325,6 +302,13 @@
 
         <label for="setAuthor">{$tl.builders.author}</label>
         <input id="setAuthor" type="text" bind:value={workingTileset.author} placeholder="You!" />
+
+        <label for="tileset-supports">{$tl.builders.supported_orientations}</label>
+	<select id="tileset-supports" bind:value={workingTileset.supported_orientations}>
+	  <option value={HexOrientation.FLATTOP}>{$tl.builders.supported_orientations_options[HexOrientation.FLATTOP]}</option>
+	  <option value={HexOrientation.POINTYTOP}>{$tl.builders.supported_orientations_options[HexOrientation.POINTYTOP]}</option>
+	  <option value={'both'}>{$tl.builders.supported_orientations_options['both']}</option>
+	</select>
 
         <label for="setVersion">{$tl.builders.version}</label>
         <input id="setVersion" type="number" bind:value={workingTileset.version} />
@@ -361,9 +345,7 @@
           class="tile-button"
           class:selected={selectedTile == tile}
           style={tile.id == phantomTileButtonId ? 'opacity: 0' : ''}
-          on:click={() => {
-            selectedTile = tile
-          }}
+          on:click={() => { selectedTile = tile }}
           draggable={true}
           on:dragstart={(e) => {
             dragButton(e, tile)
@@ -387,7 +369,7 @@
   </nav>
 
   {#if selectedTile}
-    <div id="tile-preview">
+    <section id="tile-preview">
       <div id="pixi-container" style="height: 300px; width: 300px;">
         <CanvasHolder {app} />
       </div>
@@ -400,12 +382,12 @@
         }}
       />
 
-      <div id="tile-controls">
+      <div id="tile-preview-controls">
         <button
           class="outline-button"
           on:click={() => {
             orientation = orientation == HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP
-            generatePreview(selectedTile)
+            generate_tile_preview(selectedTile)
           }}
           title={$tl.builders.change_orientation}
         >
@@ -431,59 +413,116 @@
           <img src="/assets/img/tools/trash.png" alt="Trash" />
         </button>
       </div>
-    </div>
+    </section>
 
-    <div id="tile-style">
-      <!-- Background Color -->
-      <div class="color" style="margin-bottom: 10px">
-        <ColorInputPixi bind:value={selectedTile.bgColor} w={'50'} h={'50'} />
 
-        <div>
-          <p>Background</p>
-          <p class="color-string">
-            {PIXI.utils.hex2string(selectedTile.bgColor)}
-          </p>
-        </div>
-      </div>
+    <aside id="tile-style">
 
-      <!-- File Upload Button -->
-      <button class="file-input-button outline-button">
-        {$tl.builders.tileset_builder.upload_symbol}
-        <input
-          type="file"
-          accept="image/*"
-          bind:files={symbolFiles}
-          on:change={(e) => {
-            updateSymbolFile()
-            e.currentTarget.value = '' /*Hacky, but necessary*/
-          }}
-        />
-      </button>
+	  <!-- Background Color -->
+	  <div class="color" style="margin-bottom: 0.5em">
+	    <ColorInputPixi bind:value={selectedTile.bgColor} w={'50'} h={'50'} />
 
-      <!-- Symbol Input Controls -->
-      {#if selectedTile.symbol}
-        <div class="color" style="margin-top: 10px">
-          <ColorInputPixi bind:value={selectedTile.symbol.color} w={'50'} h={'50'} />
+	    <div>
+	      <p>Background</p>
+	      <p class="color-string">{PIXI.utils.hex2string(selectedTile.bgColor)}</p>
+	    </div>
+	  </div>
 
-          <div>
-            <p>
-              {$tl.builders.tileset_builder.symbol}
-            </p>
-            <p class="color-string">
-              {PIXI.utils.hex2string(selectedTile.symbol.color)}
-            </p>
-          </div>
-        </div>
+	  <!-- Upload Symbol Button -->
+	  <button class="file-input-button outline-button" style="margin-bottom: 0.25em">
+	    {selectedTile.symbol ? $tl.builders.tileset_builder.replace_symbol : $tl.builders.tileset_builder.upload_symbol}
+	    <input
+	      type="file"
+	      accept="image/*"
+	      bind:files={symbolFiles}
+	      on:change={(e) => {
+		updateSymbolFile()
+		e.currentTarget.value = '' /*Hacky, but necessary*/
+	      }}
+	    />
+	  </button>
 
-        <div id="symbol-scale">
-          {$tl.builders.tileset_builder.symbol_scale}
-          <input type="range" min="5" max="100" bind:value={selectedTile.symbol.pHex} />
-          <input type="number" bind:value={selectedTile.symbol.pHex} />
-        </div>
-      {/if}
-    </div>
+	  <!-- Remove Symbol Button -->
+	  {#if selectedTile.symbol}
+	    <button class="outline-button">
+	      Remove Symbol
+	    </button>
+	  {/if}
+
+	  <!-- Symbol Input Controls -->
+	  {#if selectedTile.symbol}
+	      <!-- Symbol Color -->
+	      <div class="color" style="margin-top: 10px">
+		<ColorInputPixi bind:value={selectedTile.symbol.color} w={'50'} h={'50'} />
+
+		<div>
+		  <p>
+		    {$tl.builders.tileset_builder.symbol}
+		  </p>
+		  <p class="color-string">
+		    {PIXI.utils.hex2string(selectedTile.symbol.color)}
+		  </p>
+		</div>
+	      </div>
+
+
+	      <!-- Symbol Rotation -->
+	      <div class="builder-control-row">
+		<label for="tile-scale-relative">{$tl.builders.rotation}</label>
+		<input id="tile-scale-relative" type="number" bind:value={selectedTile.symbol.rotation} />
+		deg
+	      </div>
+	      <div class="builder-control-row" style="margin-bottom: 0.5em;">
+		<button style="height: 2em;" class="img-button" on:click={() => selectedTile.symbol.rotation = (360 + selectedTile.symbol.rotation - 60)%360}>
+		  <img src={`/assets/img/ui/rotate60_left_${preview_hex_info.orientation}.png`} alt={$tl.icon_panel.rotate60_left}>
+		</button>
+		<input type="range" min="0" max="359" bind:value={selectedTile.symbol.rotation} />
+		<button style="height: 2em;" class="img-button" on:click={() => selectedTile.symbol.rotation = (selectedTile.symbol.rotation+60)%360}>
+		  <img src={`/assets/img/ui/rotate60_right_${preview_hex_info.orientation}.png`} alt={$tl.icon_panel.rotate60_right}>
+		</button>
+	      </div>
+
+	      <!-- Symbol Scale -->
+	      <div class="builder-control-row">
+		<label for="tile-scalemode">{$tl.builders.tileset_builder.symbol_scale}</label>
+		<select id="tile-scalemode" value={selectedTile.symbol.scaleMode} on:input={(e) => update_symbol_scalemode(e.currentTarget.value)}>
+		  <option value={ScaleMode.RELATIVE}>Relative</option>
+		  <option value={ScaleMode.BYDIMENSION}>By Dimension</option>
+		</select>
+	      </div>
+	    {#if selectedTile.symbol.scaleMode === ScaleMode.RELATIVE}
+
+	      <div class="builder-control-row">
+		<label for="tile-scale-relative">{$tl.builders.tileset_builder.scale_relative}</label>
+		<input id="tile-scale-relative" type="number" bind:value={selectedTile.symbol.pHex} />
+		%
+	      </div>
+	      <div class="builder-control-row">
+		<input type="range" min="5" max="100" bind:value={selectedTile.symbol.pHex} />
+	      </div>
+	    {:else if selectedTile.symbol.scaleMode === ScaleMode.BYDIMENSION}
+	      <div class="builder-control-row">
+		<label for="tile-scale-relative">{$tl.builders.tileset_builder.scale_bydimension.width}</label>
+		<input id="tile-scale-relative" type="number" bind:value={selectedTile.symbol.pWidth} />
+		%
+	      </div>
+	      <div class="builder-control-row">
+		<input type="range" min="5" max="100" bind:value={selectedTile.symbol.pWidth} />
+	      </div>
+
+	      <div class="builder-control-row">
+		<label for="tile-scale-relative">{$tl.builders.tileset_builder.scale_bydimension.height}</label>
+		<input id="tile-scale-relative" type="number" bind:value={selectedTile.symbol.pHeight} />
+		%
+	      </div>
+	      <div class="builder-control-row">
+		<input type="range" min="5" max="100" bind:value={selectedTile.symbol.pHeight} />
+	      </div>
+	    {/if}
+	  {/if}
+    </aside>
   {:else}
-    <div id="editor-placeholder">
+    <aside id="editor-placeholder">
       <p style="color: #f2f2f2; margin-bottom: 10px;">
         {$tl.builders.tileset_builder.helptext}
       </p>
@@ -491,24 +530,19 @@
       <p style="font-size: 10pt">
         {$tl.builders.tileset_builder.helpsubtitle}
       </p>
-    </div>
+    </aside>
   {/if}
 </main>
 
 <style>
-  #symbol-scale {
-    display: flex;
-    flex-direction: column;
-    margin-top: 10px;
-  }
 
-  #tile-controls {
+  #tile-preview-controls {
     margin-top: 5px;
     display: flex;
     gap: 5px;
   }
 
-  #tile-controls button {
+  #tile-preview-controls button {
     width: 40px;
     height: 40px;
     padding: 0px;
@@ -517,7 +551,7 @@
     align-items: center;
   }
 
-  #tile-controls button img {
+  #tile-preview-controls button img {
     height: 80%;
   }
 
@@ -527,7 +561,7 @@
     box-sizing: border-box;
   }
 
-  #set-controls #grid {
+  #set-controls #tileset-attr-grid {
     width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -535,9 +569,16 @@
     gap: 5px;
   }
 
-  #grid input {
+  #tileset-attr-grid input {
     width: 100%;
     box-sizing: border-box;
+    height: 2em;
+  }
+
+  #tileset-attr-grid label {
+    height: 100%;
+    display: flex;
+    align-items: center;
   }
 
   #editor-placeholder {
@@ -593,6 +634,7 @@
     display: flex;
     justify-content: center;
     flex-direction: column;
+    min-width: 350px;
     width: 50%;
   }
 
@@ -644,4 +686,21 @@
     font-size: 10pt;
     color: #bbbbbb;
   }
+
+  .builder-control-row {
+    display: flex;
+    gap: 0.25em;
+    height: 2em;
+    align-items: center;
+  }
+  .builder-control-row :first-child {
+    flex-grow: 1;
+  }
+
+  .builder-control-row input[type="number"] {
+    width: 4em;
+    height: 2em;
+  }
+
+
 </style>
