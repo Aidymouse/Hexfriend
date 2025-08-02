@@ -15,6 +15,7 @@
   import { tfield } from '../stores/tfield'
   import { data_icon, data_terrain } from '../stores/data'
   import { tl } from '../stores/translation'
+  import Alert from '../components/Alert.svelte'
 
   export let loadedIconsets: Iconset[]
   export let app: PIXI.Application
@@ -128,6 +129,10 @@
             /></button
           >
         </h2>
+      {/if}
+
+      {#if !iconset.collapsed && iconset.supported_orientations !== 'both' && $tfield.orientation !== iconset.supported_orientations}
+	<Alert severity="warn">{$tl.icon_panel.support_warnings[iconset.supported_orientations]}</Alert>
       {/if}
 
       <div class="button-grid" class:hidden={iconset.collapsed}>
