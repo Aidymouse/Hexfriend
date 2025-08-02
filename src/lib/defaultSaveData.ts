@@ -17,7 +17,7 @@ let DEFAULTSAVEDATA: save_data = {
 
 	TerrainField: {
 		hexWidth: 50,
-		hexHeight: 45,
+		hexHeight: 43.3,
 		orientation: HexOrientation.FLATTOP,
 
 		rows: 20,
