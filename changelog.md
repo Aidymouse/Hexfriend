@@ -1,16 +1,21 @@
 # Changelog
 For Techy People
 
-# Version 2.0 - Whole new worlds, Hexfriend!
+# Version 3.0 - Found your feet, Hexfriend
 
-## Version 2.3
+## Version 3.0
 _Some tooltips + the new wiki entry in the about will need translation. Translations now have a typescript type so it should be pretty easy to figure out what needs translating._
 - Updated save data format to v13, changing a couple names to snake_case
 - Tileset import dialog looks for .hfts files now
 - Overhauled many of the types, they were so messy
 - Added wiki link in about
-- Tile Symbols and icons are now one type. Because, like, duh
-- Hexfriend no longer relies on the loading of the hexfriend loading graphic to initiate the initial map load
+- Tile Symbols and icons are now one type. Because, like, duh (WIP)
+- Hexfriend no longer relies on the loading of the hexfriend loading graphic to initiate the initial map load (WIP)
+- Icons (and terrain (WIP)) have two scale modes now. One maintains aspect ratio (pre-3.0 behaviour) and one stretches the image to fit a pre-defined percentage of the hexes width and height. In laymans terms, Hexfriend now supports image-based tilesets. (WIP)
+- Establish an icon set converter so old iconset versions can be updated
+- Default hex height has become 43.3, a close-enough approximation of a true hex
+
+# Version 2.0 - Whole new worlds, Hexfriend!
 
 ## Version 2.2
 _Doesn't require any translation updates_
