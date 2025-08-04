@@ -43,6 +43,8 @@ export const en_us: Translation = {
 	terrain_panel: {
 		terrain_color: "Terrain Color",
 		symbol_color: "Symbol Color",
+		rotate60_left: "Rotate 60 degrees left",
+		rotate60_right: "Rotate 60 degrees right",
 		support_warnings: {
 			[HexOrientation.FLATTOP]: "This tileset was made for Flat Topped hexes. It might not look right on this map.",
 			[HexOrientation.POINTYTOP]: "This tileset was made for Pointy Topped hexes. It might not look right on this map.",

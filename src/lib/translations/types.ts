@@ -41,6 +41,8 @@ export type Translation = {
 	terrain_panel: {
 		terrain_color: string, // Label for terrain color control
 		symbol_color: string, // Label for symbol color control
+		rotate60_left: string, // Title for rotate button
+		rotate60_right: string, // Title for rotate button
 		support_warnings: { // Warnings for icon sets that only support certain hex orientations
 			[k in HexOrientation]: string
 		}
