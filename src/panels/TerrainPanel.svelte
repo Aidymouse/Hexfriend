@@ -1,15 +1,18 @@
 <script lang="ts">
   import { getHexPath } from '../helpers/hexHelpers'
   import { tiles_match } from '../helpers/tiles'
+  import { generate_tile_previews } from '../helpers/tileFns'
 
   import { get_symbol_texture } from '../lib/texture_loader'
 
   import type { terrain_data } from '../types/data'
   import type { terrain_field } from '../types/terrain'
-  import type { Tile, TileSymbol, Tileset } from '../types/tilesets'
+  import { HexOrientation } from '../types/terrain'
+  import type { Tile, Tileset } from '../types/tilesets'
+  import type { Icon } from '../types/icon'
 
   import { tfield } from '../stores/tfield'
-  import { data_terrain } from '../stores/data'
+  import { data_overlay, data_terrain } from '../stores/data'
   import { tl } from '../stores/translation'
 
   import * as PIXI from 'pixi.js'
@@ -22,10 +25,10 @@
   export let app: PIXI.Application
 
   // Used for previews
-  let g = new PIXI.Graphics()
-  let s = new PIXI.Sprite()
-  let c = new PIXI.Container()
-  c.addChild(g, s)
+  let grph = new PIXI.Graphics()
+  let spr = new PIXI.Sprite()
+  let cont = new PIXI.Container()
+  cont.addChild(grph, spr)
 
   let tilePreview: string //generateTilePreview($data_terrain);
 
@@ -38,49 +41,35 @@
       ...t,
       symbol: t.symbol ? { ...t.symbol } : null,
     }
-    tilePreview = await generateTilePreview($data_terrain)
+    tilePreview = (await get_tile_previews())[$tfield.orientation]
     $data_terrain.usingPaintbucket = false
     $data_terrain.usingEraser = false
   }
 
-  function findSymbolScale(symbol: TileSymbol, hexWidth: number, hexHeight: number) {
-    if (hexWidth < hexHeight) {
-      let s = (hexWidth * symbol.pHex) / 100 / symbol.texWidth
-      return { x: s, y: s }
-    } else {
-      let s = (hexHeight * symbol.pHex) / 100 / symbol.texHeight
-      return { x: s, y: s }
-    }
+  // TODO: why is number input not the same width as the icon panel number input height
+  const update_rotation = (new_rotation: number) => {
+    $data_terrain.tile.symbol.rotation = new_rotation
+    get_tile_previews().then((previews) => {
+      tilePreview = previews[$tfield.orientation]
+    })
   }
 
-  async function generateTilePreview(data_terrain: terrain_data) {
-    g.clear()
-    g.beginFill(data_terrain.tile ? data_terrain.tile.bgColor : $tfield.blankHexColor)
-
-    let hexWidth = 50
-    let hexHeight = 45
-
-    if ($tfield.orientation == 'pointyTop') {
-      hexWidth = 45
-      hexHeight = 50
-    }
-
-    g.drawPolygon(getHexPath(hexWidth, hexHeight, $tfield.orientation, 0, 0))
-    g.endFill()
-
-    if (data_terrain.tile && data_terrain.tile.symbol) {
-      s.texture = get_symbol_texture(data_terrain.tile)
-      s.tint = data_terrain.tile.symbol.color
-      s.scale = findSymbolScale(data_terrain.tile.symbol, hexWidth, hexHeight)
-      s.anchor.set(0.5)
-      s.rotation = PIXI.DEG_TO_RAD * data_terrain.tile.symbol.rotation
-    } else {
-      s.texture = null
-    }
-
-    let b64 = await app.renderer.extract.base64(c) //PIXI.autoDetectRenderer().plugins.extract.base64(c)
-
-    return b64
+  const get_tile_previews = async (): Promise<{ flatTop: string; pointyTop: string }> => {
+    if (!$data_terrain.tile) return { flatTop: '', pointyTop: '' }
+    // TODO: parse tileset and make it so we only generate one rotation of preview if a tileset only supports one
+    return generate_tile_previews(
+      $data_terrain.tile,
+      {
+        hexWidth: $tfield.hexWidth,
+        hexHeight: $tfield.hexHeight,
+        color: new PIXI.Color($data_terrain.tile.bgColor).toHex(),
+        orientation: HexOrientation.FLATTOP, // Doesnt matter
+      },
+      spr,
+      grph,
+      cont,
+      app,
+    )
   }
 
   function styleMatchesData(tile: Tile): boolean {
@@ -91,11 +80,13 @@
     loadedTilesets = loadedTilesets
     $tfield.orientation = $tfield.orientation
 
-    tilePreview = await generateTilePreview($data_terrain)
+    // tilePreview = await get_tile_previews()[$tfield.orientation]
+    // console.log(tilePreview)
   })
 
   onMount(async () => {
-    tilePreview = await generateTilePreview($data_terrain)
+    // TODO: this isnt working weeh
+    tilePreview = await get_tile_previews()[$tfield.orientation]
   })
 </script>
 
@@ -122,13 +113,49 @@
       </span>
 
       <div id="rotation-slider">
-        <input type="range" id="symbol-rotation" min={0} max={359} bind:value={$data_terrain.tile.symbol.rotation} />
+        <button
+          class="img-button"
+          style="height: 2em"
+          on:click={() => {
+            update_rotation((360 + $data_terrain.tile.symbol.rotation - 60) % 360)
+          }}
+        >
+          <img
+            src={`/assets/img/ui/rotate60_left_${$tfield.orientation}.png`}
+            alt={$tl.terrain_panel.rotate60_left}
+            title={$tl.terrain_panel.rotate60_left}
+          />
+        </button>
+        <input
+          type="range"
+          id="symbol-rotation"
+          min={0}
+          max={359}
+          bind:value={$data_terrain.tile.symbol.rotation}
+          on:input={(e) => update_rotation(e.currentTarget.valueAsNumber)}
+        />
+        <button
+          class="img-button"
+          style="height: 2em"
+          on:click={() => {
+            update_rotation(($data_terrain.tile.symbol.rotation + 60) % 360)
+          }}
+        >
+          <img
+            src={`/assets/img/ui/rotate60_right_${$tfield.orientation}.png`}
+            alt={$tl.terrain_panel.rotate60_right}
+            title={$tl.terrain_panel.rotate60_right}
+          />
+        </button>
+
         <input
           type="number"
           id="symbol-rotation-num"
           min={0}
           max={359}
           bind:value={$data_terrain.tile.symbol.rotation}
+          on:input={(e) => update_rotation(e.currentTarget.valueAsNumber)}
+          style="height: 2em"
         />
       </div>
     {/if}
@@ -159,7 +186,8 @@
             on:click={async () => {
               await changeTile(tile)
             }}
-            class:selected={styleMatchesData(tile)}><img src={tile.preview} alt={tile.display} /></button
+            class:selected={styleMatchesData(tile)}
+            ><img src={tile[`preview_${$tfield.orientation}`]} alt={tile.display} /></button
           >
         {/each}
       </div>
@@ -242,6 +270,7 @@
     display: flex;
     gap: var(--large-radius);
     grid-column: 1/3;
+    align-items: center;
   }
 
   #terrain-preview img.flatTop {
