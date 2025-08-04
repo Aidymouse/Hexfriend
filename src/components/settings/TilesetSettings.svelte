@@ -9,7 +9,7 @@
   import { tfield } from '../../stores/tfield'
   import { tl } from '../../stores/translation'
 
-  import { update_map_to_new_default_tileset, update_tileset_format } from '../../lib/tileset_updater'
+  import { convert_tileset_to_latest } from '../../lib/tilesetConverter'
   import * as texture_loader from '../../lib/texture_loader'
 
   import { get_tileset_id } from '../../helpers/tiles'
