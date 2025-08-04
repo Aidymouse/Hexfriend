@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js'
 import { type Tile } from '../types/tilesets'
 import { HexOrientation } from '../types/terrain'
-import { getHexPathRadius } from './hexHelpers'
+import { getHexPathRadius, getHexPath } from './hexHelpers'
 import { get_icon_scale_for_hex } from './imageSizing'
 import { type PreviewHexInfo } from './iconFns'
 
@@ -16,6 +16,7 @@ import { type PreviewHexInfo } from './iconFns'
  * @returns an object with a base64 string for both the flat top and pointy top preview
  * */
 export async function generate_tile_previews(tile: Tile, preview_hex_info: PreviewHexInfo, spr: PIXI.Sprite, grph: PIXI.Graphics, cont: PIXI.Container, app: PIXI.Application) {
+	spr.anchor.set(0.5);
 	spr.texture = null
 	if (tile.symbol) {
 		const tex = await PIXI.Assets.load(tile.symbol.base64)
@@ -35,14 +36,14 @@ export async function generate_tile_previews(tile: Tile, preview_hex_info: Previ
 	// Flat Top
 	grph.clear()
 	grph.beginFill(tile.bgColor)
-	grph.drawPolygon(getHexPathRadius(preview_hex_info.hexWidth / 2, HexOrientation.FLATTOP, 0, 0))
+	grph.drawPolygon(getHexPath(preview_hex_info.hexWidth, preview_hex_info.hexHeight, HexOrientation.FLATTOP, 0, 0))
 	grph.endFill()
 	const preview_ft = await app.renderer.extract.base64(cont)
 
 	// Pointy Top
 	grph.clear()
 	grph.beginFill(tile.bgColor)
-	grph.drawPolygon(getHexPathRadius(preview_hex_info.hexWidth / 2, HexOrientation.POINTYTOP, 0, 0))
+	grph.drawPolygon(getHexPath(preview_hex_info.hexWidth, preview_hex_info.hexHeight, HexOrientation.POINTYTOP, 0, 0))
 	grph.endFill()
 
 	const preview_pt = await app.renderer.extract.base64(cont)
