@@ -22,8 +22,8 @@ export const en_us: Translation = {
 		},
 		scale_relative: "Proportion of Hex",
 		scale_bydimension: {
-		  width: "Percent of Width",
-		  height: "Percent of Height",
+			width: "Percent of Width",
+			height: "Percent of Height",
 		}
 	},
 
@@ -39,23 +39,23 @@ export const en_us: Translation = {
 		eraser_terrain: "Erase Terrain",
 		eraser_icon: "Erase Icons",
 	},
-	
+
 	terrain_panel: {
 		terrain_color: "Terrain Color",
 		symbol_color: "Symbol Color",
 		support_warnings: {
-		  [HexOrientation.FLATTOP]: "This tileset was made for Flat Topped hexes. It might not look right on this map.",
-		  [HexOrientation.POINTYTOP]: "This tileset was made for Pointy Topped hexes. It might not look right on this map.",
+			[HexOrientation.FLATTOP]: "This tileset was made for Flat Topped hexes. It might not look right on this map.",
+			[HexOrientation.POINTYTOP]: "This tileset was made for Pointy Topped hexes. It might not look right on this map.",
 		}
 	},
 
 	icon_panel: {
-		icon_color: "Icon Color",	
-		rotate60_left: "Rotate 60 degrees left",	
-		rotate60_right: "Rotate 60 degrees right",	
+		icon_color: "Icon Color",
+		rotate60_left: "Rotate 60 degrees left",
+		rotate60_right: "Rotate 60 degrees right",
 		support_warnings: {
-		  [HexOrientation.FLATTOP]: "This iconset was made for Flat Topped hexes. It might not look right on this map.",
-		  [HexOrientation.POINTYTOP]: "This iconset was made for Pointy Topped hexes. It might not look right on this map.",
+			[HexOrientation.FLATTOP]: "This iconset was made for Flat Topped hexes. It might not look right on this map.",
+			[HexOrientation.POINTYTOP]: "This iconset was made for Pointy Topped hexes. It might not look right on this map.",
 		}
 	},
 
@@ -71,8 +71,8 @@ export const en_us: Translation = {
 
 		save_current_style: "Save current path style",
 		update_style_title: "Update this path style to match what is currently set above.",
-        rename_path_style_prompt: "What would you like to call this path?",
-        delete_path_style_prompt: "Delete this path style?",
+		rename_path_style_prompt: "What would you like to call this path?",
+		delete_path_style_prompt: "Delete this path style?",
 		update_style: "Update Style",
 		rename_style: "Rename",
 		duplicate_style: "Duplicate",
@@ -92,8 +92,8 @@ export const en_us: Translation = {
 		rename_style: "Rename",
 		duplicate_style: "Duplicate",
 		delete_style: "Delete",
-        rename_text_style_prompt: "What would you like this text style to be called?",
-        delete_text_style_prompt: "Are you sure you would like to delete this text style?",
+		rename_text_style_prompt: "What would you like this text style to be called?",
+		delete_text_style_prompt: "Are you sure you would like to delete this text style?",
 	},
 
 	eraser_panel: {
@@ -146,7 +146,7 @@ export const en_us: Translation = {
 				large_indented_row: "Large Indented Row",
 			},
 		},
-		
+
 		hexes: {
 			title: "Hexes",
 			blank_color: "Blank Hex Color",
@@ -166,7 +166,7 @@ export const en_us: Translation = {
 			retain_paths: "Path",
 			retain_text: "Text",
 		},
-		
+
 		shape: {
 			title: "Shape and Size",
 			disclaimer: "Hexes removed by a reduction in map size are completely erased.",
@@ -227,7 +227,7 @@ export const en_us: Translation = {
 			already_loaded: "You've already loaded this tileset :)",
 			remove_confirmation: "This will remove all tiles in use from this set. Continue?",
 		},
-		
+
 		icon_sets: {
 			title: "Icon Sets",
 			import: "Import Icon Set",
@@ -249,18 +249,18 @@ export const en_us: Translation = {
 			title: "About",
 			version: "version",
 			version_tagline: "\"Whole new worlds, Hexfriend!\"", // It's advised you make this one funny little line for this language, that way you don't have to come back and change it for every version. Maybe a hexagon pun or something?
-			
+
 			// These messages are stiched together with a link in the middle in the form start + link + end
-			credits: { 
+			credits: {
 				start: "By Aidymouse and all the wonderful",
 				contributorlink: "contributors",
 				end: ""
 			},
-            wiki: {
-                start: "Learn more about Hexfriends advanced features on ",
-                wiki_link_text: "the wiki",
-                end: ""
-            },
+			wiki: {
+				start: "Learn more about Hexfriends advanced features on ",
+				wiki_link_text: "the wiki",
+				end: ""
+			},
 			guts: {
 				start: "Hexfriend is built with Svelte, Pixi JS and Typescript. Check out the ",
 				github_link: "Github",
@@ -290,9 +290,9 @@ export const en_us: Translation = {
 		duplicate: "Duplicate this hex",
 		supported_orientations: "Supports",
 		supported_orientations_options: {
-		  [HexOrientation.FLATTOP]: "Flat Top",
-		  [HexOrientation.POINTYTOP]: "Pointy Top",
-		  'both': 'Both'
+			[HexOrientation.FLATTOP]: "Flat Top",
+			[HexOrientation.POINTYTOP]: "Pointy Top",
+			'both': 'Both'
 		},
 		rotation: 'Rotation',
 
@@ -308,6 +308,7 @@ export const en_us: Translation = {
 			background: "Background",
 			upload_symbol: "Upload Symbol",
 			replace_symbol: "Replace Symbol",
+			remove_symbol: "Remove Symbol",
 			symbol: "Symbol",
 			scale: "Symbol Scale",
 		},

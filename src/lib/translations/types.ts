@@ -12,17 +12,17 @@ export type Translation = {
 		import: string,
 		reset: string,
 	},
-	
+
 	icons: {
-	  scale_mode: string, // Header for scale mode
-	  scale_mode_options: {
-	    [k in ScaleMode]: string // Label for scale mode options in a dropdown
-	  }
-	  scale_relative: string // Label for pHex attribute
-	  scale_bydimension: { // Label for pHex attribute
-	    width: string,
-	    height: string,
-	  } 
+		scale_mode: string, // Header for scale mode
+		scale_mode_options: {
+			[k in ScaleMode]: string // Label for scale mode options in a dropdown
+		}
+		scale_relative: string // Label for pHex attribute
+		scale_bydimension: { // Label for pHex attribute
+			width: string,
+			height: string,
+		}
 	}
 
 	tools: {
@@ -37,12 +37,12 @@ export type Translation = {
 		eraser_terrain: string,
 		eraser_icon: string,
 	},
-	
+
 	terrain_panel: {
 		terrain_color: string, // Label for terrain color control
 		symbol_color: string, // Label for symbol color control
 		support_warnings: { // Warnings for icon sets that only support certain hex orientations
-		  [k in HexOrientation]: string
+			[k in HexOrientation]: string
 		}
 	},
 
@@ -51,7 +51,7 @@ export type Translation = {
 		rotate60_left: string, // Rotate button on icon panel
 		rotate60_right: string // Rotate buttonon icon panel
 		support_warnings: { // Warnings for icon sets that only support certain hex orientations
-		  [k in HexOrientation]: string
+			[k in HexOrientation]: string
 		}
 	},
 
@@ -142,7 +142,7 @@ export type Translation = {
 				large_indented_row: string,
 			},
 		},
-		
+
 		hexes: {
 			title: string,
 			blank_color: string,
@@ -162,7 +162,7 @@ export type Translation = {
 			retain_paths: string,
 			retain_text: string,
 		},
-		
+
 		shape: {
 			title: string,
 			disclaimer: string,
@@ -223,7 +223,7 @@ export type Translation = {
 			already_loaded: string,
 			remove_confirmation: string,
 		},
-		
+
 		icon_sets: {
 			title: string,
 			import: string,
@@ -245,9 +245,9 @@ export type Translation = {
 			title: string,
 			version: string,
 			version_tagline: string, // It's advised you make this one funny little line for this language, that way you don't have to come back and change it for every version. Maybe a hexagon pun or something?
-			
+
 			// These messages are stiched together with a link in the middle in the form start + link + end
-			credits: { 
+			credits: {
 				start: string,
 				contributorlink: string,
 				end: string
@@ -285,7 +285,7 @@ export type Translation = {
 		change_orientation: string,
 		duplicate: string,
 		supported_orientations: string, // Label for supported orientations dropdown
-		supported_orientations_options: {[o in HexOrientation]: string} & {both: string},
+		supported_orientations_options: { [o in HexOrientation]: string } & { both: string },
 		rotation: string // Label for icon and tile symbol rotation controls
 		tileset_builder: {
 			import_tileset: string,
@@ -299,6 +299,7 @@ export type Translation = {
 			background: string,
 			upload_symbol: string,
 			replace_symbol: string, // Button text for symbol replace button
+			remove_symbol: string, // Button text for symbol remove button
 			symbol: string,
 			scale: string, // Header for symbol scale
 		},
