@@ -56,7 +56,7 @@
 
   // Lib
   import * as texture_loader from './lib/texture_loader'
-  import { update_tileset_format } from './lib/tileset_updater'
+  import { convert_tileset_to_latest } from './lib/tilesetConverter'
 
   // Panels
   import IconPanel from './panels/IconPanel.svelte'
@@ -673,8 +673,8 @@
 
     // Load Textures
     loadedTilesets.forEach(async (tileset) => {
-      if (tileset.format_version == undefined || tileset.format_version < LATEST_TILESET_FORMAT_VERSION) {
-        let updated_tileset = update_tileset_format(tileset)
+      if (!tileset.format_version || tileset.format_version < LATEST_TILESET_FORMAT_VERSION) {
+        let updated_tileset = await convert_tileset_to_latest(tileset)
 
         loadedTilesets = loadedTilesets.filter((ts) => ts.id != tileset.id)
         loadedTilesets.push(updated_tileset)
@@ -700,6 +700,7 @@
     loadedSave = data
     loadedId = id
 
+    console.log("Loaded Sets", loadedTilesets)
     let firstTile = loadedTilesets[0].tiles[0]
     $data_terrain.tile = {
       ...firstTile,
