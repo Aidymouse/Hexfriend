@@ -85,14 +85,16 @@
   })
 
   onMount(async () => {
-    // TODO: this isnt working weeh
-    tilePreview = await get_tile_previews()[$tfield.orientation]
+    // Yes, you have to split it out or it doesnt work. Idk why.
+    const p = await get_tile_previews()
+    tilePreview = p[$tfield.orientation]
   })
 </script>
 
 <div class="panel">
   <div id="terrain-preview">
     <div id="preview-image-centerer">
+      <!-- TODO: throbber -->
       <img
         src={tilePreview}
         alt={'Current Tile Preview'}
@@ -102,17 +104,34 @@
     </div>
 
     <span class="terrain-preview-control-row">
-      <ColorInputPixi bind:value={$data_terrain.tile.bgColor} id={'terrainColor'} />
+      <ColorInputPixi
+        bind:value={$data_terrain.tile.bgColor}
+        on:input={() => 
+          get_tile_previews().then((previews) => {
+            tilePreview = previews[$tfield.orientation]
+          })
+        }
+        id={'terrainColor'}
+      />
       <label for="terrainColor">{$tl.terrain_panel.terrain_color}</label>
     </span>
 
     {#if $data_terrain.tile.symbol}
       <span class="terrain-preview-control-row">
-        <ColorInputPixi bind:value={$data_terrain.tile.symbol.color} id={'symbolColor'} />
+        <ColorInputPixi
+          bind:value={$data_terrain.tile.symbol.color}
+          on:input={() => 
+            get_tile_previews().then((previews) => {
+              tilePreview = previews[$tfield.orientation]
+            })
+          }
+          id={'symbolColor'}
+        />
         <label for="symbolColor">{$tl.terrain_panel.symbol_color}</label>
       </span>
 
       <div id="rotation-slider">
+      <div style="display: flex; align-items: center;">
         <button
           class="img-button"
           style="height: 2em"
@@ -126,6 +145,8 @@
             title={$tl.terrain_panel.rotate60_left}
           />
         </button>
+
+      </div>
         <input
           type="range"
           id="symbol-rotation"
@@ -134,6 +155,7 @@
           bind:value={$data_terrain.tile.symbol.rotation}
           on:input={(e) => update_rotation(e.currentTarget.valueAsNumber)}
         />
+      <div style="display: flex; align-items: center;">
         <button
           class="img-button"
           style="height: 2em"
@@ -147,6 +169,7 @@
             title={$tl.terrain_panel.rotate60_right}
           />
         </button>
+      </div>
 
         <input
           type="number"
@@ -155,7 +178,6 @@
           max={359}
           bind:value={$data_terrain.tile.symbol.rotation}
           on:input={(e) => update_rotation(e.currentTarget.valueAsNumber)}
-          style="height: 2em"
         />
       </div>
     {/if}
@@ -174,8 +196,8 @@
               alt="Toggle Tileset Visibility"
               src={'/assets/img/ui/arrow.png'}
               class:rotated={tileset.collapsed}
-            /></button
-          >
+            />
+          </button>
         </h2>
       {/if}
       <div class="button-grid" class:hidden={tileset.collapsed}>
@@ -270,7 +292,6 @@
     display: flex;
     gap: var(--large-radius);
     grid-column: 1/3;
-    align-items: center;
   }
 
   #terrain-preview img.flatTop {
