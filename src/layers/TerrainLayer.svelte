@@ -5,7 +5,6 @@
   import type { pan_state } from '../types/panning'
   import type { TerrainHex, terrain_field } from '../types/terrain'
   import type { Tile } from '../types/tilesets'
-  import type { TileSymbol } from '../types/tilesets'
   import type { hex_id } from '../types/toolData'
   import { tools } from '../types/toolData'
   import type CoordsLayer from './CoordsLayer.svelte'
@@ -44,6 +43,8 @@
   import { onMount } from 'svelte'
 
   import { get_symbol_texture } from '../lib/texture_loader'
+  import { get_icon_scale_for_hex } from '../helpers/imageSizing'
+  import type { PreviewHexInfo } from '../helpers/iconFns'
 
   export let cont_terrain: PIXI.Container
 
@@ -67,18 +68,7 @@
   export let comp_coordsLayer: CoordsLayer
 
   export function copyHex(from: TerrainHex, to: TerrainHex) {
-    to.tile = from.tile
-      ? {
-          ...from.tile,
-          preview: '',
-          symbol: from.tile.symbol
-            ? {
-                ...from.tile.symbol,
-                base64: '',
-              }
-            : null,
-        }
-      : null
+    to.tile = structuredClone(from.tile)
   }
 
   /* SQUARE SHAPED MAPS */
@@ -726,22 +716,6 @@
   }
 
   /* RENDER FUNCTIONS */
-  function findSymbolScale(symbol: TileSymbol) {
-    if ($tfield.hexWidth < $tfield.hexHeight) {
-      let s = ($tfield.hexWidth * symbol.pHex) / 100 / symbol.texWidth
-      return {
-        x: s,
-        y: s,
-      }
-    } else {
-      let s = ($tfield.hexHeight * symbol.pHex) / 100 / symbol.texHeight
-      return {
-        x: s,
-        y: s,
-      }
-    }
-  }
-
   export function renderGrid() {
     gridGraphics.clear()
     if (!$tfield.grid.shown) return
@@ -846,7 +820,7 @@
     }
 
     ns.texture = get_symbol_texture(hex.tile)
-    ns.scale = findSymbolScale(hex.tile.symbol)
+    ns.scale = get_icon_scale_for_hex(hex.tile.symbol, { hexWidth: $tfield.hexWidth, hexHeight: $tfield.hexHeight })
     ns.tint = hex.tile.symbol.color
     ns.position.set(hexWorldCoords.x, hexWorldCoords.y) // Position is updated even though it's usually the same, but if hex has been resized since last draw the symbol position will be different
     ns.rotation = PIXI.DEG_TO_RAD * (hex.tile.symbol.rotation ?? 0)
