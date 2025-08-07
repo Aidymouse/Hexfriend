@@ -5,6 +5,8 @@
   import { generate_icon_preview, type PreviewHexInfo } from '../helpers/iconFns'
   import { generate_tile_previews } from '../helpers/tileFns'
 
+  // TODO: preview hex controls
+
   let preview_hex_info: PreviewHexInfo = {
     hexWidth: 50 * 6,
     hexHeight: 43.3 * 6,
@@ -359,8 +361,12 @@
 
     <div
       id="tile-buttons"
-      on:dragover={(e) => { e.preventDefault() }}
-      on:dragenter={(e) => { e.preventDefault() }}
+      on:dragover={(e) => {
+        e.preventDefault()
+      }}
+      on:dragenter={(e) => {
+        e.preventDefault()
+      }}
       on:drop={dropButton}
     >
       {#each workingTileset.tiles as tile (tile.id)}
