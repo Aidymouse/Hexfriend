@@ -45,6 +45,7 @@
   import { get_symbol_texture } from '../lib/texture_loader'
   import { get_icon_scale_for_hex } from '../helpers/imageSizing'
   import type { PreviewHexInfo } from '../helpers/iconFns'
+  import { generate_tile_previews } from '../helpers/tileFns'
 
   export let cont_terrain: PIXI.Container
 
@@ -835,7 +836,8 @@
     $tfield.hexes[hexId].tile = tile
       ? {
           ...tile,
-          preview: '',
+          preview_flatTop: '',
+          preview_pointyTop: '',
           symbol: tile.symbol ? { ...tile.symbol, base64: '' } : null,
         }
       : null
@@ -939,14 +941,13 @@
         return
       }
 
-      // HACKY!!!! Needs changing
-      //$data_terrain.tile = cHex.tile ? { ...cHex.tile, symbol: cHex.tile.symbol ? { ...cHex.tile.symbol } : null } : generateBlankTile();
-      $data_terrain.tile = {
-        ...cHex.tile,
-        symbol: cHex.tile.symbol ? { ...cHex.tile.symbol } : null,
-      }
+      console.log(cHex)
 
+      //$data_terrain.tile = cHex.tile ? { ...cHex.tile, symbol: cHex.tile.symbol ? { ...cHex.tile.symbol } : null } : generateBlankTile();
+      $data_terrain.tile = structuredClone(cHex.tile)
       $data_terrain.usingEyedropper = false
+      // HACKY!!!!
+      $data_terrain.genPreview = true
     }
   }
 

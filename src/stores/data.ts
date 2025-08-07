@@ -12,6 +12,7 @@ export let data_terrain: Writable<terrain_data> = writable({
     usingPaintbucket: false,
     usingEraser: false,
     renderOpacity: 1,
+    genPreview: false,
 })
 
 export let data_path: Writable<path_data> = writable({

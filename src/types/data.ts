@@ -11,6 +11,8 @@ export interface terrain_data {
 	usingPaintbucket: boolean;
 	usingEraser: boolean;
 	renderOpacity: number;
+	/** Might be a hack, but this lets me tell the terrainpanel to generate new previews from anywhere I have terrain_data */
+	genPreview: boolean;
 }
 
 export type icon_data = {
