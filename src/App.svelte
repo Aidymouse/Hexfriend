@@ -94,7 +94,7 @@
 
   // TYPES
   import type { eraser_data, terrain_data, text_data } from './types/data'
-  import type { Iconset } from './types/icon'
+  import { LATEST_ICONSET_FORMAT_VERSION, type Iconset } from './types/icon'
   import type { pan_state } from './types/panning'
   import type { save_data } from './types/savedata'
   // Constants
@@ -107,6 +107,7 @@
   import { afterUpdate, onMount } from 'svelte'
   import { Map_Exports } from './types/export'
   import Scratchpad from './components/scratchpad/Scratchpad.svelte'
+  import { convert_iconset_to_latest } from './lib/iconsetConverter'
 
   /* STATE */
 
@@ -648,16 +649,27 @@
 
         loadedTilesets = loadedTilesets.filter((ts) => ts.id != tileset.id)
         loadedTilesets.push(updated_tileset)
-      }
 
-      console.log(`Loading textures for ${tileset.name}`)
-      await texture_loader.load_tileset_textures(tileset)
+        console.log(`Loading textures for ${tileset.name}`)
+        await texture_loader.load_tileset_textures(updated_tileset)
+      } else {
+        console.log(`Loading textures for ${tileset.name}`)
+        await texture_loader.load_tileset_textures(tileset)
+      }
     }
 
     // Load Icons
     for (const iconset of loadedIconsets) {
-      console.log(`Loading icon textures for ${iconset.name}`)
-      await texture_loader.load_iconset_textures(iconset)
+      if (!iconset.format_version || iconset.format_version < LATEST_ICONSET_FORMAT_VERSION) {
+        const updated_iconset = convert_iconset_to_latest(iconset)
+        loadedIconsets = loadedIconsets.filter((is) => is.id != iconset.id)
+        loadedIconsets.push(updated_iconset)
+        console.log(`Loading icon textures for ${iconset.name}`)
+        await texture_loader.load_iconset_textures(updated_iconset)
+      } else {
+        console.log(`Loading icon textures for ${iconset.name}`)
+        await texture_loader.load_iconset_textures(iconset)
+      }
     }
 
     $tfield = data.TerrainField
@@ -947,15 +959,7 @@
         redrawEntireMap()
       }}
       {exportMap}
-      load={(data, id) => {
-        loadInit(data, id)
-
-        appState = app_state.LOADINGMAP
-
-        setTimeout(() => {
-          do_load(dataToLoad.data, dataToLoad.id)
-        }, 150)
-      }}
+      load={load_map}
       on:mouseup={pointerup}
     />
 
