@@ -14,6 +14,7 @@
   import { tl } from '../../stores/translation'
 
   import { get_radius_from_width_height, get_width_height_from_radius } from '../../helpers/hexHelpers'
+  import { data_terrain } from '../../stores/data'
 
   export let comp_coordsLayer
   export let comp_terrainLayer
@@ -70,6 +71,8 @@
       bind:value={$tfield.orientation}
       on:change={() => {
         changeOrientation()
+
+        $data_terrain.genPreview = true
 
         comp_coordsLayer.cullUnusedCoordinates()
         comp_coordsLayer.updateAllCoordPositions()
