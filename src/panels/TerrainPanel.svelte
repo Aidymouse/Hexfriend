@@ -46,7 +46,6 @@
     $data_terrain.usingEraser = false
   }
 
-  // TODO: why is number input not the same width as the icon panel number input height
   const update_rotation = (new_rotation: number) => {
     $data_terrain.tile.symbol.rotation = new_rotation
     get_tile_previews().then((previews) => {
@@ -70,6 +69,16 @@
       cont,
       app,
     )
+  }
+
+  $: {
+    if ($data_terrain.genPreview) {
+      console.log('Generate New Preview Please')
+      get_tile_previews().then((p) => {
+        tilePreview = p[$tfield.orientation]
+      })
+      $data_terrain.genPreview = false
+    }
   }
 
   function styleMatchesData(tile: Tile): boolean {
@@ -106,11 +115,10 @@
     <span class="terrain-preview-control-row">
       <ColorInputPixi
         bind:value={$data_terrain.tile.bgColor}
-        on:input={() => 
+        on:input={() =>
           get_tile_previews().then((previews) => {
             tilePreview = previews[$tfield.orientation]
-          })
-        }
+          })}
         id={'terrainColor'}
       />
       <label for="terrainColor">{$tl.terrain_panel.terrain_color}</label>
@@ -120,33 +128,31 @@
       <span class="terrain-preview-control-row">
         <ColorInputPixi
           bind:value={$data_terrain.tile.symbol.color}
-          on:input={() => 
+          on:input={() =>
             get_tile_previews().then((previews) => {
               tilePreview = previews[$tfield.orientation]
-            })
-          }
+            })}
           id={'symbolColor'}
         />
         <label for="symbolColor">{$tl.terrain_panel.symbol_color}</label>
       </span>
 
       <div id="rotation-slider">
-      <div style="display: flex; align-items: center;">
-        <button
-          class="img-button"
-          style="height: 2em"
-          on:click={() => {
-            update_rotation((360 + $data_terrain.tile.symbol.rotation - 60) % 360)
-          }}
-        >
-          <img
-            src={`/assets/img/ui/rotate60_left_${$tfield.orientation}.png`}
-            alt={$tl.terrain_panel.rotate60_left}
-            title={$tl.terrain_panel.rotate60_left}
-          />
-        </button>
-
-      </div>
+        <div style="display: flex; align-items: center;">
+          <button
+            class="img-button"
+            style="height: 2em"
+            on:click={() => {
+              update_rotation((360 + $data_terrain.tile.symbol.rotation - 60) % 360)
+            }}
+          >
+            <img
+              src={`/assets/img/ui/rotate60_left_${$tfield.orientation}.png`}
+              alt={$tl.terrain_panel.rotate60_left}
+              title={$tl.terrain_panel.rotate60_left}
+            />
+          </button>
+        </div>
         <input
           type="range"
           id="symbol-rotation"
@@ -155,21 +161,21 @@
           bind:value={$data_terrain.tile.symbol.rotation}
           on:input={(e) => update_rotation(e.currentTarget.valueAsNumber)}
         />
-      <div style="display: flex; align-items: center;">
-        <button
-          class="img-button"
-          style="height: 2em"
-          on:click={() => {
-            update_rotation(($data_terrain.tile.symbol.rotation + 60) % 360)
-          }}
-        >
-          <img
-            src={`/assets/img/ui/rotate60_right_${$tfield.orientation}.png`}
-            alt={$tl.terrain_panel.rotate60_right}
-            title={$tl.terrain_panel.rotate60_right}
-          />
-        </button>
-      </div>
+        <div style="display: flex; align-items: center;">
+          <button
+            class="img-button"
+            style="height: 2em"
+            on:click={() => {
+              update_rotation(($data_terrain.tile.symbol.rotation + 60) % 360)
+            }}
+          >
+            <img
+              src={`/assets/img/ui/rotate60_right_${$tfield.orientation}.png`}
+              alt={$tl.terrain_panel.rotate60_right}
+              title={$tl.terrain_panel.rotate60_right}
+            />
+          </button>
+        </div>
 
         <input
           type="number"
@@ -192,11 +198,7 @@
             on:click={() => {
               tileset.collapsed = !tileset.collapsed
             }}
-            ><img
-              alt="Toggle Tileset Visibility"
-              src={'/assets/img/ui/arrow.png'}
-              class:rotated={tileset.collapsed}
-            />
+            ><img alt="Toggle Tileset Visibility" src={'/assets/img/ui/arrow.png'} class:rotated={tileset.collapsed} />
           </button>
         </h2>
       {/if}
