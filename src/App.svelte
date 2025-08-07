@@ -393,7 +393,7 @@
       case null:
         switch (shortcutData.function) {
           case 'save':
-            saveInit()
+            save_map()
             break
 
           case 'toggleViewMaps':
@@ -562,19 +562,16 @@
   function createNewMap() {
     /* TODO: Save Data Checking */
 
-    loadInit(JSON.parse(JSON.stringify(DEFAULTSAVEDATA)), null)
+    load_map(JSON.parse(JSON.stringify(DEFAULTSAVEDATA)), null)
 
-    appState = app_state.LOADINGMAP
-
-    // I get suspicious when it loads too fast
-    setTimeout(() => {
-      load_map(dataToLoad.data, dataToLoad.id)
-    }, 150)
+    // setTimeout(() => {
+    //   do_load(dataToLoad.data, dataToLoad.id)
+    // }, 150)
   }
 
-  async function saveInit() {
+  async function save_map() {
     // = asyncExtract(app, offsetContainer)
-    if (loadedSave.title == '') {
+    if (loadedSave.title === '') {
       let t = prompt('Map Title:')
       if (t != null) {
         loadedSave.title = t
@@ -584,6 +581,8 @@
       }
     }
     saving = true
+
+    saveToDexie()
   }
 
   async function asyncExtract(app, container): Promise<string> {
@@ -596,17 +595,7 @@
 
     let c = JSON.stringify(loadedSave)
 
-    let p
-
-    let p1 = asyncExtract(app, offsetContainer)
-      .catch((error) => {
-        console.log('Oh no')
-
-        p = ''
-      })
-      .then((r) => (p = r))
-
-    await p1
+    let p = await asyncExtract(app, offsetContainer)
 
     if (loadedId) {
       db.mapSaves.update(loadedId, {
@@ -640,33 +629,7 @@
     saving = false
   }
 
-  function loadInit(data: save_data, id: number | null) {
-    // Clean up
-    if (id) {
-      console.log(`Loading ${id}`)
-    } else if (data.title) {
-      console.log(`Loading ${data.title}`)
-    } else {
-      console.log('Loading default save data')
-    }
-
-    // Deal with outdated save data
-    data = convertSaveDataToLatest(data)
-
-    dataToLoad = { data: data, id: id }
-    appState = app_state.LOADINGMAP
-
-    //loadSave(data, id);
-    //await loadSave(data, id)
-
-    $data_path.selectedPath = null
-    $data_text.selectedText = null
-
-    // await tick() // The terrain field needs time to hook onto
-    //comp_terrainLayer.renderAllHexes()
-  }
-
-  async function load_map(data: save_data, id: number | null) {
+  async function do_load(data: save_data, id: number | null) {
     console.log('Initiate load', id)
     loadedTilesets = data.tilesets
     loadedIconsets = data.iconsets
@@ -700,14 +663,14 @@
     loadedSave = data
     loadedId = id
 
-    console.log("Loaded Sets", loadedTilesets)
+    console.log('Loaded Sets', loadedTilesets)
     let firstTile = loadedTilesets[0].tiles[0]
     $data_terrain.tile = {
       ...firstTile,
       symbol: firstTile.symbol ? { ...firstTile.symbol } : null,
     }
 
-    $data_icon.icon = {...loadedIconsets[0].icons[0]}
+    $data_icon.icon = { ...loadedIconsets[0].icons[0] }
 
     // Center the map
     let tf = loadedSave.TerrainField
@@ -754,23 +717,56 @@
     console.log('Loaded, ready')
   }
 
-  $: appState, andSave()
-
-  function loadAndSave(data: save_data, id: number | null) {
-    loadInit(data, id)
-    loadAndSaving = true
-    // also triggers andSave()
-  }
-
-  function andSave() {
-    // when app_state becomes NORMAL again, then trigger save
-    if (loadAndSaving) {
-      if (appState == app_state.NORMAL) {
-        saveInit()
-        loadAndSaving = false
-      }
+  function load_map(data: save_data, id: number | null) {
+    // Clean up
+    if (id) {
+      console.log(`Loading ${id}`)
+    } else if (data.title) {
+      console.log(`Loading ${data.title}`)
+    } else {
+      console.log('Loading default save data')
     }
+
+    // Deal with outdated save data
+    data = convertSaveDataToLatest(data)
+
+    dataToLoad = { data: data, id: id }
+    appState = app_state.LOADINGMAP
+
+    //loadSave(data, id);
+    //await loadSave(data, id)
+
+    $data_path.selectedPath = null
+    $data_text.selectedText = null
+
+    // await tick() // The terrain field needs time to hook onto
+    //comp_terrainLayer.renderAllHexes()
+
+    appState = app_state.LOADINGMAP
+
+    // I get suspicious when it loads too fast
+    setTimeout(() => {
+      do_load(data, id)
+    }, 150)
   }
+
+  //$: appState, andSave()
+
+  // function loadAndSave(data: save_data, id: number | null) {
+  //   do_load(data, id)
+  //   loadAndSaving = true
+  //   // also triggers andSave()
+  // }
+  //
+  // function andSave() {
+  //   // when app_state becomes NORMAL again, then trigger save
+  //   if (loadAndSaving) {
+  //     if (appState == app_state.NORMAL) {
+  //       saveInit()
+  //       loadAndSaving = false
+  //     }
+  //   }
+  // }
 
   /* Order matters */
   /* TODO: Put this somewhere better, add other layers */
@@ -807,15 +803,7 @@
   <main id="content-arranger">
     {#if saving}
       <div id="save-indicator">
-        <img
-          src="../assets/img/site/hexfriend.png"
-          on:load={() => {
-            setTimeout(() => {
-              saveToDexie()
-            }, 30)
-          }}
-          alt={'Saving...'}
-        />
+        <img src="../assets/img/site/hexfriend.png" alt={'Saving...'} />
         <p>{$tl.save_indicator}</p>
       </div>
     {/if}
@@ -911,7 +899,7 @@
       >
         <img src="assets/img/tools/maps.png" alt="Maps" />
       </button>
-      <button on:click={saveInit} title={'Save'}>
+      <button on:click={save_map} title={'Save'}>
         <img src="assets/img/tools/save.png" alt="Save" />
       </button>
     </div>
@@ -923,7 +911,7 @@
         }}
         title={'Overlay Help'}
       >
-        <img src="assets/img/ui/help/question_mark.png" alt="Help" />
+        <img src={`assets/img/ui/help/question_mark.png`} alt="Help" />
       </button>
     </div>
 
@@ -931,7 +919,7 @@
       <ShortcutList bind:this={comp_shortcutList} on:mouseup={pointerup} />
     {/if}
 
-    <SavedMaps bind:showSavedMaps {createNewMap} load={loadInit} {loadAndSave} on:mouseup={pointerup} />
+    <SavedMaps bind:showSavedMaps {createNewMap} load={load_map} {save_map} on:mouseup={pointerup} />
 
     <Settings
       {loadedSave}
@@ -963,7 +951,7 @@
         appState = app_state.LOADINGMAP
 
         setTimeout(() => {
-          load_map(dataToLoad.data, dataToLoad.id)
+          do_load(dataToLoad.data, dataToLoad.id)
         }, 150)
       }}
       on:mouseup={pointerup}
@@ -975,13 +963,16 @@
 
     {#if showHelp}
       <div id="help-overlay">
-        <!-- TODO: translate!!! -->
-        <img id="welcome" src="assets/img/ui/help/welcome.png" alt="Welcome To Hexfriend" />
-        <img id="map" src="assets/img/ui/help/map.png" alt="This Is The Map" />
-        <img id="settings-saving" src="assets/img/ui/help/settings_saving.png" alt="Settings & Saving" />
-        <img id="tools" src="assets/img/ui/help/tools.png" alt="Choose Your Tool" />
-        <img id="configure" src="assets/img/ui/help/configure.png" alt="Configure The Tools" />
-        <img id="shortcuts" src="assets/img/ui/help/shortcuts.png" alt="Check Out The Shortcuts" />
+        <img id="welcome" src={`assets/img/ui/help/${$tl.language}/welcome.png`} alt="Welcome To Hexfriend" />
+        <img id="map" src={`assets/img/ui/help/${$tl.language}/map.png`} alt="This Is The Map" />
+        <img
+          id="settings-saving"
+          src={`assets/img/ui/help/${$tl.language}/settings_saving.png`}
+          alt="Settings & Saving"
+        />
+        <img id="tools" src={`assets/img/ui/help/${$tl.language}/tools.png`} alt="Choose Your Tool" />
+        <img id="configure" src={`assets/img/ui/help/${$tl.language}/configure.png`} alt="Configure The Tools" />
+        <img id="shortcuts" src={`assets/img/ui/help/${$tl.language}/shortcuts.png`} alt="Check Out The Shortcuts" />
       </div>
     {/if}
   </main>
