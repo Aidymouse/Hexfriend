@@ -393,7 +393,7 @@
       case null:
         switch (shortcutData.function) {
           case 'save':
-            save_map()
+            save_map(loadedSave, loadedId)
             break
 
           case 'toggleViewMaps':
@@ -569,12 +569,13 @@
     // }, 150)
   }
 
-  async function save_map() {
+  // Null if map is new. Can be set to null to force save a new map
+  async function save_map(data_to_save: save_data, save_id: number | null, preview_override: string | null = null) {
     // = asyncExtract(app, offsetContainer)
-    if (loadedSave.title === '') {
+    if (data_to_save.title === '') {
       let t = prompt('Map Title:')
       if (t != null) {
-        loadedSave.title = t
+        data_to_save.title = t
       } else {
         saving = false
         return
@@ -582,7 +583,9 @@
     }
     saving = true
 
-    saveToDexie()
+    let p = await asyncExtract(app, offsetContainer)
+
+    return saveToDexie(data_to_save, save_id, preview_override ?? p)
   }
 
   async function asyncExtract(app, container): Promise<string> {
@@ -590,30 +593,29 @@
     return new Promise((r) => r(app.renderer.extract.base64(container)))
   }
 
-  async function saveToDexie() {
+  /** Saves the map to dexie + updates the currently loaded ID */
+  async function saveToDexie(data: save_data, id: number | null, preview_base64: string): Promise<number> {
     // console.log(loadedSave);
 
-    let c = JSON.stringify(loadedSave)
+    let c = JSON.stringify(data)
 
-    let p = await asyncExtract(app, offsetContainer)
-
-    if (loadedId) {
-      db.mapSaves.update(loadedId, {
-        mapTitle: loadedSave.title,
-        previewBase64: p,
-        saveVersion: loadedSave.saveVersion,
+    if (id !== null) {
+      db.mapSaves.update(id, {
+        mapTitle: data.title,
+        previewBase64: preview_base64,
+        saveVersion: data.saveVersion,
       })
 
-      db.mapStrings.update(loadedId, {
+      db.mapStrings.update(id, {
         mapString: c,
       })
 
-      console.log(`Updated saved map with id ${loadedId}`)
+      console.log(`Updated saved map with id ${id}`)
     } else {
       const id = await db.mapSaves.add({
-        mapTitle: loadedSave.title,
-        previewBase64: p,
-        saveVersion: loadedSave.saveVersion,
+        mapTitle: data.title,
+        previewBase64: preview_base64,
+        saveVersion: data.saveVersion,
       })
 
       await db.mapStrings.add({
@@ -627,6 +629,8 @@
     $store_has_unsaved_changes = false
 
     saving = false
+
+    return loadedId
   }
 
   async function do_load(data: save_data, id: number | null) {
@@ -899,7 +903,7 @@
       >
         <img src="assets/img/tools/maps.png" alt="Maps" />
       </button>
-      <button on:click={save_map} title={'Save'}>
+      <button on:click={() => save_map(loadedSave, loadedId)} title={'Save'}>
         <img src="assets/img/tools/save.png" alt="Save" />
       </button>
     </div>
