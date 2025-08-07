@@ -4,6 +4,7 @@ import { HexOrientation } from '../types/terrain'
 import { getHexPathRadius, getHexPath } from './hexHelpers'
 import { get_icon_scale_for_hex } from './imageSizing'
 import { type PreviewHexInfo } from './iconFns'
+import { get_symbol_texture } from '../lib/texture_loader'
 
 
 /** Generates a flat top and pointy top preview for a tile 
@@ -19,7 +20,8 @@ export async function generate_tile_previews(tile: Tile, preview_hex_info: Previ
 	spr.anchor.set(0.5);
 	spr.texture = null
 	if (tile.symbol) {
-		const tex = await PIXI.Assets.load(tile.symbol.base64)
+		//const tex = await PIXI.Assets.load(tile.symbol.base64)
+		const tex = get_symbol_texture(tile)
 		spr.texture = tex
 		tile.symbol.texWidth = tex.width
 		tile.symbol.texHeight = tex.height
