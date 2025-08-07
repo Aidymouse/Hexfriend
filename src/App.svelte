@@ -595,11 +595,14 @@
 
   /** Saves the map to dexie + updates the currently loaded ID */
   async function saveToDexie(data: save_data, id: number | null, preview_base64: string): Promise<number> {
-    // console.log(loadedSave);
-
     let c = JSON.stringify(data)
 
-    if (id !== null) {
+    let curSave = undefined
+    if (id) {
+      curSave = await db.mapSaves.get(id)
+    }
+
+    if (id !== null && curSave !== undefined) {
       db.mapSaves.update(id, {
         mapTitle: data.title,
         previewBase64: preview_base64,
@@ -639,7 +642,7 @@
     loadedIconsets = data.iconsets
 
     // Load Textures
-    loadedTilesets.forEach(async (tileset) => {
+    for (const tileset of loadedTilesets) {
       if (!tileset.format_version || tileset.format_version < LATEST_TILESET_FORMAT_VERSION) {
         let updated_tileset = await convert_tileset_to_latest(tileset)
 
@@ -649,7 +652,7 @@
 
       console.log(`Loading textures for ${tileset.name}`)
       await texture_loader.load_tileset_textures(tileset)
-    })
+    }
 
     // Load Icons
     for (const iconset of loadedIconsets) {
@@ -840,12 +843,7 @@
 
       <TerrainLayer bind:cont_terrain bind:this={comp_terrainLayer} {changeTool} {comp_coordsLayer} />
       <PathLayer bind:this={comp_pathLayer} bind:cont_all_paths bind:paths={loadedSave.paths} />
-      <IconLayer
-        bind:this={comp_iconLayer}
-        bind:pHex={loadedSave.icon_hex_size_percentage}
-        bind:icons={loadedSave.icons}
-        bind:cont_icon
-      />
+      <IconLayer bind:this={comp_iconLayer} bind:icons={loadedSave.icons} bind:cont_icon />
       <CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} />
       <LargeHexesLayer bind:cont_largehexes />
       <TextLayer bind:cont_all_text bind:this={comp_textLayer} bind:texts={loadedSave.texts} />
