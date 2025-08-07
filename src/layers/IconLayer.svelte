@@ -58,14 +58,13 @@
     // Ideally, this would only trigger on a load. It can trigger on any update for now though...
     icons.forEach((i) => (iconId = Math.max(iconId, i.onLayerId)))
     iconId++
-
   }
 
   $: {
     //$store_selected_tool = $store_selected_tool
   }
 
-  function get_icon_position(): {iconX: number, iconY: number} {
+  function get_icon_position(): { iconX: number; iconY: number } {
     let iconX = store_panning.curWorldX()
     let iconY = store_panning.curWorldY()
 
@@ -94,19 +93,17 @@
     return { iconX, iconY }
   }
 
-
   export function placeIcon() {
-
     const { iconX, iconY } = get_icon_position()
 
     let newIcon: IconLayerIcon = {
-      ...($data_icon.icon),
+      ...$data_icon.icon,
       x: iconX,
       y: iconY,
       onLayerId: iconId,
       texId: $data_icon.icon.texId,
       rotation: $data_icon.icon.rotation,
-      scale: get_icon_scale_for_hex($data_icon.icon, {hexWidth: $tfield.hexWidth, hexHeight: $tfield.hexHeight})
+      scale: get_icon_scale_for_hex($data_icon.icon, { hexWidth: $tfield.hexWidth, hexHeight: $tfield.hexHeight }),
     }
 
     icons.push(newIcon)
@@ -148,7 +145,7 @@
   }
 
   export function pointermove() {
-    //if (floatingIcon) 
+    //if (floatingIcon)
     if (draggedIcon) updateDraggedIcon()
 
     updateFloatingIcon()
@@ -164,37 +161,38 @@
   // Floating icons have a few bugs / polish requried:
   // - Icon appears weirdly when icon layer is switched too, will need to update when layer is switched to - still true?
 
-
   function updateFloatingIcon() {
-    const {iconX, iconY} = get_icon_position();
-    const icon_scale = get_icon_scale_for_hex($data_icon.icon, $tfield);
+    const { iconX, iconY } = get_icon_position()
+    const icon_scale = get_icon_scale_for_hex($data_icon.icon, $tfield)
 
     spr_floating_icon.visible = false
-      console.log("Updating floating icon")
-      spr_floating_icon.visible =
-        !$data_icon.usingEraser &&
-        $store_selected_tool == tools.ICON &&
-        cursorOnLayer &&
-        !$data_icon.dragMode &&
-        draggedIcon == null &&
-        !$data_icon.usingEyedropper
-      spr_floating_icon.texture = get_icon_texture($data_icon.icon.texId)
-      spr_floating_icon.tint = $data_icon.icon.color
+    console.log('Updating floating icon')
+    spr_floating_icon.visible =
+      !$data_icon.usingEraser &&
+      $store_selected_tool == tools.ICON &&
+      cursorOnLayer &&
+      !$data_icon.dragMode &&
+      draggedIcon == null &&
+      !$data_icon.usingEyedropper
+    spr_floating_icon.texture = get_icon_texture($data_icon.icon.texId)
+    spr_floating_icon.tint = $data_icon.icon.color
 
-      const matrix = new PIXI.Matrix().rotate(PIXI.DEG_TO_RAD * $data_icon.icon.rotation).scale(icon_scale.x, icon_scale.y)
-      spr_floating_icon.transform.setFromMatrix(matrix);
-      spr_floating_icon.x = iconX
-      spr_floating_icon.y = iconY
-      spr_floating_icon.tint = $data_icon.icon.color
-      // spr_floating_icon.eventMode = 'static' // !!! TODO
+    const matrix = new PIXI.Matrix()
+      .rotate(PIXI.DEG_TO_RAD * $data_icon.icon.rotation)
+      .scale(icon_scale.x, icon_scale.y)
+    spr_floating_icon.transform.setFromMatrix(matrix)
+    spr_floating_icon.x = iconX
+    spr_floating_icon.y = iconY
+    spr_floating_icon.tint = $data_icon.icon.color
+    // spr_floating_icon.eventMode = 'static' // !!! TODO
   }
 
   /** Hide floating icon when tool is changed */
   store_selected_tool.subscribe((n) => {
     if (n !== tools.ICON) {
-	spr_floating_icon.visible = false;
+      spr_floating_icon.visible = false
     } else {
-	spr_floating_icon.visible = true;
+      spr_floating_icon.visible = true
     }
   })
 
@@ -272,7 +270,8 @@
     // Because it relies on row/col coords
 
     icons.forEach((icon: IconLayerIcon) => {
-      let oldOrientation: HexOrientation = newOrientation === HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP
+      let oldOrientation: HexOrientation =
+        newOrientation === HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP
 
       // Find the center coordinates of the hex the icon wants to stay in
       let oldClosestHexCubeCoords = coords_worldToCube(
@@ -412,7 +411,8 @@
       dragOffsetX = store_panning.curWorldX() - clicked_icon.x
       dragOffsetY = store_panning.curWorldY() - clicked_icon.y
     } else if ($data_icon.usingEyedropper) {
-      $data_icon.icon = {...clicked_icon}
+      $data_icon.icon = { ...clicked_icon }
+      $data_icon.usingEyedropper = false
 
       updateFloatingIcon()
     }
@@ -423,13 +423,11 @@
   }
 
   function updateDraggedIcon() {
-    const {iconX, iconY} = get_icon_position()
+    const { iconX, iconY } = get_icon_position()
 
     icons = icons
     $store_has_unsaved_changes = true
   }
-
-
 
   afterUpdate(() => {
     let marked_for_saving: number[] = []
@@ -455,16 +453,19 @@
       }
 
       /** We use a matrix because to scale bydimension in the desired way rotation must happen first. Setting scale and rotation does scale first */
-      const rotate_scale_matrix = new PIXI.Matrix().rotate(PIXI.DEG_TO_RAD * (icon.rotation ?? 0)).scale(icon.scale.x, icon.scale.y);
+      const rotate_scale_matrix = new PIXI.Matrix()
+        .rotate(PIXI.DEG_TO_RAD * (icon.rotation ?? 0))
+        .scale(icon.scale.x, icon.scale.y)
 
-      pixi_icons[icon.onLayerId].transform.setFromMatrix(rotate_scale_matrix); // Do this first or the other stuff you set is wrong
+      pixi_icons[icon.onLayerId].transform.setFromMatrix(rotate_scale_matrix) // Do this first or the other stuff you set is wrong
       pixi_icons[icon.onLayerId].x = icon.x
       pixi_icons[icon.onLayerId].y = icon.y
       pixi_icons[icon.onLayerId].tint = icon.color
       //pixi_icons[icon.onLayerId].scale.x = icon.scale.x
       //pixi_icons[icon.onLayerId].scale.y = icon.scale.y
       //pixi_icons[icon.onLayerId].rotation = PIXI.DEG_TO_RAD * (icon.rotation ?? 0)
-      pixi_icons[icon.onLayerId].eventMode = $store_selected_tool == tools.ICON || $store_selected_tool == tools.ERASER ? 'static' : 'auto'
+      pixi_icons[icon.onLayerId].eventMode =
+        $store_selected_tool == tools.ICON || $store_selected_tool == tools.ERASER ? 'static' : 'auto'
 
       marked_for_saving.push(icon.onLayerId)
     })
@@ -477,7 +478,6 @@
         delete pixi_icons[icon_id]
       }
     })
-
   })
 
   onMount(() => {
