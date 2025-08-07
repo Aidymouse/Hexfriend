@@ -7,7 +7,7 @@ import { type PreviewHexInfo } from './iconFns'
 import { get_symbol_texture } from '../lib/texture_loader'
 
 
-/** Generates a flat top and pointy top preview for a tile 
+/** Generates a flat top and pointy top preview for a tile. Width and height are swapped for the opposite of the provided hex orientation, to preserve aspect ratio of the hex
  * @param tile
  * @param preview_hex_info
  * @param spr - A pixi sprite to serve as the symbol
@@ -16,51 +16,62 @@ import { get_symbol_texture } from '../lib/texture_loader'
  * @param app
  * @returns an object with a base64 string for both the flat top and pointy top preview
  * */
-export async function generate_tile_previews(tile: Tile, preview_hex_info: PreviewHexInfo, spr: PIXI.Sprite, grph: PIXI.Graphics, cont: PIXI.Container, app: PIXI.Application) {
+const debug = false;
+export async function generate_tile_previews(tile: Tile, preview_hex_info: PreviewHexInfo, spr: PIXI.Sprite, grph: PIXI.Graphics, cont: PIXI.Container, app: PIXI.Application, load_texture_from_tile: boolean = false) {
+
+	const preview_hex_ft = { ...preview_hex_info, orientation: HexOrientation.FLATTOP }
+	if (preview_hex_info.orientation === HexOrientation.POINTYTOP) {
+		preview_hex_ft.hexHeight = preview_hex_info.hexWidth
+		preview_hex_ft.hexWidth = preview_hex_info.hexHeight
+	}
+	const preview_ft = await generate_tile_preview(tile, preview_hex_ft, spr, grph, cont, app, load_texture_from_tile)
+
+	const preview_hex_pt = { ...preview_hex_info, orientation: HexOrientation.POINTYTOP }
+	if (preview_hex_info.orientation === HexOrientation.FLATTOP) {
+		preview_hex_pt.hexHeight = preview_hex_info.hexWidth
+		preview_hex_pt.hexWidth = preview_hex_info.hexHeight
+	}
+	const preview_pt = await generate_tile_preview(tile, preview_hex_pt, spr, grph, cont, app, load_texture_from_tile)
+
+	return { flatTop: preview_ft, pointyTop: preview_pt }
+}
+
+export async function generate_tile_preview(tile: Tile, preview_hex_info: PreviewHexInfo, spr: PIXI.Sprite, grph: PIXI.Graphics, cont: PIXI.Container, app: PIXI.Application, load_texture_from_tile: boolean = false) {
+		//debug && console.log('generate_tile_previews', 'for', tile);
+		debug && console.log('generate_tile_previews', 'on', preview_hex_info);
 	spr.anchor.set(0.5);
 	spr.texture = null
 	if (tile.symbol) {
-		//const tex = await PIXI.Assets.load(tile.symbol.base64)
-		const tex = get_symbol_texture(tile)
+		let tex = get_symbol_texture(tile)
+		if (load_texture_from_tile) {
+			tex = await PIXI.Assets.load(tile.symbol.base64)
+			debug && console.log('generate_tile_previews', 'loaded tex from', tile.symbol.base64);
+		}
+
+		debug && console.log('generate_tile_previews', 'tex', tex);
+
+
 		spr.texture = tex
-		tile.symbol.texWidth = tex.width
-		tile.symbol.texHeight = tex.height
+		// tile.symbol.texWidth = tex.width
+		// tile.symbol.texHeight = tex.height
 		spr.tint = tile.symbol.color
 
 		// Flat Top Sprite
 		const symbol_scale = get_icon_scale_for_hex(tile.symbol, preview_hex_info)
+		debug && console.log('generate_tile_previews', 'scale', symbol_scale);
+		debug && console.log('generate_tile_previews', 'resultant tex dimensions', {width: tile.symbol.texWidth * symbol_scale.x, height: tile.symbol.texHeight * symbol_scale.y});
 		const mtrx = new PIXI.Matrix()
 			.rotate(PIXI.DEG_TO_RAD * tile.symbol.rotation)
 			.scale(symbol_scale.x, symbol_scale.y)
 		spr.transform.setFromMatrix(mtrx)
 	}
 
-	// Flat Top
 	grph.clear()
 	grph.beginFill(tile.bgColor)
-	grph.drawPolygon(getHexPath(preview_hex_info.hexWidth, preview_hex_info.hexHeight, HexOrientation.FLATTOP, 0, 0))
+	grph.drawPolygon(getHexPath(preview_hex_info.hexWidth, preview_hex_info.hexHeight, preview_hex_info.orientation, 0, 0))
 	grph.endFill()
-	const preview_ft = await app.renderer.extract.base64(cont)
+	const preview = await app.renderer.extract.base64(cont)
 
-	// Pointy Top
-	grph.clear()
-	grph.beginFill(tile.bgColor)
-	grph.drawPolygon(getHexPath(preview_hex_info.hexWidth, preview_hex_info.hexHeight, HexOrientation.POINTYTOP, 0, 0))
-	grph.endFill()
+	return preview
 
-	const preview_pt = await app.renderer.extract.base64(cont)
-
-	// tile.preview_pointyTop = preview_pt
-	// tile.preview_flatTop = preview_ft
-	// tile = { ...tile, preview_pointyTop: preview_pt, preview_flatTop: preview_ft }
-	// selectedTile = selectedTile
-	// previews[tile.id] = {
-	//   [HexOrientation.FLATTOP]: preview_ft,
-	//   [HexOrientation.POINTYTOP]: preview_pt,
-	// }
-
-	// tile.preview_flatTop = preview_ft
-	// tile.preview_pointyTop = preview_pt
-
-	return { flatTop: preview_ft, pointyTop: preview_pt }
 }
