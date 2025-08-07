@@ -44,11 +44,14 @@ const convert_v3_to_v4 = async (old: Tileset): Promise<Tileset> => {
 
 	// All tile symbols turned into Icons
 	let spr = new PIXI.Sprite();
-	let app = new PIXI.Application()
+	let app = new PIXI.Application({ width: 300, height: 300})
 	let cont = new PIXI.Container()
 	let grph = new PIXI.Graphics()
+	cont.addChild(grph);
+	cont.addChild(spr);
+	app.stage.addChild(cont);
 
-	t.tiles.forEach(async (tile) => {
+	for (const tile of t.tiles) {
 
 		if (tile.symbol) {
 			tile.symbol.scaleMode = ScaleMode.RELATIVE
@@ -56,19 +59,17 @@ const convert_v3_to_v4 = async (old: Tileset): Promise<Tileset> => {
 			tile.symbol.display = ""
 			tile.symbol.texId = `${tile.id}_symbol`
 			tile.symbol.rotation = 0
+			tile.symbol.scaleMode = ScaleMode.RELATIVE
 		}
 
-		const previews = await generate_tile_previews(tile, { hexWidth: 50, hexHeight: 43.3, orientation: HexOrientation.FLATTOP, color: DEFAULT_BLANK_HEX_COLOR_STRING }, spr, grph, cont, app)
-		//@ts-ignore - v3 and below had only one preview, which was flat top
+		const previews = await generate_tile_previews(tile, { hexWidth: 50, hexHeight: 43.3, orientation: HexOrientation.FLATTOP, color: DEFAULT_BLANK_HEX_COLOR_STRING }, spr, grph, cont, app, true)
 		tile.preview_flatTop = previews.flatTop
 		tile.preview_pointyTop = previews.pointyTop
 
 
-		// TODO: generate pointy top preview
-
 		//@ts-ignore
 		delete tile.preview
-	})
+	}
 
 
 
