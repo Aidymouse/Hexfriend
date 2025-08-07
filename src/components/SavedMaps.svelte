@@ -61,9 +61,7 @@
 
     //loadAndSave(mapData)
     // Saving with null forces a new save + updates to current map
-    save_map(mapData, null, preview).then((new_id) => {
-      load(mapData, new_id)
-    })
+    save_map(mapData, null, preview).then((new_id) => {})
   }
 </script>
 
