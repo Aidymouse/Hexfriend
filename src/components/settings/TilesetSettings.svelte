@@ -14,6 +14,7 @@
 
   import { get_tileset_id } from '../../helpers/tiles'
   import { DEFAULTTILESET } from '../../lib/defaultTileset'
+  import { update_tileset_format } from '../../lib/tileset_updater'
 
   export let comp_terrainLayer
   export let comp_terrain_panel
