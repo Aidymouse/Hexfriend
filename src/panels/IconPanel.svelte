@@ -20,7 +20,7 @@
   export let loadedIconsets: Iconset[]
   export let app: PIXI.Application
 
-  let iconPreview: string 
+  let iconPreview: string
 
   let spr_preview = new PIXI.Sprite()
   let grph_preview = new PIXI.Graphics()
@@ -37,29 +37,36 @@
       color: PIXI.utils.hex2string(n.blankHexColor),
       hexHeight: n.hexHeight,
       hexWidth: n.hexWidth,
-      orientation: n.orientation
+      orientation: n.orientation,
     }
 
-    get_icon_preview($data_icon.icon).then(p => iconPreview = p); // Needed?
+    get_icon_preview($data_icon.icon).then((p) => (iconPreview = p)) // Needed?
   })
 
   function selectIcon(iconData: Icon) {
-    $data_icon.icon = {...iconData}
+    $data_icon.icon = { ...iconData }
     $data_icon.usingEraser = false
   }
-
 
   function iconMatchesData(icon: Icon): boolean {
     if ($data_icon.icon.color != icon.color) return false
     if ($data_icon.icon.texId != icon.texId) return false
-    // TODO: rotation?
+    if ($data_icon.icon.rotation != icon.rotation) return false
+    if ($data_icon.icon.scaleMode !== icon.scaleMode) {
+      return false
+    } else if ($data_icon.icon.scaleMode === ScaleMode.RELATIVE && icon.scaleMode === ScaleMode.RELATIVE) {
+      if (icon.pHex !== $data_icon.icon.pHex) return false
+    } else if ($data_icon.icon.scaleMode === ScaleMode.BYDIMENSION && icon.scaleMode === ScaleMode.BYDIMENSION) {
+      if (icon.pWidth !== $data_icon.icon.pWidth || icon.pHeight !== $data_icon.icon.pHeight) return false
+    }
+
     return true
   }
 
   afterUpdate(() => {
     loadedIconsets = loadedIconsets
     $tfield.orientation = $tfield.orientation
-    get_icon_preview($data_icon.icon).then(p => iconPreview = p)
+    get_icon_preview($data_icon.icon).then((p) => (iconPreview = p))
   })
 
   onMount(async () => {
@@ -85,30 +92,50 @@
 
     <span class="icon-preview-control-row">
       {#if ($data_icon.icon.scaleMode ?? ScaleMode.RELATIVE) === ScaleMode.RELATIVE}
-	<input type="range" id="iconSize" min={10} max={100} bind:value={$data_icon.icon.pHex} />
-	<button class="outline-button">{$tl.general.reset}</button >
+        <input type="range" id="iconSize" min={10} max={100} bind:value={$data_icon.icon.pHex} />
+        <button class="outline-button">{$tl.general.reset}</button>
       {/if}
     </span>
 
     <div id="rotation-slider">
       <div style="display: flex; align-items: center;">
-	<button class="img-button" style="height: 2em" on:click={() => { $data_icon.icon.rotation = (360 + $data_icon.icon.rotation-60) % 360 }}>
-	  <img src={`/assets/img/ui/rotate60_left_${$tfield.orientation}.png`} alt="<-" title={$tl.icon_panel.rotate60_left}>
-	</button>
+        <button
+          class="img-button"
+          style="height: 2em"
+          on:click={() => {
+            $data_icon.icon.rotation = (360 + $data_icon.icon.rotation - 60) % 360
+          }}
+        >
+          <img
+            src={`/assets/img/ui/rotate60_left_${$tfield.orientation}.png`}
+            alt="<-"
+            title={$tl.icon_panel.rotate60_left}
+          />
+        </button>
       </div>
       <input type="range" id="icon-rotation" min={0} max={359} bind:value={$data_icon.icon.rotation} />
       <div style="display: flex; align-items: center;">
-	<button class="img-button" style="height: 2em" on:click={() => { $data_icon.icon.rotation = ($data_icon.icon.rotation+60)%360 }}>
-	  <img src={`/assets/img/ui/rotate60_right_${$tfield.orientation}.png`} alt="->" title={$tl.icon_panel.rotate60_right}>
-	</button>
+        <button
+          class="img-button"
+          style="height: 2em"
+          on:click={() => {
+            $data_icon.icon.rotation = ($data_icon.icon.rotation + 60) % 360
+          }}
+        >
+          <img
+            src={`/assets/img/ui/rotate60_right_${$tfield.orientation}.png`}
+            alt="->"
+            title={$tl.icon_panel.rotate60_right}
+          />
+        </button>
       </div>
-      <input 
-	type="number"
-	id="icon-rotation-num"
-	min={0}
-	max={359}
-	bind:value={$data_icon.icon.rotation}
-	on:change={() => $data_icon.icon.rotation = $data_icon.icon.rotation % 360}
+      <input
+        type="number"
+        id="icon-rotation-num"
+        min={0}
+        max={359}
+        bind:value={$data_icon.icon.rotation}
+        on:change={() => ($data_icon.icon.rotation = $data_icon.icon.rotation % 360)}
       />
     </div>
   </div>
@@ -132,7 +159,7 @@
       {/if}
 
       {#if !iconset.collapsed && iconset.supported_orientations !== 'both' && $tfield.orientation !== iconset.supported_orientations}
-	<Alert severity="warn">{$tl.icon_panel.support_warnings[iconset.supported_orientations]}</Alert>
+        <Alert severity="warn">{$tl.icon_panel.support_warnings[iconset.supported_orientations]}</Alert>
       {/if}
 
       <div class="button-grid" class:hidden={iconset.collapsed}>
