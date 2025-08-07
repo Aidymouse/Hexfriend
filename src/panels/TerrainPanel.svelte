@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getHexPath } from '../helpers/hexHelpers'
   import { tiles_match } from '../helpers/tiles'
-  import { generate_tile_previews } from '../helpers/tileFns'
+  import { generate_tile_preview } from '../helpers/tileFns'
 
   import { get_symbol_texture } from '../lib/texture_loader'
 
@@ -19,6 +19,7 @@
   import { afterUpdate, onMount } from 'svelte'
 
   import ColorInputPixi from '../components/ColorInputPixi.svelte'
+  import { writable } from 'svelte/store'
 
   export let loadedTilesets: Tileset[]
 
@@ -41,28 +42,29 @@
       ...t,
       symbol: t.symbol ? { ...t.symbol } : null,
     }
-    tilePreview = (await get_tile_previews())[$tfield.orientation]
+    tilePreview = await get_tile_preview()
     $data_terrain.usingPaintbucket = false
     $data_terrain.usingEraser = false
   }
 
   const update_rotation = (new_rotation: number) => {
     $data_terrain.tile.symbol.rotation = new_rotation
-    get_tile_previews().then((previews) => {
-      tilePreview = previews[$tfield.orientation]
+    get_tile_preview().then((preview) => {
+      tilePreview = preview
     })
   }
 
-  const get_tile_previews = async (): Promise<{ flatTop: string; pointyTop: string }> => {
-    if (!$data_terrain.tile) return { flatTop: '', pointyTop: '' }
-    // TODO: parse tileset and make it so we only generate one rotation of preview if a tileset only supports one
-    return generate_tile_previews(
+  // TODO: because flat topped hexes are narrower, their images are thinner, so they take up more of the button, because it scales by width. It would be nice if the previews were square images.
+  const get_tile_preview = async (): Promise<string> => {
+    if (!$data_terrain.tile) return ''
+
+    return generate_tile_preview(
       $data_terrain.tile,
       {
         hexWidth: $tfield.hexWidth,
         hexHeight: $tfield.hexHeight,
         color: new PIXI.Color($data_terrain.tile.bgColor).toHex(),
-        orientation: HexOrientation.FLATTOP, // Doesnt matter
+        orientation: $tfield.orientation,
       },
       spr,
       grph,
@@ -74,8 +76,8 @@
   $: {
     if ($data_terrain.genPreview) {
       console.log('Generate New Preview Please')
-      get_tile_previews().then((p) => {
-        tilePreview = p[$tfield.orientation]
+      get_tile_preview().then((p) => {
+        tilePreview = p
       })
       $data_terrain.genPreview = false
     }
@@ -94,9 +96,8 @@
   })
 
   onMount(async () => {
-    // Yes, you have to split it out or it doesnt work. Idk why.
-    const p = await get_tile_previews()
-    tilePreview = p[$tfield.orientation]
+    const p = await get_tile_preview()
+    tilePreview = p
   })
 </script>
 
@@ -116,8 +117,8 @@
       <ColorInputPixi
         bind:value={$data_terrain.tile.bgColor}
         on:input={() =>
-          get_tile_previews().then((previews) => {
-            tilePreview = previews[$tfield.orientation]
+          get_tile_preview().then((previews) => {
+            tilePreview = previews
           })}
         id={'terrainColor'}
       />
@@ -129,8 +130,8 @@
         <ColorInputPixi
           bind:value={$data_terrain.tile.symbol.color}
           on:input={() =>
-            get_tile_previews().then((previews) => {
-              tilePreview = previews[$tfield.orientation]
+            get_tile_preview().then((previews) => {
+              tilePreview = previews
             })}
           id={'symbolColor'}
         />
