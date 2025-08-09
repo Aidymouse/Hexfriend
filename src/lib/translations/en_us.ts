@@ -252,7 +252,7 @@ export const en_us: Translation = {
 		about: {
 			title: "About",
 			version: "version",
-			version_tagline: "\"Whole new worlds, Hexfriend!\"", // It's advised you make this one funny little line for this language, that way you don't have to come back and change it for every version. Maybe a hexagon pun or something?
+			version_tagline: "\"Found your feet, Hexfriend!\"", // It's advised you make this one funny little line for this language, that way you don't have to come back and change it for every version. Maybe a hexagon pun or something?
 
 			// These messages are stiched together with a link in the middle in the form start + link + end
 			credits: {
