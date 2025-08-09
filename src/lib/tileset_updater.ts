@@ -1,60 +1,7 @@
 import type { terrain_field } from "../types/terrain";
 import type { Tileset } from "../types/tilesets";
 
-function tileset_format_1_to_2(old_tileset: Tileset): Tileset {
-
-    console.log(`Updating tileset (${old_tileset.name}) format: 1 -> 2`)
-
-    old_tileset.tiles.forEach(tile => {
-        tile.tileset_id = old_tileset.id
-    })
-
-    // Collapsed
-    old_tileset.collapsed = false
-
-    old_tileset.format_version = 2
-
-    return old_tileset
-
-}
-
-function tileset_format_2_to_3(old_tileset: Tileset): Tileset {
-
-    console.log(`Updating tileset (${old_tileset.name}) format: 2 -> 3`)
-
-    // Tile Symbol Rotation
-    old_tileset.tiles.forEach(tile => {
-        if (tile.symbol) tile.symbol.rotation = 0;
-    })
-
-    old_tileset.format_version = 3
-
-    return old_tileset
-
-}
-
-export function update_tileset_format(tileset: Tileset) {
-
-    switch (tileset.format_version) {
-
-        case undefined:
-            tileset = tileset_format_1_to_2(tileset)
-
-        case null:
-            tileset = tileset_format_1_to_2(tileset)
-
-        case 1:
-            tileset = tileset_format_1_to_2(tileset)
-
-        case 2:
-            tileset = tileset_format_2_to_3(tileset)
-
-    }
-
-    return tileset
-
-}
-
+/** @deprecated - This file now longer used */
 
 // Names that get mapped to are up to date as of v7 of the default tileset
 // May be missing some names to map from, there's an alert if the update process fails because of this directing them to the issues thread
