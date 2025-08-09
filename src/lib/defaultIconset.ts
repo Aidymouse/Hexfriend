@@ -3,7 +3,7 @@ import type { Iconset } from "../types/icon";
 
 const DEFAULTICONSET: Iconset = {
 	"name": "Default",
-	"id": "default:v6",
+	"id": "default",
 	"author": "Aidymouse",
 	"version": 6,
 	"icons": [
