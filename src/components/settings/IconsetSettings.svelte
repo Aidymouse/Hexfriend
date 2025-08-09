@@ -70,12 +70,12 @@
 <div id="iconsets">
   {#each loadedIconsets as iconset (iconset.id)}
     <div class="loaded-tileset">
-      <span>
+      <span style="display: flex">
       	{iconset.name}
         <span class="helper-text">v{iconset.version}</span>
       </span>
 
-      {#if iconset.id !== 'default'}
+      {#if iconset.id.split(":")[0] !== 'default' || (loadedIconsets.find(is => is.id === 'default') && iconset.id !== 'default')}
         <button
           on:click={() => {
             removeIconset(iconset.id)
