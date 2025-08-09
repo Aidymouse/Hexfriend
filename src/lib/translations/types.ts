@@ -222,7 +222,9 @@ export type Translation = {
 			title: string,
 			import: string,
 			builder: string,
+			/** @deprecated - No longer used as of Hexfriend 3.0 */
 			already_loaded: string,
+			make_copy_confirmation: string, // The prompt to import a copy of a tileset
 			remove_confirmation: string,
 		},
 
@@ -230,7 +232,9 @@ export type Translation = {
 			title: string,
 			import: string,
 			builder: string,
+			/** @deprecated - Hexfriend 3.0 */
 			already_loaded: string,
+			make_copy_confirmation: string, // The prompt to import a copy of an icon set
 		},
 
 
