@@ -5,6 +5,7 @@ import { getHexPathRadius, getHexPath } from './hexHelpers'
 import { get_icon_scale_for_hex } from './imageSizing'
 import { type PreviewHexInfo } from './iconFns'
 import { get_symbol_texture } from '../lib/texture_loader'
+import { type Tileset } from '../types/tilesets'
 
 
 /** Generates a flat top and pointy top preview for a tile. Width and height are swapped for the opposite of the provided hex orientation, to preserve aspect ratio of the hex
@@ -74,4 +75,15 @@ export async function generate_tile_preview(tile: Tile, preview_hex_info: Previe
 
 	return preview
 
+}
+
+/** Makes a copy of a tileset updated to have a new ID */
+export const copy_tileset = (set: Tileset, new_id: string) => {
+	let new_tileset = {...set}
+	new_tileset.id = new_id
+	for (const tile of new_tileset.tiles) {
+		tile.tileset_id = new_id
+	}
+
+	return new_tileset
 }

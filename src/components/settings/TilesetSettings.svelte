@@ -4,6 +4,7 @@
   import type { Tileset } from '../../types/tilesets'
 
   import { LATEST_TILESET_FORMAT_VERSION, LATEST_DEFAULT_TILESET_VERSION } from '../../types/tilesets'
+  import { update_map_to_new_default_tileset } from '../../lib/tileset_updater'
 
   import { store_has_unsaved_changes } from '../../stores/flags'
   import { tfield } from '../../stores/tfield'
@@ -14,7 +15,7 @@
 
   import { get_tileset_id } from '../../helpers/tiles'
   import { DEFAULTTILESET } from '../../lib/defaultTileset'
-  import { update_tileset_format } from '../../lib/tileset_updater'
+  import { copy_tileset } from '../../helpers/tileFns'
 
   export let comp_terrainLayer
   export let comp_terrain_panel
@@ -41,12 +42,19 @@
 
       /* Check that set hasn't already been imported */
       if (set_already_imported != null) {
-        alert($tl.settings.tilesets.already_loaded)
-        return
+	if (confirm($tl.settings.tilesets.make_copy_confirmation)) {
+		let new_id = `${setToImport.id}_copy`
+		let counter = 0
+		while (loadedTilesets.find( ts => ts.id === new_id) ) {
+			counter += 1;
+			new_id = `${setToImport.id}_copy_${counter}`
+		}
+		setToImport = copy_tileset(setToImport, new_id);
+	}
       }
 
       if (setToImport.format_version < LATEST_TILESET_FORMAT_VERSION) {
-        setToImport = update_tileset_format(setToImport)
+        setToImport = convert_tileset_to_latest(setToImport)
       }
 
       loadedTilesets.push(setToImport)
@@ -77,15 +85,6 @@
     // Check if these tiles are being used anywere
   }
 
-  function update_default_tileset() {
-    let successfully_updated = update_map_to_new_default_tileset($tfield)
-    if (!successfully_updated) return
-
-    // Remove default tileset
-    loadedTilesets = loadedTilesets.filter((ts) => get_tileset_id(ts) != 'default')
-    loadedTilesets.push(DEFAULTTILESET)
-    loadedSave.tilesets = loadedTilesets
-  }
 </script>
 
 <div id="tilesets">
@@ -113,18 +112,6 @@
         </button>
       {/if}
 
-      <!-- Update Default Tileset Button -->
-      {#if get_tileset_id(tileset) == 'default' && tileset.version < LATEST_DEFAULT_TILESET_VERSION}
-        <button
-          id="default-tileset-update-button"
-          on:click={() => {
-            update_default_tileset()
-          }}
-          title={`Update Tileset to v${LATEST_DEFAULT_TILESET_VERSION}`}
-        >
-          <img src="/assets/img/ui/arrow.png" alt={''} title={`Update Tileset to v${LATEST_DEFAULT_TILESET_VERSION}`} />
-        </button>
-      {/if}
     </div>
   {/each}
 
