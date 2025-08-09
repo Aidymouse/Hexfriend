@@ -1,18 +1,19 @@
 <script lang="ts">
   import '../../styles/settings.css'
 
-  import { LATEST_DEFAULT_ICONS_VERSION } from '../../types/savedata'
+  import { LATEST_DEFAULT_ICONS_VERSION, type save_data } from '../../types/savedata'
   import { type Iconset } from '../../types/icon'
 
   import { store_has_unsaved_changes } from '../../stores/flags'
   import { tl } from '../../stores/translation'
+	import { copy_iconset } from '../../helpers/iconFns'
 
   import * as texture_loader from '../../lib/texture_loader'
 
   import { convert_iconset_to_latest } from '../../lib/iconsetConverter'
-  export let loadedSave
-  export let loadedIconsets
-  export let iconset_text
+  import SettingHeading from './SettingHeading.svelte'
+  export let loadedSave: save_data
+  export let loadedIconsets: Iconset[]
 
   export let appState
 
@@ -25,6 +26,7 @@
 
   let iconsetFiles: FileList
 
+  // TODO: allow copies of icon sets
   function importIconset() {
     let importFile = iconsetFiles[0]
 
@@ -37,9 +39,18 @@
       let setToImport = JSON.parse(eb.target.result as string)
 
       /* Check that set hasn't already been imported */
-      if (loadedIconsets.find((is: Iconset) => is.id == setToImport.id) != null) {
-        alert($tl.settings.icon_sets.already_loaded)
-        return
+      if (loadedIconsets.find((is: Iconset) => is.id == setToImport.id || is.id.split(":")[0] === 'default' && setToImport.id.split(":")[0] === 'default') != null) {
+
+      	if (confirm($tl.settings.icon_sets.make_copy_confirmation)) {
+		let new_id = `${setToImport.id}_copy`
+		let counter = 0;
+		while (loadedIconsets.find(is => is.id === new_id)) {
+			counter += 1;
+			new_id = `${new_id}_copy_${counter}`
+		}
+		setToImport = copy_iconset(setToImport, new_id)
+
+	}
       }
 
       setToImport = convert_iconset_to_latest(setToImport)
@@ -59,9 +70,12 @@
 <div id="iconsets">
   {#each loadedIconsets as iconset (iconset.id)}
     <div class="loaded-tileset">
-      {iconset.name}
+      <span>
+      	{iconset.name}
+        <span class="helper-text">v{iconset.version}</span>
+      </span>
 
-      {#if iconset.id.split(':')[0] != 'default' && iconset.version != LATEST_DEFAULT_ICONS_VERSION}
+      {#if iconset.id !== 'default'}
         <button
           on:click={() => {
             removeIconset(iconset.id)

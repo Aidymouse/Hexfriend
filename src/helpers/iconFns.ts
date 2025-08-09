@@ -4,6 +4,7 @@ import * as PIXI from 'pixi.js'
 import { type Icon } from "../types/icon"
 import { get_icon_texture } from '../lib/texture_loader'
 import { get_icon_scale_for_hex, get_image_scaled_for_hex_relative, ScaleMode } from "./imageSizing"
+import { type Iconset } from "../types/icon"
 
 
 export type PreviewHexInfo = {
@@ -84,4 +85,14 @@ export async function generate_ordered_icon_preview(icon: Icon, hexInfo: Preview
 	app.destroy();
 
 	return b64;
+}
+
+export const copy_iconset = (set: Iconset, new_id: string)  => {
+	let new_iconset = {...set}
+
+	new_iconset.id = new_id
+	// for (const icon of new_iconset.icons) {
+	// }
+
+	return new_iconset
 }
