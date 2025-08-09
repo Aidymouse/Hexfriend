@@ -80,7 +80,7 @@ export async function load_tileset_textures(tileset: Tileset) {
 
 		let tile_symbol_texture_id = `${tile.tileset_id}:${tile.id}`
 
-        await load_symbol_texture(tile_symbol_texture_id, tile.symbol.base64)
+        	await load_symbol_texture(tile_symbol_texture_id, tile.symbol.base64)
 
 	}
 }
