@@ -361,7 +361,7 @@
   <div class="setting-container">
     <h2>{$tl.settings.about.title}</h2>
     <p class="helper-text">
-      Hexfriend v2.2 - {$tl.settings.about.version_tagline}
+      Hexfriend v3.0 - {$tl.settings.about.version_tagline}
     </p>
 
     <p class="helper-text" style="margin-top: var(--small-radius)">
