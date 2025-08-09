@@ -9,12 +9,14 @@ _Some tooltips + the new wiki entry in the about will need translation. Translat
 - Tileset import dialog looks for .hfts files now
 - Overhauled many of the types, they were so messy
 - Added wiki link in about
+- Hexfriend no longer relies on the loading of the hexfriend loading graphic to initiate the initial map load 
 - Hex Symbols are now Icons internally, for easier code re-use
-- Hexfriend no longer relies on the loading of the hexfriend loading graphic to initiate the initial map load (WIP)
 - Icons and Terrain have two scale modes now. One maintains aspect ratio (pre-3.0 behaviour) and one stretches the image to fit a pre-defined percentage of the hexes width and height. In laymans terms, Hexfriend now supports image-based tilesets.
 - Establish an icon set converter so old iconset versions can be updated
 - Default hex height has become 43.3, a close-enough approximation of a true hex
 - Default Tileset updates to v9, default Iconset to v6
+- You can now import the same tileset or iconset more than once (it makes copies)
+- The default tileset does not have an option to update it if it's on an outdated version (but you can import the latest tileset because of the change above this one)
 
 # Version 2.0 - Whole new worlds, Hexfriend!
 
