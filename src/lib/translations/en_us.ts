@@ -352,6 +352,10 @@ export const en_us: Translation = {
 			preset: "Preset",
 		}
 	},
+	preview_hex_controls: {
+		color: "Color"
+	},
+
 
 
 

@@ -346,7 +346,11 @@ export type Translation = {
 		}
 	},
 
+	preview_hex_controls: {
+		color: string // The label for preview hex color controls
+	}
 
 
 
 }
+
