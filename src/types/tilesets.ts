@@ -7,8 +7,8 @@ export type Tile = {
 	bgColor: number; // Some tiles won't *really* need a bg color, if they're all icon cos they're images, but, whatever
 	id: string; // Local to the tileset
 	symbol: Icon | null; // Picture to draw on the hex. This also implicitly sets the tile type as dynamic or bydimension
-	tileset_id: string; // Idk why we store a reference to this TODO
-	preview_flatTop: string; // Just the background TODO: find out why this is needed too. I think for buttons ?
+	tileset_id: string; // Used to identify which tile to select when the tile is clicked on
+	preview_flatTop: string; // Preview for the tile panel
 	preview_pointyTop: string; 
 }
 
