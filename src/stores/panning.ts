@@ -133,7 +133,6 @@ if (pan.zoomScale < minZoom) {
 }
 // controls how far you can zoom in (bigger number is closer in)
 let maxZoom = (window.innerWidth + window.innerHeight) / 2;
-// TODO: use tile size
 // maxZoom /= 100 * 2;
 maxZoom /= ((get(tfield).hexWidth + get(tfield).hexHeight + get(tfield).grid.gap) / 2) * 4;
 
