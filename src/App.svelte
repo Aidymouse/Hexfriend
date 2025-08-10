@@ -561,8 +561,6 @@
 
   /* DATA LOAD */
   function createNewMap() {
-    /* TODO: Save Data Checking */
-
     load_map(JSON.parse(JSON.stringify(DEFAULTSAVEDATA)), null)
 
     // setTimeout(() => {
