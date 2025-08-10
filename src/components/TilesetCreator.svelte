@@ -5,8 +5,6 @@
   import { generate_icon_preview, type PreviewHexInfo } from '../helpers/iconFns'
   import { generate_tile_previews } from '../helpers/tileFns'
 
-  // TODO: preview hex controls
-
   let preview_hex_info: PreviewHexInfo = {
     hexWidth: 50 * 6,
     hexHeight: 43.3 * 6,
@@ -446,14 +444,14 @@
         >
           <img src="/assets/img/tools/trash.png" alt="Trash" />
         </button>
-
-        <details style="width: 80%">
-          <summary>Preview Hex Controls</summary>
-          <div id="creator-hex-controls">
-            <PreviewHexControls bind:preview_hex_info />
-          </div>
-        </details>
       </div>
+
+      <details style="width: 80%; margin-top: 5px;">
+        <summary>Preview Hex Controls</summary>
+        <div id="creator-hex-controls">
+          <PreviewHexControls bind:preview_hex_info />
+        </div>
+      </details>
     </section>
 
     <aside id="tile-style">
