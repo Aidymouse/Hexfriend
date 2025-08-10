@@ -28,6 +28,7 @@
   import { afterUpdate, tick } from 'svelte'
   import { convert_tileset_to_latest } from '../lib/tilesetConverter'
   import { ScaleMode } from '../helpers/imageSizing'
+  import PreviewHexControls from './PreviewHexControls.svelte'
 
   let app = new PIXI.Application({
     height: 300,
@@ -445,6 +446,13 @@
         >
           <img src="/assets/img/tools/trash.png" alt="Trash" />
         </button>
+
+        <details style="width: 80%">
+          <summary>Preview Hex Controls</summary>
+          <div id="creator-hex-controls">
+            <PreviewHexControls bind:preview_hex_info />
+          </div>
+        </details>
       </div>
     </section>
 
@@ -658,6 +666,14 @@
     height: 100%;
     display: flex;
     align-items: center;
+  }
+
+  #creator-hex-controls {
+    padding: 0.5em;
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    grid-auto-rows: 1fr;
+    grid-row-gap: 0.25em;
   }
 
   #editor-placeholder {

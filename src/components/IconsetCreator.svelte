@@ -15,6 +15,7 @@
   import { generate_icon_preview, type PreviewHexInfo } from '../helpers/iconFns'
   import { get_icon_scale_for_hex, ScaleMode } from '../helpers/imageSizing'
   import { DEFAULT_BLANK_HEX_COLOR } from '../types/defaults'
+  import PreviewHexControls from './PreviewHexControls.svelte'
 
   let app = new PIXI.Application({
     width: 300,
@@ -23,7 +24,6 @@
   })
 
   export let appState
-
 
   let preview_hex_info: PreviewHexInfo = {
     hexWidth: 50 * 6,
@@ -40,31 +40,26 @@
     version: 1,
     collapsed: false,
     icons: [],
-    format_version: LATEST_ICONSET_FORMAT_VERSION
+    format_version: LATEST_ICONSET_FORMAT_VERSION,
   }
 
   let selectedIcon: Icon | null = null
   let icon_previews: { [iconId: string]: string } = {}
 
   $: {
-    get_icon_generator_preview(selectedIcon).then(p => icon_previews[selectedIcon.id] = p)
+    if (selectedIcon) get_icon_generator_preview(selectedIcon).then((p) => (icon_previews[selectedIcon.id] = p))
   }
 
-
-  let local_color_string = "#ffffff"
+  let local_color_string = '#ffffff'
   const attempt_parse_color = () => {
-
     try {
       const c = new PIXI.Color(local_color_string).toNumber()
       //console.log(c);
-      selectedIcon.color = c;
-    } catch {
-    }
+      selectedIcon.color = c
+    } catch {}
 
     //console.log(PIXI.utils.string2hex(local_color_string))
-
   }
-
 
   //const l: PIXI.Loader = new PIXI.Loader();
   let texId: number = 0
@@ -104,7 +99,7 @@
   async function newIcon() {
     //console.log(newIconFiles)
 
-    Array.from(newIconFiles).forEach((file) => {
+    for (const file of Array.from(newIconFiles)) {
       let r = new FileReader()
 
       r.readAsDataURL(file)
@@ -114,7 +109,7 @@
 
         const newTexture = await loadTexture(texId, r.result)
 
-	const stockIcon: Icon = {
+        const stockIcon: Icon = {
           color: 0xffffff,
           rotation: 0,
           base64: r.result as string,
@@ -123,25 +118,25 @@
           texHeight: newTexture.height,
           scaleMode: ScaleMode.RELATIVE,
           pHex: 80,
-	  display: "",
-	  texId: "",
-	  id: ""
-	}
+          display: '',
+          texId: '',
+          id: '',
+        }
 
         const newIcon: Icon = {
-	  ...(selectedIcon ?? stockIcon),
+          ...(selectedIcon ?? stockIcon),
           display: iconName,
           texId: texId,
           id: findID(IDify(iconName)),
         }
 
         workingIconset.icons = [...workingIconset.icons, newIcon]
-	const preview = await get_icon_generator_preview(newIcon)
-	get_icon_generator_preview(newIcon).then((res) => {
-	  icon_previews = {...icon_previews, [newIcon.id]: res }
-	})
+        const preview = await get_icon_generator_preview(newIcon)
+        get_icon_generator_preview(newIcon).then((res) => {
+          icon_previews = { ...icon_previews, [newIcon.id]: res }
+        })
       }
-    })
+    }
   }
 
   function duplicateIcon(icon: Icon) {
@@ -159,7 +154,17 @@
   }
 
   async function get_icon_generator_preview(icon: Icon) {
-    return generate_icon_preview(icon, preview_hex_info, grph_icon_preview, spr_icon_preview, cont_icon_preview, app, loadedTextures[icon.texId])
+    if (icon === null) return
+
+    return generate_icon_preview(
+      icon,
+      preview_hex_info,
+      grph_icon_preview,
+      spr_icon_preview,
+      cont_icon_preview,
+      app,
+      loadedTextures[icon.texId],
+    )
   }
 
   function exportIconset() {
@@ -197,12 +202,12 @@
 
       /* Load textures */
       setToImport.icons.forEach((icon: Icon) => {
-        loadTexture(icon.texId, icon.base64).then( r => {
-	  get_icon_generator_preview(icon).then(p => { 
-	  console.log(p)
-	  icon_previews[icon.id] = p })
-	})
-	
+        loadTexture(icon.texId, icon.base64).then((r) => {
+          get_icon_generator_preview(icon).then((p) => {
+            console.log(p)
+            icon_previews[icon.id] = p
+          })
+        })
       })
 
       workingIconset = { ...setToImport }
@@ -257,10 +262,10 @@
       )
       grph_background_hex.endFill()
 
-      const icon_scale = get_icon_scale_for_hex( selectedIcon, preview_hex_info,)
+      const icon_scale = get_icon_scale_for_hex(selectedIcon, preview_hex_info)
 
       const mtrx = new PIXI.Matrix().rotate(PIXI.DEG_TO_RAD * selectedIcon.rotation).scale(icon_scale.x, icon_scale.y)
-      spr_icon.transform.setFromMatrix(mtrx);
+      spr_icon.transform.setFromMatrix(mtrx)
       spr_icon.texture = loadedTextures[selectedIcon.texId]
       spr_icon.x = 150
       spr_icon.y = 150
@@ -292,7 +297,6 @@
         break
       }
     }
-
   }
 </script>
 
@@ -317,14 +321,17 @@
 
         <label for="supported-orientations">{$tl.builders.supported_orientations}</label>
         <select id="supported-orientations" bind:value={workingIconset.supported_orientations}>
-	  <option value={HexOrientation.FLATTOP}>{$tl.builders.supported_orientations_options[HexOrientation.FLATTOP]}</option>
-	  <option value={HexOrientation.POINTYTOP}>{$tl.builders.supported_orientations_options[HexOrientation.POINTYTOP]}</option>
-	  <option value={'both'}>{$tl.builders.supported_orientations_options['both']}</option>
-	</select>
+          <option value={HexOrientation.FLATTOP}
+            >{$tl.builders.supported_orientations_options[HexOrientation.FLATTOP]}</option
+          >
+          <option value={HexOrientation.POINTYTOP}
+            >{$tl.builders.supported_orientations_options[HexOrientation.POINTYTOP]}</option
+          >
+          <option value={'both'}>{$tl.builders.supported_orientations_options['both']}</option>
+        </select>
 
         <label for="setVersion">{$tl.builders.version}</label>
         <input id="setVersion" type="number" bind:value={workingIconset.version} />
-
 
         <button on:click={() => importIconset()} class="file-input-button">
           {$tl.builders.icon_set_builder.import_iconset}
@@ -344,9 +351,14 @@
     </div>
 
     <!-- ICON BUTTONS -->
-    <div id="icon-buttons"
-      on:dragover={(e) => { e.preventDefault() }}
-      on:dragenter={(e) => { e.preventDefault() }}
+    <div
+      id="icon-buttons"
+      on:dragover={(e) => {
+        e.preventDefault()
+      }}
+      on:dragenter={(e) => {
+        e.preventDefault()
+      }}
       on:drop={dropButton}
     >
       {#each workingIconset.icons as icon (icon.id)}
@@ -354,10 +366,16 @@
           class="icon-button"
           class:selected={selectedIcon == icon}
           style={icon.id == phantomIconButtonId ? 'opacity: 0' : ''}
-          on:click={() => { selectedIcon = icon }}
+          on:click={() => {
+            selectedIcon = icon
+          }}
           draggable={true}
-          on:dragstart={(e) => { dragButton(e, icon) }}
-          on:dragenter={(e) => { draggedOverButton(e, icon) }}
+          on:dragstart={(e) => {
+            dragButton(e, icon)
+          }}
+          on:dragenter={(e) => {
+            draggedOverButton(e, icon)
+          }}
           title={icon.display}
         >
           <img src={icon_previews[icon.id]} draggable="false" alt="Button for {icon.display}" />
@@ -401,7 +419,10 @@
               ...preview_hex_info,
               hexWidth: preview_hex_info.hexHeight,
               hexHeight: preview_hex_info.hexWidth,
-              orientation: preview_hex_info.orientation === HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP,
+              orientation:
+                preview_hex_info.orientation === HexOrientation.FLATTOP
+                  ? HexOrientation.POINTYTOP
+                  : HexOrientation.FLATTOP,
             }
           }}
           title={$tl.builders.change_orientation}
@@ -425,31 +446,27 @@
         >
           <img src="/assets/img/tools/trash.png" alt="Trash" />
         </button>
-
       </div>
 
       <details style="width: 80%">
-	<summary>Preview Hex Controls</summary>
-	<div id="creator-hex-controls">
-	 <label for="hex-width">Hex Width</label> 
-	 <input id="hex-width" type="number" bind:value={preview_hex_info.hexWidth} />
-	 <label for="hex-height">Hex Height</label> 
-	 <input id="hex-height" type="number" bind:value={preview_hex_info.hexHeight} />
-	 <label for="hex-color">Color</label> 
-	 <div style="display: flex; gap: 0.5em">
-	   <ColorInput name="hex-color" bind:value={preview_hex_info.color} />
-	   <button on:click={() => { preview_hex_info.color = new PIXI.Color(DEFAULT_BLANK_HEX_COLOR).toHex() }}>
-	    Reset
-	   </button>
-	 </div>
-	</div>
+        <summary>Preview Hex Controls</summary>
+        <div id="creator-hex-controls">
+          <PreviewHexControls bind:preview_hex_info />
+        </div>
       </details>
     </section>
 
     <aside id="icon-style">
       <!-- Icon Tint -->
       <div class="color" style="margin-bottom: 0.625em">
-        <ColorInputPixi bind:value={selectedIcon.color} w={'50'} h={'50'} on:input={(e) => {local_color_string = e.detail.string}} />
+        <ColorInputPixi
+          bind:value={selectedIcon.color}
+          w={'50'}
+          h={'50'}
+          on:input={(e) => {
+            local_color_string = e.detail.string
+          }}
+        />
 
         <div>
           <p>{$tl.builders.icon_set_builder.tint}</p>
@@ -459,71 +476,81 @@
 
       <!-- Rotation -->
       <div class="scale-holder">
-	<label for="icon-builder-rotation">{$tl.builders.rotation}</label>
-	<input id="icon-builder-rotation" type="number" bind:value={selectedIcon.rotation} />
-	<p>deg</p>
+        <label for="icon-builder-rotation">{$tl.builders.rotation}</label>
+        <input id="icon-builder-rotation" type="number" bind:value={selectedIcon.rotation} />
+        <p>deg</p>
       </div>
       <div style="display: flex; gap: 0.5em; align-items: center;">
-	<button class="img-button" style="height: 2em" on:click={() => selectedIcon.rotation = (360 + selectedIcon.rotation-60)%360}>
-	  <img 
-	    src={`/assets/img/ui/rotate60_left_${preview_hex_info.orientation}.png`}
-	    alt={$tl.icon_panel.rotate60_left}
-	    title={$tl.icon_panel.rotate60_left}
-	  >
-	</button>
-	<input type="range" min="0" max="359" bind:value={selectedIcon.rotation} />
-	<button class="img-button" style="height: 2em" on:click={() => selectedIcon.rotation = (selectedIcon.rotation+60)%360}>
-	  <img 
-	    src={`/assets/img/ui/rotate60_right_${preview_hex_info.orientation}.png`}
-	    alt={$tl.icon_panel.rotate60_right}
-	    title={$tl.icon_panel.rotate60_right}
-	  >
-	</button>
+        <button
+          class="img-button"
+          style="height: 2em"
+          on:click={() => (selectedIcon.rotation = (360 + selectedIcon.rotation - 60) % 360)}
+        >
+          <img
+            src={`/assets/img/ui/rotate60_left_${preview_hex_info.orientation}.png`}
+            alt={$tl.icon_panel.rotate60_left}
+            title={$tl.icon_panel.rotate60_left}
+          />
+        </button>
+        <input type="range" min="0" max="359" bind:value={selectedIcon.rotation} />
+        <button
+          class="img-button"
+          style="height: 2em"
+          on:click={() => (selectedIcon.rotation = (selectedIcon.rotation + 60) % 360)}
+        >
+          <img
+            src={`/assets/img/ui/rotate60_right_${preview_hex_info.orientation}.png`}
+            alt={$tl.icon_panel.rotate60_right}
+            title={$tl.icon_panel.rotate60_right}
+          />
+        </button>
       </div>
 
       <!-- Scale -->
       <div id="symbol-scale">
         <div class="builder-control-row">
           <label for="icon-scale-mode">{$tl.builders.icon_set_builder.scale}</label>
-          <select id="icon-scale-mode"
-	    bind:value={selectedIcon.scaleMode}
-            on:change={(e) => { change_scale_mode(e.currentTarget.value) }}
+          <select
+            id="icon-scale-mode"
+            bind:value={selectedIcon.scaleMode}
+            on:change={(e) => {
+              change_scale_mode(e.currentTarget.value)
+            }}
           >
-              <option value={ScaleMode.RELATIVE}>{$tl.icons.scale_mode_options[ScaleMode.RELATIVE]}</option>
-              <option value={ScaleMode.BYDIMENSION}>{$tl.icons.scale_mode_options[ScaleMode.BYDIMENSION]}</option>
+            <option value={ScaleMode.RELATIVE}>{$tl.icons.scale_mode_options[ScaleMode.RELATIVE]}</option>
+            <option value={ScaleMode.BYDIMENSION}>{$tl.icons.scale_mode_options[ScaleMode.BYDIMENSION]}</option>
           </select>
         </div>
       </div>
 
       {#if selectedIcon.scaleMode === ScaleMode.RELATIVE}
-	<div class="scale-holder">
-	  <label for="icon-builder-scale-relative">{$tl.icons.scale_relative}</label>
-	  <input id="icon-builder-scale-relative" type="number" bind:value={selectedIcon.pHex} />
-	  <p>%</p>
-	</div>
-	<div>
-	  <input type="range" min="5" max="100" bind:value={selectedIcon.pHex} />
-	</div>
-
+        <div class="scale-holder">
+          <label for="icon-builder-scale-relative">{$tl.icons.scale_relative}</label>
+          <input id="icon-builder-scale-relative" type="number" bind:value={selectedIcon.pHex} />
+          <p>%</p>
+        </div>
+        <div>
+          <input type="range" min="5" max="100" bind:value={selectedIcon.pHex} />
+        </div>
       {:else if selectedIcon.scaleMode === ScaleMode.BYDIMENSION}
-	<div>
-	<div class="scale-holder">
-	  <label for="icon-builder-scale-2d-width">{$tl.icons.scale_bydimension.width}</label>
-	  <input id="icon-builder-scale-2d-width" type="number" bind:value={selectedIcon.pWidth} />
-	  <p>%</p>
-	</div>
-	<div>
-	  <input type="range" min="5" max="100" bind:value={selectedIcon.pWidth} />
-	</div>
-	<div class="scale-holder">
-	  <label for="icon-builder-scale-2d-height">{$tl.icons.scale_bydimension.height}</label>
-	  <input id="icon-builder-scale-2d-height" type="number" bind:value={selectedIcon.pHeight} />
-	  <p>%</p>
-	</div>
-	<div style="display: flex; gap: 0.5em; align-items: center;">
-	  <input type="range" min="5" max="100" bind:value={selectedIcon.pHeight} />
-	</div>
-	</div>
+        <div>
+          <div class="scale-holder">
+            <label for="icon-builder-scale-2d-width">{$tl.icons.scale_bydimension.width}</label>
+            <input id="icon-builder-scale-2d-width" type="number" bind:value={selectedIcon.pWidth} />
+            <p>%</p>
+          </div>
+          <div>
+            <input type="range" min="5" max="100" bind:value={selectedIcon.pWidth} />
+          </div>
+          <div class="scale-holder">
+            <label for="icon-builder-scale-2d-height">{$tl.icons.scale_bydimension.height}</label>
+            <input id="icon-builder-scale-2d-height" type="number" bind:value={selectedIcon.pHeight} />
+            <p>%</p>
+          </div>
+          <div style="display: flex; gap: 0.5em; align-items: center;">
+            <input type="range" min="5" max="100" bind:value={selectedIcon.pHeight} />
+          </div>
+        </div>
       {/if}
     </aside>
   {:else}
@@ -577,17 +604,6 @@
     grid-row-gap: 0.25em;
   }
 
-  #creator-hex-controls input {
-    height: 2em;
-    border-radius: var(--small-radius);
-  }
-
-  #creator-hex-controls label {
-    height: 100%;
-    display: flex;
-    align-items: center;
-  }
-
   #set-controls {
     padding: 0.625em;
     background-color: var(--primary-background);
@@ -617,7 +633,7 @@
     flex-grow: 1;
   }
 
-  .builder-control-row input[type="number"] {
+  .builder-control-row input[type='number'] {
     width: 4em;
     height: 2em;
   }
