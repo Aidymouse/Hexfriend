@@ -10,6 +10,7 @@
   export let preview_hex_info: PreviewHexInfo
 
   console.log($tl.preview_hex_controls)
+  // TODO: add set by radius
 </script>
 
 <label for="hex-width">{$tl.settings.hexes.width}</label>
