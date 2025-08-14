@@ -6,7 +6,7 @@
 
   import { store_has_unsaved_changes } from '../../stores/flags'
   import { tl } from '../../stores/translation'
-	import { copy_iconset } from '../../helpers/iconFns'
+  import { copy_iconset } from '../../helpers/iconFns'
 
   import * as texture_loader from '../../lib/texture_loader'
 
@@ -26,7 +26,6 @@
 
   let iconsetFiles: FileList
 
-  // TODO: allow copies of icon sets
   function importIconset() {
     let importFile = iconsetFiles[0]
 
@@ -39,18 +38,22 @@
       let setToImport = JSON.parse(eb.target.result as string)
 
       /* Check that set hasn't already been imported */
-      if (loadedIconsets.find((is: Iconset) => is.id == setToImport.id || is.id.split(":")[0] === 'default' && setToImport.id.split(":")[0] === 'default') != null) {
-
-      	if (confirm($tl.settings.icon_sets.make_copy_confirmation)) {
-		let new_id = `${setToImport.id}_copy`
-		let counter = 0;
-		while (loadedIconsets.find(is => is.id === new_id)) {
-			counter += 1;
-			new_id = `${new_id}_copy_${counter}`
-		}
-		setToImport = copy_iconset(setToImport, new_id)
-
-	}
+      if (
+        loadedIconsets.find(
+          (is: Iconset) =>
+            is.id == setToImport.id ||
+            (is.id.split(':')[0] === 'default' && setToImport.id.split(':')[0] === 'default'),
+        ) != null
+      ) {
+        if (confirm($tl.settings.icon_sets.make_copy_confirmation)) {
+          let new_id = `${setToImport.id}_copy`
+          let counter = 0
+          while (loadedIconsets.find((is) => is.id === new_id)) {
+            counter += 1
+            new_id = `${new_id}_copy_${counter}`
+          }
+          setToImport = copy_iconset(setToImport, new_id)
+        }
       }
 
       setToImport = convert_iconset_to_latest(setToImport)
@@ -71,11 +74,11 @@
   {#each loadedIconsets as iconset (iconset.id)}
     <div class="loaded-tileset">
       <span style="display: flex">
-      	{iconset.name}
+        {iconset.name}
         <span class="helper-text">v{iconset.version}</span>
       </span>
 
-      {#if iconset.id.split(":")[0] !== 'default' || (loadedIconsets.find(is => is.id === 'default') && iconset.id !== 'default')}
+      {#if iconset.id.split(':')[0] !== 'default' || (loadedIconsets.find((is) => is.id === 'default') && iconset.id !== 'default')}
         <button
           on:click={() => {
             removeIconset(iconset.id)
