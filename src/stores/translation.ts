@@ -13,7 +13,7 @@ export const translation_map: {[key: string]: { translation: Translation, label:
 
 const merge_translation = (translation: Translation, merge: Translation) => {
     for (const [trans_key, trans_value] of Object.entries(translation)) {
-        if (!merge[trans_key]) continue;
+        if (merge[trans_key] === undefined) continue;
 
         if (typeof trans_value === 'object') {
             translation[trans_key] = merge_translation(translation[trans_key], merge[trans_key])
