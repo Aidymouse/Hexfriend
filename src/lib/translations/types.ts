@@ -11,7 +11,7 @@ export type Translation = {
 		export: string,
 		import: string,
 		reset: string,
-		saved: string,
+		saved: string, // Text that pops up when a map successfully saves
 	},
 
 	icons: {

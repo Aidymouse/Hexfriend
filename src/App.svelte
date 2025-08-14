@@ -632,6 +632,16 @@
 
     saving = false
 
+    // Update saving text
+    document.getElementById('saving-text').style.display = 'block'
+    document.getElementById('saving-text').style.opacity = '1'
+    document.getElementById('saving-text').style.marginBottom = '0em'
+
+    setTimeout(() => {
+      document.getElementById('saving-text').style.marginBottom = '-1em'
+      document.getElementById('saving-text').style.opacity = '0'
+    }, 1000)
+
     return loadedId
   }
 
@@ -883,37 +893,44 @@
       <ToolButtons {changeTool} />
     </div>
 
-    <div id="setting-buttons" on:mouseup={pointerup}>
-      <button
-        on:click={() => {
-          showSettings = true
-        }}
-        title={'Map Settings'}
-      >
-        <img src="assets/img/tools/settings.png" alt="Map Settings" />
-      </button>
-      <button
-        on:click={() => {
-          var theme = document.documentElement.getAttribute('data-theme')
-          theme = theme === 'dark' ? 'light' : 'dark'
-          document.documentElement.setAttribute('data-theme', theme)
-          document.querySelector('meta[name="color-scheme"]').setAttribute('content', theme)
-        }}
-        title={'Toggle theme'}
-      >
-        <img src="assets/img/tools/moon-sun.svg" alt="Theme" />
-      </button>
-      <button
-        on:click={() => {
-          showSavedMaps = true
-        }}
-        title={'Maps'}
-      >
-        <img src="assets/img/tools/maps.png" alt="Maps" />
-      </button>
-      <button on:click={() => save_map(loadedSave, loadedId)} title={'Save'}>
-        <img src="assets/img/tools/save.png" alt="Save" />
-      </button>
+    <div id="top-left-floater">
+      <div id="setting-buttons" on:mouseup={pointerup}>
+        <button
+          on:click={() => {
+            showSettings = true
+          }}
+          title={'Map Settings'}
+        >
+          <img src="assets/img/tools/settings.png" alt="Map Settings" />
+        </button>
+        <button
+          on:click={() => {
+            var theme = document.documentElement.getAttribute('data-theme')
+            theme = theme === 'dark' ? 'light' : 'dark'
+            document.documentElement.setAttribute('data-theme', theme)
+            document.querySelector('meta[name="color-scheme"]').setAttribute('content', theme)
+          }}
+          title={'Toggle theme'}
+        >
+          <img src="assets/img/tools/moon-sun.svg" alt="Theme" />
+        </button>
+        <button
+          on:click={() => {
+            showSavedMaps = true
+          }}
+          title={'Maps'}
+        >
+          <img src="assets/img/tools/maps.png" alt="Maps" />
+        </button>
+        <button on:click={() => save_map(loadedSave, loadedId)} title={'Save'}>
+          <img src="assets/img/tools/save.png" alt="Save" />
+        </button>
+      </div>
+      <div style="height: 100%; display: flex; align-items: center;">
+        <p id="saving-text">
+          {$tl.general.saved}
+        </p>
+      </div>
     </div>
 
     <div id="help-buttons" on:mouseup={pointerup} class:show={showHelp}>
@@ -1098,7 +1115,6 @@
   }
 
   /* Tools */
-
   #tool-buttons {
     position: absolute;
     align-self: flex-end;
@@ -1106,10 +1122,28 @@
   }
 
   /* SETTING BUTTONS */
-  #setting-buttons {
+
+  #top-left-floater {
     position: fixed;
     top: 0em;
     left: 0em;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5em;
+    height: 56px;
+  }
+
+  #saving-text {
+    background-color: var(--world-background);
+    margin: 0;
+    margin-bottom: -1em;
+    opacity: 0;
+    transition-duration: 0.2s;
+    padding: 0.5em;
+    border-radius: var(--small-radius);
+  }
+
+  #setting-buttons {
     display: flex;
     padding: 0.5em;
     flex-direction: row;
@@ -1117,6 +1151,7 @@
     border-bottom-right-radius: 0.5em;
     opacity: 0.5;
     gap: 0.25em;
+    height: 40px;
 
     transition-duration: 0.2s;
   }
