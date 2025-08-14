@@ -17,6 +17,7 @@ _Some tooltips + the new wiki entry in the about will need translation. Translat
 - Default Tileset updates to v9, default Iconset to v6
 - You can now import the same tileset or iconset more than once (it makes copies)
 - The default tileset does not have an option to update it if it's on an outdated version (but you can import the latest tileset because of the change above this one)
+- Translations are now merged with a placeholder translation so they won't crash when you switch to a translation that needs updates
 
 # Version 2.0 - Whole new worlds, Hexfriend!
 
