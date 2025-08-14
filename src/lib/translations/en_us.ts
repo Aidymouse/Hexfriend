@@ -12,6 +12,7 @@ export const en_us: Translation = {
 		export: "Export",
 		import: "Import",
 		reset: "Reset",
+		saved: "Saved",
 	},
 
 	icons: {

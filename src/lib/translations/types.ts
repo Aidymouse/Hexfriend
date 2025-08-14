@@ -11,6 +11,7 @@ export type Translation = {
 		export: string,
 		import: string,
 		reset: string,
+		saved: string,
 	},
 
 	icons: {
