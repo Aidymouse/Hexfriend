@@ -176,6 +176,7 @@ function convert_v9_to_v10(old_data: save_data): save_data {
 }
 
 function convert_v10_to_v11(old_data: save_data): save_data {
+	console.log("Converting save: v10 to v11")
 
 	if (old_data.coords.offsets == null) {
 
@@ -193,6 +194,7 @@ function convert_v10_to_v11(old_data: save_data): save_data {
 }
 
 function convert_v11_to_v12(old_data: save_data): save_data {
+	console.log("Converting save: v11 to v12")
 	Object.entries(old_data.TerrainField.hexes).forEach(([hex_id, hex]) => {
 		if (hex.tile && hex.tile.symbol) hex.tile.symbol.rotation = 0;
 	})
@@ -216,15 +218,18 @@ function convert_v12_to_v13(old_data: save_data): save_data {
     //@ts-ignore - Pre v13 it was called textStyles
     old_data.text_styles = old_data.textStyles.map(ts => ({...ts, alpha: 1}))
 
+	console.log(old_data.icons);
 
-    /** Icon Scale Modes */
+	old_data.icons.forEach(i => {
+		if (!i.scaleMode) i.scaleMode = ScaleMode.RELATIVE
+		if (typeof i.scale === 'number') i.scale = {x: i.scale, y: i.scale};
+		i.onLayerId = parseInt(i.id);
+
+	})
+
+	/** Icon Scale Modes */
 	old_data.saveVersion = 13
-    const newIcons = old_data.icons.map(i => {
-        // @ts-ignore  - Icons pre v13 had pHex just on them rather than in a scale mode
-        if (!i.scaleMode && i.pHex) {
-            return {...i, scaleMode: ScaleMode.RELATIVE}
-        }
-    })
+
 
 	return old_data;
 }
