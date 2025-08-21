@@ -222,8 +222,8 @@
     </div>
   </div>
   <label title={$tl.settings.hexes.retain_position_explanation}>
-    {$tl.settings.hexes.retain_icon_scale}
-    <sup id="retain-position-tip" title={$tl.settings.hexes.retain_position_explanation}>?</sup>
+    {$tl.settings.hexes.update_icon_scale}
+    <sup id="retain-position-tip" title={$tl.settings.hexes.update_icon_scale_explanation}>?</sup>
   </label>
   <div id="retain-position-container">
     <div id="retain-position-grid">
