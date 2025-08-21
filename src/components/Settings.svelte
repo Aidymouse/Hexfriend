@@ -105,6 +105,8 @@
     $resize_parameters.old_hex_width = $tfield.hexWidth
     $resize_parameters.old_hex_height = $tfield.hexHeight
     $resize_parameters.old_gap = $tfield.grid.gap
+
+    console.log(resize_parameters)
   }
 
   // Imports
@@ -266,7 +268,14 @@
     <SettingHeading text={$tl.settings.grid.title} bind:toggle={hidden_settings.grid} />
     <div class="settings-hider" class:hidden={hidden_settings.grid}>
       <div class="hider">
-        <GridSettings bind:comp_terrainLayer bind:comp_coordsLayer {renderGrid} {redrawEntireMap} {retain_positions} />
+        <GridSettings
+          bind:comp_terrainLayer
+          bind:comp_coordsLayer
+          {renderGrid}
+          {redrawEntireMap}
+          {retain_positions}
+          {save_old_resize_parameters}
+        />
       </div>
     </div>
   </div>

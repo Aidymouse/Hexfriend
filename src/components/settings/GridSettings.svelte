@@ -17,6 +17,7 @@
   export let renderGrid: Function
   export let redrawEntireMap: Function
   export let retain_positions: Function
+  export let save_old_resize_parameters: Function
 </script>
 
 <div class="settings-grid">
@@ -58,6 +59,7 @@
       redrawEntireMap()
       comp_coordsLayer.updateAllCoordPositions()
       retain_positions()
+      save_old_resize_parameters()
     }}
   />
 

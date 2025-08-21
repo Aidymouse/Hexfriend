@@ -13,15 +13,16 @@ const hexDirVectors: cube_coords[] = [
 ];
 
 export function getHexPath(
-	width: number,
-	height: number,
+	hexWidth: number,
+	hexHeight: number,
 	orientation: HexOrientation = HexOrientation.FLATTOP,
 	centerX: number = 0,
 	centerY: number = 0,
 	gap: number = 0,
 ): number[] {
-	width += gap;
-	height += gap;
+
+	const width = hexWidth + gap;
+	const height = hexHeight + gap;
 	if (orientation == 'pointyTop') {
 		return [
 			centerX,
@@ -183,21 +184,21 @@ export function cube_round(frac: cube_coords): cube_coords {
 }
 
 export function coords_worldToCube(worldX: number, worldY: number, HexOrientation: HexOrientation, hexWidth: number, hexHeight: number, gridGap: number): cube_coords {
-	hexWidth += gridGap;
-	hexHeight += gridGap;
+	const hex_width = hexWidth + gridGap;
+	const hex_height = hexHeight + gridGap;
 	if (HexOrientation == 'flatTop') {
 		// This is the inversion of the axialToWorld
 		// Of course, substituting -q-r in as S
 
-		let q = worldX / (hexWidth * 0.75);
-		let r = ((2 * worldY) / hexHeight - q) / 2;
+		let q = worldX / (hex_width * 0.75);
+		let r = ((2 * worldY) / hex_height - q) / 2;
 
 		let roundedCoords = cube_round(AxialToCube(q, r));
 
 		return roundedCoords;
 	} else if (HexOrientation == 'pointyTop') {
-		let r = worldY / (hexHeight * 0.75);
-		let q = ((2 * worldX) / hexWidth - r) / 2;
+		let r = worldY / (hex_height * 0.75);
+		let q = ((2 * worldX) / hex_width - r) / 2;
 
 		let roundedCoords = cube_round(AxialToCube(q, r));
 
@@ -214,19 +215,19 @@ export function coords_cubeToWorld(
 	hexHeight: number,
 	gridGap: number = 0
 ): { x: number; y: number } {
-	hexWidth += gridGap;
-	hexHeight += gridGap;
+	const hex_width = hexWidth + gridGap;
+	const hex_height = hexHeight + gridGap;
 	if (HexOrientation == 'flatTop') {
-		let hx = q * hexWidth * 0.75;
-		let hy = (r * hexHeight) / 2 - (s * hexHeight) / 2;
+		let hx = q * hex_width * 0.75;
+		let hy = (r * hex_height) / 2 - (s * hex_height) / 2;
 
 		return {
 			x: hx,
 			y: hy,
 		};
 	} else if (HexOrientation == 'pointyTop') {
-		let hx = (q * hexWidth) / 2 - (s * hexWidth) / 2;
-		let hy = r * hexHeight * 0.75;
+		let hx = (q * hex_width) / 2 - (s * hex_width) / 2;
+		let hy = r * hex_height * 0.75;
 
 		return {
 			x: hx,
