@@ -19,6 +19,7 @@ _Some tooltips + the new wiki entry in the about will need translation. Translat
 - The default tileset does not have an option to update it if it's on an outdated version (but you can import the latest tileset because of the change above this one)
 - Translations are now merged with a placeholder translation so they won't crash when you switch to a translation that needs updates
 - Fix icon, path, text position retainment when changing grid gap
+- Added "Update Icon Scale" option to Hex settings
 
 # Version 2.0 - Whole new worlds, Hexfriend!
 
