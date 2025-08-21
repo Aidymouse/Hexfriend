@@ -20,6 +20,7 @@
   export let comp_terrainLayer
 
   export let retain_positions: Function
+  export let retain_positions_orientation_change: Function
   export let save_old_resize_parameters: Function
   export let renderAllHexes: Function
   export let redrawEntireMap: Function
@@ -81,6 +82,9 @@
         comp_coordsLayer.updateAllCoordsText()
         comp_coordsLayer.populateBlankHexes()
 
+        retain_positions_orientation_change()
+
+        // Width and Height flip so we save the old params
         save_old_resize_parameters()
       }}
     />

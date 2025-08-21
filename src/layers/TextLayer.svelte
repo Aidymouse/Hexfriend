@@ -20,9 +20,13 @@
   import { coords_cubeToWorld, coords_worldToCube } from '../helpers/hexHelpers'
   import { store_selected_tool } from '../stores/tools'
   import { tools } from '../types/toolData'
-  import { find_new_pos_through_resize, type HexSizeParams } from '../lib/map_resize'
+  import {
+    find_new_pos_square_orientation_change,
+    find_new_pos_through_resize,
+    type HexSizeParams,
+  } from '../lib/map_resize'
   import HexesSettings from '../components/settings/HexesSettings.svelte'
-  import type { HexOrientation } from '../types/terrain'
+  import type { HexOrientation, HexRaised } from '../types/terrain'
 
   //import { Transformer, TransformerHandle } from "@pixi-essentials/transformer"
 
@@ -74,20 +78,34 @@
     hoveredText = hoveredText
   }
 
-  export function retain_text_position_on_hex_resize(
+  export function retain_text_position_on_hex_resize(old_hex_size: HexSizeParams, new_hex_size: HexSizeParams) {
+    texts.forEach((text) => {
+      let text_height = getTextHeight(text)
+      let text_y = text.y + text_height // Makes anchor point of text the bottom
+
+      const new_text_pos = find_new_pos_through_resize({ x: text.x, y: text_y }, old_hex_size, new_hex_size)
+
+      text.x = new_text_pos.x
+      text.y = new_text_pos.y - text_height
+    })
+
+    texts = texts
+  }
+
+  export function retain_text_position_on_orientation_change(
     old_hex_size: HexSizeParams,
     new_hex_size: HexSizeParams,
-    orientation: HexOrientation,
+    cur_raised: HexRaised,
   ) {
     texts.forEach((text) => {
       let text_height = getTextHeight(text)
       let text_y = text.y + text_height // Makes anchor point of text the bottom
 
-      const new_text_pos = find_new_pos_through_resize(
+      const new_text_pos = find_new_pos_square_orientation_change(
         { x: text.x, y: text_y },
         old_hex_size,
         new_hex_size,
-        orientation,
+        cur_raised,
       )
 
       text.x = new_text_pos.x

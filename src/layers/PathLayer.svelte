@@ -2,7 +2,7 @@
   import type { path_data } from '../types/data'
   import type { pan_state } from '../types/panning'
   import type { path_layer_path } from '../types/path'
-  import type { terrain_field } from '../types/terrain'
+  import type { HexRaised, terrain_field } from '../types/terrain'
   import type { shortcut_data } from '../types/inputs'
   import type { tools } from '../types/toolData'
 
@@ -26,7 +26,11 @@
   import { DashLine } from 'pixi-dashed-line'
 
   import { afterUpdate, onMount } from 'svelte'
-  import { find_new_pos_through_resize, type HexSizeParams } from '../lib/map_resize'
+  import {
+    find_new_pos_square_orientation_change,
+    find_new_pos_through_resize,
+    type HexSizeParams,
+  } from '../lib/map_resize'
 
   let pan: pan_state
   store_panning.store.subscribe((newPan) => {
@@ -36,11 +40,7 @@
   export let paths: path_layer_path[] = []
   export let cont_all_paths: PIXI.Container
 
-  export function retain_path_position_on_hex_resize(
-    old_hex_size: HexSizeParams,
-    new_hex_size: HexSizeParams,
-    orientation: HexOrientation,
-  ) {
+  export function retain_path_position_on_hex_resize(old_hex_size: HexSizeParams, new_hex_size: HexSizeParams) {
     paths.forEach((path) => {
       for (let pI = 0; pI < path.points.length; pI += 2) {
         let path_point_x = path.points[pI]
@@ -50,7 +50,31 @@
           { x: path_point_x, y: path_point_y },
           old_hex_size,
           new_hex_size,
-          orientation,
+        )
+
+        path.points[pI] = new_point_pos.x
+        path.points[pI + 1] = new_point_pos.y
+      }
+    })
+
+    paths = paths
+  }
+
+  export function retain_path_position_on_orientation_change(
+    old_hex_size: HexSizeParams,
+    new_hex_size: HexSizeParams,
+    cur_raised: HexRaised,
+  ) {
+    paths.forEach((path) => {
+      for (let pI = 0; pI < path.points.length; pI += 2) {
+        let path_point_x = path.points[pI]
+        let path_point_y = path.points[pI + 1]
+
+        const new_point_pos = find_new_pos_square_orientation_change(
+          { x: path_point_x, y: path_point_y },
+          old_hex_size,
+          new_hex_size,
+          cur_raised,
         )
 
         path.points[pI] = new_point_pos.x

@@ -3,7 +3,7 @@
   import type { IconLayerIcon, Icon } from '../types/icon'
   import type { shortcut_data } from '../types/inputs'
   import type { pan_state } from '../types/panning'
-  import type { terrain_field } from '../types/terrain'
+  import type { HexRaised, terrain_field } from '../types/terrain'
   import type { cube_coords } from '../types/coordinates'
   import { HexOrientation } from '../types/terrain'
 
@@ -31,7 +31,11 @@
   import { afterUpdate, onMount } from 'svelte'
 
   import { get_icon_scale_for_hex } from '../helpers/imageSizing'
-  import { find_new_pos_through_resize, type HexSizeParams } from '../lib/map_resize'
+  import {
+    find_new_pos_square_orientation_change,
+    find_new_pos_through_resize,
+    type HexSizeParams,
+  } from '../lib/map_resize'
   export let icons: IconLayerIcon[] = []
   let pixi_icons: { [icon_id: number]: PIXI.Sprite } = {} // keeps up to date with icons
 
@@ -65,13 +69,28 @@
     //$store_selected_tool = $store_selected_tool
   }
 
-  export function retain_icon_position_on_hex_resize(
+  export function retain_icon_position_on_hex_resize(old_hex_size: HexSizeParams, new_hex_size: HexSizeParams) {
+    icons.forEach((icon: IconLayerIcon) => {
+      const new_pos = find_new_pos_through_resize({ x: icon.x, y: icon.y }, old_hex_size, new_hex_size)
+      icon.x = new_pos.x
+      icon.y = new_pos.y
+    })
+
+    icons = icons
+  }
+
+  export function retain_icon_position_on_orientation_change(
     old_hex_size: HexSizeParams,
     new_hex_size: HexSizeParams,
-    orientation: HexOrientation,
+    cur_raised: HexRaised,
   ) {
     icons.forEach((icon: IconLayerIcon) => {
-      const new_pos = find_new_pos_through_resize({ x: icon.x, y: icon.y }, old_hex_size, new_hex_size, orientation)
+      const new_pos = find_new_pos_square_orientation_change(
+        { x: icon.x, y: icon.y },
+        old_hex_size,
+        new_hex_size,
+        cur_raised,
+      )
       icon.x = new_pos.x
       icon.y = new_pos.y
     })

@@ -34,6 +34,8 @@
   import { onMount } from 'svelte'
   import SelectGrid from './SelectGrid.svelte'
   import type { HexSizeParams } from '../lib/map_resize'
+  import { map_shape } from '../types/settings'
+  import SavedMaps from './SavedMaps.svelte'
 
   export let loadedSave: save_data
   export let showSettings: boolean
@@ -81,32 +83,58 @@
 
   let iconset_text = 'Icon Set'
 
-  function retain_positions() {
+  function retain_positions_on_resize() {
     const old_hex_size: HexSizeParams = {
       width: $resize_parameters.old_hex_width,
       height: $resize_parameters.old_hex_height,
+      orientation: $resize_parameters.old_orientation,
       gap: $resize_parameters.old_gap,
     }
     const new_hex_size: HexSizeParams = {
       width: $tfield.hexWidth,
       height: $tfield.hexHeight,
+      orientation: $tfield.orientation,
       gap: $tfield.grid.gap,
     }
 
-    if (retainIconPosition)
-      comp_iconLayer.retain_icon_position_on_hex_resize(old_hex_size, new_hex_size, $tfield.orientation)
-    if (retainPathPosition)
-      comp_pathLayer.retain_path_position_on_hex_resize(old_hex_size, new_hex_size, $tfield.orientation)
-    if (retainTextPosition)
-      comp_textLayer.retain_text_position_on_hex_resize(old_hex_size, new_hex_size, $tfield.orientation)
+    if (retainIconPosition) comp_iconLayer.retain_icon_position_on_hex_resize(old_hex_size, new_hex_size)
+    if (retainPathPosition) comp_pathLayer.retain_path_position_on_hex_resize(old_hex_size, new_hex_size)
+    if (retainTextPosition) comp_textLayer.retain_text_position_on_hex_resize(old_hex_size, new_hex_size)
+  }
+
+  const retain_positions_on_orientation_change = () => {
+    if ($tfield.mapShape === map_shape.FLOWER) {
+      retain_positions_on_resize() // Equiv. because Orientation is tracked in resize params
+    } else {
+      const old_hex_size: HexSizeParams = {
+        width: $resize_parameters.old_hex_width,
+        height: $resize_parameters.old_hex_height,
+        orientation: $resize_parameters.old_orientation,
+        gap: $resize_parameters.old_gap,
+      }
+      const new_hex_size: HexSizeParams = {
+        width: $tfield.hexWidth,
+        height: $tfield.hexHeight,
+        orientation: $tfield.orientation,
+        gap: $tfield.grid.gap,
+      }
+
+      if (retainIconPosition)
+        comp_iconLayer.retain_icon_position_on_orientation_change(old_hex_size, new_hex_size, $tfield.raised)
+      if (retainPathPosition)
+        comp_pathLayer.retain_path_position_on_orientation_change(old_hex_size, new_hex_size, $tfield.raised)
+      if (retainTextPosition)
+        comp_textLayer.retain_text_position_on_orientation_change(old_hex_size, new_hex_size, $tfield.raised)
+    }
   }
 
   function save_old_resize_parameters() {
     $resize_parameters.old_hex_width = $tfield.hexWidth
     $resize_parameters.old_hex_height = $tfield.hexHeight
     $resize_parameters.old_gap = $tfield.grid.gap
+    $resize_parameters.old_orientation = $tfield.orientation
 
-    console.log(resize_parameters)
+    //console.log(resize_parameters)
   }
 
   // Imports
@@ -165,7 +193,7 @@
     document.getElementById('floating-hexfriend').style.opacity = `${hexfriend_affection / 100}`
 
     if (hexfriend_affection > 100) {
-      // Some hearts
+      // TODO: Some hearts
       document.getElementById('floating-hexfriend').style.opacity = '0'
 
       document.getElementById('little-hexfriend').innerHTML = '⟨ ꈍ‿ꈍ ⟩'
@@ -273,7 +301,7 @@
           bind:comp_coordsLayer
           {renderGrid}
           {redrawEntireMap}
-          {retain_positions}
+          retain_positions={retain_positions_on_resize}
           {save_old_resize_parameters}
         />
       </div>
@@ -292,10 +320,11 @@
           bind:retainPathPosition
           bind:retainTextPosition
           bind:retainIconScale
-          {retain_positions}
+          retain_positions={retain_positions_on_resize}
           {save_old_resize_parameters}
           {renderAllHexes}
           {redrawEntireMap}
+          retain_positions_orientation_change={retain_positions_on_orientation_change}
         />
       </div>
     </div>
