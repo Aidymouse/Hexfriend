@@ -39,7 +39,7 @@ export const get_image_scaled_for_hex_bydimension = (texWidth: number, texHeight
 }
 
 /** Wraps the image scaling functions but takes in an icon. Defaults to relative scale mode if none is present */
-export const get_icon_scale_for_hex = (icon: Icon, hexInfo: Pick<PreviewHexInfo, 'hexWidth' | 'hexHeight'>) => {
+export const get_icon_scale_for_hex = (icon: Icon, hexInfo: Pick<PreviewHexInfo, 'hexWidth' | 'hexHeight'>): {x: number, y: number} => {
 	if (icon.scaleMode === ScaleMode.BYDIMENSION) {
 		return get_image_scaled_for_hex_bydimension(icon.texWidth, icon.texHeight, hexInfo.hexWidth, hexInfo.hexHeight, icon.pWidth, icon.pHeight)
 	}
