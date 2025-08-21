@@ -164,10 +164,12 @@ export const en_us: Translation = {
 			size_by_radius: "Size by Radius",
 			radius_set: "Set",
 			retain_position: "Retain Position",
-			retain_position_explanation: "Selected objects will attempt to remain in their hex when they are resized",
+			retain_position_explanation: "Selected objects will retain their position relative to hex-center when hexes are resized.",
 			retain_icons: "Icons",
 			retain_paths: "Path",
 			retain_text: "Text",
+			retain_icon_scale: "Retain Icon Scale",
+			retain_icon_scale_explanation: "Icons will resize when hex size changes to retain the same relative size.",
 		},
 
 		shape: {
