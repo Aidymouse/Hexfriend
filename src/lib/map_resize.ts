@@ -58,7 +58,8 @@ export const find_new_pos_through_resize = (pos: {x: number, y: number}, old_hex
 }
 
 /** Square maps keep things in the same relative row/column position, so the logic for finding a new spot on orientation change is different. 
- * WARN: doesn't care about raised column / indented row, that stuff is terrain only
+ * WARN: this goes really weird if you change orientation, change raised col/indented row, then change orientation again. If you keep doing it stuff moves to really weird places. 
+ * TODO: Warrants further investigation one day
  * INFO: Orientation change on a flower map is handled by the above fn
  * */
 export const find_new_pos_square_orientation_change = (pos: {x: number, y: number}, old_hex_size: HexSizeParams, new_hex_size: HexSizeParams, cur_raised: HexRaised ) => {
