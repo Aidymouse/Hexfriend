@@ -169,6 +169,8 @@ language: "TODO",
 			retain_icons: "TODO",
 			retain_paths: "TODO",
 			retain_text: "TODO",
+			retain_icon_scale: "TODO",
+			retain_icon_scale_explanation: "TODO",
 		},
 
 		shape: {
