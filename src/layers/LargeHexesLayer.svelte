@@ -3,7 +3,7 @@
   import type { hex_id } from '../types/toolData'
   import type { terrain_field } from '../types/terrain'
 
-  import { HexOrientation, hex_raised } from '../types/terrain'
+  import { HexOrientation, HexRaised } from '../types/terrain'
 
   import * as store_panning from '../stores/panning'
   import { tfield } from '../stores/tfield'
@@ -45,7 +45,7 @@
     for (let bigRow = 0 - encompassMod; bigRow < bigRows + encompassMod; bigRow++) {
       for (let bigCol = 0 - encompassMod; bigCol < bigCols + encompassMod; bigCol++) {
         let bigHexX, bigHexY
-        let raisedMod = $tfield.largehexes.raised == hex_raised.EVEN ? -1 : 1
+        let raisedMod = $tfield.largehexes.raised == HexRaised.EVEN ? -1 : 1
 
         if ($tfield.orientation == HexOrientation.FLATTOP) {
           bigHexX = bigCol * bigWidth * 0.75 + zeroOffsetX

@@ -1,15 +1,16 @@
-import { coords_cubeToWorld, coords_worldToCube } from "../helpers/hexHelpers"
+import { coords_cubeToq, coords_cubeTor, coords_cubeToWorld, coords_qToCube, coords_rToCube, coords_worldToCube } from "../helpers/hexHelpers"
 import type { IconLayerIcon } from "../types/icon"
-import type { HexOrientation } from "../types/terrain"
+import { HexOrientation, HexRaised } from "../types/terrain"
 
 export type HexSizeParams = {
 	width: number,
 	height: number,
 	gap: number
+         orientation: HexOrientation
 }
 
 /** With old and new hex coords we find the position on the grid of new sized hexes that is equiv. to the position on the old grid */
-export const find_new_pos_through_resize = (pos: {x: number, y: number}, old_hex_size: HexSizeParams, new_hex_size: HexSizeParams, orientation: HexOrientation): {x: number, y: number} => {
+export const find_new_pos_through_resize = (pos: {x: number, y: number}, old_hex_size: HexSizeParams, new_hex_size: HexSizeParams): {x: number, y: number} => {
 
     console.log(old_hex_size, new_hex_size)
 
@@ -17,7 +18,7 @@ export const find_new_pos_through_resize = (pos: {x: number, y: number}, old_hex
       let closestHexCubeCoords = coords_worldToCube(
         pos.x,
         pos.y,
-        orientation,
+        old_hex_size.orientation,
         old_hex_size.width,
         old_hex_size.height,
         old_hex_size.gap
@@ -26,7 +27,7 @@ export const find_new_pos_through_resize = (pos: {x: number, y: number}, old_hex
         closestHexCubeCoords.q,
         closestHexCubeCoords.r,
         closestHexCubeCoords.s,
-        orientation,
+        old_hex_size.orientation,
         old_hex_size.width,
         old_hex_size.height,
         old_hex_size.gap,
@@ -44,7 +45,7 @@ export const find_new_pos_through_resize = (pos: {x: number, y: number}, old_hex
         closestHexCubeCoords.q,
         closestHexCubeCoords.r,
         closestHexCubeCoords.s,
-        orientation,
+        new_hex_size.orientation,
         new_hex_size.width,
         new_hex_size.height,
         new_hex_size.gap,
@@ -56,9 +57,82 @@ export const find_new_pos_through_resize = (pos: {x: number, y: number}, old_hex
       return {x: new_x, y: new_y}
 }
 
+/** Square maps keep things in the same relative row/column position, so the logic for finding a new spot on orientation change is different. 
+ * WARN: doesn't care about raised column / indented row, that stuff is terrain only
+ * INFO: Orientation change on a flower map is handled by the above fn
+ * */
+export const find_new_pos_square_orientation_change = (pos: {x: number, y: number}, old_hex_size: HexSizeParams, new_hex_size: HexSizeParams, cur_raised: HexRaised ) => {
+      let oldOrientation = old_hex_size.orientation
+
+      // Find the center coordinates of the hex the icon wants to stay in
+      let oldClosestHexCubeCoords = coords_worldToCube(
+        pos.x,
+        pos.y,
+        oldOrientation,
+        old_hex_size.width,
+        old_hex_size.height,
+        old_hex_size.gap,
+      )
+      let oldClosestHexPos = coords_cubeToWorld(
+        oldClosestHexCubeCoords.q,
+        oldClosestHexCubeCoords.r,
+        oldClosestHexCubeCoords.s,
+        oldOrientation,
+        old_hex_size.width,
+        old_hex_size.height,
+        old_hex_size.gap,
+      )
+
+      let distanceFromHexLeft = old_hex_size.width / 2 + pos.x - oldClosestHexPos.x
+      let distanceFromHexTop = old_hex_size.height / 2 + pos.y - oldClosestHexPos.y
+
+      // How far left and down were we in the old hex?
+      let proportionalHorizontalDistance = distanceFromHexLeft / old_hex_size.width
+      let proportionalVerticalDistance = distanceFromHexTop / old_hex_size.height
+
+      // Find the row / col of the old hex
+      let conservedClosestHexRowCol =
+        oldOrientation == 'flatTop'
+          ? coords_cubeToq(
+              cur_raised,
+              oldClosestHexCubeCoords.q,
+              oldClosestHexCubeCoords.r,
+              oldClosestHexCubeCoords.s,
+            )
+          : coords_cubeTor(
+              cur_raised,
+              oldClosestHexCubeCoords.q,
+              oldClosestHexCubeCoords.r,
+              oldClosestHexCubeCoords.s,
+            )
+
+      // Find the hex position of the hex at the same row/col, but opposite orientation
+      let newHexCubeCoords = new_hex_size.orientation === HexOrientation.FLATTOP 
+          ? coords_qToCube(cur_raised, conservedClosestHexRowCol.col, conservedClosestHexRowCol.row)
+          : coords_rToCube(cur_raised, conservedClosestHexRowCol.col, conservedClosestHexRowCol.row)
+
+      // Find X and Y world position of new hex
+      let newHexPos = coords_cubeToWorld(
+        newHexCubeCoords.q,
+        newHexCubeCoords.r,
+        newHexCubeCoords.s,
+        new_hex_size.orientation,
+        new_hex_size.width,
+        new_hex_size.height,
+        new_hex_size.gap,
+      )
+
+      // Adjust icon position to be the same amount left and down proportional to hex width and height as it was before the transformation
+  const new_pos = {
+      x: newHexPos.x - new_hex_size.width / 2 + new_hex_size.width * proportionalHorizontalDistance,
+       y: newHexPos.y - new_hex_size.height / 2 + new_hex_size.height * proportionalVerticalDistance
+  }
+
+  return new_pos
+}
+
 
 /** These are never used - I like the idea though. */
-const find_new_pos_through_orientation_change = () => {} // TODO:
   // export function retainIconPositionOnOrientationChange(newOrientation: HexOrientation) {
   //   switch ($tfield.mapShape) {
   //     case map_shape.SQUARE:

@@ -1,6 +1,6 @@
 import { LATESTSAVEDATAVERSION } from '../types/savedata';
 import type { save_data } from '../types/savedata';
-import { hex_raised } from '../types/terrain';
+import { HexRaised } from '../types/terrain';
 import { ScaleMode } from '../helpers/imageSizing';
 
 /** I better make sure I like these names because they can NEVER CHANGE! Or old save versions will need to know what they used to be */
@@ -25,7 +25,7 @@ function convert_v1_to_v5(oldData: save_data): save_data {
 					y: 1,
 				},
 				diameterInHexes: 3,
-				raised: hex_raised.EVEN,
+				raised: HexRaised.EVEN,
 				encompassEdges: false,
 			};
 		}

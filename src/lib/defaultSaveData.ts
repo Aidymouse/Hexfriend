@@ -5,7 +5,7 @@ import type { Iconset } from '../types/icon';
 import type { save_data } from '../types/savedata';
 import { LATESTSAVEDATAVERSION } from '../types/savedata';
 import { map_shape } from '../types/settings';
-import { HexOrientation, hex_raised } from '../types/terrain';
+import { HexOrientation, HexRaised } from '../types/terrain';
 import type { Tile, Tileset } from '../types/tilesets';
 import { DEFAULTICONSET } from './defaultIconset';
 import { DEFAULTTILESET } from './defaultTileset';
@@ -22,7 +22,7 @@ let DEFAULTSAVEDATA: save_data = {
 
 		rows: 20,
 		columns: 20,
-		raised: hex_raised.EVEN, // Which row / column should be higher / indented. This is implemented with an invisible hex. It's all quite messy. --Addendum 1st April 2024: I don't think this is true anymore.
+		raised: HexRaised.EVEN, // Which row / column should be higher / indented. This is implemented with an invisible hex. It's all quite messy. --Addendum 1st April 2024: I don't think this is true anymore.
 
 		hexesOut: 7,
 		mapShape: map_shape.FLOWER,
@@ -36,7 +36,7 @@ let DEFAULTSAVEDATA: save_data = {
 			style: { width: 3, color: 0x333333 },
 			offset: { x: 0, y: 1 },
 			diameterInHexes: 3,
-			raised: hex_raised.EVEN,
+			raised: HexRaised.EVEN,
 			encompassEdges: false,
 		},
 

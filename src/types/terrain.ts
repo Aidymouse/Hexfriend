@@ -9,7 +9,7 @@ export enum HexOrientation {
 	POINTYTOP = 'pointyTop',
 }
 
-export enum hex_raised {
+export enum HexRaised {
 	EVEN = 'even',
 	ODD = 'odd',
 }
@@ -36,7 +36,7 @@ export type terrain_field = {
 		style: { width: number; color: number };
 		offset: { x: number; y: number };
 		diameterInHexes: number;
-		raised: hex_raised;
+		raised: HexRaised;
 		encompassEdges: boolean;
 	};
 
@@ -46,7 +46,7 @@ export type terrain_field = {
 	/* All has to do with square maps */
 	rows: number;
 	columns: number;
-	raised: hex_raised;
+	raised: HexRaised;
 
 	orientation: HexOrientation;
 	blankHexColor: number;

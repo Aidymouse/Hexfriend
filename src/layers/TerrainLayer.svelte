@@ -33,7 +33,7 @@
   import { tl } from '../stores/translation'
 
   // Enums
-  import { HexOrientation, hex_raised } from '../types/terrain'
+  import { HexOrientation, HexRaised } from '../types/terrain'
   import { map_shape } from '../types/settings'
 
   // There's probably some clean up to do in that different colored hexes can have the same ID...
@@ -260,7 +260,7 @@
           $data_overlay.x += delta_x
 
           if (amount % 2 == 1) {
-            $tfield.raised = $tfield.raised == hex_raised.ODD ? hex_raised.EVEN : hex_raised.ODD
+            $tfield.raised = $tfield.raised == HexRaised.ODD ? HexRaised.EVEN : HexRaised.ODD
             square_updateRaisedColumn()
             let delta_y = ($tfield.hexHeight + $tfield.grid.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1)
             pan.offsetY += delta_y * pan.zoomScale
@@ -294,7 +294,7 @@
           $data_overlay.y += delta_y
 
           if (amount % 2 == 1) {
-            $tfield.raised = $tfield.raised == hex_raised.ODD ? hex_raised.EVEN : hex_raised.ODD
+            $tfield.raised = $tfield.raised == HexRaised.ODD ? HexRaised.EVEN : HexRaised.ODD
             square_changeIndentedRow()
             let delta_x = ($tfield.hexWidth + $tfield.grid.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1)
             pan.offsetX += delta_x * pan.zoomScale
@@ -426,7 +426,7 @@
 
         if ($tfield.orientation == 'flatTop') {
           if (amount % 2 == 1) {
-            $tfield.raised = $tfield.raised == hex_raised.ODD ? hex_raised.EVEN : hex_raised.ODD
+            $tfield.raised = $tfield.raised == HexRaised.ODD ? HexRaised.EVEN : HexRaised.ODD
             square_updateRaisedColumn()
           }
 
@@ -476,7 +476,7 @@
           $data_overlay.y -= delta_y
 
           if (amount % 2 == 1) {
-            $tfield.raised = $tfield.raised == hex_raised.ODD ? hex_raised.EVEN : hex_raised.ODD
+            $tfield.raised = $tfield.raised == HexRaised.ODD ? HexRaised.EVEN : HexRaised.ODD
             square_changeIndentedRow()
             let delta_x = ($tfield.hexWidth + $tfield.grid.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1)
             pan.offsetX += delta_x * pan.zoomScale
