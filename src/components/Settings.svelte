@@ -77,7 +77,7 @@
   let retainIconPosition: boolean = true
   let retainPathPosition: boolean = true
   let retainTextPosition: boolean = true
-  let retainIconScale: boolean = true
+  let retain_icon_scale: boolean = true
 
   let exportType: 'Export As...' | 'image/png' | 'application/json' = 'Export As...'
 
@@ -126,6 +126,17 @@
       if (retainTextPosition)
         comp_textLayer.retain_text_position_on_orientation_change(old_hex_size, new_hex_size, $tfield.raised)
     }
+  }
+
+  /** Retains scale of icons on hex changes */
+  const retain_scale = () => {
+    const new_hex_size: HexSizeParams = {
+      width: $tfield.hexWidth,
+      height: $tfield.hexHeight,
+      orientation: $tfield.orientation,
+      gap: $tfield.grid.gap,
+    }
+    if (retain_icon_scale) comp_iconLayer.retain_icon_scale(new_hex_size)
   }
 
   function save_old_resize_parameters() {
@@ -319,12 +330,13 @@
           bind:retainIconPosition
           bind:retainPathPosition
           bind:retainTextPosition
-          bind:retainIconScale
+          bind:retainIconScale={retain_icon_scale}
           retain_positions={retain_positions_on_resize}
           {save_old_resize_parameters}
           {renderAllHexes}
           {redrawEntireMap}
           retain_positions_orientation_change={retain_positions_on_orientation_change}
+          {retain_scale}
         />
       </div>
     </div>

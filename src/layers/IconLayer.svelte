@@ -36,6 +36,7 @@
     find_new_pos_through_resize,
     type HexSizeParams,
   } from '../lib/map_resize'
+  import HexesSettings from '../components/settings/HexesSettings.svelte'
   export let icons: IconLayerIcon[] = []
   let pixi_icons: { [icon_id: number]: PIXI.Sprite } = {} // keeps up to date with icons
 
@@ -94,6 +95,17 @@
       icon.x = new_pos.x
       icon.y = new_pos.y
     })
+
+    icons = icons
+  }
+
+  /** TODO: one day it would be nice if icons had their relative scales updated when you change hex size so that this could really be a retainment instead of a fresh calculation */
+  export function retain_icon_scale(new_hex_size: HexSizeParams) {
+    for (const icon of icons) {
+      const new_scale = get_icon_scale_for_hex(icon, { hexWidth: new_hex_size.width, hexHeight: new_hex_size.height })
+      icon.scale.x = new_scale.x
+      icon.scale.y = new_scale.y
+    }
 
     icons = icons
   }

@@ -21,6 +21,7 @@
 
   export let retain_positions: Function
   export let retain_positions_orientation_change: Function
+  export let retain_scale: Function
   export let save_old_resize_parameters: Function
   export let renderAllHexes: Function
   export let redrawEntireMap: Function
@@ -83,6 +84,7 @@
         comp_coordsLayer.populateBlankHexes()
 
         retain_positions_orientation_change()
+        retain_scale()
 
         // Width and Height flip so we save the old params
         save_old_resize_parameters()
@@ -138,6 +140,7 @@
       redrawEntireMap()
       comp_coordsLayer.updateAllCoordPositions()
       retain_positions()
+      retain_scale()
       save_old_resize_parameters()
     }}
   />
@@ -156,6 +159,7 @@
       redrawEntireMap()
       comp_coordsLayer.updateAllCoordPositions()
       retain_positions()
+      retain_scale()
       save_old_resize_parameters()
     }}
   />
@@ -178,6 +182,7 @@
         redrawEntireMap()
 
         retain_positions()
+        retain_scale()
         save_old_resize_parameters()
 
         comp_coordsLayer.updateAllCoordPositions()
