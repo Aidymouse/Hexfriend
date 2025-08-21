@@ -168,8 +168,8 @@ export const en_us: Translation = {
 			retain_icons: "Icons",
 			retain_paths: "Path",
 			retain_text: "Text",
-			retain_icon_scale: "Retain Icon Scale",
-			retain_icon_scale_explanation: "Icons will resize when hex size changes to retain the same relative size.",
+			update_icon_scale: "Update Icon Scale",
+			update_icon_scale_explanation: "Icons will update their scale to match the new size of a hex on resize. WARNING: The scale is calculated from the size requested when the icon is placed. If you have resized hexes with this option turned off, the icon size my jump to something unexpected.",
 		},
 
 		shape: {

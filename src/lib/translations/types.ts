@@ -164,8 +164,8 @@ export type Translation = {
 			retain_icons: string,
 			retain_paths: string,
 			retain_text: string,
-			retain_icon_scale: string,
-			retain_icon_scale_explanation: string,
+			update_icon_scale: string,
+			update_icon_scale_explanation: string,
 		},
 
 		shape: {
