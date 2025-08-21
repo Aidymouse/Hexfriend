@@ -33,6 +33,7 @@
   // Lib
   import { onMount } from 'svelte'
   import SelectGrid from './SelectGrid.svelte'
+  import type { HexSizeParams } from '../lib/map_resize'
 
   export let loadedSave: save_data
   export let showSettings: boolean
@@ -74,16 +75,30 @@
   let retainIconPosition: boolean = true
   let retainPathPosition: boolean = true
   let retainTextPosition: boolean = true
+  let retainIconScale: boolean = true
 
   let exportType: 'Export As...' | 'image/png' | 'application/json' = 'Export As...'
 
   let iconset_text = 'Icon Set'
 
   function retain_positions() {
+    const old_hex_size: HexSizeParams = {
+      width: $resize_parameters.old_hex_width,
+      height: $resize_parameters.old_hex_height,
+      gap: $resize_parameters.old_gap,
+    }
+    const new_hex_size: HexSizeParams = {
+      width: $tfield.hexWidth,
+      height: $tfield.hexHeight,
+      gap: $tfield.grid.gap,
+    }
+
     if (retainIconPosition)
-      comp_iconLayer.retain_icon_position_on_hex_resize($tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap)
-    if (retainPathPosition) comp_pathLayer.retain_path_position_on_hex_resize()
-    if (retainTextPosition) comp_textLayer.retain_text_position_on_hex_resize()
+      comp_iconLayer.retain_icon_position_on_hex_resize(old_hex_size, new_hex_size, $tfield.orientation)
+    if (retainPathPosition)
+      comp_pathLayer.retain_path_position_on_hex_resize(old_hex_size, new_hex_size, $tfield.orientation)
+    if (retainTextPosition)
+      comp_textLayer.retain_text_position_on_hex_resize(old_hex_size, new_hex_size, $tfield.orientation)
   }
 
   function save_old_resize_parameters() {
@@ -267,6 +282,7 @@
           bind:retainIconPosition
           bind:retainPathPosition
           bind:retainTextPosition
+          bind:retainIconScale
           {retain_positions}
           {save_old_resize_parameters}
           {renderAllHexes}

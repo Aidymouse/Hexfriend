@@ -31,6 +31,7 @@
   import { afterUpdate, onMount } from 'svelte'
 
   import { get_icon_scale_for_hex } from '../helpers/imageSizing'
+  import { find_new_pos_through_resize, type HexSizeParams } from '../lib/map_resize'
   export let icons: IconLayerIcon[] = []
   let pixi_icons: { [icon_id: number]: PIXI.Sprite } = {} // keeps up to date with icons
 
@@ -62,6 +63,20 @@
 
   $: {
     //$store_selected_tool = $store_selected_tool
+  }
+
+  export function retain_icon_position_on_hex_resize(
+    old_hex_size: HexSizeParams,
+    new_hex_size: HexSizeParams,
+    orientation: HexOrientation,
+  ) {
+    icons.forEach((icon: IconLayerIcon) => {
+      const new_pos = find_new_pos_through_resize({ x: icon.x, y: icon.y }, old_hex_size, new_hex_size, orientation)
+      icon.x = new_pos.x
+      icon.y = new_pos.y
+    })
+
+    icons = icons
   }
 
   function get_icon_position(): { iconX: number; iconY: number } {
@@ -206,146 +221,6 @@
   }
 
   // This is called during layer set up when maps are loaded, or when hex fields are focused on.
-
-  export function retain_icon_position_on_hex_resize(newHexWidth: number, newHexHeight: number, newGap: number) {
-    // Find proprtional horizontal and vertical distance from center of nearest hex, and retain the position with the new width and height
-    icons.forEach((icon: IconLayerIcon) => {
-      let closestHexCubeCoords = coords_worldToCube(
-        icon.x,
-        icon.y,
-        $tfield.orientation,
-        $resize_parameters.old_hex_width,
-        $resize_parameters.old_hex_height,
-        $resize_parameters.old_gap,
-      )
-      let closestHexPos = coords_cubeToWorld(
-        closestHexCubeCoords.q,
-        closestHexCubeCoords.r,
-        closestHexCubeCoords.s,
-        $tfield.orientation,
-        $resize_parameters.old_hex_width,
-        $resize_parameters.old_hex_height,
-        $resize_parameters.old_gap,
-      )
-
-      let vector_from_hex_center = {
-        x: closestHexPos.x - icon.x,
-        y: closestHexPos.y - icon.y,
-      }
-
-      let hex_horiz_scale = newHexWidth / $resize_parameters.old_hex_width
-      let hex_vert_scale = newHexHeight / $resize_parameters.old_hex_height
-
-      let closestHexPosNew = coords_cubeToWorld(
-        closestHexCubeCoords.q,
-        closestHexCubeCoords.r,
-        closestHexCubeCoords.s,
-        $tfield.orientation,
-        newHexWidth,
-        newHexHeight,
-        newGap,
-      )
-
-      icon.x = closestHexPosNew.x - vector_from_hex_center.x * hex_horiz_scale
-      icon.y = closestHexPosNew.y - vector_from_hex_center.y * hex_vert_scale
-    })
-
-    icons = icons
-  }
-
-  export function retainIconPositionOnOrientationChange(newOrientation: HexOrientation) {
-    switch ($tfield.mapShape) {
-      case map_shape.SQUARE:
-        square_retainIconPositionOnOrientationChange(newOrientation)
-        break
-
-      case map_shape.FLOWER:
-        flower_retainIconPositionOnOrientationChange(newOrientation)
-        break
-    }
-  }
-
-  function square_retainIconPositionOnOrientationChange(newOrientation: HexOrientation) {
-    // Only really works on square maps afaik
-    // Because it relies on row/col coords
-
-    icons.forEach((icon: IconLayerIcon) => {
-      let oldOrientation: HexOrientation =
-        newOrientation === HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP
-
-      // Find the center coordinates of the hex the icon wants to stay in
-      let oldClosestHexCubeCoords = coords_worldToCube(
-        icon.x,
-        icon.y,
-        oldOrientation,
-        oldHexWidth,
-        oldHexHeight,
-        $tfield.grid.gap,
-      )
-      let oldClosestHexPos = coords_cubeToWorld(
-        oldClosestHexCubeCoords.q,
-        oldClosestHexCubeCoords.r,
-        oldClosestHexCubeCoords.s,
-        oldOrientation,
-        oldHexWidth,
-        oldHexHeight,
-        $tfield.grid.gap,
-      )
-
-      let distanceFromHexLeft = oldHexWidth / 2 + icon.x - oldClosestHexPos.x
-      let distanceFromHexTop = oldHexHeight / 2 + icon.y - oldClosestHexPos.y
-
-      // How far left and down were we in the old hex?
-      let proportionalHorizontalDistance = distanceFromHexLeft / oldHexWidth
-      let proportionalVerticalDistance = distanceFromHexTop / oldHexHeight
-
-      // Find the row / col of the old hex
-      let conservedClosestHexRowCol =
-        oldOrientation == 'flatTop'
-          ? coords_cubeToq(
-              $tfield.raised,
-              oldClosestHexCubeCoords.q,
-              oldClosestHexCubeCoords.r,
-              oldClosestHexCubeCoords.s,
-            )
-          : coords_cubeTor(
-              $tfield.raised,
-              oldClosestHexCubeCoords.q,
-              oldClosestHexCubeCoords.r,
-              oldClosestHexCubeCoords.s,
-            )
-
-      // Find the hex position of the hex at the same row/col, but opposite orientation
-      let newHexCubeCoords =
-        $tfield.orientation == 'flatTop'
-          ? coords_qToCube($tfield.raised, conservedClosestHexRowCol.col, conservedClosestHexRowCol.row)
-          : coords_rToCube($tfield.raised, conservedClosestHexRowCol.col, conservedClosestHexRowCol.row)
-
-      // Find X and Y world position of new hex
-      let newHexPos = coords_cubeToWorld(
-        newHexCubeCoords.q,
-        newHexCubeCoords.r,
-        newHexCubeCoords.s,
-        $tfield.orientation,
-        $tfield.hexWidth,
-        $tfield.hexHeight,
-        $tfield.grid.gap,
-      )
-
-      // Adjust icon position to be the same amount left and down proportional to hex width and height as it was before the transformation
-      icon.x = newHexPos.x - $tfield.hexWidth / 2 + $tfield.hexWidth * proportionalHorizontalDistance
-      icon.y = newHexPos.y - $tfield.hexHeight / 2 + $tfield.hexHeight * proportionalVerticalDistance
-    })
-
-    icons = icons
-
-    oldHexWidth = $tfield.hexWidth
-    oldHexHeight = $tfield.hexHeight
-  }
-
-  function flower_retainIconPositionOnOrientationChange(newOrientation: HexOrientation) {
-    // Find the current
-  }
 
   export function handleKeyboardShortcut(shortcutData: shortcut_data) {
     switch (shortcutData.function) {

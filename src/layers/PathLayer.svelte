@@ -26,6 +26,7 @@
   import { DashLine } from 'pixi-dashed-line'
 
   import { afterUpdate, onMount } from 'svelte'
+  import { find_new_pos_through_resize, type HexSizeParams } from '../lib/map_resize'
 
   let pan: pan_state
   store_panning.store.subscribe((newPan) => {
@@ -35,49 +36,25 @@
   export let paths: path_layer_path[] = []
   export let cont_all_paths: PIXI.Container
 
-  export function retain_path_position_on_hex_resize() {
+  export function retain_path_position_on_hex_resize(
+    old_hex_size: HexSizeParams,
+    new_hex_size: HexSizeParams,
+    orientation: HexOrientation,
+  ) {
     paths.forEach((path) => {
       for (let pI = 0; pI < path.points.length; pI += 2) {
         let path_point_x = path.points[pI]
         let path_point_y = path.points[pI + 1]
 
-        let closest_old_hex = coords_worldToCube(
-          path_point_x,
-          path_point_y,
-          $tfield.orientation,
-          $resize_parameters.old_hex_width,
-          $resize_parameters.old_hex_height,
-          $resize_parameters.old_gap,
-        )
-        let closest_old_hex_center = coords_cubeToWorld(
-          closest_old_hex.q,
-          closest_old_hex.r,
-          closest_old_hex.s,
-          $tfield.orientation,
-          $resize_parameters.old_hex_width,
-          $resize_parameters.old_hex_height,
-          $resize_parameters.old_gap,
+        const new_point_pos = find_new_pos_through_resize(
+          { x: path_point_x, y: path_point_y },
+          old_hex_size,
+          new_hex_size,
+          orientation,
         )
 
-        let vec_to_hex_center = {
-          x: closest_old_hex_center.x - path_point_x,
-          y: closest_old_hex_center.y - path_point_y,
-        }
-
-        let hex_pos_new = coords_cubeToWorld(
-          closest_old_hex.q,
-          closest_old_hex.r,
-          closest_old_hex.s,
-          $tfield.orientation,
-          $tfield.hexWidth,
-          $tfield.hexHeight,
-          $tfield.grid.gap,
-        )
-        let pos_scale_horiz = $tfield.hexWidth / $resize_parameters.old_hex_width
-        let pos_scale_vert = $tfield.hexHeight / $resize_parameters.old_hex_height
-
-        path.points[pI] = hex_pos_new.x - vec_to_hex_center.x * pos_scale_horiz
-        path.points[pI + 1] = hex_pos_new.y - vec_to_hex_center.y * pos_scale_vert
+        path.points[pI] = new_point_pos.x
+        path.points[pI + 1] = new_point_pos.y
       }
     })
 

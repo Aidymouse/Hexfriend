@@ -81,7 +81,6 @@
     data_eraser,
     data_text,
   } from './stores/data'
-  import { resize_parameters } from './stores/resize_parameters'
   import { tl } from './stores/translation'
 
   // GLOBAL STYLES

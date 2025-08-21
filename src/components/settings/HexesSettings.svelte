@@ -28,6 +28,8 @@
   export let retainPathPosition: boolean
   export let retainTextPosition: boolean
 
+  export let retainIconScale: boolean
+
   function changeOrientation() {
     let t = $tfield.hexWidth
     $tfield.hexWidth = $tfield.hexHeight
@@ -207,6 +209,19 @@
         image_filename={'/assets/img/tools/text.svg'}
         title={$tl.settings.hexes.retain_text}
         bind:checked={retainTextPosition}
+      />
+    </div>
+  </div>
+  <label title={$tl.settings.hexes.retain_position_explanation}>
+    {$tl.settings.hexes.retain_icon_scale}
+    <sup id="retain-position-tip" title={$tl.settings.hexes.retain_position_explanation}>?</sup>
+  </label>
+  <div id="retain-position-container">
+    <div id="retain-position-grid">
+      <ImageCheckbox
+        image_filename={'/assets/img/tools/icon.svg'}
+        title={$tl.settings.hexes.retain_icons}
+        bind:checked={retainIconScale}
       />
     </div>
   </div>
