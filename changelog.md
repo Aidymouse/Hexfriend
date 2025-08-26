@@ -3,6 +3,11 @@ For Techy People
 
 # Version 3.0 - Found your feet, Hexfriend
 
+## Version 3.1
+ - Fix the terrain and icon generators
+ - Terrain generator checkboxes now have actual labels
+
+
 ## Version 3.0
 _Some tooltips + the new wiki entry in the about will need translation. Translations now have a typescript type so it should be pretty easy to figure out what needs translating._
 - Updated save data format to v13, changing a couple names to snake_case
