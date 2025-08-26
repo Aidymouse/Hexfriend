@@ -3,7 +3,7 @@
   import type { IconLayerIcon, Icon } from '../types/icon'
   import type { shortcut_data } from '../types/inputs'
   import type { pan_state } from '../types/panning'
-  import type { HexRaised, terrain_field } from '../types/terrain'
+  import type { HexPosition, HexRaised, terrain_field } from '../types/terrain'
   import type { cube_coords } from '../types/coordinates'
   import { HexOrientation } from '../types/terrain'
 
@@ -137,6 +137,39 @@
     }
 
     return { iconX, iconY }
+  }
+
+  /** Used to place an icon externally, like from the icon generator */
+  export function emplaceIcon(
+    icon: Icon,
+    position: HexPosition,
+    icon_scale: { x: number; y: number } | undefined = undefined,
+  ) {
+    const icon_pos = coords_cubeToWorld(
+      position.q,
+      position.r,
+      position.s,
+      $tfield.orientation,
+      $tfield.hexWidth,
+      $tfield.hexHeight,
+      $tfield.grid.gap,
+    )
+
+    let newIcon: IconLayerIcon = {
+      ...icon,
+      x: icon_pos.x,
+      y: icon_pos.y,
+      onLayerId: iconId,
+      texId: icon.texId,
+      rotation: icon.rotation,
+      scale: icon_scale ?? get_icon_scale_for_hex(icon, { hexWidth: $tfield.hexWidth, hexHeight: $tfield.hexHeight }),
+    }
+
+    icons.push(newIcon)
+    iconId++
+    icons = icons
+
+    $store_has_unsaved_changes = true
   }
 
   export function placeIcon() {

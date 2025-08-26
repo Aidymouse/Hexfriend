@@ -24,6 +24,12 @@ export type TerrainHex = {
 	s: number;
 }
 
+export type HexPosition = {
+	q: number,
+	r: number,
+	s: number
+}
+
 export type terrain_field = {
 	hexWidth: number;
 	hexHeight: number;

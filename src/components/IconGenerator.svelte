@@ -14,6 +14,7 @@
   import type { coords_cubeToWorld } from '../helpers/hexHelpers'
   import type { Iconset, Icon } from '../types/icon'
   import Checkbox from './Checkbox.svelte'
+  import { get_image_scaled_for_hex_relative, ScaleMode } from '../helpers/imageSizing'
 
   export let loadedIconsets: Iconset[]
 
@@ -27,7 +28,7 @@
   let gen_config_clear = false
   let gen_config_use_seed = false
   let gen_seed = ''
-  let icon_scale = 80
+  let icon_phex = 80
 
   interface rule {
     item: Icon
@@ -58,6 +59,7 @@
 
   // Wrapper for generation methods
   function generate() {
+    let icon_scale = get_image_scaled_for_hex_relative(100, 100, 50, 43.4, icon_phex)
     let rand_func = get_min_max_rand_function(Math.random)
     let rand_0_1 = Math.random
     if (gen_config_use_seed) {
@@ -95,15 +97,16 @@
       } else {
         rand_icon = pick_from_weighted(random_chances, rand_func)
       }
-      rand_icon.pHex = icon_scale
+      rand_icon.scaleMode = ScaleMode.RELATIVE
+      rand_icon.pHex = 80
 
       if (gen_config_animate) {
         setTimeout(() => {
-          comp_iconLayer.place_icon(rand_icon, hex_pos)
+          comp_iconLayer.emplaceIcon(rand_icon, hex_pos, icon_scale)
         }, icons_placed * 15)
         icons_placed += 1
       } else {
-        comp_iconLayer.place_icon(rand_icon, hex_pos)
+        comp_iconLayer.emplaceIcon(rand_icon, hex_pos, icon_scale)
       }
     })
 
@@ -205,12 +208,12 @@
           {$tl.generators.icon_generator.out_of_connector}
           <input type="number" min={1} bind:value={current_ruleset.chance_for_icon_high} />
         </div>
-        <span class="left-center-text">{$tl.generators.icon_generator.icon_scale}: {icon_scale}%</span>
+        <span class="left-center-text">{$tl.generators.icon_generator.icon_scale}: {icon_phex}%</span>
         <span
-          ><input id="icon-scale" type="range" min={10} max={100} bind:value={icon_scale} />
+          ><input id="icon-scale" type="range" min={10} max={100} bind:value={icon_phex} />
           <button
             on:click={() => {
-              icon_scale = 80
+              icon_phex = 80
             }}>{$tl.general.reset}</button
           ></span
         >
