@@ -328,7 +328,11 @@
             }}
             class:selected={selected_key == tile_key}
           >
-            <img src={get_tile_from_key(tile_key).preview} alt={get_tile_from_key(tile_key).display} /></button
+            <img
+              src={get_tile_from_key(tile_key)[`preview_${$tfield.orientation}`]}
+              alt={get_tile_from_key(tile_key).display}
+              style="max-width: 4em;"
+            /></button
           >
 
           <div class="added-ids">
@@ -339,7 +343,7 @@
                   removeTileFromFunction(tile_key, allowedData.key)
                 }}
               >
-                <img src={get_tile_from_key(allowedData.key).preview} alt={allowedData.key} />
+                <img src={get_tile_from_key(allowedData.key)[`preview_${$tfield.orientation}`]} alt={allowedData.key} />
                 <p class="weight-container">{allowedData.weight}</p>
                 <!-- Weight has to absolute but also float in middle, hence the container -->
               </div>
@@ -357,7 +361,7 @@
           }}
           class:selected={selected_key == tile_key}
         >
-          <img src={get_tile_from_key(tile_key).preview} alt={tile_key} />
+          <img src={get_tile_from_key(tile_key)[`preview_${$tfield.orientation}`]} alt={tile_key} />
         </button>
       {/each}
     </div>
@@ -372,7 +376,11 @@
               addTileToFunction(selected_key, tile_to_key(tile))
             }}
           >
-            <img src={tile.preview} alt={tile.id} title={`Add ${tile.display} to generation ruleset`} />
+            <img
+              src={tile[`preview_${$tfield.orientation}`]}
+              alt={tile.id}
+              title={`Add ${tile.display} to generation ruleset`}
+            />
           </button>
         {/each}
       {/each}
@@ -415,9 +423,18 @@
     </div>
     <div id="right-side">
       <div id="generate-buttons">
-        <span><Checkbox bind:checked={gen_config_animate} />{$tl.generators.animate}</span>
-        <span><Checkbox bind:checked={gen_config_clear} />{$tl.generators.clear_before_generation}</span>
-        <span><Checkbox bind:checked={gen_config_use_seed} />{$tl.generators.seed_generation}</span>
+        <span>
+          <Checkbox bind:checked={gen_config_animate} id="animate-terrain-generator" />
+          <label for="animate-terrain-generator">{$tl.generators.animate}</label>
+        </span>
+        <span>
+          <Checkbox id="clear-terrain-generator" bind:checked={gen_config_clear} />
+          <label for="clear-terrain-generator">{$tl.generators.clear_before_generation}</label>
+        </span>
+        <span>
+          <Checkbox id="seed-terrain-generator" bind:checked={gen_config_use_seed} />
+          <label for="seed-terrain-generator">{$tl.generators.seed_generation}</label>
+        </span>
       </div>
       <div id="generate">
         <button
