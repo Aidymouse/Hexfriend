@@ -16,6 +16,9 @@
   import { get_radius_from_width_height, get_width_height_from_radius } from '../../helpers/hexHelpers'
   import { data_terrain } from '../../stores/data'
 
+  import { record_undo_action } from '../../lib/undo_handler'
+  import { UndoActions } from '../../types/undoTypes'
+
   export let comp_coordsLayer
   export let comp_terrainLayer
 
@@ -38,11 +41,35 @@
     $tfield.hexHeight = t
     //$tfield.hexWidth, $tfield.hexHeight = $tfield.hexHeight, $tfield.hexWidth
 
+    record_undo_action({
+      type: UndoActions.ChangeHexOrientation,
+      new_orientation: $tfield.orientation,
+    })
+
     comp_terrainLayer.changeOrientation()
 
     $store_has_unsaved_changes = true
 
     //redrawEntireMap()
+  }
+
+  export const change_hex_dimensions = (new_width: number, new_height: number) => {
+    record_undo_action({
+      type: UndoActions.ChangeHexDimensions,
+      old_width: $tfield.hexWidth,
+      old_height: $tfield.hexHeight,
+      new_width: new_width,
+      new_height: new_height,
+    })
+
+    $tfield.hexWidth = new_width
+    $tfield.hexHeight = new_height
+
+    redrawEntireMap()
+    comp_coordsLayer.updateAllCoordPositions()
+    retain_positions() // How is undo gonna work with retaining icon position?
+    retain_scale()
+    save_old_resize_parameters()
   }
 </script>
 
@@ -130,18 +157,13 @@
     id="hexWidth"
     type="number"
     min={1}
-    bind:value={$tfield.hexWidth}
+    value={$tfield.hexWidth}
     on:change={(e) => {
       if (Number.isNaN(e.currentTarget.valueAsNumber)) {
-        $tfield.hexWidth = $resize_parameters.old_hex_width
         return
       }
 
-      redrawEntireMap()
-      comp_coordsLayer.updateAllCoordPositions()
-      retain_positions()
-      retain_scale()
-      save_old_resize_parameters()
+      change_hex_dimensions(e.currentTarget.valueAsNumber, $tfield.hexHeight)
     }}
   />
 
@@ -153,14 +175,9 @@
     bind:value={$tfield.hexHeight}
     on:change={(e) => {
       if (Number.isNaN(e.currentTarget.valueAsNumber)) {
-        $tfield.hexHeight = $resize_parameters.old_hex_height
         return
       }
-      redrawEntireMap()
-      comp_coordsLayer.updateAllCoordPositions()
-      retain_positions()
-      retain_scale()
-      save_old_resize_parameters()
+      change_hex_dimensions($tfield.hexHeight, e.currentTarget.valueAsNumber)
     }}
   />
 
