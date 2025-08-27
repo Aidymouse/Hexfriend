@@ -57,6 +57,7 @@
   // Lib
   import * as texture_loader from './lib/texture_loader'
   import { convert_tileset_to_latest } from './lib/tilesetConverter'
+  import { handle_undo_action, handle_redo_action, pop_undo_action, push_undo_action } from './lib/undo_handler'
 
   // Panels
   import IconPanel from './panels/IconPanel.svelte'
@@ -107,6 +108,7 @@
   import { Map_Exports } from './types/export'
   import Scratchpad from './components/scratchpad/Scratchpad.svelte'
   import { convert_iconset_to_latest } from './lib/iconsetConverter'
+  import { store_undo } from './stores/undo'
 
   /* STATE */
 
@@ -420,6 +422,20 @@
             $data_text.contextStyleId = null
             break
 
+          case 'undo':
+            let undo_action = pop_undo_action()
+            if (undo_action !== null) {
+              handle_undo_action(undo_action, comp_terrainLayer)
+            }
+            break
+
+          case 'redo':
+            let redo_action = push_undo_action()
+            if (redo_action !== null) {
+              handle_redo_action(redo_action, comp_terrainLayer)
+            }
+            break
+
           case 'changeTool_terrain':
             changeTool(tools.TERRAIN)
             break
@@ -557,6 +573,8 @@
     $data_terrain.usingEyedropper = false
     $data_icon.usingEyedropper = false
   }
+
+  function redo() {}
 
   /* DATA LOAD */
   function createNewMap() {

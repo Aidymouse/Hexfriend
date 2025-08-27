@@ -14,6 +14,8 @@ export let shortcuts: shortcut_data[] = [
 	{ keycode: 'escape', function: 'backToMainView', tool: null, display: 'Back to Main View' },
 	{ keycode: 'control+/', function: 'toggleShortcutList', tool: null, display: 'View Shortcut List' },
 	{ keycode: 'shift+/', function: 'toggleControls', tool: null, display: 'Toggle Controls' },
+	{ keycode: 'control+z', function: 'undo', tool: null, display: 'Undo' },
+	{ keycode: 'control+shift+z', function: 'redo', tool: null, display: 'Redo' },
 
 	{ keycode: '1', function: 'changeTool_terrain', tool: null, display: 'Terrain Tool' },
 	{ keycode: '2', function: 'changeTool_icon', tool: null, display: 'Icon Tool' },
@@ -22,7 +24,7 @@ export let shortcuts: shortcut_data[] = [
 	{ keycode: '5', function: 'changeTool_eraser', tool: null, display: 'Eraser Tool' },
 	{ keycode: '6', function: 'changeTool_overlay', tool: null, display: 'Overlay Tool' },
 
-	{ keycode: 'control+q', function: 'toggle_overlay', tool: null, display: 'Toggle Overlay Visibility' },
+	{ keycode: 'shift+q', function: 'toggle_overlay', tool: null, display: 'Toggle Overlay Visibility' },
 
 	// TERRAIN
 	{ keycode: 'e', function: 'toggleEraser', tool: tools.TERRAIN, display: 'Toggle Eraser' },
