@@ -17,7 +17,7 @@
   import { data_terrain } from '../../stores/data'
 
   import { record_undo_action } from '../../lib/undo_handler'
-  import { UndoActions } from '../../types/undoTypes'
+  import { UndoActions, type UndoAction } from '../../types/undoTypes'
 
   export let comp_coordsLayer
   export let comp_terrainLayer
@@ -35,32 +35,52 @@
 
   export let retainIconScale: boolean
 
-  function changeOrientation() {
+  function changeOrientation(new_orientation: HexOrientation, record_action: boolean = true) {
+    if ($tfield.orientation === new_orientation) return
+
+    $tfield.orientation = new_orientation
+
     let t = $tfield.hexWidth
     $tfield.hexWidth = $tfield.hexHeight
     $tfield.hexHeight = t
-    //$tfield.hexWidth, $tfield.hexHeight = $tfield.hexHeight, $tfield.hexWidth
 
-    record_undo_action({
-      type: UndoActions.ChangeHexOrientation,
-      new_orientation: $tfield.orientation,
-    })
+    if (record_action) {
+      record_undo_action({
+        type: UndoActions.ChangeHexOrientation,
+        new_orientation: $tfield.orientation,
+      })
+    }
 
     comp_terrainLayer.changeOrientation()
+
+    $data_terrain.genPreview = true
+
+    comp_coordsLayer.cullUnusedCoordinates()
+    comp_coordsLayer.updateAllCoordPositions()
+    comp_coordsLayer.updateAllCoordsText()
+    comp_coordsLayer.populateBlankHexes()
+
+    retain_positions_orientation_change()
+    retain_scale()
+
+    // Width and Height flip so we save the old params
+    save_old_resize_parameters()
 
     $store_has_unsaved_changes = true
 
     //redrawEntireMap()
   }
 
-  export const change_hex_dimensions = (new_width: number, new_height: number) => {
-    record_undo_action({
-      type: UndoActions.ChangeHexDimensions,
-      old_width: $tfield.hexWidth,
-      old_height: $tfield.hexHeight,
-      new_width: new_width,
-      new_height: new_height,
-    })
+  export const change_hex_dimensions = (new_width: number, new_height: number, record_action: boolean = true) => {
+    if (record_action) {
+      record_undo_action({
+        type: UndoActions.ChangeHexDimensions,
+        old_width: $tfield.hexWidth,
+        old_height: $tfield.hexHeight,
+        new_width: new_width,
+        new_height: new_height,
+      })
+    }
 
     $tfield.hexWidth = new_width
     $tfield.hexHeight = new_height
@@ -70,6 +90,33 @@
     retain_positions() // How is undo gonna work with retaining icon position?
     retain_scale()
     save_old_resize_parameters()
+  }
+
+  /** Undo */
+  export const handle_undo = (action: UndoAction) => {
+    switch (action.type) {
+      case UndoActions.ChangeHexOrientation: {
+        const revert_orientation =
+          action.new_orientation === HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP
+        changeOrientation(revert_orientation, false)
+        break
+      }
+      case UndoActions.ChangeHexDimensions: {
+        change_hex_dimensions(action.old_width, action.old_height, false)
+      }
+    }
+  }
+
+  export const handle_redo = (action: UndoAction) => {
+    switch (action.type) {
+      case UndoActions.ChangeHexOrientation: {
+        changeOrientation(action.new_orientation, false)
+        break
+      }
+      case UndoActions.ChangeHexDimensions: {
+        change_hex_dimensions(action.new_width, action.new_height, false)
+      }
+    }
   }
 </script>
 
@@ -99,22 +146,11 @@
         { title: 'Flat Top', value: HexOrientation.FLATTOP, filename: 'flatTop' },
         { title: 'Pointy Top', value: HexOrientation.POINTYTOP, filename: 'pointyTop' },
       ]}
-      bind:value={$tfield.orientation}
+      value={$tfield.orientation}
       on:change={() => {
-        changeOrientation()
-
-        $data_terrain.genPreview = true
-
-        comp_coordsLayer.cullUnusedCoordinates()
-        comp_coordsLayer.updateAllCoordPositions()
-        comp_coordsLayer.updateAllCoordsText()
-        comp_coordsLayer.populateBlankHexes()
-
-        retain_positions_orientation_change()
-        retain_scale()
-
-        // Width and Height flip so we save the old params
-        save_old_resize_parameters()
+        changeOrientation(
+          $tfield.orientation === HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP,
+        )
       }}
     />
   </div>

@@ -36,6 +36,7 @@
   import type { HexSizeParams } from '../lib/map_resize'
   import { map_shape } from '../types/settings'
   import SavedMaps from './SavedMaps.svelte'
+  import { UndoActions, type UndoAction } from '../types/undoTypes'
 
   export let loadedSave: save_data
   export let showSettings: boolean
@@ -146,6 +147,30 @@
     $resize_parameters.old_orientation = $tfield.orientation
 
     //console.log(resize_parameters)
+  }
+
+  let comp_hexes: HexesSettings
+
+  /** Undo */
+  export const handle_undo = (action: UndoAction) => {
+    switch (action.type) {
+      case UndoActions.ChangeHexOrientation:
+      case UndoActions.ChangeHexDimensions: {
+        comp_hexes.handle_undo(action)
+        break
+      }
+    }
+  }
+
+  export const handle_redo = (action: UndoAction) => {
+    console.log('settings redo')
+    switch (action.type) {
+      case UndoActions.ChangeHexOrientation:
+      case UndoActions.ChangeHexDimensions: {
+        comp_hexes.handle_redo(action)
+        break
+      }
+    }
   }
 
   // Imports
@@ -325,6 +350,7 @@
     <div class="settings-hider" class:hidden={hidden_settings.hexes}>
       <div class="hider">
         <HexesSettings
+          bind:this={comp_hexes}
           bind:comp_coordsLayer
           bind:comp_terrainLayer
           bind:retainIconPosition
@@ -393,7 +419,7 @@
     <SettingHeading text={$tl.settings.icon_sets.title} bind:toggle={hidden_settings.iconsets} />
     <div class="settings-hider" class:hidden={hidden_settings.iconsets}>
       <div class="hider">
-        <IconsetSettings bind:loadedSave bind:loadedIconsets bind:iconset_text bind:appState />
+        <IconsetSettings bind:loadedSave bind:loadedIconsets bind:appState />
       </div>
     </div>
   </div>
