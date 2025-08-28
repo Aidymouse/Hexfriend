@@ -148,6 +148,7 @@
   let comp_coordsLayer: CoordsLayer
   let comp_overlayLayer: OverlayLayer
   let comp_shortcutList: ShortcutList
+  let comp_settings: Settings
 
   let comp_terrain_panel: TerrainPanel
 
@@ -425,14 +426,14 @@
           case 'undo':
             let undo_action = pop_undo_action()
             if (undo_action !== null) {
-              handle_undo_action(undo_action, comp_terrainLayer)
+              handle_undo_action(undo_action, { terrainLayer: comp_terrainLayer, settings: comp_settings })
             }
             break
 
           case 'redo':
             let redo_action = push_undo_action()
             if (redo_action !== null) {
-              handle_redo_action(redo_action, comp_terrainLayer)
+              handle_redo_action(redo_action, { terrainLayer: comp_terrainLayer, settings: comp_settings })
             }
             break
 
@@ -969,6 +970,7 @@
 
     <Settings
       {loadedSave}
+      bind:this={comp_settings}
       bind:showSettings
       bind:appState
       bind:showTerrainGenerator
