@@ -1,0 +1,17 @@
+{
+	"id": "/",
+    "name": "Hexfriend",
+    "short_name": "Hexfriend",
+    "description": "The friendly online hex mapper :)",
+    "start_url": "/",
+    "icons": [
+       {
+        "src": "public/assets/img/site/hexfriend.png",
+        "sizes": "500x500",
+        "type": "image/png"
+        }
+    ],
+    "theme_color": "#8CC63F",
+    "background_color": "#333333",
+    "display": "standalone"
+ }
