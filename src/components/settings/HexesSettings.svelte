@@ -35,6 +35,8 @@
 
   export let retainIconScale: boolean
 
+
+  /** Changes the orientation of hexes. Record action is optional because... */
   function changeOrientation(new_orientation: HexOrientation, record_action: boolean = true) {
     if ($tfield.orientation === new_orientation) return
 
@@ -229,8 +231,7 @@
 
         let new_dims = get_width_height_from_radius(radius, $tfield.orientation)
 
-        $tfield.hexWidth = new_dims.width
-        $tfield.hexHeight = new_dims.height
+	change_hex_dimensions(new_dims.width, new_dims.height, true);
 
         redrawEntireMap()
 
