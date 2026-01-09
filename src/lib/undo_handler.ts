@@ -88,6 +88,7 @@ export const handle_undo_action = (action: UndoAction, components: UndoComponent
 	//console.log("UNDO", action)
 	switch (action.type) {
 		/** Settings */
+		case UndoActions.ToggleGrid: 
 		case UndoActions.ChangeHexDimensions: 
 		case UndoActions.ChangeHexOrientation: {
 			// console.log(components)
@@ -107,6 +108,7 @@ export const handle_redo_action = (action: UndoAction, components: UndoComponent
 	console.log("REDO", action)
 	switch (action.type) {
 		/** Settings */
+		case UndoActions.ToggleGrid:
 		case UndoActions.ChangeHexDimensions: 
 		case UndoActions.ChangeHexOrientation: {
 			components.settings.handle_redo(action)

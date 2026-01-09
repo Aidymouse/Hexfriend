@@ -149,22 +149,34 @@
     //console.log(resize_parameters)
   }
 
+  let comp_grid: GridSettings
   let comp_hexes: HexesSettings
 
   /** Undo */
   export const handle_undo = (action: UndoAction) => {
     switch (action.type) {
+			case UndoActions.ToggleGrid: {
+        comp_grid.handle_undo(action)
+			}
+
       case UndoActions.ChangeHexOrientation:
       case UndoActions.ChangeHexDimensions: {
         comp_hexes.handle_undo(action)
         break
       }
+
+
     }
   }
 
   export const handle_redo = (action: UndoAction) => {
     console.log('settings redo')
     switch (action.type) {
+      case UndoActions.ToggleGrid: {
+        comp_grid.handle_redo(action)
+        break
+			}
+
       case UndoActions.ChangeHexOrientation:
       case UndoActions.ChangeHexDimensions: {
         comp_hexes.handle_redo(action)
@@ -333,6 +345,7 @@
     <div class="settings-hider" class:hidden={hidden_settings.grid}>
       <div class="hider">
         <GridSettings
+          bind:this={comp_grid}
           bind:comp_terrainLayer
           bind:comp_coordsLayer
           {renderGrid}

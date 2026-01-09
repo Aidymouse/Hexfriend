@@ -11,6 +11,9 @@
   import { map_shape } from '../../types/settings'
   import { HexOrientation } from '../../types/terrain'
 
+  import { UndoActions, type UndoAction } from '../../types/undoTypes'
+  import { record_undo_action } from '../../lib/undo_handler'
+
   export let comp_terrainLayer
   export let comp_coordsLayer
 
@@ -18,12 +21,43 @@
   export let redrawEntireMap: Function
   export let retain_positions: Function
   export let save_old_resize_parameters: Function
+
+	function toggle_grid(enabled: boolean, record_action: boolean = true) {
+		console.log('Grid Toggle', enabled)
+		$tfield.grid.shown = enabled
+		comp_terrainLayer.renderGrid()
+
+		if (record_action) {
+      record_undo_action({
+        type: UndoActions.ToggleGrid,
+        enabled: !enabled
+      })
+		}
+	}
+
+	export const handle_undo = (action: UndoAction) => {
+		switch (action.type) {
+			case UndoActions.ToggleGrid: {
+				toggle_grid(action.enabled, false)
+			}
+		}
+	}
+
+	export const handle_redo = (action: UndoAction) => {
+		switch (action.type) {
+			case UndoActions.ToggleGrid: {
+				toggle_grid(!action.enabled, false)
+			}
+		}
+	}
+
+
 </script>
 
 <div class="settings-grid">
   <label for="showGrid">{$tl.settings.grid.show}</label>
   <!-- Weird bug where the grid wont render if you turn it off then resize the hex flower map ?? -->
-  <Checkbox bind:checked={$tfield.grid.shown} id={'showGrid'} on:change={comp_terrainLayer.renderGrid} />
+  <Checkbox bind:checked={$tfield.grid.shown} id={'showGrid'} on:change={() => toggle_grid($tfield.grid.shown)} />
   {#if $tfield.grid.shown}
     <label for="gridThickness">{$tl.settings.grid.thickness}</label>
     <input
