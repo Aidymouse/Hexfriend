@@ -22,42 +22,122 @@
   export let retain_positions: Function
   export let save_old_resize_parameters: Function
 
-	function toggle_grid(enabled: boolean, record_action: boolean = true) {
-		console.log('Grid Toggle', enabled)
-		$tfield.grid.shown = enabled
-		comp_terrainLayer.renderGrid()
+  function toggle_grid(enabled: boolean, record_action: boolean = true) {
+    $tfield.grid.shown = enabled
+    comp_terrainLayer.renderGrid()
 
-		if (record_action) {
+    if (record_action) {
       record_undo_action({
         type: UndoActions.ToggleGrid,
-        enabled: !enabled
+        enabled: !enabled,
       })
-		}
-	}
+    }
+  }
 
-	export const handle_undo = (action: UndoAction) => {
-		switch (action.type) {
-			case UndoActions.ToggleGrid: {
-				toggle_grid(action.enabled, false)
-			}
-		}
-	}
+  function change_grid_thickness(thickness: number, record_action: boolean = true) {
+    if (record_action) {
+      record_undo_action({
+        type: UndoActions.ChangeGridThickness,
+        old_thickness: $tfield.grid.thickness,
+        new_thickness: thickness,
+      })
+    }
 
-	export const handle_redo = (action: UndoAction) => {
-		switch (action.type) {
-			case UndoActions.ToggleGrid: {
-				toggle_grid(!action.enabled, false)
-			}
-		}
-	}
+    $tfield.grid.thickness = thickness
+    renderGrid()
+  }
 
+  function change_grid_color(new_color: number, record_action: boolean = true) {
+    if (record_action) {
+      record_undo_action({
+        type: UndoActions.ChangeGridColor,
+        new_color: parseInt(`${new_color}`),
+        old_color: parseInt(`${$tfield.grid.stroke}`),
+      })
+    }
+    $tfield.grid.stroke = new_color
+    renderGrid()
+  }
 
+  function change_gap(new_gap: number, record_action: boolean = true) {
+    console.log('Changing Gap', new_gap)
+    if (record_action) {
+      record_undo_action({
+        type: UndoActions.ChangeGridGap,
+        new_gap: new_gap,
+        old_gap: parseInt(`${$tfield.grid.gap}`),
+      })
+    }
+
+    $tfield.grid.gap = new_gap
+
+    redrawEntireMap()
+    comp_coordsLayer.updateAllCoordPositions()
+    retain_positions()
+    save_old_resize_parameters()
+  }
+
+  function toggle_large_hexes(enabled: boolean) {}
+
+  function lh_change_size(new_size: number) {}
+
+  function lg_change_color(new_color: number) {}
+
+  function lh_change_outline_thickness(new_thickness) {}
+
+  function lh_change_offset(new_hori: number, new_vert: number) {}
+
+  function lh_toggle_edge_encompass() {}
+
+  export const handle_undo = (action: UndoAction) => {
+    switch (action.type) {
+      case UndoActions.ToggleGrid: {
+        toggle_grid(action.enabled, false)
+        break
+      }
+      case UndoActions.ChangeGridThickness: {
+        change_grid_thickness(action.old_thickness, false)
+        break
+      }
+      case UndoActions.ChangeGridColor: {
+        change_grid_color(action.old_color, false)
+        break
+      }
+      case UndoActions.ChangeGridGap: {
+        change_gap(action.old_gap, false)
+        break
+      }
+    }
+  }
+
+  export const handle_redo = (action: UndoAction) => {
+    switch (action.type) {
+      case UndoActions.ToggleGrid: {
+        toggle_grid(!action.enabled, false)
+        break
+      }
+      case UndoActions.ChangeGridThickness: {
+        change_grid_thickness(action.new_thickness, false)
+        break
+      }
+      case UndoActions.ChangeGridColor: {
+        console.log('Redo Change Grid Color', action)
+        change_grid_color(action.new_color, false)
+        break
+      }
+      case UndoActions.ChangeGridGap: {
+        change_gap(action.new_gap, false)
+        break
+      }
+    }
+  }
 </script>
 
 <div class="settings-grid">
   <label for="showGrid">{$tl.settings.grid.show}</label>
   <!-- Weird bug where the grid wont render if you turn it off then resize the hex flower map ?? -->
   <Checkbox bind:checked={$tfield.grid.shown} id={'showGrid'} on:change={() => toggle_grid($tfield.grid.shown)} />
+
   {#if $tfield.grid.shown}
     <label for="gridThickness">{$tl.settings.grid.thickness}</label>
     <input
@@ -65,17 +145,17 @@
       type="number"
       min="0"
       max="99"
-      bind:value={$tfield.grid.thickness}
-      on:change={() => {
-        renderGrid()
+      value={$tfield.grid.thickness}
+      on:change={(e) => {
+        change_grid_thickness(e.target.valueAsNumber)
       }}
     />
 
     <label for="gridColor">{$tl.settings.grid.color}</label>
     <ColorInputPixi
-      bind:value={$tfield.grid.stroke}
-      on:change={() => {
-        renderGrid()
+      value={$tfield.grid.stroke}
+      on:input={(e) => {
+        change_grid_color(e.detail.number)
       }}
       id={'gridColor'}
     />
@@ -87,13 +167,10 @@
     type="number"
     min="0"
     max="99"
-    bind:value={$tfield.grid.gap}
+    value={$tfield.grid.gap}
     on:focus={() => {}}
-    on:change={() => {
-      redrawEntireMap()
-      comp_coordsLayer.updateAllCoordPositions()
-      retain_positions()
-      save_old_resize_parameters()
+    on:change={(e) => {
+      change_gap(e.target.valueAsNumber)
     }}
   />
 

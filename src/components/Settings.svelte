@@ -155,27 +155,31 @@
   /** Undo */
   export const handle_undo = (action: UndoAction) => {
     switch (action.type) {
-			case UndoActions.ToggleGrid: {
+      case UndoActions.ToggleGrid:
+      case UndoActions.ChangeGridThickness:
+      case UndoActions.ChangeGridColor:
+      case UndoActions.ChangeGridGap: {
         comp_grid.handle_undo(action)
-			}
+      }
 
       case UndoActions.ChangeHexOrientation:
       case UndoActions.ChangeHexDimensions: {
         comp_hexes.handle_undo(action)
         break
       }
-
-
     }
   }
 
   export const handle_redo = (action: UndoAction) => {
     console.log('settings redo')
     switch (action.type) {
-      case UndoActions.ToggleGrid: {
+      case UndoActions.ToggleGrid:
+      case UndoActions.ChangeGridThickness:
+      case UndoActions.ChangeGridColor:
+      case UndoActions.ChangeGridGap: {
         comp_grid.handle_redo(action)
         break
-			}
+      }
 
       case UndoActions.ChangeHexOrientation:
       case UndoActions.ChangeHexDimensions: {
