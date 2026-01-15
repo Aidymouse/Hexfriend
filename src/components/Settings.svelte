@@ -158,7 +158,12 @@
       case UndoActions.ToggleGrid:
       case UndoActions.ChangeGridThickness:
       case UndoActions.ChangeGridColor:
-      case UndoActions.ChangeGridGap: {
+      case UndoActions.ChangeGridGap: 
+      case UndoActions.ToggleGridLargeHexes: 
+      case UndoActions.ChangeGridLargeHexSize: 
+      case UndoActions.ChangeGridLargeHexColor: 
+      case UndoActions.ChangeGridLargeHexOffset: 
+      case UndoActions.ToggleGridLargeHexEdgeEncompass: {
         comp_grid.handle_undo(action)
       }
 
@@ -176,7 +181,12 @@
       case UndoActions.ToggleGrid:
       case UndoActions.ChangeGridThickness:
       case UndoActions.ChangeGridColor:
-      case UndoActions.ChangeGridGap: {
+      case UndoActions.ChangeGridGap: 
+      case UndoActions.ToggleGridLargeHexes: 
+      case UndoActions.ChangeGridLargeHexSize: 
+      case UndoActions.ChangeGridLargeHexColor: 
+      case UndoActions.ChangeGridLargeHexOffset: 
+      case UndoActions.ToggleGridLargeHexEdgeEncompass: {
         comp_grid.handle_redo(action)
         break
       }

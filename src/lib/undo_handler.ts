@@ -86,7 +86,12 @@ export const handle_undo_action = (action: UndoAction, components: UndoComponent
     case UndoActions.ChangeGridColor:
     case UndoActions.ChangeGridGap:
     case UndoActions.ChangeHexDimensions:
-    case UndoActions.ChangeHexOrientation: {
+    case UndoActions.ChangeHexOrientation: 
+    case UndoActions.ToggleGridLargeHexes: 
+    case UndoActions.ChangeGridLargeHexSize: 
+    case UndoActions.ChangeGridLargeHexColor: 
+    case UndoActions.ChangeGridLargeHexOffset: 
+    case UndoActions.ToggleGridLargeHexEdgeEncompass: {
       // console.log(components)
       components.settings.handle_undo(action)
       break
@@ -109,7 +114,12 @@ export const handle_redo_action = (action: UndoAction, components: UndoComponent
     case UndoActions.ChangeGridColor:
     case UndoActions.ChangeGridGap:
     case UndoActions.ChangeHexDimensions:
-    case UndoActions.ChangeHexOrientation: {
+    case UndoActions.ChangeHexOrientation: 
+    case UndoActions.ToggleGridLargeHexes: 
+    case UndoActions.ChangeGridLargeHexSize: 
+    case UndoActions.ChangeGridLargeHexColor: 
+    case UndoActions.ChangeGridLargeHexOffset: 
+    case UndoActions.ToggleGridLargeHexEdgeEncompass: {
       components.settings.handle_redo(action)
       break
     }

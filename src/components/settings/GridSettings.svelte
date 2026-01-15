@@ -29,7 +29,7 @@
     if (record_action) {
       record_undo_action({
         type: UndoActions.ToggleGrid,
-        enabled: !enabled,
+        enabled: enabled,
       })
     }
   }
@@ -77,11 +77,30 @@
     save_old_resize_parameters()
   }
 
-  function toggle_large_hexes(enabled: boolean) {}
+  function toggle_large_hexes(enabled: boolean, record_action: boolean = true) {
+    if (record_action) {
+      record_undo_action({
+	type: UndoActions.ToggleGridLargeHexes,
+	enabled,
+      })
+    }
 
-  function lh_change_size(new_size: number) {}
+    $tfield.largehexes.shown = enabled;
+  }
 
-  function lg_change_color(new_color: number) {}
+  function lh_change_size(new_size: number, record_action: boolean = true) {
+    if (record_action) {
+      record_undo_action({
+	type: UndoActions.ChangeGridLargeHexSize,
+	old_size: $tfield.largehexes.diameterInHexes,
+	new_size,
+      })
+    }
+
+    $tfield.largehexes.diameterInHexes = new_size;
+  }
+
+  function lh_change_color(new_color: number) {}
 
   function lh_change_outline_thickness(new_thickness) {}
 
@@ -92,7 +111,7 @@
   export const handle_undo = (action: UndoAction) => {
     switch (action.type) {
       case UndoActions.ToggleGrid: {
-        toggle_grid(action.enabled, false)
+        toggle_grid(!action.enabled, false)
         break
       }
       case UndoActions.ChangeGridThickness: {
@@ -107,13 +126,21 @@
         change_gap(action.old_gap, false)
         break
       }
+      case UndoActions.ToggleGridLargeHexes: {
+	toggle_large_hexes(!action.enabled, false)
+	break;
+      }
+      case UndoActions.ChangeGridLargeHexSize: {
+	lh_change_size(action.old_size, false)
+	break;
+      }
     }
   }
 
   export const handle_redo = (action: UndoAction) => {
     switch (action.type) {
       case UndoActions.ToggleGrid: {
-        toggle_grid(!action.enabled, false)
+        toggle_grid(action.enabled, false)
         break
       }
       case UndoActions.ChangeGridThickness: {
@@ -128,6 +155,14 @@
       case UndoActions.ChangeGridGap: {
         change_gap(action.new_gap, false)
         break
+      }
+      case UndoActions.ToggleGridLargeHexes: {
+	toggle_large_hexes(action.enabled, false)
+	break;
+      }
+      case UndoActions.ChangeGridLargeHexSize: {
+	lh_change_size(action.new_size, false)
+	break;
       }
     }
   }
@@ -176,11 +211,15 @@
 
   <!-- LARGE HEXES -->
   <label for="showOverlay">{$tl.settings.grid.large_hexes.title}</label>
-  <Checkbox bind:checked={$tfield.largehexes.shown} id="showOverlay" />
+  <Checkbox checked={$tfield.largehexes.shown} id="showOverlay" on:change={() => {
+  	toggle_large_hexes(!$tfield.largehexes.shown)
+  }} />
 
   {#if $tfield.largehexes.shown}
     <label for="overlayDiameter">{$tl.settings.grid.large_hexes.size}</label>
-    <input type="number" id="overlayDiameter" min={2} bind:value={$tfield.largehexes.diameterInHexes} />
+    <input type="number" id="overlayDiameter" min={2} value={$tfield.largehexes.diameterInHexes} on:change={e => {
+      lh_change_size(e.target.valueAsNumber)
+    }}/>
 
     <label for="overlayColor">{$tl.settings.grid.large_hexes.color}</label>
     <ColorInputPixi id={'overlayColor'} bind:value={$tfield.largehexes.style.color} />
