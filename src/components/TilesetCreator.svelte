@@ -4,6 +4,7 @@
   import { get_icon_scale_for_hex } from '../helpers/imageSizing'
   import { generate_icon_preview, type PreviewHexInfo } from '../helpers/iconFns'
   import { generate_tile_previews } from '../helpers/tileFns'
+  import { load_tileset_textures } from '../lib/texture_loader.ts'
 
   let preview_hex_info: PreviewHexInfo = {
     hexWidth: 50 * 6,
@@ -143,7 +144,8 @@
   }
 
   const get_tile_previews = async (tile: Tile) => {
-    return generate_tile_previews(tile, preview_hex_info, previewSprite, previewGraphics, previewContainer, app)
+    const previews = await generate_tile_previews(tile, preview_hex_info, previewSprite, previewGraphics, previewContainer, app)
+    return previews
   }
 
   function IDify(name: string): string {
@@ -173,7 +175,7 @@
       }
     }
 
-    get_tile_previews(selectedTile)
+    await get_tile_previews(selectedTile)
   }
 
   function exportTileset() {
@@ -212,6 +214,8 @@
       setToImport = await convert_tileset_to_latest(setToImport)
 
       console.log(setToImport)
+
+      load_tileset_textures(setToImport)
 
       /* Load textures */
 
@@ -298,12 +302,14 @@
         spr_symbol.tint = selectedTile.symbol.color
       }
 
+      // Update preview of the selected tile
       const newpreviews = await get_tile_previews(selectedTile)
       if (selectedTile.preview_flatTop !== newpreviews.flatTop) {
         selectedTile.preview_flatTop = newpreviews.flatTop
         selectedTile.preview_pointyTop = newpreviews.pointyTop
         workingTileset = workingTileset
       }
+
     }
   })
 </script>
