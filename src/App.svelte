@@ -687,7 +687,7 @@
     // Load Icons
     for (const iconset of loadedIconsets) {
       if (!iconset.format_version || iconset.format_version < LATEST_ICONSET_FORMAT_VERSION) {
-        const updated_iconset = convert_iconset_to_latest(iconset)
+        const updated_iconset = await convert_iconset_to_latest(iconset)
         loadedIconsets = loadedIconsets.filter((is) => is.id != iconset.id)
         loadedIconsets.push(updated_iconset)
         console.log(`Loading icon textures for ${iconset.name}`)

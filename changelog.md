@@ -3,6 +3,12 @@ For Techy People
 
 # Version 3.0 - Found your feet, Hexfriend
 
+## Version 3.2
+ - Hexfriend now works offline
+ - Iconset converter now finds the textures width and height for old iconsets
+    - Fixes issue where Iconset Creator previews failed to load
+ - Custom tilesets are now imported with proper awaiting, fixing their previews in the terrain panel
+
 ## Version 3.1
  - Fix the terrain and icon generators
  - Terrain generator checkboxes now have actual labels
