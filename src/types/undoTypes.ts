@@ -1,8 +1,6 @@
 import type { HexOrientation, TerrainHex } from './terrain'
 
 export enum UndoActions {
-  ChangeHexDimensions = 'Change Hex Dimensions',
-  ChangeHexOrientation = 'Change Hex Orientation',
 
   ToggleGrid = 'Toggle Grid',
   ChangeGridThickness = 'Change Grid Thickness',
@@ -15,13 +13,15 @@ export enum UndoActions {
   ChangeGridLargeHexOffset = 'Change Grid Large Hex Offset',
   ToggleGridLargeHexEdgeEncompass = 'Change Grid Large Hex Edge Encompass',
 
+  ChangeHexBlankColor = 'Change Blank Hex Color',
+  ChangeHexDimensions = 'Change Hex Dimensions',
+  ChangeHexOrientation = 'Change Hex Orientation',
+
   PlaceTerrain = 'Place Terrain',
 }
 
 // (One day) Concise list of all actions available in Hexfriend
 export type UndoAction =
-  | ChangeHexDimensions
-  | ChangeHexOrientation
   // Terrain
   | PlaceTerrain
   // Grid
@@ -35,6 +35,10 @@ export type UndoAction =
   | ChangeGridLargeHexWidth
   | ChangeGridLargeHexOffset
   | ToggleGridLargeHexEdgeEncompass
+  // Hex Settings
+  | ChangeHexBlankColor
+  | ChangeHexDimensions
+  | ChangeHexOrientation
 
 /** Settings */
 
@@ -98,6 +102,12 @@ type ToggleGridLargeHexEdgeEncompass = {
 }
 
 // Hex settings
+type ChangeHexBlankColor = {
+  type: UndoActions.ChangeHexBlankColor,
+  new_color: number,
+  old_color: number,
+}
+
 type ChangeHexDimensions = {
   type: UndoActions.ChangeHexDimensions
   old_width: number

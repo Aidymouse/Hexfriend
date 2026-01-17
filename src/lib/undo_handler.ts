@@ -81,19 +81,22 @@ export type UndoComponents = {
 }
 
 const undo_routes: {[k in UndoActions]: keyof UndoComponents} = {
-	// Settings
+    // Settings
     [UndoActions.ToggleGrid]: 'settings',
     [UndoActions.ChangeGridThickness]: 'settings',
     [UndoActions.ChangeGridColor]: 'settings',
     [UndoActions.ChangeGridGap]: 'settings',
-    [UndoActions.ChangeHexDimensions]: 'settings',
-    [UndoActions.ChangeHexOrientation]: 'settings',
     [UndoActions.ToggleGridLargeHexes]: 'settings',
     [UndoActions.ChangeGridLargeHexSize]: 'settings',
     [UndoActions.ChangeGridLargeHexColor]: 'settings',
     [UndoActions.ChangeGridLargeHexWidth]: 'settings',
     [UndoActions.ChangeGridLargeHexOffset]: 'settings',
     [UndoActions.ToggleGridLargeHexEdgeEncompass]: 'settings',
+
+    [UndoActions.ChangeHexBlankColor]: 'settings',
+    [UndoActions.ChangeHexDimensions]: 'settings',
+    [UndoActions.ChangeHexOrientation]: 'settings',
+
 
     [UndoActions.PlaceTerrain]: 'terrainLayer'
 }

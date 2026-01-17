@@ -1,13 +1,21 @@
 <script lang="ts">
   import { store_undo } from '../stores/undo'
+  import * as PIXI from 'pixi.js'
   import { UndoActions, type UndoAction } from '../types/undoTypes'
 
+  import { HexOrientation } from '../types/terrain'
+
+  const undo_action_formatters: Partial<{[k in UndoActions]: (k) => string}> = {
+    [UndoActions.ChangeHexBlankColor]: (a) => `${new PIXI.Color(a.new_color).toHex()}`,
+    [UndoActions.ChangeHexDimensions]: (a) => `${a.new_width} x ${a.new_height}`,
+    [UndoActions.ChangeHexOrientation]: (a) => `${a.new_orientation === HexOrientation.FLATTOP ? 'Flat Top' : 'Pointy Top'}`,
+    [UndoActions.ToggleGridLargeHexes]: (a) => `${a.enabled ? 'On' : 'Off'}`
+  }
+
   const format_undo_action = (action: UndoAction): string => {
-    switch (action.type) {
-      case UndoActions.ToggleGridLargeHexes: {
-	return `${action.enabled ? 'On' : 'Off'}`
-      }
-    }
+    const formatter = undo_action_formatters[action.type]
+    const defaultFormatter = (a) => 'TODO'
+    return (formatter ?? defaultFormatter)(action)
   }
 </script>
 

@@ -94,9 +94,28 @@
     save_old_resize_parameters()
   }
 
+  function change_hex_blank_color(new_color: number, record_action: boolean = true) {
+    if (record_action) {
+      record_undo_action({
+	type: UndoActions.ChangeHexBlankColor,
+	new_color,
+	old_color: parseInt(`${$tfield.blankHexColor}`)
+      })
+    }
+
+    console.log("New color", new_color)
+
+    $tfield.blankHexColor = new_color
+    renderAllHexes()
+  }
+
   /** Undo */
   export const handle_undo = (action: UndoAction) => {
     switch (action.type) {
+      case UndoActions.ChangeHexBlankColor: {
+	change_hex_blank_color(action.old_color, false)
+	break
+      }
       case UndoActions.ChangeHexOrientation: {
         const revert_orientation =
           action.new_orientation === HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP
@@ -111,6 +130,10 @@
 
   export const handle_redo = (action: UndoAction) => {
     switch (action.type) {
+      case UndoActions.ChangeHexBlankColor: {
+	change_hex_blank_color(action.new_color, false)
+	break
+      }
       case UndoActions.ChangeHexOrientation: {
         changeOrientation(action.new_orientation, false)
         break
@@ -126,9 +149,9 @@
   <label for="blankHexColor">{$tl.settings.hexes.blank_color}</label>
   <div style="display: flex; gap: 0.25em; align-items: center;">
     <ColorInputPixi
-      bind:value={$tfield.blankHexColor}
-      on:change={() => {
-        renderAllHexes()
+      value={$tfield.blankHexColor}
+      on:input={(e) => {
+	change_hex_blank_color(e.detail.number)
       }}
       id={'blankHexColor'}
     />
@@ -136,7 +159,7 @@
     <button
       style={'height: fit-content;'}
       on:click={() => {
-        $tfield.blankHexColor = 0xf2f2f2
+	change_hex_blank_color(0xf2f2f2)
       }}>{$tl.settings.hexes.blank_color_reset}</button
     >
   </div>

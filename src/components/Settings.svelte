@@ -168,10 +168,15 @@
         comp_grid.handle_undo(action)
       }
 
+      case UndoActions.ChangeHexBlankColor:
       case UndoActions.ChangeHexOrientation:
       case UndoActions.ChangeHexDimensions: {
         comp_hexes.handle_undo(action)
         break
+      }
+
+      default: {
+	console.warn("Unhandled Settings Undo", action)
       }
     }
   }
@@ -192,10 +197,15 @@
         break
       }
 
+      case UndoActions.ChangeHexBlankColor:
       case UndoActions.ChangeHexOrientation:
       case UndoActions.ChangeHexDimensions: {
         comp_hexes.handle_redo(action)
         break
+      }
+
+      default: {
+	console.warn("Unhandled Settings Redo", action)
       }
     }
   }
