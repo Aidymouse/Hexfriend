@@ -100,7 +100,19 @@
     $tfield.largehexes.diameterInHexes = new_size;
   }
 
-  function lh_change_color(new_color: number) {}
+  function lh_change_color(new_color: number, record_action: boolean = true) {
+    if (record_action) {
+      record_undo_action({
+	type: UndoActions.ChangeGridLargeHexColor,
+	old_color: $tfield.largehexes.style.color,
+	new_color,
+      })
+    }
+
+    console.log("Changing LH color", new_color)
+
+    $tfield.largehexes.style.color = new_color
+  }
 
   function lh_change_outline_thickness(new_thickness) {}
 
@@ -134,6 +146,12 @@
 	lh_change_size(action.old_size, false)
 	break;
       }
+      case UndoActions.ChangeGridLargeHexColor: {
+	lh_change_color(action.old_color, false)
+	break;
+      }
+      case UndoActions.ChangeGridLargeHexOffset: {}
+      case UndoActions.ToggleGridLargeHexEdgeEncompass: {}
     }
   }
 
@@ -164,6 +182,12 @@
 	lh_change_size(action.new_size, false)
 	break;
       }
+      case UndoActions.ChangeGridLargeHexColor: {
+	lh_change_color(action.new_color, false)
+	break;
+      }
+      case UndoActions.ChangeGridLargeHexOffset: {}
+      case UndoActions.ToggleGridLargeHexEdgeEncompass: {}
     }
   }
 </script>
@@ -222,7 +246,9 @@
     }}/>
 
     <label for="overlayColor">{$tl.settings.grid.large_hexes.color}</label>
-    <ColorInputPixi id={'overlayColor'} bind:value={$tfield.largehexes.style.color} />
+    <ColorInputPixi id={'overlayColor'} value={$tfield.largehexes.style.color} on:change={(e) => {
+    	lh_change_color(e.detail.number)
+    }}/>
 
     <label for="overlayThickness">{$tl.settings.grid.large_hexes.outline_thickness}</label>
     <input type="number" id={'overlayThickness'} bind:value={$tfield.largehexes.style.width} />
