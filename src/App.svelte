@@ -319,6 +319,10 @@
     if (!$store_inputs.mouseDown[2]) store_panning.handlers.endPan()
 
     switch ($store_selected_tool) {
+      case tools.TERRAIN:
+        comp_terrainLayer.pointerup()
+        break
+
       case tools.ICON:
         comp_iconLayer.pointerup()
         break

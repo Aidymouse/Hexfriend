@@ -16,6 +16,7 @@ export enum UndoActions {
   ChangeHexBlankColor = 'Change Blank Hex Color',
   ChangeHexDimensions = 'Change Hex Dimensions',
   ChangeHexOrientation = 'Change Hex Orientation',
+  ChangeHexRaisedIndented = 'Change Hex Raised Column / Indented Row',
 
   PlaceTerrain = 'Place Terrain',
 }

@@ -864,6 +864,8 @@
       let clickedId = genHexId(clickedCoords.q, clickedCoords.r, clickedCoords.s)
 
       paintFromTile(clickedId, $data_terrain.tile)
+
+      placed_terrain[clickedId] = {...$data_terrain.tile}
     }
   }
 
@@ -941,9 +943,6 @@
         return
       }
 
-      console.log(cHex)
-
-      //$data_terrain.tile = cHex.tile ? { ...cHex.tile, symbol: cHex.tile.symbol ? { ...cHex.tile.symbol } : null } : generateBlankTile();
       $data_terrain.tile = structuredClone(cHex.tile)
       $data_terrain.usingEyedropper = false
       // HACKY!!!!
@@ -1093,7 +1092,21 @@
     return visitedIDs
   }
 
+  let mouse_lock: { locked: boolean, lock_action: null | 'terrain' } = {
+  	locked: false,
+	lock_action: null
+  }
+
+  let placed_terrain: {[hexid: string]: Tile} = {}
+
   export function pointerdown() {
+
+    // Start a mouse lock, released when mouse events stop.
+    // During a mouse lock, events are collated into event records (assembled undo actions I spose?)
+    // When mouse lock is released, the event record is committed to undo history
+
+    // Actually, instead of keeping a locked state, I can just collate everything that happens on mouse down, and remove it on mouse up.
+    
     if ($data_terrain.usingEyedropper) {
       eyedrop()
     } else if ($data_terrain.usingPaintbucket && $data_terrain.usingEraser) {
@@ -1105,6 +1118,15 @@
     } else {
       placeTerrain()
     }
+  }
+
+  export function pointerup() {
+      // Get placed terrain, etc, and put into undo record
+
+      console.log(placed_terrain)
+
+      placed_terrain = {}
+
   }
 
   export function clearTerrainSprites() {
