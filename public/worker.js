@@ -1,4 +1,4 @@
-const version = "v3.1";
+const version = "v3.2";
 
 const addResourcesToCache = async (resources) => {
 	const cache = await caches.open(version);
@@ -54,8 +54,7 @@ self.addEventListener("install", (event) => {
 	event.waitUntil(
 		addResourcesToCache([
 			"/",
-			"/index.html",
-			"/src/main.ts"
+			"/index.html"
 		]),
 	);
 });
