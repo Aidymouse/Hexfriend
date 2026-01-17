@@ -25,15 +25,19 @@ Paintbucketing
 Erase Paintbucketing
 */
 
+/** The undo pointer points at the latest action that has been performed */
+ 
 let local_undo
 
 store_undo.subscribe((u) => (local_undo = u))
 
 export const record_undo_action = (action: UndoAction) => {
-  if (local_undo.undo_pointer !== local_undo.stack.length) {
+  if (local_undo.undo_pointer !== local_undo.stack.length-1) {
+
     console.log('Recorded new action not in present')
+
     store_undo.update((u) => {
-      u.stack = u.stack.slice(0, u.undo_pointer)
+      u.stack = u.stack.slice(0, u.undo_pointer+1)
       console.log(u.stack)
       //u.undo_pointer += 1;
       return u
@@ -49,25 +53,25 @@ export const record_undo_action = (action: UndoAction) => {
   console.log(local_undo)
 }
 
-// Move back, return
+// Take current acti
 export const pop_undo_action = (): UndoAction | null => {
-  if (local_undo.undo_pointer === 0) return null
+  if (local_undo.undo_pointer === -1) return null
+  const action = local_undo.stack[local_undo.undo_pointer]
   store_undo.update((u) => {
     u.undo_pointer -= 1
     return u
   })
-  const action = local_undo.stack[local_undo.undo_pointer]
   return action
 }
 
 export const push_undo_action = (): UndoAction | null => {
-  if (local_undo.undo_pointer >= local_undo.stack.length) return null
+  if (local_undo.undo_pointer >= local_undo.stack.length-1) return null
 
-  const action = local_undo.stack[local_undo.undo_pointer]
   store_undo.update((u) => {
     u.undo_pointer += 1
     return u
   })
+  const action = local_undo.stack[local_undo.undo_pointer]
   return action
 }
 
