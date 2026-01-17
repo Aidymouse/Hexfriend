@@ -67,6 +67,8 @@
   import TextPanel from './panels/TextPanel.svelte'
   import EraserPanel from './panels/EraserPanel.svelte'
 
+  import UndoRecord from './components/UndoRecord.svelte'
+
   // Stores
   import * as store_panning from './stores/panning'
   import { tfield } from './stores/tfield'
@@ -889,23 +891,27 @@
     </section>
 
     <!-- Panels -->
-    {#if showTerrainGenerator}
-      <TerrainGenerator {loadedTilesets} {comp_terrainLayer} bind:showTerrainGenerator />
-    {:else if show_icon_generator}
-      <IconGenerator {loadedIconsets} {comp_iconLayer} bind:show_icon_generator />
-    {:else if $store_selected_tool == tools.TERRAIN}
-      <TerrainPanel bind:this={comp_terrain_panel} {loadedTilesets} {app} />
-    {:else if $store_selected_tool == tools.ICON}
-      <IconPanel {app} {loadedIconsets} />
-    {:else if $store_selected_tool == tools.PATH}
-      <PathPanel {comp_pathLayer} bind:loaded_path_styles={loadedSave.path_styles} />
-    {:else if $store_selected_tool == tools.TEXT}
-      <TextPanel {comp_textLayer} bind:loaded_text_styles={loadedSave.text_styles} />
-    {:else if $store_selected_tool == tools.ERASER}
-      <EraserPanel bind:loaded_save={loadedSave} />
-    {:else if $store_selected_tool == tools.OVERLAY}
-      <OverlayPanel />
-    {/if}
+    <section id="panel-quadrant">
+      {#if showTerrainGenerator}
+	<TerrainGenerator {loadedTilesets} {comp_terrainLayer} bind:showTerrainGenerator />
+      {:else if show_icon_generator}
+	<IconGenerator {loadedIconsets} {comp_iconLayer} bind:show_icon_generator />
+      {:else if $store_selected_tool == tools.TERRAIN}
+	<TerrainPanel bind:this={comp_terrain_panel} {loadedTilesets} {app} />
+      {:else if $store_selected_tool == tools.ICON}
+	<IconPanel {app} {loadedIconsets} />
+      {:else if $store_selected_tool == tools.PATH}
+	<PathPanel {comp_pathLayer} bind:loaded_path_styles={loadedSave.path_styles} />
+      {:else if $store_selected_tool == tools.TEXT}
+	<TextPanel {comp_textLayer} bind:loaded_text_styles={loadedSave.text_styles} />
+      {:else if $store_selected_tool == tools.ERASER}
+	<EraserPanel bind:loaded_save={loadedSave} />
+      {:else if $store_selected_tool == tools.OVERLAY}
+	<OverlayPanel />
+      {/if}
+
+      <UndoRecord />
+    </section>
 
     <div id="tool-buttons" on:mouseup={pointerup}>
       <ToolButtons {changeTool} />
