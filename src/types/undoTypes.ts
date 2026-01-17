@@ -11,6 +11,7 @@ export enum UndoActions {
   ToggleGridLargeHexes = 'Toggle Grid Large Hexes',
   ChangeGridLargeHexSize = 'Change Grid Large Hex Size',
   ChangeGridLargeHexColor = 'Change Grid Large Hex Color',
+  ChangeGridLargeHexWidth = 'Change Grid Large Hex Width',
   ChangeGridLargeHexOffset = 'Change Grid Large Hex Offset',
   ToggleGridLargeHexEdgeEncompass = 'Change Grid Large Hex Edge Encompass',
 
@@ -31,6 +32,7 @@ export type UndoAction =
   | ToggleGridLargeHexes
   | ChangeGridLargeHexSize
   | ChangeGridLargeHexColor
+  | ChangeGridLargeHexWidth
   | ChangeGridLargeHexOffset
   | ToggleGridLargeHexEdgeEncompass
 
@@ -74,6 +76,12 @@ type ChangeGridLargeHexColor = {
   type: UndoActions.ChangeGridLargeHexColor
   old_color: number
   new_color: number
+}
+
+type ChangeGridLargeHexWidth = {
+  type: UndoActions.ChangeGridLargeHexWidth
+  old_width: number
+  new_width: number
 }
 
 type ChangeGridLargeHexOffset = {

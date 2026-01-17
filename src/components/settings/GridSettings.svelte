@@ -101,7 +101,6 @@
   }
 
   function lh_change_color(new_color: number, record_action: boolean = true) {
-  	console.log("Recording action", record_action)
     if (record_action) {
       record_undo_action({
 	type: UndoActions.ChangeGridLargeHexColor,
@@ -115,11 +114,44 @@
     $tfield.largehexes.style.color = new_color
   }
 
-  function lh_change_outline_thickness(new_thickness) {}
+  function lh_change_outline_thickness(new_thickness: number, record_action: boolean = true) {
+    if (record_action) {
+      record_undo_action({
+	type: UndoActions.ChangeGridLargeHexWidth,
+        new_width: parseInt(`${new_thickness}`),
+        old_width: parseInt(`${$tfield.largehexes.style.width}`),
+      })
+    }
 
-  function lh_change_offset(new_hori: number, new_vert: number) {}
+    $tfield.largehexes.style.width = new_thickness
 
-  function lh_toggle_edge_encompass() {}
+  }
+
+  function lh_change_offset(new_hori: number, new_vert: number, record_action: boolean = true) {
+    if (record_action) {
+      record_undo_action({
+	type: UndoActions.ChangeGridLargeHexOffset,
+	old_horizontal: $tfield.largehexes.offset.x,
+	old_vertical: $tfield.largehexes.offset.y,
+	new_horizontal: new_hori,
+	new_vertical: new_vert
+      })
+    }
+
+    $tfield.largehexes.offset.x = new_hori;
+    $tfield.largehexes.offset.y = new_vert;
+  }
+
+  function lh_toggle_edge_encompass(enabled: boolean, record_action: boolean = true) {
+    if (record_action) {
+      record_undo_action({
+	type: UndoActions.ToggleGridLargeHexEdgeEncompass,
+	enabled,
+      })
+    }
+
+    $tfield.largehexes.encompassEdges = enabled
+  }
 
   export const handle_undo = (action: UndoAction) => {
     switch (action.type) {
@@ -151,8 +183,18 @@
 	lh_change_color(action.old_color, false)
 	break
       }
-      case UndoActions.ChangeGridLargeHexOffset: {}
-      case UndoActions.ToggleGridLargeHexEdgeEncompass: {}
+      case UndoActions.ChangeGridLargeHexWidth: {
+	lh_change_outline_thickness(action.old_width, false)
+	break
+      }
+      case UndoActions.ChangeGridLargeHexOffset: {
+	lh_change_offset(action.old_horizontal, action.old_vertical, false)
+	break
+      }
+      case UndoActions.ToggleGridLargeHexEdgeEncompass: {
+	lh_toggle_edge_encompass(!action.enabled, false)
+	break
+      }
     }
   }
 
@@ -187,8 +229,18 @@
 	lh_change_color(action.new_color, false)
 	break;
       }
-      case UndoActions.ChangeGridLargeHexOffset: {}
-      case UndoActions.ToggleGridLargeHexEdgeEncompass: {}
+      case UndoActions.ChangeGridLargeHexWidth: {
+      	lh_change_outline_thickness(action.new_width, false)
+	break;
+      }
+      case UndoActions.ChangeGridLargeHexOffset: {
+	lh_change_offset(action.new_horizontal, action.new_vertical, false)
+	break
+      }
+      case UndoActions.ToggleGridLargeHexEdgeEncompass: {
+	lh_toggle_edge_encompass(action.enabled, false)
+	break
+      }
     }
   }
 </script>
@@ -252,20 +304,28 @@
     }}/>
 
     <label for="overlayThickness">{$tl.settings.grid.large_hexes.outline_thickness}</label>
-    <input type="number" id={'overlayThickness'} bind:value={$tfield.largehexes.style.width} />
+    <input type="number" id={'overlayThickness'} value={$tfield.largehexes.style.width} on:change={e => {
+    	lh_change_outline_thickness(e.target.valueAsNumber)
+    }}/>
 
-    <label for="overlayOffsetX" title={$tl.settings.grid.large_hexes.horizontal_offset_tooltip}
-      >{$tl.settings.grid.large_hexes.horizontal_offset}</label
-    >
-    <input type="number" bind:value={$tfield.largehexes.offset.x} min={0} step={0.25} />
+    <label for="overlayOffsetX" title={$tl.settings.grid.large_hexes.horizontal_offset_tooltip}>
+      {$tl.settings.grid.large_hexes.horizontal_offset}
+    </label>
+    <input type="number" value={$tfield.largehexes.offset.x} min={0} step={0.25} on:change={e => {
+      lh_change_offset(e.target.valueAsNumber, $tfield.largehexes.offset.y)
+    }}/>
 
-    <label for="overlayOffsetY" title={$tl.settings.grid.large_hexes.vertical_offset_tooltip}
-      >{$tl.settings.grid.large_hexes.vertical_offset}</label
-    >
-    <input type="number" bind:value={$tfield.largehexes.offset.y} min={0} step={0.25} />
+    <label for="overlayOffsetY" title={$tl.settings.grid.large_hexes.vertical_offset_tooltip}>
+      {$tl.settings.grid.large_hexes.vertical_offset}
+    </label>
+    <input type="number" value={$tfield.largehexes.offset.y} min={0} step={0.25} on:change={e => {
+      lh_change_offset($tfield.largehexes.offset.x, e.target.valueAsNumber)
+    }}/>
 
     <label for="overlayEncompass">{$tl.settings.grid.large_hexes.encompasedges}</label>
-    <Checkbox bind:checked={$tfield.largehexes.encompassEdges} id="overlayEncompass" />
+    <Checkbox checked={$tfield.largehexes.encompassEdges} id="overlayEncompass" on:change={e => {
+      lh_toggle_edge_encompass(!$tfield.largehexes.encompassEdges)
+    }}/>
 
     {#if $tfield.mapShape == map_shape.SQUARE}
       <label

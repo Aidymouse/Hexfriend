@@ -1,9 +1,8 @@
 <script lang="ts">
-  import {} from '../lib/undo_handler.ts'
-  import { store_undo } from '../stores/undo.ts'
-  import { UndoActions } from '../types/undoTypes.ts'
+  import { store_undo } from '../stores/undo'
+  import { UndoActions, type UndoAction } from '../types/undoTypes'
 
-  const format_undo_action = (action: UndoActions): string => {
+  const format_undo_action = (action: UndoAction): string => {
     switch (action.type) {
       case UndoActions.ToggleGridLargeHexes: {
 	return `${action.enabled ? 'On' : 'Off'}`

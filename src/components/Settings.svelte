@@ -162,6 +162,7 @@
       case UndoActions.ToggleGridLargeHexes: 
       case UndoActions.ChangeGridLargeHexSize: 
       case UndoActions.ChangeGridLargeHexColor: 
+      case UndoActions.ChangeGridLargeHexWidth: 
       case UndoActions.ChangeGridLargeHexOffset: 
       case UndoActions.ToggleGridLargeHexEdgeEncompass: {
         comp_grid.handle_undo(action)
@@ -184,6 +185,7 @@
       case UndoActions.ToggleGridLargeHexes: 
       case UndoActions.ChangeGridLargeHexSize: 
       case UndoActions.ChangeGridLargeHexColor: 
+      case UndoActions.ChangeGridLargeHexWidth: 
       case UndoActions.ChangeGridLargeHexOffset: 
       case UndoActions.ToggleGridLargeHexEdgeEncompass: {
         comp_grid.handle_redo(action)
