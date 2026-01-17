@@ -26,14 +26,14 @@
 
   let iconsetFiles: FileList
 
-  function importIconset() {
+  async function importIconset() {
     let importFile = iconsetFiles[0]
 
     if (!importFile) return
 
     let r = new FileReader()
     r.readAsText(importFile)
-    r.onload = (eb) => {
+    r.onload = async (eb) => {
       /* Read the file */
       let setToImport = JSON.parse(eb.target.result as string)
 
@@ -56,14 +56,14 @@
         }
       }
 
-      setToImport = convert_iconset_to_latest(setToImport)
-
-      loadedIconsets.push(setToImport)
-      loadedIconsets = loadedIconsets
+      setToImport = await convert_iconset_to_latest(setToImport)
 
       /* We also have to load all of these textures */
       //addIconsetTextures(setToImport, L);
-      texture_loader.load_iconset_textures(setToImport)
+      await texture_loader.load_iconset_textures(setToImport)
+
+      loadedIconsets.push(setToImport)
+      loadedIconsets = loadedIconsets
 
       $store_has_unsaved_changes = true
     }

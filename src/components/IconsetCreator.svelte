@@ -3,6 +3,7 @@
   import { LATEST_ICONSET_FORMAT_VERSION, type Icon, type Iconset } from '../types/icon'
   import ColorInput from './ColorInput.svelte'
   import { convert_iconset_to_latest } from '../lib/iconsetConverter'
+  import { load_iconset_textures } from '../lib/texture_loader.ts'
 
   import { tl } from '../stores/translation'
 
@@ -91,6 +92,7 @@
   let newIconFiles: FileList
 
   async function loadTexture(texId, result) {
+	console.log("Now real Loading Texture for", texId, result)
     let newTexture = await PIXI.Assets.load(result)
     loadedTextures[texId] = newTexture
     return newTexture
@@ -198,20 +200,23 @@
       /* Read the file */
       let setToImport = JSON.parse(eb.target.result as string)
 
+      setToImport = await convert_iconset_to_latest(setToImport)
+
+      console.log("Importing Iconset to Builder", setToImport)
+
       icon_previews = {}
 
       /* Load textures */
       setToImport.icons.forEach((icon: Icon) => {
         loadTexture(icon.texId, icon.base64).then((r) => {
-          get_icon_generator_preview(icon).then((p) => {
-            console.log(p)
-            icon_previews[icon.id] = p
+          get_icon_generator_preview(icon).then((icon_preview) => {
+            //console.log("Preview for ", icon.id, icon_preview)
+            icon_previews[icon.id] = icon_preview
           })
         })
       })
 
       workingIconset = { ...setToImport }
-      workingIconset = convert_iconset_to_latest(workingIconset)
       await tick()
       //workingIconset.icons = workingIconset.icons;
 
