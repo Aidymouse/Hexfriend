@@ -27,14 +27,14 @@
 
   let tilesetFiles: FileList
 
-  function importTileset() {
+  async function importTileset() {
     let importFile = tilesetFiles[0]
 
     if (!importFile) return
 
     let r = new FileReader()
     r.readAsText(importFile)
-    r.onload = (eb) => {
+    r.onload = async (eb) => {
       /* Read the file */
       let setToImport = JSON.parse(eb.target.result as string)
 
@@ -53,16 +53,15 @@
 	}
       }
 
-      if (setToImport.format_version < LATEST_TILESET_FORMAT_VERSION) {
-        setToImport = convert_tileset_to_latest(setToImport)
-      }
-
-      loadedTilesets.push(setToImport)
-      loadedTilesets = loadedTilesets
+      setToImport = await convert_tileset_to_latest(setToImport)
 
       /* We also have to load all of these textures */
       //addTilesetTextures(setToImport, L);
       texture_loader.load_tileset_textures(setToImport)
+
+      loadedTilesets.push(setToImport)
+      loadedTilesets = loadedTilesets
+
       $store_has_unsaved_changes = true
     }
   }
