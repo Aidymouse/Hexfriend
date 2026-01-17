@@ -80,57 +80,55 @@ export type UndoComponents = {
   settings: Settings
 }
 
+const undo_routes: {[k in UndoActions]: keyof UndoComponents} = {
+	// Settings
+    [UndoActions.ToggleGrid]: 'settings',
+    [UndoActions.ChangeGridThickness]: 'settings',
+    [UndoActions.ChangeGridColor]: 'settings',
+    [UndoActions.ChangeGridGap]: 'settings',
+    [UndoActions.ChangeHexDimensions]: 'settings',
+    [UndoActions.ChangeHexOrientation]: 'settings',
+    [UndoActions.ToggleGridLargeHexes]: 'settings',
+    [UndoActions.ChangeGridLargeHexSize]: 'settings',
+    [UndoActions.ChangeGridLargeHexColor]: 'settings',
+    [UndoActions.ChangeGridLargeHexWidth]: 'settings',
+    [UndoActions.ChangeGridLargeHexOffset]: 'settings',
+    [UndoActions.ToggleGridLargeHexEdgeEncompass]: 'settings',
+
+    [UndoActions.PlaceTerrain]: 'terrainLayer'
+}
+
 /** Handles actually undoing */
 export const handle_undo_action = (action: UndoAction, components: UndoComponents) => {
-  //console.log("UNDO", action)
-  switch (action.type) {
-    /** Settings */
-    case UndoActions.ToggleGrid:
-    case UndoActions.ChangeGridThickness:
-    case UndoActions.ChangeGridColor:
-    case UndoActions.ChangeGridGap:
-    case UndoActions.ChangeHexDimensions:
-    case UndoActions.ChangeHexOrientation: 
-    case UndoActions.ToggleGridLargeHexes: 
-    case UndoActions.ChangeGridLargeHexSize: 
-    case UndoActions.ChangeGridLargeHexColor: 
-    case UndoActions.ChangeGridLargeHexOffset: 
-    case UndoActions.ToggleGridLargeHexEdgeEncompass: {
-      // console.log(components)
-      components.settings.handle_undo(action)
-      break
-    }
-    /** Terrain */
-    /** Fall back */
-    default: {
-      console.warn('Unhandled undo action', action.type)
-      break
-    }
-  }
+	switch (undo_routes[action.type]) {
+		case 'settings': {
+			components.settings.handle_undo(action)
+			break
+		}
+		case 'terrainLayer': {
+			components.terrainLayer.handle_undo(action)
+			break
+		}
+		default: {
+      			console.warn('Unhandled undo action', action.type)
+      			break
+		}
+	}
 }
 
 export const handle_redo_action = (action: UndoAction, components: UndoComponents) => {
-  console.log('REDO', action)
-  switch (action.type) {
-    /** Settings */
-    case UndoActions.ToggleGrid:
-    case UndoActions.ChangeGridThickness:
-    case UndoActions.ChangeGridColor:
-    case UndoActions.ChangeGridGap:
-    case UndoActions.ChangeHexDimensions:
-    case UndoActions.ChangeHexOrientation: 
-    case UndoActions.ToggleGridLargeHexes: 
-    case UndoActions.ChangeGridLargeHexSize: 
-    case UndoActions.ChangeGridLargeHexColor: 
-    case UndoActions.ChangeGridLargeHexOffset: 
-    case UndoActions.ToggleGridLargeHexEdgeEncompass: {
-      components.settings.handle_redo(action)
-      break
-    }
-    /** Fallback */
-    default: {
-      console.warn('Unhandled undo action', action.type)
-      break
-    }
-  }
+	switch (undo_routes[action.type]) {
+		case 'settings': {
+			components.settings.handle_redo(action)
+			break
+		}
+		case 'terrainLayer': {
+			components.terrainLayer.handle_redo(action)
+			break
+		}
+		default: {
+      			console.warn('Unhandled redo action', action.type)
+      			break
+		}
+	}
 }
