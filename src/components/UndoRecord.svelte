@@ -6,7 +6,7 @@
   const format_undo_action = (action: UndoActions): string => {
     switch (action.type) {
       case UndoActions.ToggleGridLargeHexes: {
-	return `${action.enabled}`
+	return `${action.enabled ? 'On' : 'Off'}`
       }
     }
   }
