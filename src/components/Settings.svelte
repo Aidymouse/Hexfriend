@@ -176,7 +176,6 @@
   }
 
   export const handle_redo = (action: UndoAction) => {
-    console.log('settings redo')
     switch (action.type) {
       case UndoActions.ToggleGrid:
       case UndoActions.ChangeGridThickness:
