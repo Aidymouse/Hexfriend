@@ -320,7 +320,7 @@
 
     switch ($store_selected_tool) {
       case tools.TERRAIN:
-        comp_terrainLayer.pointerup()
+        comp_terrainLayer.pointerup(e)
         break
 
       case tools.ICON:

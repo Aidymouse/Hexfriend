@@ -1,6 +1,6 @@
 import type { map_shape } from './settings';
 import type { Tile } from './tilesets';
-import type { hex_id } from './toolData';
+import type { HexId } from './toolData';
 import type * as PIXI from 'pixi.js';
 
 
@@ -57,5 +57,5 @@ export type terrain_field = {
 	orientation: HexOrientation;
 	blankHexColor: number;
 
-	hexes: { [key: hex_id]: TerrainHex };
+	hexes: { [key: HexId]: TerrainHex };
 }

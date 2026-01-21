@@ -29,3 +29,10 @@ export function tiles_match(tile1: Tile, tile2: Tile) {
 
     return true;
 }
+
+/** Replaces the large and unneeded (outside of loading) base64 with an empty string
+ * @returns A tile with empty strings instead of base64
+* */
+export const compress_tile = (tile: Tile): Tile => {
+  return {...tile, preview_flatTop: '', preview_pointyTop: '', symbol: tile.symbol ? {...tile.symbol, base64: ''} : null }
+}

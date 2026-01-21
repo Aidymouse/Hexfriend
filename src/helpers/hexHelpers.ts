@@ -1,5 +1,5 @@
 import type { TerrainHex } from '../types/terrain';
-import type { hex_id } from '../types/toolData';
+import type { HexId } from '../types/toolData';
 import type { cube_coords } from '../types/coordinates';
 import { HexOrientation } from '../types/terrain';
 
@@ -84,16 +84,16 @@ export function getHexPathRadius(radius: number, orientation: HexOrientation = H
 	return getHexPath(w, h, orientation, centerX, centerY);
 }
 
-export function id_to_coords(hex_id: hex_id): cube_coords {
+export function id_to_coords(hex_id: HexId): cube_coords {
 	let id_parts = hex_id.split(":")
 	return {q: +id_parts[0], r: +id_parts[1], s: +id_parts[2]}
 }
 
-export function genHexId(q: number, r: number, s: number): hex_id {
+export function genHexId(q: number, r: number, s: number): HexId {
 	return `${q}:${r}:${s}`;
 }
 
-export function genHexId_coordsObj(coords: cube_coords): hex_id {
+export function genHexId_coordsObj(coords: cube_coords): HexId {
 	let q = coords.q;
 	let r = coords.r;
 	let s = coords.s;
@@ -106,7 +106,7 @@ export function genHexId_tfieldHex(hex: TerrainHex) {
 
 }
 
-export function genCoordsObj(hexId: hex_id): cube_coords {
+export function genCoordsObj(hexId: HexId): cube_coords {
 	let idParts = hexId.split(':');
 
 	return {
@@ -117,7 +117,7 @@ export function genCoordsObj(hexId: hex_id): cube_coords {
 }
 
 /* NEIGHBOURS */
-export function getRing(centerId: hex_id, radius: number): hex_id[] {
+export function getRing(centerId: HexId, radius: number): HexId[] {
 	if (radius == 0) {
 		return [centerId]
 	}
@@ -147,7 +147,7 @@ function cube_add(c1: cube_coords, c2: cube_coords): cube_coords {
 	return { q: c1.q + c2.q, r: c1.r + c2.r, s: c1.s + c2.s };
 }
 
-export function getNeighbours(q: number, r: number, s: number): hex_id[] {
+export function getNeighbours(q: number, r: number, s: number): HexId[] {
 	return [
 		genHexId(q + 1, r, s - 1),
 		genHexId(q + 1, r - 1, s),
@@ -238,13 +238,13 @@ export function coords_cubeToWorld(
 
 // EVEN Q = second column has raised tile - the DEFAULT for new maps
 // ODD Q = first column has raised tile
-function coords_cubeToEvenq(q: number, r: number, s) {
+function coords_cubeToEvenq(q: number, r: number, s: number) {
 	let col = q;
 	let row = r + (q + (q & 1)) / 2;
 	return { col: col, row: row };
 }
 
-function coords_cubeToOddq(q: number, r: number, s) {
+function coords_cubeToOddq(q: number, r: number, s: number) {
 	let col = q;
 	let row = r + (q - (q & 1)) / 2;
 	return { col: col, row: row };
@@ -274,36 +274,36 @@ export function coords_qToCube(oddOrEven: 'odd' | 'even', col: number, row: numb
 
 // EVEN R = first row is indented
 // ODD R = second row is indented
-function coords_cubeToEvenr(q, r, s) {
+function coords_cubeToEvenr(q: number, r: number, s: number) {
 	let col = q + (r + (r & 1)) / 2;
 	let row = r;
 	return { col: col, row: row };
 }
 
-function coords_cubeToOddr(q, r, s) {
+function coords_cubeToOddr(q: number, r: number, s: number) {
 	let col = q + (r - (r & 1)) / 2;
 	let row = r;
 	return { col: col, row: row };
 }
 
-export function coords_cubeTor(indentedRow: 'odd' | 'even', q, r, s) {
+export function coords_cubeTor(indentedRow: 'odd' | 'even', q: number, r: number, s: number,) {
 	if (indentedRow == 'even') return coords_cubeToEvenr(q, r, s);
 	return coords_cubeToOddr(q, r, s);
 }
 
-function coords_evenrToCube(col, row) {
+function coords_evenrToCube(col: number, row: number) {
 	var q = col - (row + (row & 1)) / 2;
 	var r = row;
 	return { q: q, r: r, s: -q - r };
 }
 
-function coords_oddrToCube(col, row) {
+function coords_oddrToCube(col: number, row: number) {
 	var q = col - (row - (row & 1)) / 2;
 	var r = row;
 	return { q: q, r: r, s: -q - r };
 }
 
-export function coords_rToCube(indentedRow: 'odd' | 'even', col, row) {
+export function coords_rToCube(indentedRow: 'odd' | 'even', col: number, row: number) {
 	if (indentedRow == 'even') return coords_evenrToCube(col, row);
 	return coords_oddrToCube(col, row);
 }

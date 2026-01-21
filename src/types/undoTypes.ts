@@ -1,4 +1,6 @@
 import type { HexOrientation, TerrainHex } from './terrain'
+import type { Tile } from './tilesets'
+import { HexRaised } from './terrain'
 
 export enum UndoActions {
 
@@ -16,7 +18,7 @@ export enum UndoActions {
   ChangeHexBlankColor = 'Change Blank Hex Color',
   ChangeHexDimensions = 'Change Hex Dimensions',
   ChangeHexOrientation = 'Change Hex Orientation',
-  ChangeHexRaisedIndented = 'Change Hex Raised Column / Indented Row',
+  ChangeHexRaisedIndented = 'Change Hex Raised',
 
   PlaceTerrain = 'Place Terrain',
 }
@@ -40,6 +42,7 @@ export type UndoAction =
   | ChangeHexBlankColor
   | ChangeHexDimensions
   | ChangeHexOrientation
+  | ChangeHexRaisedIndented
 
 /** Settings */
 
@@ -122,9 +125,14 @@ type ChangeHexOrientation = {
   new_orientation: HexOrientation // You can derive old from new - there are only two!
 }
 
+type ChangeHexRaisedIndented = {
+  type: UndoActions.ChangeHexRaisedIndented,
+  raised: HexRaised
+}
+
 /** Terrain */
 type PlaceTerrain = {
   type: UndoActions.PlaceTerrain
-  old_tiles: TerrainHex[]
-  new_tiles: TerrainHex[]
+  placed_terrain: { tile: Tile, hex_ids: string[] },
+  replaced_terrain: { [hex_id: string]: Tile }
 }

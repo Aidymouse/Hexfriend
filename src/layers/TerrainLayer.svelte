@@ -5,7 +5,7 @@
   import type { pan_state } from '../types/panning'
   import type { TerrainHex, terrain_field } from '../types/terrain'
   import type { Tile } from '../types/tilesets'
-  import type { hex_id } from '../types/toolData'
+  import type { hex_id, HexId } from '../types/toolData'
   import { tools } from '../types/toolData'
   import type CoordsLayer from './CoordsLayer.svelte'
 
@@ -15,7 +15,7 @@
   import { tfield } from '../stores/tfield'
   import { store_inputs } from '../stores/inputs'
 
-  import { tiles_match } from '../helpers/tiles'
+  import { tiles_match, compress_tile } from '../helpers/tiles'
   import {
     coords_cubeToWorld,
     coords_qToCube,
@@ -47,6 +47,9 @@
   import type { PreviewHexInfo } from '../helpers/iconFns'
   import { generate_tile_previews } from '../helpers/tileFns'
 
+  import { DEFAULTTILESET } from '../lib/defaultTileset'
+  import { record_undo_action } from '../lib/undo_handler'
+  import { UndoActions, type UndoAction } from '../types/undoTypes'
   export let cont_terrain: PIXI.Container
 
   export let changeTool: Function
@@ -60,6 +63,13 @@
   cont_terrain.addChild(gridGraphics)
 
   let terrainSprites: { [key: hex_id]: PIXI.Sprite } = {}
+
+  // Since all placed terrain must be one tile, we can just store the tile.
+  let placed_terrain: { tile: Tile, hex_ids: string[] } = { 
+    tile: compress_tile(DEFAULTTILESET.tiles[0]),
+    hex_ids: []
+  }
+  let replaced_terrain: {[hexid: string]: Tile} = {}
 
   let pan: pan_state
   store_panning.store.subscribe((newPan) => {
@@ -863,9 +873,17 @@
 
       let clickedId = genHexId(clickedCoords.q, clickedCoords.r, clickedCoords.s)
 
+      // Update undo registers
+      if (hexExists(clickedId) && replaced_terrain[clickedId] === undefined) {
+	const existing_tile = $tfield.hexes[clickedId].tile
+	replaced_terrain[clickedId] = existing_tile ? compress_tile(existing_tile) : null
+	placed_terrain.hex_ids = placed_terrain.hex_ids.concat(clickedId) 
+	placed_terrain.tile = compress_tile($data_terrain.tile)
+      }
+
+      // Paint the tilee	
       paintFromTile(clickedId, $data_terrain.tile)
 
-      placed_terrain[clickedId] = {...$data_terrain.tile}
     }
   }
 
@@ -1097,7 +1115,6 @@
 	lock_action: null
   }
 
-  let placed_terrain: {[hexid: string]: Tile} = {}
 
   export function pointerdown() {
 
@@ -1120,12 +1137,25 @@
     }
   }
 
-  export function pointerup() {
+  export function pointerup(e) {
       // Get placed terrain, etc, and put into undo record
 
-      console.log(placed_terrain)
+      if (e.button === 0) { // Left Mouse
+	console.log(placed_terrain, replaced_terrain)
 
-      placed_terrain = {}
+	
+	if (placed_terrain.hex_ids.length > 0) {
+	  record_undo_action({
+	    type: UndoActions.PlaceTerrain,
+	    placed_terrain: {...placed_terrain},
+	    replaced_terrain: {...replaced_terrain}
+	  })
+	}
+	
+
+	placed_terrain.hex_ids = []
+	replaced_terrain = {}
+      }
 
   }
 
@@ -1185,6 +1215,30 @@
       case 'togglePaintbucket':
         $data_terrain.usingPaintbucket = !$data_terrain.usingPaintbucket
         break
+    }
+  }
+
+  export const handle_undo = (action: UndoAction) => {
+    switch (action.type) {
+      case UndoActions.PlaceTerrain: {
+	for (const [hex_id, tile] of Object.entries(action.replaced_terrain)) {
+	  if (tile === null) {
+	    eraseHex(hex_id as HexId)
+	  } else {
+	    paintFromTile(hex_id as HexId, tile)
+	  }
+	}
+      }
+    }
+  }
+
+  export const handle_redo = (action: UndoAction) => {
+    switch (action.type) {
+      case UndoActions.PlaceTerrain: {
+	for (const hex_id of action.placed_terrain.hex_ids) {
+	  paintFromTile(hex_id as HexId, action.placed_terrain.tile)
+	}
+      }
     }
   }
 

@@ -4,11 +4,16 @@ import type { HexOrientation } from "./terrain";
 
 export type Tile = {
 	display: string;
-	bgColor: number; // Some tiles won't *really* need a bg color, if they're all icon cos they're images, but, whatever
-	id: string; // Local to the tileset
-	symbol: Icon | null; // Picture to draw on the hex. This also implicitly sets the tile type as dynamic or bydimension
-	tileset_id: string; // Used to identify which tile to select when the tile is clicked on
-	preview_flatTop: string; // Preview for the tile panel
+	// Some tiles won't *really* need a bg color, if they're all icon cos they're images, but, whatever
+	bgColor: number; 
+	// Local to the tileset
+	id: string; 
+	// Picture to draw on the hex. This also implicitly sets the tile type as dynamic or bydimension
+	symbol: Icon | null; 
+	// Used to identify which tile to select when the tile is clicked on
+	tileset_id: string; 
+	// Previews for the tile panel
+	preview_flatTop: string; 
 	preview_pointyTop: string; 
 }
 
