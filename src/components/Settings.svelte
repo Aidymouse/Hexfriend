@@ -170,7 +170,8 @@
 
       case UndoActions.ChangeHexBlankColor:
       case UndoActions.ChangeHexOrientation:
-      case UndoActions.ChangeHexDimensions: {
+      case UndoActions.ChangeHexDimensions: 
+      case UndoActions.ChangeHexRaisedIndented: {
         comp_hexes.handle_undo(action)
         break
       }
@@ -199,7 +200,8 @@
 
       case UndoActions.ChangeHexBlankColor:
       case UndoActions.ChangeHexOrientation:
-      case UndoActions.ChangeHexDimensions: {
+      case UndoActions.ChangeHexDimensions:
+      case UndoActions.ChangeHexRaisedIndented: {
         comp_hexes.handle_redo(action)
         break
       }

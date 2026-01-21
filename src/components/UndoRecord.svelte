@@ -3,13 +3,15 @@
   import * as PIXI from 'pixi.js'
   import { UndoActions, type UndoAction } from '../types/undoTypes'
 
-  import { HexOrientation } from '../types/terrain'
+  import { HexOrientation, HexRaised } from '../types/terrain'
 
   const undo_action_formatters: Partial<{[k in UndoActions]: (k) => string}> = {
     [UndoActions.ChangeHexBlankColor]: (a) => `${new PIXI.Color(a.new_color).toHex()}`,
     [UndoActions.ChangeHexDimensions]: (a) => `${a.new_width} x ${a.new_height}`,
     [UndoActions.ChangeHexOrientation]: (a) => `${a.new_orientation === HexOrientation.FLATTOP ? 'Flat Top' : 'Pointy Top'}`,
-    [UndoActions.ToggleGridLargeHexes]: (a) => `${a.enabled ? 'On' : 'Off'}`
+    [UndoActions.ChangeHexRaisedIndented]: (a) => `${a.raised === HexRaised.ODD ? 'Odd' : 'Even'}`,
+    [UndoActions.ToggleGridLargeHexes]: (a) => `${a.enabled ? 'On' : 'Off'}`,
+    [UndoActions.PlaceTerrain]: (a) => `${a.placed_terrain.hex_ids.length} x ${a.placed_terrain.tile.display}`,
   }
 
   const format_undo_action = (action: UndoAction): string => {

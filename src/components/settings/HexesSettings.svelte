@@ -5,7 +5,7 @@
   import SelectGrid from '../SelectGrid.svelte'
   import ImageCheckbox from '../ImageCheckbox.svelte'
 
-  import { HexOrientation } from '../../types/terrain'
+  import { HexOrientation, HexRaised } from '../../types/terrain'
   import { map_shape } from '../../types/settings'
 
   import { tfield } from '../../stores/tfield'
@@ -109,6 +109,26 @@
     renderAllHexes()
   }
 
+  function change_raised_indented(new_raised: HexRaised, record_action: boolean = true) {
+	  if (record_action) {
+	    record_undo_action({
+	      type: UndoActions.ChangeHexRaisedIndented,
+	      raised: new_raised
+	    })
+	  }
+
+	  console.log(new_raised)
+
+	  $tfield.raised = new_raised
+
+          if ($tfield.orientation == HexOrientation.FLATTOP) {
+            comp_terrainLayer.square_updateRaisedColumn()
+          } else {
+            comp_terrainLayer.square_changeIndentedRow()
+          }
+          comp_coordsLayer.cullUnusedCoordinates()
+  }
+
   /** Undo */
   export const handle_undo = (action: UndoAction) => {
     switch (action.type) {
@@ -124,6 +144,11 @@
       }
       case UndoActions.ChangeHexDimensions: {
         change_hex_dimensions(action.old_width, action.old_height, false)
+	break
+      }
+      case UndoActions.ChangeHexRaisedIndented: {
+        change_raised_indented(action.raised === HexRaised.ODD ? HexRaised.EVEN : HexRaised.ODD, false)
+	break
       }
     }
   }
@@ -140,6 +165,11 @@
       }
       case UndoActions.ChangeHexDimensions: {
         change_hex_dimensions(action.new_width, action.new_height, false)
+	break
+      }
+      case UndoActions.ChangeHexRaisedIndented: {
+        change_raised_indented(action.raised, false)
+	break
       }
     }
   }
@@ -172,10 +202,8 @@
         { title: 'Pointy Top', value: HexOrientation.POINTYTOP, filename: 'pointyTop' },
       ]}
       value={$tfield.orientation}
-      on:change={() => {
-        changeOrientation(
-          $tfield.orientation === HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP,
-        )
+      on:change={(e) => {
+        changeOrientation(e.detail.option)
       }}
     />
   </div>
@@ -191,23 +219,18 @@
         options={[
           {
             title: $tl.general.even,
-            value: 'even',
+            value: HexRaised.EVEN,
             filename: `${$tfield.orientation == HexOrientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}even`,
           },
           {
             title: $tl.general.odd,
-            value: 'odd',
+            value: HexRaised.ODD,
             filename: `${$tfield.orientation == HexOrientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}odd`,
           },
         ]}
-        bind:value={$tfield.raised}
-        on:change={() => {
-          if ($tfield.orientation == HexOrientation.FLATTOP) {
-            comp_terrainLayer.square_updateRaisedColumn()
-          } else {
-            comp_terrainLayer.square_changeIndentedRow()
-          }
-          comp_coordsLayer.cullUnusedCoordinates()
+        value={$tfield.raised}
+        on:change={(e) => {
+	  change_raised_indented(e.detail.option)
         }}
       />
     </span>
