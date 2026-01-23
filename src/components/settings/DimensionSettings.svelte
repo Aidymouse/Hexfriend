@@ -17,7 +17,7 @@
 
   let addOrRemoveMapDimensions: 'add' | 'remove' = 'add'
 
-  function square_expandMapDimension(direction, amount) {
+  function square_expandMapDimension(direction, amount, record_action = true) {
     comp_terrainLayer.square_expandMapDimension(direction, amount)
 
     let xMod = 0
@@ -50,6 +50,14 @@
     comp_textLayer.moveAllTexts(xMod, yMod)
 
     $store_has_unsaved_changes = true
+
+    if (record_action) {
+      record_undo_action({
+        type: UndoActions.ExpandDimensionsSquare,
+        direction,
+        hexes_expanded: amount,
+      })
+    }
   }
 
   function square_reduceMapDimension(direction, amount, record_action = true) {
@@ -63,7 +71,8 @@
       if (amount == 0) return
     }
 
-    comp_terrainLayer.square_reduceMapDimension(direction, amount)
+    const removed_terrain = comp_terrainLayer.square_reduceMapDimension(direction, amount)
+    console.log(removed_terrain)
 
     let xMod = 0
     let yMod = 0
@@ -99,6 +108,15 @@
     comp_iconLayer.moveAllIcons(xMod, yMod)
     comp_pathLayer.moveAllPaths(xMod, yMod)
     comp_textLayer.moveAllTexts(xMod, yMod)
+
+    if (record_action) {
+      record_undo_action({
+        type: UndoActions.ReduceDimensionsSquare,
+        direction,
+        hexes_reduced: amount,
+        //terrain_removed: {}
+      })
+    }
 
     $store_has_unsaved_changes = true
   }
@@ -226,7 +244,7 @@
 </div>
 
 {#if $tfield.mapShape == map_shape.SQUARE}
-  <section id="map-dimensions-container">
+  <section id="map-dimensions-container" style="margin-top: var(--small-radius)">
     <div id="map-dimensions">
       {#if addOrRemoveMapDimensions == 'add'}
         <button
