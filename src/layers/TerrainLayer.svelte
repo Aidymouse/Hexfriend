@@ -608,16 +608,23 @@
     // });
   }
 
-  export function flower_reduceHexesOut(amount: number) {
+  export function flower_reduceHexesOut(amount: number): { [k: string]: Tile } {
     $store_has_unsaved_changes = true
 
     if ($tfield.hexesOut == 0) return
+
+    let removed_hexes: {[k: string]: Tile} = {}
 
     for (let curRing = 0; curRing < amount; curRing++) {
       let idsToAdd = getRing('0:0:0', $tfield.hexesOut)
 
       idsToAdd.forEach((hexId) => {
+
+	if ($tfield.hexes[hexId].tile !== null) {
+	  removed_hexes[hexId] = {...$tfield.hexes[hexId].tile}
+	}
         eliminateHex(hexId)
+
       })
 
       $tfield.hexesOut -= 1
@@ -627,10 +634,7 @@
     renderGrid()
     comp_coordsLayer.cullUnusedCoordinates()
 
-    // unused
-    // store_$tfield.store.update(() => {
-    // 	return $tfield;
-    // });
+    return removed_hexes
   }
 
   /* TRANSFORMATIONS THAT APPLY TO ALL MAP TYPES */
