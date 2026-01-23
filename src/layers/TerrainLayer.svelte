@@ -5,7 +5,7 @@
   import type { pan_state } from '../types/panning'
   import type { TerrainHex, terrain_field } from '../types/terrain'
   import type { Tile } from '../types/tilesets'
-  import type { hex_id, HexId } from '../types/toolData'
+  import type { HexId } from '../types/toolData'
   import { tools } from '../types/toolData'
   import type CoordsLayer from './CoordsLayer.svelte'
 
@@ -62,7 +62,7 @@
   cont_terrain.addChild(symbolsContainer)
   cont_terrain.addChild(gridGraphics)
 
-  let terrainSprites: { [key: hex_id]: PIXI.Sprite } = {}
+  let terrainSprites: { [key: HexId]: PIXI.Sprite } = {}
 
   // Since all placed terrain must be one tile, we can just store the tile.
   let placed_terrain: { tile: Tile; hex_ids: string[] } = {
@@ -90,7 +90,7 @@
       for (let col = 1; col < $tfield.columns; col += 2) {
         // Create hex at bottom of column
         let newHexCoords: cube_coords = coords_qToCube('odd', col, $tfield.rows - 1)
-        let newId: hex_id = genHexId_coordsObj(newHexCoords)
+        let newId: HexId = genHexId_coordsObj(newHexCoords)
         $tfield.hexes[newId] = {
           q: newHexCoords.q,
           r: newHexCoords.r,
@@ -415,25 +415,34 @@
     }
   }
 
-  export function square_reduceMapDimension(direction: 'left' | 'right' | 'top' | 'bottom', amount: number) {
+  export function square_reduceMapDimension(
+    direction: 'left' | 'right' | 'top' | 'bottom',
+    amount: number,
+  ): { [hex_id: HexId]: Tile } {
     $store_has_unsaved_changes = true
 
+    const removed_hexes: { [hex_id: HexId]: Tile } = {}
+
     switch (direction) {
-      case 'right':
-        if (amount >= $tfield.columns) amount = $tfield.columns - 1
-        if (amount == 0) return
-        square_removeRight(amount)
-
-        break
-
-      case 'left':
+      case 'left': {
         if (amount >= $tfield.columns) amount = $tfield.columns - 1
         if (amount == 0) return
 
-        // Move everything 1 left
+        // Find removed hex ids
+        let l_idsToRemove = []
+        for (let i = 0; i < amount; i++) {
+          const col_ids = square_getHexIdsInColumn(i)
+          for (const id of col_ids) {
+            if ($tfield.hexes[id].tile !== null) {
+              removed_hexes[id] = { ...$tfield.hexes[id].tile }
+            }
+          }
+        }
+
+        // Move everything left
         square_moveAllHexesLeft(amount)
-        square_removeRight(amount)
 
+        // Maintain the illusion of removing the right side
         if ($tfield.orientation == 'flatTop') {
           if (amount % 2 == 1) {
             $tfield.raised = $tfield.raised == HexRaised.ODD ? HexRaised.EVEN : HexRaised.ODD
@@ -458,8 +467,31 @@
 
           $data_overlay.x -= delta_x
         }
+      } // Deliberate fallthrough
+
+      case 'right': {
+        if (amount >= $tfield.columns) amount = $tfield.columns - 1
+        if (amount == 0) return
+
+        let r_idsToEliminate = []
+        for (let i = 0; i < amount; i++) {
+          r_idsToEliminate = r_idsToEliminate.concat(square_getHexIdsInColumn($tfield.columns - 1 - i))
+        }
+
+        // This check ensures we don't add to removed hexes if removing from the left.
+        if (Object.keys(removed_hexes).length === 0) {
+          for (const id of r_idsToEliminate) {
+            if ($tfield.hexes[id].tile !== null) {
+              removed_hexes[id] = { ...$tfield.hexes[id].tile }
+            }
+          }
+        }
+
+        eliminatedHexesById(r_idsToEliminate)
+        $tfield.columns -= amount
 
         break
+      }
 
       case 'bottom':
         if (amount >= $tfield.rows) amount = $tfield.rows - 1
@@ -502,8 +534,38 @@
     })
 
     renderAllHexes()
+
+    return removed_hexes
   }
 
+  function square_getHexIdsInRow(row: number): HexId[] {
+    let ids = []
+    for (let col = 0; col < $tfield.columns; col++) {
+      const coord_finder = $tfield.orientation === HexOrientation.FLATTOP ? coords_qToCube : coords_rToCube
+      const coords = coord_finder($tfield.raised, col, row)
+      ids.push(genHexId_coordsObj(coords))
+    }
+    return ids
+  }
+
+  function square_getHexIdsInColumn(col: number): HexId[] {
+    let ids = []
+    for (let row = 0; row < $tfield.rows; row++) {
+      const coord_finder = $tfield.orientation === HexOrientation.FLATTOP ? coords_qToCube : coords_rToCube
+      let coords = coord_finder($tfield.raised, col, row)
+
+      ids.push(genHexId_coordsObj(coords))
+    }
+    return ids
+  }
+
+  function eliminatedHexesById(ids: HexId[]) {
+    for (const id of ids) {
+      eliminateHex(id)
+    }
+  }
+
+  /*
   function square_removeRight(amount: number) {
     for (let col = 0; col < amount; col++) {
       for (let row = 0; row < $tfield.rows; row++) {
@@ -517,6 +579,7 @@
       $tfield.columns -= 1
     }
   }
+  */
 
   function square_moveAllHexesLeft(amount: number) {
     for (let col = 0; col <= $tfield.columns - 1 - amount; col++) {
@@ -544,6 +607,7 @@
     }
   }
 
+  /*
   function square_removeBottom(amount: number) {
     for (let col = 0; col < $tfield.columns; col++) {
       for (let row = 0; row < amount; row++) {
@@ -557,6 +621,7 @@
     }
     $tfield.rows -= amount
   }
+  */
 
   function square_moveAllHexesUp(amount: number) {
     for (let col = 0; col < $tfield.columns; col++) {
@@ -723,7 +788,7 @@
   }
 
   function eliminateAllHexes() {
-    Object.keys($tfield.hexes).forEach((hexId: hex_id) => {
+    Object.keys($tfield.hexes).forEach((hexId: HexId) => {
       eliminateHex(hexId)
     })
   }
@@ -735,7 +800,7 @@
 
     gridGraphics.lineStyle($tfield.grid.thickness, $tfield.grid.stroke)
 
-    Object.keys($tfield.hexes).forEach((hexId: hex_id) => {
+    Object.keys($tfield.hexes).forEach((hexId: HexId) => {
       let hex = $tfield.hexes[hexId]
 
       let hexC = coords_cubeToWorld(
@@ -762,20 +827,20 @@
 
   export function renderSelectiveHexes(callback: Function) {
     // Re-renders hexes that pass true
-    Object.keys($tfield.hexes).forEach((hexId: hex_id) => {
+    Object.keys($tfield.hexes).forEach((hexId: HexId) => {
       if (callback($tfield.hexes[hexId])) renderHex(hexId)
     })
   }
 
   export async function renderAllHexes() {
     terrainGraphics.clear()
-    Object.keys($tfield.hexes).forEach((hexId: hex_id) => {
+    Object.keys($tfield.hexes).forEach((hexId: HexId) => {
       renderHex(hexId)
     })
     renderGrid()
   }
 
-  export function renderHex(hexId: hex_id) {
+  export function renderHex(hexId: HexId) {
     let hex = $tfield.hexes[hexId]
     let hexWorldCoords = coords_cubeToWorld(
       hex.q,
@@ -840,7 +905,7 @@
   }
 
   /* PAINT */
-  export function paintFromTile(hexId: hex_id, tile: Tile, render: boolean = true) {
+  export function paintFromTile(hexId: HexId, tile: Tile, render: boolean = true) {
     if (!hexExists(hexId)) return
 
     if (tiles_match($tfield.hexes[hexId].tile, tile)) return
@@ -888,7 +953,7 @@
     }
   }
 
-  function paintHexFromData(hexId: hex_id) {
+  function paintHexFromData(hexId: HexId) {
     $store_has_unsaved_changes = true
 
     //$data_terrain = $data_terrain
@@ -901,11 +966,11 @@
     return null == Object.entries($tfield.hexes).find(([id, hex]) => hex.tile != null)
   }
 
-  export function hexExists(hexId: hex_id): boolean {
+  export function hexExists(hexId: HexId): boolean {
     return $tfield.hexes[hexId] != undefined
   }
 
-  function hexesMatch(hexId1: hex_id, hexId2: hex_id): boolean {
+  function hexesMatch(hexId1: HexId, hexId2: HexId): boolean {
     if (!hexExists(hexId1)) return false
     if (!hexExists(hexId2)) return false
 
@@ -915,7 +980,7 @@
     return tiles_match(hex1.tile, hex2.tile)
   }
 
-  function hexMatchesData(hexId: hex_id): boolean {
+  function hexMatchesData(hexId: HexId): boolean {
     if (!hexExists(hexId)) return false
 
     let hex = $tfield.hexes[hexId]
@@ -927,7 +992,7 @@
   export function removeAllTilesOfSet(setId: string) {
     $store_has_unsaved_changes = true
 
-    Object.entries($tfield.hexes).forEach(([hexId, hex]: [hex_id, TerrainHex]) => {
+    Object.entries($tfield.hexes).forEach(([hexId, hex]: [HexId, TerrainHex]) => {
       if (!hex.tile) return
 
       let hexSetId = hex.tile.tileset_id
@@ -986,7 +1051,7 @@
     if (hexExists(clickedId)) eraseHex(clickedId)
   }
 
-  export function eraseHex(hexId: hex_id) {
+  export function eraseHex(hexId: HexId) {
     $tfield.hexes[hexId].tile = null
     renderHex(hexId)
   }
@@ -1010,7 +1075,7 @@
     // Check if hex in data matches the clicked style. If it does, abort painting!
     // Should be done in paint terrain as well
 
-    getContiguousHexIdsOfSameType(clickedId).forEach((hexId: hex_id) => {
+    getContiguousHexIdsOfSameType(clickedId).forEach((hexId: HexId) => {
       paintHexFromData(hexId)
     })
 
@@ -1035,14 +1100,14 @@
     if ($tfield.hexes[clickedId].tile == null) return
 
     let hexes = getContiguousHexIdsOfSameType(clickedId)
-    hexes.forEach((hexId: hex_id) => {
+    hexes.forEach((hexId: HexId) => {
       eraseHex(hexId)
     })
 
     $store_has_unsaved_changes = true
   }
 
-  function eliminateHex(hexId: hex_id) {
+  function eliminateHex(hexId: HexId) {
     if (terrainSprites[hexId]) {
       symbolsContainer.removeChild(terrainSprites[hexId])
       terrainSprites[hexId].destroy()
@@ -1062,11 +1127,12 @@
       id: 'noset_blank',
       tileset_id: 'noset_blank',
       symbol: null,
-      preview: '',
+      preview_flatTop: '',
+      preview_pointyTop: '',
     }
   }
 
-  export function get_existant_neighbours(hex_id: hex_id): TerrainHex[] {
+  export function get_existant_neighbours(hex_id: HexId): TerrainHex[] {
     let coords = id_to_coords(hex_id)
 
     let neighbourIds = getNeighbours(coords.q, coords.r, coords.s)
@@ -1076,13 +1142,13 @@
     return valid_neighbour_ids.map((id) => get_hex(id))
   }
 
-  function get_hex(hex_id: hex_id): TerrainHex {
+  function get_hex(hex_id: HexId): TerrainHex {
     if (hexExists(hex_id)) return $tfield.hexes[hex_id]
 
     return null
   }
 
-  function getContiguousHexIdsOfSameType(hexId: hex_id): hex_id[] {
+  function getContiguousHexIdsOfSameType(hexId: HexId): HexId[] {
     let startHex = { ...$tfield.hexes[hexId] } // Any neighbours with the same style (same bgColor, symbol and symbolColor) will be changed and their neighbours will be added to the list
 
     let seenIds = [genHexId(startHex.q, startHex.r, startHex.s)] // Seen hexes have been added to the hex stack
@@ -1094,7 +1160,7 @@
 
       // Add only matching neighbours to hexStack
       let neighbourIds = getNeighbours(currentHex.q, currentHex.r, currentHex.s)
-      neighbourIds.forEach((nId: hex_id) => {
+      neighbourIds.forEach((nId: HexId) => {
         if (!hexExists(nId)) return
         if (seenIds.find((sId) => sId == nId)) return
 
@@ -1157,7 +1223,7 @@
   }
 
   export function clearTerrainSprites() {
-    Object.keys(terrainSprites).forEach((hexId: hex_id) => {
+    Object.keys(terrainSprites).forEach((hexId: HexId) => {
       symbolsContainer.removeChild(terrainSprites[hexId])
       terrainSprites[hexId].destroy()
       delete terrainSprites[hexId]
