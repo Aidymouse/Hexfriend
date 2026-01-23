@@ -24,6 +24,8 @@
     "ghpages": "^0.0.10",
     "pixi-dashed-line": "^1.4.2",
     "pixi.js": "^7.2.4",
+    "prettier": "^3.8.1",
+    "prettier-plugin-svelte": "^3.4.1",
     "svelte-persisted-store": "^0.9.2"
   }
 }
