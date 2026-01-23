@@ -38,6 +38,7 @@
   import SavedMaps from './SavedMaps.svelte'
   import { UndoActions, type UndoAction } from '../types/undoTypes'
 
+  import OverlayLayer from '../layers/OverlayLayer.svelte'
   export let loadedSave: save_data
   export let showSettings: boolean
   export let appState
@@ -151,6 +152,11 @@
 
   let comp_grid: GridSettings
   let comp_hexes: HexesSettings
+  let comp_shape: DimensionSettings
+  let comp_coordinates: CoordinateSettings
+  let comp_overlay: OverlaySettings
+  let comp_tilesets: TilesetSettings
+  let comp_iconsets: IconsetSettings
 
   /** Undo */
   export const handle_undo = (action: UndoAction) => {
@@ -173,6 +179,14 @@
       case UndoActions.ChangeHexDimensions: 
       case UndoActions.ChangeHexRaisedIndented: {
         comp_hexes.handle_undo(action)
+        break
+      }
+
+      case UndoActions.ExpandDimensionsFlower:
+      case UndoActions.ReduceDimensionsFlower:
+      case UndoActions.ExpandDimensionsSquare:
+      case UndoActions.ReduceDimensionsSquare: {
+        comp_shape.handle_undo(action)
         break
       }
 
@@ -203,6 +217,14 @@
       case UndoActions.ChangeHexDimensions:
       case UndoActions.ChangeHexRaisedIndented: {
         comp_hexes.handle_redo(action)
+        break
+      }
+
+      case UndoActions.ExpandDimensionsFlower:
+      case UndoActions.ReduceDimensionsFlower:
+      case UndoActions.ExpandDimensionsSquare:
+      case UndoActions.ReduceDimensionsSquare: {
+        comp_shape.handle_redo(action)
         break
       }
 
@@ -413,7 +435,7 @@
     <SettingHeading text={$tl.settings.shape.title} bind:toggle={hidden_settings.dimensions} />
     <div class="settings-hider" class:hidden={hidden_settings.dimensions}>
       <div class="hider">
-        <DimensionSettings bind:comp_terrainLayer bind:comp_iconLayer bind:comp_textLayer bind:comp_pathLayer />
+        <DimensionSettings bind:this={comp_shape} bind:comp_terrainLayer bind:comp_iconLayer bind:comp_textLayer bind:comp_pathLayer />
       </div>
     </div>
   </div>
@@ -423,7 +445,7 @@
     <SettingHeading text={$tl.settings.coordinates.title} bind:toggle={hidden_settings.coordinates} />
     <div class="settings-hider" class:hidden={hidden_settings.coordinates}>
       <div class="hider">
-        <CoordinateSettings bind:comp_coordsLayer />
+        <CoordinateSettings bind:this={comp_coordinates} bind:comp_coordsLayer />
       </div>
     </div>
   </div>
@@ -433,7 +455,7 @@
     <SettingHeading text={$tl.settings.overlay.title} bind:toggle={hidden_settings.overlay} />
     <div class="settings-hider" class:hidden={hidden_settings.overlay}>
       <div class="hider">
-        <OverlaySettings bind:showSettings />
+        <OverlaySettings bind:this={comp_overlay} bind:showSettings />
       </div>
     </div>
   </div>
@@ -444,6 +466,7 @@
     <div class="settings-hider" class:hidden={hidden_settings.tilesets}>
       <div class="hider">
         <TilesetSettings
+	  bind:this={comp_tilesets}
           bind:loadedSave
           bind:loadedTilesets
           bind:comp_terrainLayer
@@ -459,7 +482,7 @@
     <SettingHeading text={$tl.settings.icon_sets.title} bind:toggle={hidden_settings.iconsets} />
     <div class="settings-hider" class:hidden={hidden_settings.iconsets}>
       <div class="hider">
-        <IconsetSettings bind:loadedSave bind:loadedIconsets bind:appState />
+        <IconsetSettings bind:this={comp_iconsets} bind:loadedSave bind:loadedIconsets bind:appState />
       </div>
     </div>
   </div>

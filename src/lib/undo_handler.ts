@@ -97,6 +97,11 @@ const undo_routes: {[k in UndoActions]: keyof UndoComponents} = {
     [UndoActions.ChangeHexDimensions]: 'settings',
     [UndoActions.ChangeHexOrientation]: 'settings',
     [UndoActions.ChangeHexRaisedIndented]: 'settings',
+    
+    [UndoActions.ExpandDimensionsFlower]: 'settings',
+    [UndoActions.ReduceDimensionsFlower]: 'settings',
+    [UndoActions.ExpandDimensionsSquare]: 'settings',
+    [UndoActions.ReduceDimensionsSquare]: 'settings',
 
 
     [UndoActions.PlaceTerrain]: 'terrainLayer'

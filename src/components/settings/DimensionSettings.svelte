@@ -8,6 +8,8 @@
   import { store_has_unsaved_changes } from '../../stores/flags'
   import { tl } from '../../stores/translation'
 
+  import { record_undo_action } from '../../lib/undo_handler'
+  import { UndoActions, type UndoAction } from '../../types/undoTypes'
   export let comp_terrainLayer
   export let comp_iconLayer
   export let comp_pathLayer
@@ -50,7 +52,7 @@
     $store_has_unsaved_changes = true
   }
 
-  function square_reduceMapDimension(direction, amount) {
+  function square_reduceMapDimension(direction, amount, record_action = true) {
     if (direction == 'left' || direction == 'right') {
       if ($tfield.columns <= amount) amount = $tfield.columns - 1
       if (amount == 0) return
@@ -101,12 +103,56 @@
     $store_has_unsaved_changes = true
   }
 
-  function flower_expandHexesOut(amount) {
+  function flower_processTypedNumber(e) {
+    const typed = parseInt(e.target.value)
+
+    if (isNaN(typed)) { 
+      //document.querySelector("#hexes-out-input").setAttribute('value', `${$tfield.hexesOut}`)
+      $tfield.hexesOut = $tfield.hexesOut
+      return
+    }
+
+    const diff = typed - $tfield.hexesOut
+
+    if (typed > 200) {
+      if (!confirm($tl.settings.shape.high_hexesout_warning)) { 
+	//document.querySelector("#hexes-out-input").setAttribute('value', `${$tfield.hexesOut}`)
+	$tfield.hexesOut = $tfield.hexesOut
+	return
+      }
+    }
+
+    if (diff > 0) {
+      flower_expandHexesOut(diff)
+    } else if (diff < 0) {
+      flower_reduceHexesOut(-diff)
+    }
+
+    console.log($tfield.hexesOut)
+  }
+
+  function flower_expandHexesOut(amount, record_action = true) {
+    if (record_action) {
+      record_undo_action({
+	type: UndoActions.ExpandDimensionsFlower,
+	hexes_expanded: amount
+      })
+    }
+
     comp_terrainLayer.flower_expandHexesOut(amount)
   }
 
-  function flower_reduceHexesOut(amount) {
-    comp_terrainLayer.flower_reduceHexesOut(amount)
+  function flower_reduceHexesOut(amount, record_action=true) {
+
+    const removed_hexes = comp_terrainLayer.flower_reduceHexesOut(amount)
+
+    if (record_action) {
+      record_undo_action({
+	type: UndoActions.ReduceDimensionsFlower,
+	hexes_reduced: amount,
+	terrain_removed: removed_hexes, 
+      })
+    }
   }
 
   function changeMapShape() {
@@ -115,7 +161,7 @@
     if (comp_terrainLayer.areAllHexesBlank()) {
       comp_terrainLayer.changeMapShape($tfield.mapShape)
     } else {
-      let changeConfirm = confirm('Are you sure? Changing shape will erase all hexes.')
+      let changeConfirm = confirm($tl.settings.shape.shape_change_warning)
 
       if (changeConfirm) {
         comp_terrainLayer.changeMapShape($tfield.mapShape)
@@ -124,6 +170,42 @@
 
     $store_has_unsaved_changes = true
   }
+
+  export const handle_undo = (action: UndoAction) => {
+    switch (action.type) {
+      case UndoActions.ExpandDimensionsFlower: {
+	flower_reduceHexesOut(action.hexes_expanded, false)
+	break
+      }
+      case UndoActions.ReduceDimensionsFlower: {
+	flower_expandHexesOut(action.hexes_reduced, false)
+	for (const [hexId, tile] of Object.entries(action.terrain_removed)) {
+	  comp_terrainLayer.paintFromTile(hexId, tile)
+	}
+	break
+      }
+      case UndoActions.ExpandDimensionsSquare: {}
+      case UndoActions.ReduceDimensionsSquare: {}
+    }
+  }
+
+  export const handle_redo = (action: UndoAction) => {
+    switch (action.type) {
+      case UndoActions.ExpandDimensionsFlower: {
+	flower_expandHexesOut(action.hexes_expanded, false)
+	break
+      }
+      case UndoActions.ReduceDimensionsFlower: {
+	flower_reduceHexesOut(action.hexes_reduced, false)
+	break
+      }
+      case UndoActions.ExpandDimensionsSquare: {}
+      case UndoActions.ReduceDimensionsSquare: {}
+    }
+  }
+
+
+
 </script>
 
 <div class="settings-grid">
@@ -234,7 +316,11 @@
       >
         -
       </button>
-      <div id="counter-container">{$tfield.hexesOut}</div>
+
+      <div id="counter-container">
+	<input id="hexes-out-input" type="number" value={$tfield.hexesOut} on:change={flower_processTypedNumber}>
+      </div>
+
       <button
         on:click={() => {
           flower_expandHexesOut(1)
@@ -283,12 +369,6 @@
     width: 100%;
   }
 
-  #flower-dimensions-container p {
-    margin-bottom: 10px;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-  }
 
   #flower-dimensions-controls-grid button {
     height: 60px;
@@ -300,6 +380,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: 20px;
+  }
+
+  #flower-dimensions-container input {
+    margin-left: 1em;
+    margin-right: 1em;
+    width: 100%;
+    height: 100%;
+    text-align: center;
     font-size: 20px;
   }
 </style>
