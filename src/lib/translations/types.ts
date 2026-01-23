@@ -171,6 +171,8 @@ export type Translation = {
 		shape: {
 			title: string,
 			disclaimer: string,
+			shape_change_warning: string,
+			high_hexesout_warning: string, // Warning displayed when greater than 200 hexes are typed into the hexes out box
 			mapshape: string,
 			flower: string,
 			square: string,

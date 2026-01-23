@@ -175,6 +175,8 @@ export const en_us: Translation = {
 		shape: {
 			title: "Shape and Size",
 			disclaimer: "Hexes removed by a reduction in map size are completely erased.",
+			shape_change_warning: "Are you sure? Changing shape will erase all hexes. This action cannot be undone.",
+			high_hexesout_warning: "Are you sure? Having more than 200 hexes out is likely to cause Hexfriend to crash.",
 			mapshape: "Map Shape",
 			flower: "Flower",
 			square: "Square",

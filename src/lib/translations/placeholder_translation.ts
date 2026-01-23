@@ -176,6 +176,8 @@ language: "TODO",
 		shape: {
 			title: "TODO",
 			disclaimer: "TODO",
+			shape_change_warning: "TODO",
+			high_hexesout_warning: "TODO",
 			mapshape: "TODO",
 			flower: "TODO",
 			square: "TODO",
