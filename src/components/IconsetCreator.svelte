@@ -92,7 +92,7 @@
   let newIconFiles: FileList
 
   async function loadTexture(texId, result) {
-	console.log("Now real Loading Texture for", texId, result)
+    console.log('Now real Loading Texture for', texId, result)
     let newTexture = await PIXI.Assets.load(result)
     loadedTextures[texId] = newTexture
     return newTexture
@@ -202,7 +202,7 @@
 
       setToImport = await convert_iconset_to_latest(setToImport)
 
-      console.log("Importing Iconset to Builder", setToImport)
+      console.log('Importing Iconset to Builder', setToImport)
 
       icon_previews = {}
 

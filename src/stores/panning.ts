@@ -1,114 +1,112 @@
-import type { pan_state } from '../types/panning';
-import { map_shape } from '../types/settings';
-import type { terrain_field } from '../types/terrain';
+import type { pan_state } from '../types/panning'
+import { map_shape } from '../types/settings'
+import type { terrain_field } from '../types/terrain'
 
-import { tfield } from './tfield';
+import { tfield } from './tfield'
 
-import * as PIXI from 'pixi.js';
-import { get, writable } from 'svelte/store';
+import * as PIXI from 'pixi.js'
+import { get, writable } from 'svelte/store'
 
 export let store = writable({
-	panning: false,
+  panning: false,
 
-	oldX: 0,
-	oldY: 0,
+  oldX: 0,
+  oldY: 0,
 
-	offsetX: window.innerWidth / 2,
-	offsetY: window.innerHeight / 2,
+  offsetX: window.innerWidth / 2,
+  offsetY: window.innerHeight / 2,
 
-	screenX: 0,
-	screenY: 0,
+  screenX: 0,
+  screenY: 0,
 
-	zoomScale: 1,
-});
+  zoomScale: 1,
+})
 
 function worldX(state: pan_state): number {
-	return (state.screenX - state.offsetX) / state.zoomScale;
+  return (state.screenX - state.offsetX) / state.zoomScale
 }
 
 function worldY(state: pan_state): number {
-	return (state.screenY - state.offsetY) / state.zoomScale;
+  return (state.screenY - state.offsetY) / state.zoomScale
 }
 
 export function curWorldX(): number {
-	return worldX(get(store));
+  return worldX(get(store))
 }
 
 export function curWorldY(): number {
-	return worldY(get(store));
+  return worldY(get(store))
 }
 
 export const handlers = {
-	startPan: function (e: PointerEvent) {
-		store.update((pan: pan_state): pan_state => {
-			pan.panning = true;
-			pan.oldX = e.clientX;
-			pan.oldY = e.clientY;
+  startPan: function (e: PointerEvent) {
+    store.update((pan: pan_state): pan_state => {
+      pan.panning = true
+      pan.oldX = e.clientX
+      pan.oldY = e.clientY
 
-			return pan;
-		});
-	},
+      return pan
+    })
+  },
 
-	handle: function (e: PointerEvent) {
-		store.update((pan: pan_state): pan_state => {
-			pan.screenX = e.clientX;
-			pan.screenY = e.clientY;
+  handle: function (e: PointerEvent) {
+    store.update((pan: pan_state): pan_state => {
+      pan.screenX = e.clientX
+      pan.screenY = e.clientY
 
-			if (pan.panning) {
-				pan.offsetX += e.clientX - pan.oldX;
-				pan.offsetY += e.clientY - pan.oldY;
+      if (pan.panning) {
+        pan.offsetX += e.clientX - pan.oldX
+        pan.offsetY += e.clientY - pan.oldY
 
-				pan.oldX = e.clientX;
-				pan.oldY = e.clientY;
-			}
+        pan.oldX = e.clientX
+        pan.oldY = e.clientY
+      }
 
-			return pan;
-		});
-	},
+      return pan
+    })
+  },
 
-	endPan: function () {
-		store.update((pan: pan_state): pan_state => {
-			pan.panning = false;
+  endPan: function () {
+    store.update((pan: pan_state): pan_state => {
+      pan.panning = false
 
-			return pan;
-		});
-	},
+      return pan
+    })
+  },
 
-	zoom: function (e: WheelEvent) {
-		store.update((pan: pan_state): pan_state => {
-			let xBeforeZoom = worldX(pan);
-			let yBeforeZoom = worldY(pan);
+  zoom: function (e: WheelEvent) {
+    store.update((pan: pan_state): pan_state => {
+      let xBeforeZoom = worldX(pan)
+      let yBeforeZoom = worldY(pan)
 
-			let zoomFactor = 1.15;
-			if (e.deltaY < 0) {
-				pan.zoomScale *= zoomFactor;
-			} else {
-				pan.zoomScale /= zoomFactor;
-			}
+      let zoomFactor = 1.15
+      if (e.deltaY < 0) {
+        pan.zoomScale *= zoomFactor
+      } else {
+        pan.zoomScale /= zoomFactor
+      }
 
-			// Cap Zoom
-			let max_zoom_out = 0.1;
-			let max_zoom_in = 500;
+      // Cap Zoom
+      let max_zoom_out = 0.1
+      let max_zoom_in = 500
 
-			pan.zoomScale = Math.max(pan.zoomScale, max_zoom_out);
-			pan.zoomScale = Math.min(pan.zoomScale, max_zoom_in);			
+      pan.zoomScale = Math.max(pan.zoomScale, max_zoom_out)
+      pan.zoomScale = Math.min(pan.zoomScale, max_zoom_in)
 
-			// Move the screen
-			let xAfterZoom = worldX(pan);
-			let yAfterZoom = worldY(pan);
+      // Move the screen
+      let xAfterZoom = worldX(pan)
+      let yAfterZoom = worldY(pan)
 
-			let dx = (xAfterZoom - xBeforeZoom) * pan.zoomScale;
-			let dy = (yAfterZoom - yBeforeZoom) * pan.zoomScale;
+      let dx = (xAfterZoom - xBeforeZoom) * pan.zoomScale
+      let dy = (yAfterZoom - yBeforeZoom) * pan.zoomScale
 
-			pan.offsetX += dx;
-			pan.offsetY += dy;
+      pan.offsetX += dx
+      pan.offsetY += dy
 
-			return pan;
-		});
-	},
-};
-
-
+      return pan
+    })
+  },
+}
 
 /*
 

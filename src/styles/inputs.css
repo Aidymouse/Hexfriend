@@ -1,244 +1,240 @@
 /* GLOBAL BUTTON STYLING */
 
-
 button {
-	border: none;
-	border-radius: var(--small-radius);
-	background-color: var(--primary-background);
-	color: var(--text);
-	padding: 0.3125em;
-	transition-duration: 0.1s;
-	transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
+  border: none;
+  border-radius: var(--small-radius);
+  background-color: var(--primary-background);
+  color: var(--text);
+  padding: 0.3125em;
+  transition-duration: 0.1s;
+  transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
-
 button:hover {
-	background-color: var(--lighter-background);
+  background-color: var(--lighter-background);
 }
 
 button:active {
-	background-color: var(--lightest-background);
+  background-color: var(--lightest-background);
 }
 
 button:disabled {
-	background-color: var(--dark-background);
-	color: var(--lighter-background);
+  background-color: var(--dark-background);
+  color: var(--lighter-background);
 }
 
 button:disabled:hover {
-	background-color: var(--dark-background);
+  background-color: var(--dark-background);
 }
 
 button.evil {
-	background-color: #634242;
-	color: var(--secondary);
+  background-color: #634242;
+  color: var(--secondary);
 }
 
 button:hover.evil {
-	background-color: #885555;
+  background-color: #885555;
 }
 
 button.img-button {
-	aspect-ratio: 1 / 1;
-    	padding: 0;
-    	display: flex;
-    	justify-content: center;
-    	align-items: center;
-
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 button.img-button img {
-	width: 80%; /* Use square images please */
+  width: 80%; /* Use square images please */
 }
-
 
 /* GLOBAL INPUT STYLE */
 input {
-	background-color: var(--lighter-background);
-	border: 0;
-	border-bottom: solid 0.125em var(--dark-background);
-	transition-duration: 0.2s;
-	transition-property: border-color;
-	color: var(--text);
+  background-color: var(--lighter-background);
+  border: 0;
+  border-bottom: solid 0.125em var(--dark-background);
+  transition-duration: 0.2s;
+  transition-property: border-color;
+  color: var(--text);
 }
 
 input[type='text'] {
-	padding: 0 0.5em;
-	border-radius: var(--large-radius);
+  padding: 0 0.5em;
+  border-radius: var(--large-radius);
 }
 
 ::placeholder {
-	color: var(--text);
-	opacity: 0.5;
+  color: var(--text);
+  opacity: 0.5;
 }
 
 input[type='number'] {
-	padding: 0 0.5em;
-	border-radius: var(--large-radius);
+  padding: 0 0.5em;
+  border-radius: var(--large-radius);
 }
 
 input:focus {
-	border-color: var(--hexfriend-green);
-	transition-duration: 0.2s;
-	transition-property: border-color;
-	outline: none;
+  border-color: var(--hexfriend-green);
+  transition-duration: 0.2s;
+  transition-property: border-color;
+  outline: none;
 }
 
 /* TEXTAREA */
 textarea {
-	outline: none;
-	color: var(--text);
-	background-color: var(--primary-background);
-	border-radius: var(--small-radius);
+  outline: none;
+  color: var(--text);
+  background-color: var(--primary-background);
+  border-radius: var(--small-radius);
 }
 
 textarea:focus {
-	outline-style: solid;
-	outline-width: 1px;
-	outline-color: var(--hexfriend-green);
-	border-color: var(--hexfriend-green);
+  outline-style: solid;
+  outline-width: 1px;
+  outline-color: var(--hexfriend-green);
+  border-color: var(--hexfriend-green);
 }
 
 /* SELECT */
 select {
-	border: none;
-	height: 2em;
-	box-sizing: border-box;
-	background-color: var(--lighter-background);
-	color: var(--text);
-	padding: 0.3125em;
-	border-radius: var(--small-radius);
+  border: none;
+  height: 2em;
+  box-sizing: border-box;
+  background-color: var(--lighter-background);
+  color: var(--text);
+  padding: 0.3125em;
+  border-radius: var(--small-radius);
 }
 
 select:hover {
-	background-color: var(--lightest-background);
+  background-color: var(--lightest-background);
 }
 
 /* CLASSES */
 .selected {
-	/*
+  /*
 	outline-style: solid;
 	outline-width: 2px;
 	outline-color: var(--hexfriend-green);
 	border-color: var(--hexfriend-green);
 	*/
-	background-color: var(--dark-primary);
-	transition-duration: 0s;
+  background-color: var(--dark-primary);
+  transition-duration: 0s;
 }
 
 .selected:hover {
-	background-color: var(--dark-primary);
+  background-color: var(--dark-primary);
 }
 
 .green-button {
-	background-color: var(--hexfriend-green);
-	color: white;
+  background-color: var(--hexfriend-green);
+  color: white;
 }
 
 .green-button:hover {
-	border: none;
-	background-color: var(--dark-primary);
+  border: none;
+  background-color: var(--dark-primary);
 }
 
 .outline-button {
-	border: solid 1px var(--lighter-background)
+  border: solid 1px var(--lighter-background);
 }
 
 select.outline {
-	border: solid 1px var(--lighter-background);
-	border-radius: var(--small-radius);
-	background-color: var(--primary-background);
-	padding: 0.3125em;
-	transition-duration: 0.2s;
-	text-align: center;
+  border: solid 1px var(--lighter-background);
+  border-radius: var(--small-radius);
+  background-color: var(--primary-background);
+  padding: 0.3125em;
+  transition-duration: 0.2s;
+  text-align: center;
 }
 
 select.outline:hover {
-	background-color: var(--light-background);
+  background-color: var(--light-background);
 }
 
 /* RANGE */
 input[type='range'] {
-	-webkit-appearance: none;
-	margin: 0.625em 0;
-	width: 100%;
-	border: none;
-	background-color: transparent;
+  -webkit-appearance: none;
+  margin: 0.625em 0;
+  width: 100%;
+  border: none;
+  background-color: transparent;
 }
 
 input[type='range']:focus {
-	outline: none;
-	border: none;
+  outline: none;
+  border: none;
 }
 
 /* Range */
 input[type='range']::-webkit-slider-runnable-track {
-	width: 100%;
-	height: 0.375em;
-	cursor: pointer;
-	background: var(--light-background);
-	border-radius: var(--large-radius);
-	transition-duration: 0.2s;
+  width: 100%;
+  height: 0.375em;
+  cursor: pointer;
+  background: var(--light-background);
+  border-radius: var(--large-radius);
+  transition-duration: 0.2s;
 }
 
 input[type='range']:active::-webkit-slider-runnable-track {
-	background: var(--hexfriend-green);
-	transition-duration: 0.2s;
+  background: var(--hexfriend-green);
+  transition-duration: 0.2s;
 }
 
 input[type='range']::-webkit-slider-thumb {
-	-webkit-appearance: none;
-	margin-top: -0.375em;
-	border: 0.125em solid var(--text);
-	height: 1.125em;
-	width: 1.125em;
-	border-radius: 50%;
-	background: var(--hexfriend-green);
-	cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -0.375em;
+  border: 0.125em solid var(--text);
+  height: 1.125em;
+  width: 1.125em;
+  border-radius: 50%;
+  background: var(--hexfriend-green);
+  cursor: pointer;
 }
 
 /* Mozilla */
 input[type='range']::-moz-range-track {
-	width: 100%;
-	height: 0.375em;
-	cursor: pointer;
-	background: var(--light-background);
-	border-radius: var(--large-radius);
-	transition-duration: 0.2s;
+  width: 100%;
+  height: 0.375em;
+  cursor: pointer;
+  background: var(--light-background);
+  border-radius: var(--large-radius);
+  transition-duration: 0.2s;
 }
 
 input[type='range']:active::-moz-range-track {
-	background: var(--hexfriend-green);
-	transition-duration: 0.2s;
+  background: var(--hexfriend-green);
+  transition-duration: 0.2s;
 }
 
 input[type='range']::-moz-range-thumb {
-	border: 0.125em solid var(--text);
-	height: 0.875em;
-	width: 0.875em;
-	border-radius: 50%;
-	background: var(--hexfriend-green);
-	cursor: pointer;
+  border: 0.125em solid var(--text);
+  height: 0.875em;
+  width: 0.875em;
+  border-radius: 50%;
+  background: var(--hexfriend-green);
+  cursor: pointer;
 }
 
 /* Custom Context Menus */
 .context-menu {
-	width: 8em;
-	display: flex;
-	flex-direction: column;
-	border: none;
-	background-color: var(--lighter-background);
-	position: fixed;
-	border-radius: var(--large-radius);
-	overflow: hidden;
+  width: 8em;
+  display: flex;
+  flex-direction: column;
+  border: none;
+  background-color: var(--lighter-background);
+  position: fixed;
+  border-radius: var(--large-radius);
+  overflow: hidden;
 }
 
 .context-menu button {
-	width: 100%;
-	height: 2em;
-	box-sizing: border-box;
-	border-radius: 0;
-	border: none;
-	text-align: left;
-	padding-left: 0.5em;
+  width: 100%;
+  height: 2em;
+  box-sizing: border-box;
+  border-radius: 0;
+  border: none;
+  text-align: left;
+  padding-left: 0.5em;
 }

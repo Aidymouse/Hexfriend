@@ -1,6 +1,6 @@
-import { get, writable } from 'svelte/store';
+import { get, writable } from 'svelte/store'
 
 export let store_undo = writable({
-    undo_pointer: -1,
-    stack: [],
+  undo_pointer: -1,
+  stack: [],
 })

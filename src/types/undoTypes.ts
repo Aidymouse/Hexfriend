@@ -3,7 +3,6 @@ import type { Tile } from './tilesets'
 import { HexRaised } from './terrain'
 
 export enum UndoActions {
-
   ToggleGrid = 'Toggle Grid',
   ChangeGridThickness = 'Change Grid Thickness',
   ChangeGridColor = 'Change Grid Color',
@@ -20,10 +19,10 @@ export enum UndoActions {
   ChangeHexOrientation = 'Change Hex Orientation',
   ChangeHexRaisedIndented = 'Change Hex Raised',
 
-  ExpandDimensionsFlower = "Expand Flower Dimensions",
-  ReduceDimensionsFlower = "Reduce Flower Dimensions",
-  ExpandDimensionsSquare = "Expand Dimensions Square",
-  ReduceDimensionsSquare = "Reduce Dimensions Square",
+  ExpandDimensionsFlower = 'Expand Flower Dimensions',
+  ReduceDimensionsFlower = 'Reduce Flower Dimensions',
+  ExpandDimensionsSquare = 'Expand Dimensions Square',
+  ReduceDimensionsSquare = 'Reduce Dimensions Square',
 
   PlaceTerrain = 'Place Terrain',
 }
@@ -117,9 +116,9 @@ type ToggleGridLargeHexEdgeEncompass = {
 
 // Hex settings
 type ChangeHexBlankColor = {
-  type: UndoActions.ChangeHexBlankColor,
-  new_color: number,
-  old_color: number,
+  type: UndoActions.ChangeHexBlankColor
+  new_color: number
+  old_color: number
 }
 
 type ChangeHexDimensions = {
@@ -136,38 +135,38 @@ type ChangeHexOrientation = {
 }
 
 type ChangeHexRaisedIndented = {
-  type: UndoActions.ChangeHexRaisedIndented,
+  type: UndoActions.ChangeHexRaisedIndented
   raised: HexRaised
 }
 
 /** Shape and Size settings **/
 type ExpandDimensionsFlower = {
-  type: UndoActions.ExpandDimensionsFlower,
+  type: UndoActions.ExpandDimensionsFlower
   hexes_expanded: number
 }
 
 type ReduceDimensionsFlower = {
-  type: UndoActions.ReduceDimensionsFlower,
-  hexes_reduced: number,
-  terrain_removed: { [k: string]: Tile } 
+  type: UndoActions.ReduceDimensionsFlower
+  hexes_reduced: number
+  terrain_removed: { [k: string]: Tile }
 }
 
 type ExpandDimensionsSquare = {
-    type: UndoActions.ExpandDimensionsSquare,
-    direction: 'top' | 'bottom' | 'left' | 'right',
-    hexes_expanded: number,
+  type: UndoActions.ExpandDimensionsSquare
+  direction: 'top' | 'bottom' | 'left' | 'right'
+  hexes_expanded: number
 }
 
 type ReduceDimensionsSquare = {
-    type: UndoActions.ReduceDimensionsSquare
-    direction: 'top' | 'bottom' | 'left' | 'right',
-    hexes_reduced: number,
-    terrain_removed: { [k: string]: Tile } 
+  type: UndoActions.ReduceDimensionsSquare
+  direction: 'top' | 'bottom' | 'left' | 'right'
+  hexes_reduced: number
+  terrain_removed: { [k: string]: Tile }
 }
 
 /** Terrain */
 type PlaceTerrain = {
   type: UndoActions.PlaceTerrain
-  placed_terrain: { tile: Tile, hex_ids: string[] },
+  placed_terrain: { tile: Tile; hex_ids: string[] }
   replaced_terrain: { [hex_id: string]: Tile }
 }

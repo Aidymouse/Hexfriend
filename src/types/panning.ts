@@ -1,14 +1,14 @@
 export interface pan_state {
-	panning: boolean;
+  panning: boolean
 
-	oldX: number;
-	oldY: number;
+  oldX: number
+  oldY: number
 
-	offsetX: number; //window.innerWidth / 2,
-	offsetY: number; //window.innerHeight / 2,
+  offsetX: number //window.innerWidth / 2,
+  offsetY: number //window.innerHeight / 2,
 
-	screenX: number;
-	screenY: number;
+  screenX: number
+  screenY: number
 
-	zoomScale: number;
+  zoomScale: number
 }

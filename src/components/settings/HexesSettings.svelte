@@ -35,7 +35,6 @@
 
   export let retainIconScale: boolean
 
-
   /** Changes the orientation of hexes. Record action is optional because... */
   function changeOrientation(new_orientation: HexOrientation, record_action: boolean = true) {
     if ($tfield.orientation === new_orientation) return
@@ -97,44 +96,44 @@
   function change_hex_blank_color(new_color: number, record_action: boolean = true) {
     if (record_action) {
       record_undo_action({
-	type: UndoActions.ChangeHexBlankColor,
-	new_color,
-	old_color: parseInt(`${$tfield.blankHexColor}`)
+        type: UndoActions.ChangeHexBlankColor,
+        new_color,
+        old_color: parseInt(`${$tfield.blankHexColor}`),
       })
     }
 
-    console.log("New color", new_color)
+    console.log('New color', new_color)
 
     $tfield.blankHexColor = new_color
     renderAllHexes()
   }
 
   function change_raised_indented(new_raised: HexRaised, record_action: boolean = true) {
-	  if (record_action) {
-	    record_undo_action({
-	      type: UndoActions.ChangeHexRaisedIndented,
-	      raised: new_raised
-	    })
-	  }
+    if (record_action) {
+      record_undo_action({
+        type: UndoActions.ChangeHexRaisedIndented,
+        raised: new_raised,
+      })
+    }
 
-	  console.log(new_raised)
+    console.log(new_raised)
 
-	  $tfield.raised = new_raised
+    $tfield.raised = new_raised
 
-          if ($tfield.orientation == HexOrientation.FLATTOP) {
-            comp_terrainLayer.square_updateRaisedColumn()
-          } else {
-            comp_terrainLayer.square_changeIndentedRow()
-          }
-          comp_coordsLayer.cullUnusedCoordinates()
+    if ($tfield.orientation == HexOrientation.FLATTOP) {
+      comp_terrainLayer.square_updateRaisedColumn()
+    } else {
+      comp_terrainLayer.square_changeIndentedRow()
+    }
+    comp_coordsLayer.cullUnusedCoordinates()
   }
 
   /** Undo */
   export const handle_undo = (action: UndoAction) => {
     switch (action.type) {
       case UndoActions.ChangeHexBlankColor: {
-	change_hex_blank_color(action.old_color, false)
-	break
+        change_hex_blank_color(action.old_color, false)
+        break
       }
       case UndoActions.ChangeHexOrientation: {
         const revert_orientation =
@@ -144,11 +143,11 @@
       }
       case UndoActions.ChangeHexDimensions: {
         change_hex_dimensions(action.old_width, action.old_height, false)
-	break
+        break
       }
       case UndoActions.ChangeHexRaisedIndented: {
         change_raised_indented(action.raised === HexRaised.ODD ? HexRaised.EVEN : HexRaised.ODD, false)
-	break
+        break
       }
     }
   }
@@ -156,8 +155,8 @@
   export const handle_redo = (action: UndoAction) => {
     switch (action.type) {
       case UndoActions.ChangeHexBlankColor: {
-	change_hex_blank_color(action.new_color, false)
-	break
+        change_hex_blank_color(action.new_color, false)
+        break
       }
       case UndoActions.ChangeHexOrientation: {
         changeOrientation(action.new_orientation, false)
@@ -165,11 +164,11 @@
       }
       case UndoActions.ChangeHexDimensions: {
         change_hex_dimensions(action.new_width, action.new_height, false)
-	break
+        break
       }
       case UndoActions.ChangeHexRaisedIndented: {
         change_raised_indented(action.raised, false)
-	break
+        break
       }
     }
   }
@@ -181,7 +180,7 @@
     <ColorInputPixi
       value={$tfield.blankHexColor}
       on:input={(e) => {
-	change_hex_blank_color(e.detail.number)
+        change_hex_blank_color(e.detail.number)
       }}
       id={'blankHexColor'}
     />
@@ -189,7 +188,7 @@
     <button
       style={'height: fit-content;'}
       on:click={() => {
-	change_hex_blank_color(0xf2f2f2)
+        change_hex_blank_color(0xf2f2f2)
       }}>{$tl.settings.hexes.blank_color_reset}</button
     >
   </div>
@@ -230,7 +229,7 @@
         ]}
         value={$tfield.raised}
         on:change={(e) => {
-	  change_raised_indented(e.detail.option)
+          change_raised_indented(e.detail.option)
         }}
       />
     </span>
@@ -277,7 +276,7 @@
 
         let new_dims = get_width_height_from_radius(radius, $tfield.orientation)
 
-	change_hex_dimensions(new_dims.width, new_dims.height, true);
+        change_hex_dimensions(new_dims.width, new_dims.height, true)
 
         redrawEntireMap()
 

@@ -31,7 +31,14 @@
     const previewPromises = testIconset.icons.map(
       (i) =>
         new Promise(async (res, rej) => {
-          const preview = await generate_icon_preview({ ...i, pHex: phex, rotation: rot }, hexInfo, grph, spr, cont, app)
+          const preview = await generate_icon_preview(
+            { ...i, pHex: phex, rotation: rot },
+            hexInfo,
+            grph,
+            spr,
+            cont,
+            app,
+          )
           res(preview)
         }),
     )
@@ -50,10 +57,10 @@
           const preview = await generate_icon_preview(
             { ...i, scaleMode: ScaleMode.BYDIMENSION, pWidth: pHor, pHeight: pVert, rotation: rot },
             hexInfo,
-	    grph,
-	    spr,
-	    cont,
-	    app
+            grph,
+            spr,
+            cont,
+            app,
           )
           res(preview)
         }),
@@ -101,7 +108,7 @@
       <input type="number" bind:value={rot} on:input={genPreviews} style="width: 4em" /> deg
     </div>
 
-	<hr />
+    <hr />
 
     <div style="display: flex">
       Phex
@@ -140,7 +147,7 @@
       />
       {pVert}%
     </div>
-	<hr />
+    <hr />
 
     <div style="display: flex">
       Hex Width
@@ -183,6 +190,5 @@
         genPreviews()
       }}>Turn to Perfect Hex</button
     >
-
   </div>
 </div>

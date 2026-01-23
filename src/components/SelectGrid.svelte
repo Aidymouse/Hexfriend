@@ -1,16 +1,16 @@
 <script lang="ts">
-  import { capitialize } from '../helpers/string';
-  import { createEventDispatcher } from 'svelte';
+  import { capitialize } from '../helpers/string'
+  import { createEventDispatcher } from 'svelte'
 
-  let dispatch = createEventDispatcher();
+  let dispatch = createEventDispatcher()
 
-  export let options: { title: string; value: string; filename: string }[] = [];
-  export let value: any;
+  export let options: { title: string; value: string; filename: string }[] = []
+  export let value: any
 
   function changeValue(newValue: any) {
-    if (value === newValue) return;
-    value = newValue;
-    dispatch('change', {option: newValue});
+    if (value === newValue) return
+    value = newValue
+    dispatch('change', { option: newValue })
   }
 </script>
 
@@ -20,7 +20,7 @@
       class="option"
       class:selected={value == o.value}
       on:click={() => {
-        changeValue(o.value);
+        changeValue(o.value)
       }}
       title={capitialize(o.title)}
     >

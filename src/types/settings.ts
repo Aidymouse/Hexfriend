@@ -1,4 +1,4 @@
 export enum map_shape {
-	SQUARE = 'square',
-	FLOWER = 'flower',
+  SQUARE = 'square',
+  FLOWER = 'flower',
 }

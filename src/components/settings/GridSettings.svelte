@@ -80,36 +80,36 @@
   function toggle_large_hexes(enabled: boolean, record_action: boolean = true) {
     if (record_action) {
       record_undo_action({
-	type: UndoActions.ToggleGridLargeHexes,
-	enabled,
+        type: UndoActions.ToggleGridLargeHexes,
+        enabled,
       })
     }
 
-    $tfield.largehexes.shown = enabled;
+    $tfield.largehexes.shown = enabled
   }
 
   function lh_change_size(new_size: number, record_action: boolean = true) {
     if (record_action) {
       record_undo_action({
-	type: UndoActions.ChangeGridLargeHexSize,
-	old_size: $tfield.largehexes.diameterInHexes,
-	new_size,
+        type: UndoActions.ChangeGridLargeHexSize,
+        old_size: $tfield.largehexes.diameterInHexes,
+        new_size,
       })
     }
 
-    $tfield.largehexes.diameterInHexes = new_size;
+    $tfield.largehexes.diameterInHexes = new_size
   }
 
   function lh_change_color(new_color: number, record_action: boolean = true) {
     if (record_action) {
       record_undo_action({
-	type: UndoActions.ChangeGridLargeHexColor,
+        type: UndoActions.ChangeGridLargeHexColor,
         new_color: parseInt(`${new_color}`),
         old_color: parseInt(`${$tfield.largehexes.style.color}`),
       })
     }
 
-    console.log("Changing LH color", new_color)
+    console.log('Changing LH color', new_color)
 
     $tfield.largehexes.style.color = new_color
   }
@@ -117,36 +117,35 @@
   function lh_change_outline_thickness(new_thickness: number, record_action: boolean = true) {
     if (record_action) {
       record_undo_action({
-	type: UndoActions.ChangeGridLargeHexWidth,
+        type: UndoActions.ChangeGridLargeHexWidth,
         new_width: parseInt(`${new_thickness}`),
         old_width: parseInt(`${$tfield.largehexes.style.width}`),
       })
     }
 
     $tfield.largehexes.style.width = new_thickness
-
   }
 
   function lh_change_offset(new_hori: number, new_vert: number, record_action: boolean = true) {
     if (record_action) {
       record_undo_action({
-	type: UndoActions.ChangeGridLargeHexOffset,
-	old_horizontal: $tfield.largehexes.offset.x,
-	old_vertical: $tfield.largehexes.offset.y,
-	new_horizontal: new_hori,
-	new_vertical: new_vert
+        type: UndoActions.ChangeGridLargeHexOffset,
+        old_horizontal: $tfield.largehexes.offset.x,
+        old_vertical: $tfield.largehexes.offset.y,
+        new_horizontal: new_hori,
+        new_vertical: new_vert,
       })
     }
 
-    $tfield.largehexes.offset.x = new_hori;
-    $tfield.largehexes.offset.y = new_vert;
+    $tfield.largehexes.offset.x = new_hori
+    $tfield.largehexes.offset.y = new_vert
   }
 
   function lh_toggle_edge_encompass(enabled: boolean, record_action: boolean = true) {
     if (record_action) {
       record_undo_action({
-	type: UndoActions.ToggleGridLargeHexEdgeEncompass,
-	enabled,
+        type: UndoActions.ToggleGridLargeHexEdgeEncompass,
+        enabled,
       })
     }
 
@@ -172,28 +171,28 @@
         break
       }
       case UndoActions.ToggleGridLargeHexes: {
-	toggle_large_hexes(!action.enabled, false)
-	break;
+        toggle_large_hexes(!action.enabled, false)
+        break
       }
       case UndoActions.ChangeGridLargeHexSize: {
-	lh_change_size(action.old_size, false)
-	break;
+        lh_change_size(action.old_size, false)
+        break
       }
       case UndoActions.ChangeGridLargeHexColor: {
-	lh_change_color(action.old_color, false)
-	break
+        lh_change_color(action.old_color, false)
+        break
       }
       case UndoActions.ChangeGridLargeHexWidth: {
-	lh_change_outline_thickness(action.old_width, false)
-	break
+        lh_change_outline_thickness(action.old_width, false)
+        break
       }
       case UndoActions.ChangeGridLargeHexOffset: {
-	lh_change_offset(action.old_horizontal, action.old_vertical, false)
-	break
+        lh_change_offset(action.old_horizontal, action.old_vertical, false)
+        break
       }
       case UndoActions.ToggleGridLargeHexEdgeEncompass: {
-	lh_toggle_edge_encompass(!action.enabled, false)
-	break
+        lh_toggle_edge_encompass(!action.enabled, false)
+        break
       }
     }
   }
@@ -218,28 +217,28 @@
         break
       }
       case UndoActions.ToggleGridLargeHexes: {
-	toggle_large_hexes(action.enabled, false)
-	break;
+        toggle_large_hexes(action.enabled, false)
+        break
       }
       case UndoActions.ChangeGridLargeHexSize: {
-	lh_change_size(action.new_size, false)
-	break;
+        lh_change_size(action.new_size, false)
+        break
       }
       case UndoActions.ChangeGridLargeHexColor: {
-	lh_change_color(action.new_color, false)
-	break;
+        lh_change_color(action.new_color, false)
+        break
       }
       case UndoActions.ChangeGridLargeHexWidth: {
-      	lh_change_outline_thickness(action.new_width, false)
-	break;
+        lh_change_outline_thickness(action.new_width, false)
+        break
       }
       case UndoActions.ChangeGridLargeHexOffset: {
-	lh_change_offset(action.new_horizontal, action.new_vertical, false)
-	break
+        lh_change_offset(action.new_horizontal, action.new_vertical, false)
+        break
       }
       case UndoActions.ToggleGridLargeHexEdgeEncompass: {
-	lh_toggle_edge_encompass(action.enabled, false)
-	break
+        lh_toggle_edge_encompass(action.enabled, false)
+        break
       }
     }
   }
@@ -288,44 +287,79 @@
 
   <!-- LARGE HEXES -->
   <label for="showOverlay">{$tl.settings.grid.large_hexes.title}</label>
-  <Checkbox checked={$tfield.largehexes.shown} id="showOverlay" on:change={() => {
-  	toggle_large_hexes(!$tfield.largehexes.shown)
-  }} />
+  <Checkbox
+    checked={$tfield.largehexes.shown}
+    id="showOverlay"
+    on:change={() => {
+      toggle_large_hexes(!$tfield.largehexes.shown)
+    }}
+  />
 
   {#if $tfield.largehexes.shown}
     <label for="overlayDiameter">{$tl.settings.grid.large_hexes.size}</label>
-    <input type="number" id="overlayDiameter" min={2} value={$tfield.largehexes.diameterInHexes} on:change={e => {
-      lh_change_size(e.target.valueAsNumber)
-    }}/>
+    <input
+      type="number"
+      id="overlayDiameter"
+      min={2}
+      value={$tfield.largehexes.diameterInHexes}
+      on:change={(e) => {
+        lh_change_size(e.target.valueAsNumber)
+      }}
+    />
 
     <label for="overlayColor">{$tl.settings.grid.large_hexes.color}</label>
-    <ColorInputPixi id={'overlayColor'} value={$tfield.largehexes.style.color} on:input={(e) => {
-    	lh_change_color(e.detail.number)
-    }}/>
+    <ColorInputPixi
+      id={'overlayColor'}
+      value={$tfield.largehexes.style.color}
+      on:input={(e) => {
+        lh_change_color(e.detail.number)
+      }}
+    />
 
     <label for="overlayThickness">{$tl.settings.grid.large_hexes.outline_thickness}</label>
-    <input type="number" id={'overlayThickness'} value={$tfield.largehexes.style.width} on:change={e => {
-    	lh_change_outline_thickness(e.target.valueAsNumber)
-    }}/>
+    <input
+      type="number"
+      id={'overlayThickness'}
+      value={$tfield.largehexes.style.width}
+      on:change={(e) => {
+        lh_change_outline_thickness(e.target.valueAsNumber)
+      }}
+    />
 
     <label for="overlayOffsetX" title={$tl.settings.grid.large_hexes.horizontal_offset_tooltip}>
       {$tl.settings.grid.large_hexes.horizontal_offset}
     </label>
-    <input type="number" value={$tfield.largehexes.offset.x} min={0} step={0.25} on:change={e => {
-      lh_change_offset(e.target.valueAsNumber, $tfield.largehexes.offset.y)
-    }}/>
+    <input
+      type="number"
+      value={$tfield.largehexes.offset.x}
+      min={0}
+      step={0.25}
+      on:change={(e) => {
+        lh_change_offset(e.target.valueAsNumber, $tfield.largehexes.offset.y)
+      }}
+    />
 
     <label for="overlayOffsetY" title={$tl.settings.grid.large_hexes.vertical_offset_tooltip}>
       {$tl.settings.grid.large_hexes.vertical_offset}
     </label>
-    <input type="number" value={$tfield.largehexes.offset.y} min={0} step={0.25} on:change={e => {
-      lh_change_offset($tfield.largehexes.offset.x, e.target.valueAsNumber)
-    }}/>
+    <input
+      type="number"
+      value={$tfield.largehexes.offset.y}
+      min={0}
+      step={0.25}
+      on:change={(e) => {
+        lh_change_offset($tfield.largehexes.offset.x, e.target.valueAsNumber)
+      }}
+    />
 
     <label for="overlayEncompass">{$tl.settings.grid.large_hexes.encompasedges}</label>
-    <Checkbox checked={$tfield.largehexes.encompassEdges} id="overlayEncompass" on:change={e => {
-      lh_toggle_edge_encompass(!$tfield.largehexes.encompassEdges)
-    }}/>
+    <Checkbox
+      checked={$tfield.largehexes.encompassEdges}
+      id="overlayEncompass"
+      on:change={(e) => {
+        lh_toggle_edge_encompass(!$tfield.largehexes.encompassEdges)
+      }}
+    />
 
     {#if $tfield.mapShape == map_shape.SQUARE}
       <label

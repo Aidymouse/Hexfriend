@@ -1,307 +1,301 @@
 //@ts-nocheck - A github issue should be opened about this
-import type { Translation } from "./types";
+import type { Translation } from './types'
 
 export const pt_br: Translation = {
-	language: "pt_br",
-	save_indicator: "Salvando...",
+  language: 'pt_br',
+  save_indicator: 'Salvando...',
 
-	general: {
-		odd: "Ímpar",
-		even: "Par",
-		export: "Exportar",
-		import: "Importar",
-		reset: "Redefinir",
-	},
+  general: {
+    odd: 'Ímpar',
+    even: 'Par',
+    export: 'Exportar',
+    import: 'Importar',
+    reset: 'Redefinir',
+  },
 
-	tools: {
-		hex_paintbucket: "Balde de Tinta de Hex",
-		hex_eraser: "Apagar Hex",
-		hex_eyedropper: "Conta gotas de Hex",
-		icon_drag: "Arrastar Ícones",
-		icon_erase: "Apagar Ícones",
-		icon_snap: "Atrair Ícones para as Bordas",
-		icon_eyedropper: "Conta gotas de Ícones",
-		path_snap: "Atrair Pontos de Caminho para as Bordas",
-		eraser_terrain: "Apagar Terreno",
-		eraser_icon: "Apagar Ícones",
-	},
-	
-	terrain_panel: {
-		terrain_color: "Cor do Terreno",
-		symbol_color: "Cor do Símbolo",
-	},
+  tools: {
+    hex_paintbucket: 'Balde de Tinta de Hex',
+    hex_eraser: 'Apagar Hex',
+    hex_eyedropper: 'Conta gotas de Hex',
+    icon_drag: 'Arrastar Ícones',
+    icon_erase: 'Apagar Ícones',
+    icon_snap: 'Atrair Ícones para as Bordas',
+    icon_eyedropper: 'Conta gotas de Ícones',
+    path_snap: 'Atrair Pontos de Caminho para as Bordas',
+    eraser_terrain: 'Apagar Terreno',
+    eraser_icon: 'Apagar Ícones',
+  },
 
-	icon_panel: {
-		icon_color: "Cor do Ícone",	
-	},
+  terrain_panel: {
+    terrain_color: 'Cor do Terreno',
+    symbol_color: 'Cor do Símbolo',
+  },
 
-	path_panel: {
-		line_ends: "Fim da Linha",
-		corners: "Cantos",
-		dashed_line: "Linha Tracejada",
+  icon_panel: {
+    icon_color: 'Cor do Ícone',
+  },
 
-		switch_end: "Troca a Ponta",
-		deselect: "De-selecionar a Linha",
-		remove_last: "Remover Último Ponto",
-		delete_path: "Apagar o Linha",
+  path_panel: {
+    line_ends: 'Fim da Linha',
+    corners: 'Cantos',
+    dashed_line: 'Linha Tracejada',
 
-		save_current_style: "Salvar o estilo de Linha atual",
-		update_style_title: "Atualizar o estilo da linha para corresponder ao que está configurado acima.",
-		update_style: "Atualizar o Estilo",
-		rename_style: "Renomear",
-		duplicate_style: "Duplicar",
-		delete_style: "Apagar",
-	},
+    switch_end: 'Troca a Ponta',
+    deselect: 'De-selecionar a Linha',
+    remove_last: 'Remover Último Ponto',
+    delete_path: 'Apagar o Linha',
 
-	text_panel: {
-		align_left: "Alinhar à Esquerda",
-		align_center: "Alinhar ao Centro",
-		align_right: "Alinhar à Direita",
-		outline: "Contorno",
-		opacity: "Opacidade",
-		delete_text: "Apagar o Texto Selecionado",
-		save_current_style: "Salvar o estilo de texto atual",
-		update_style_title: "Atualizar este estilo de linha para corresponder ao que está configurado acima.",
-		update_style: "Atualizar Estilo",
-		rename_style: "Renomear",
-		duplicate_style: "Duplicar",
-		delete_style: "Apagar",
-	},
+    save_current_style: 'Salvar o estilo de Linha atual',
+    update_style_title: 'Atualizar o estilo da linha para corresponder ao que está configurado acima.',
+    update_style: 'Atualizar o Estilo',
+    rename_style: 'Renomear',
+    duplicate_style: 'Duplicar',
+    delete_style: 'Apagar',
+  },
 
-	eraser_panel: {
-		erase_all_icons: "Apagar Todos os Ícones",
-		erase_icons_confirmation: "Realmente quer apagar todos os ícones?",
-		erase_all_paths: "Apagar Todas as Linhas",
-		erase_paths_confirmation: "Realmente quer Apagar Todas as Linhas?",
-		erase_all_text: "Apagar Todo o Texto",
-		erase_text_confirmation: "Realmente Quer Apagar Todo o Texto?",
-	},
+  text_panel: {
+    align_left: 'Alinhar à Esquerda',
+    align_center: 'Alinhar ao Centro',
+    align_right: 'Alinhar à Direita',
+    outline: 'Contorno',
+    opacity: 'Opacidade',
+    delete_text: 'Apagar o Texto Selecionado',
+    save_current_style: 'Salvar o estilo de texto atual',
+    update_style_title: 'Atualizar este estilo de linha para corresponder ao que está configurado acima.',
+    update_style: 'Atualizar Estilo',
+    rename_style: 'Renomear',
+    duplicate_style: 'Duplicar',
+    delete_style: 'Apagar',
+  },
 
-	overlay_panel: {
-		show: "Mostrar",
-		opacity: "Opacidade",
-		reset_scale: "Redefinir escala",
-		reset_position: "Redefinir posição",
-		remove: "Remover a Sobreposição",
-		remove_confirmation: "Remover a Sobreposição?",
-	},
+  eraser_panel: {
+    erase_all_icons: 'Apagar Todos os Ícones',
+    erase_icons_confirmation: 'Realmente quer apagar todos os ícones?',
+    erase_all_paths: 'Apagar Todas as Linhas',
+    erase_paths_confirmation: 'Realmente quer Apagar Todas as Linhas?',
+    erase_all_text: 'Apagar Todo o Texto',
+    erase_text_confirmation: 'Realmente Quer Apagar Todo o Texto?',
+  },
 
-	// Settings
+  overlay_panel: {
+    show: 'Mostrar',
+    opacity: 'Opacidade',
+    reset_scale: 'Redefinir escala',
+    reset_position: 'Redefinir posição',
+    remove: 'Remover a Sobreposição',
+    remove_confirmation: 'Remover a Sobreposição?',
+  },
 
-	settings: {
-		map_title: "Título do Mapa",
-		export_as: "Exportar Como...",
-		exports: {
-			png: "PNG",
-			scaled_png: "PNG ampliado",
-			scale_request_dialog: "Quer amplicar em qual porcentagem?",
-			hexfriend: "Hexfriend",
-		},
+  // Settings
 
-		grid: {
-			title: "Grade",
-			show: "Mostrar Grade",
-			thickness: "Espessura da Grade",
-			color: "Cor da Grade",
-			gap: "Lacuna",
-			large_hexes: {
-				title: "Hexágonos Grandes",
-				size: "Tamanho",
-				color: "Cor",
-				outline_thickness: "Espessura da Borda",
-				horizontal_offset: "Deslocamento Horizontal",
-				horizontal_offset_tooltip: "Descolamento Horizontal",
-				vertical_offset: "Deslocamento Vertical",
-				vertical_offset_tooltip: "Descolamento Vertical",
-				encompasedges: "Abranger as Bordas do Mapa",
-				large_raised_column: "Elevação de Coluna Grande",
-				large_indented_row: "Identação de Linha Grande",
-			},
-		},
-		
-		hexes: {
-			title: "Hexágonos (Hex)",
-			blank_color: "Cor de Fundo Hexadecimal",
-			blank_color_reset: "Redefinir",
-			orientation: "Orientação do Hex",
-			pointytop: "Topo Pontudo",
-			flattop: "Topo Reto",
-			raised_column: "Coluna Elevada",
-			indented_row: "Linha Identada",
-			width: "Largura do Hex",
-			height: "Altura do Hex",
-			size_by_radius: "Tamaho por Raio",
-			radius_set: "Definir",
-			retain_position: "Manter Posição",
-			retain_position_explanation: "Os objetos selecionados tentarão permanecer em seu hexagono quando forem redimensionados",
-			retain_icons: "Ícones",
-			retain_paths: "Linhas",
-			retain_text: "Texto",
-		},
-		
-		shape: {
-			title: "Forma e Tamanho",
-			disclaimer: "Hexágonos removidos por uma redução no tamanho do mapa são completamente apagados.",
-			mapshape: "Formato do Mapa",
-			flower: "Flor",
-			square: "Quadrado",
-			hexesout: "Hexes à partir do centro",
-			addtop: "Adicionar em Cima",
-			addbottom: "Adicionar em Baixo",
-			addleft: "Adicionar à Esquerda",
-			addright: "Adicionar à Direita",
-			removetop: "Remover de Cima",
-			removebottom: "Remover de Baixo",
-			removeleft: "Remover da Esquerda",
-			removeright: "Remover da Direita",
-			removehex: "Remover Hex",
-			addhex: "Adicionar Hex",
-		},
+  settings: {
+    map_title: 'Título do Mapa',
+    export_as: 'Exportar Como...',
+    exports: {
+      png: 'PNG',
+      scaled_png: 'PNG ampliado',
+      scale_request_dialog: 'Quer amplicar em qual porcentagem?',
+      hexfriend: 'Hexfriend',
+    },
 
-		coordinates: {
-			title: "Coordenadas",
-			disclaimer: "As coordenadas podem deixar as alterações no mapa mais lentas, como adicionar hexágonos ou alterar a orientação.",
-			show: "Mostrar coordenadas",
-			system: "Sistema de Cordenadas",
-			systems: {
-				colrow: "Coluna, Linha",
-				axial: "Axial",
-				cube: "Cubo",
-				letternumber: "Letra e Número",
-			},
-			text_labels: {
-				color: "Cor",
-				size: "Tamanho da Fonte",
-				outline_color: "Cor do Contorno",
-				outline_thickness: "Espessura do Contorno"
-			},
-			separator: "Separador",
-			space: "Distânicia da Parte Inferior",
-			offset: {
-				row: "Deslocamento da Linha",
-				column: "Deslocamento da Coluna",
-				q: "Deslocamento da Q",
-				r: "Deslocamento da R",
-				s: "Deslocamento da S"
-			},
-		},
+    grid: {
+      title: 'Grade',
+      show: 'Mostrar Grade',
+      thickness: 'Espessura da Grade',
+      color: 'Cor da Grade',
+      gap: 'Lacuna',
+      large_hexes: {
+        title: 'Hexágonos Grandes',
+        size: 'Tamanho',
+        color: 'Cor',
+        outline_thickness: 'Espessura da Borda',
+        horizontal_offset: 'Deslocamento Horizontal',
+        horizontal_offset_tooltip: 'Descolamento Horizontal',
+        vertical_offset: 'Deslocamento Vertical',
+        vertical_offset_tooltip: 'Descolamento Vertical',
+        encompasedges: 'Abranger as Bordas do Mapa',
+        large_raised_column: 'Elevação de Coluna Grande',
+        large_indented_row: 'Identação de Linha Grande',
+      },
+    },
 
-		overlay: {
-			title: "Sobreposição",
-			load: "Carregar Imagem de Sobreposição",
-			replace: "Substituir Imagem de Sobreposição",
-		},
+    hexes: {
+      title: 'Hexágonos (Hex)',
+      blank_color: 'Cor de Fundo Hexadecimal',
+      blank_color_reset: 'Redefinir',
+      orientation: 'Orientação do Hex',
+      pointytop: 'Topo Pontudo',
+      flattop: 'Topo Reto',
+      raised_column: 'Coluna Elevada',
+      indented_row: 'Linha Identada',
+      width: 'Largura do Hex',
+      height: 'Altura do Hex',
+      size_by_radius: 'Tamaho por Raio',
+      radius_set: 'Definir',
+      retain_position: 'Manter Posição',
+      retain_position_explanation:
+        'Os objetos selecionados tentarão permanecer em seu hexagono quando forem redimensionados',
+      retain_icons: 'Ícones',
+      retain_paths: 'Linhas',
+      retain_text: 'Texto',
+    },
 
-		tilesets: {
-			title: "Conjuntos de Hexágonos (Tileset)",
-			import: "Importar Conjunto",
-			builder: "Construir um Conjunto",
-			already_loaded: "Você já carregou esse conjunto de hexágonos :)",
-			remove_confirmation: "Fazer isso vai remover todos os hexágonos deste conjunto. Confirmar?",
-		},
-		
-		icon_sets: {
-			title: "Conjunto de Ícones",
-			import: "Importar Conjunto de Ícones",
-			builder: "Construir Conjunto de Ícones",
-			already_loaded: "Você já importou esse conjunto de ícones :)",
-		},
+    shape: {
+      title: 'Forma e Tamanho',
+      disclaimer: 'Hexágonos removidos por uma redução no tamanho do mapa são completamente apagados.',
+      mapshape: 'Formato do Mapa',
+      flower: 'Flor',
+      square: 'Quadrado',
+      hexesout: 'Hexes à partir do centro',
+      addtop: 'Adicionar em Cima',
+      addbottom: 'Adicionar em Baixo',
+      addleft: 'Adicionar à Esquerda',
+      addright: 'Adicionar à Direita',
+      removetop: 'Remover de Cima',
+      removebottom: 'Remover de Baixo',
+      removeleft: 'Remover da Esquerda',
+      removeright: 'Remover da Direita',
+      removehex: 'Remover Hex',
+      addhex: 'Adicionar Hex',
+    },
 
+    coordinates: {
+      title: 'Coordenadas',
+      disclaimer:
+        'As coordenadas podem deixar as alterações no mapa mais lentas, como adicionar hexágonos ou alterar a orientação.',
+      show: 'Mostrar coordenadas',
+      system: 'Sistema de Cordenadas',
+      systems: {
+        colrow: 'Coluna, Linha',
+        axial: 'Axial',
+        cube: 'Cubo',
+        letternumber: 'Letra e Número',
+      },
+      text_labels: {
+        color: 'Cor',
+        size: 'Tamanho da Fonte',
+        outline_color: 'Cor do Contorno',
+        outline_thickness: 'Espessura do Contorno',
+      },
+      separator: 'Separador',
+      space: 'Distânicia da Parte Inferior',
+      offset: {
+        row: 'Deslocamento da Linha',
+        column: 'Deslocamento da Coluna',
+        q: 'Deslocamento da Q',
+        r: 'Deslocamento da R',
+        s: 'Deslocamento da S',
+      },
+    },
 
-		generators: {
-			title: "Geradores",
-			terrain: "Gerador de Terreno",
-			icon: "Gerador de Ícones",
-		},
+    overlay: {
+      title: 'Sobreposição',
+      load: 'Carregar Imagem de Sobreposição',
+      replace: 'Substituir Imagem de Sobreposição',
+    },
 
+    tilesets: {
+      title: 'Conjuntos de Hexágonos (Tileset)',
+      import: 'Importar Conjunto',
+      builder: 'Construir um Conjunto',
+      already_loaded: 'Você já carregou esse conjunto de hexágonos :)',
+      remove_confirmation: 'Fazer isso vai remover todos os hexágonos deste conjunto. Confirmar?',
+    },
 
-		changelog: "Registro de Alterações",
+    icon_sets: {
+      title: 'Conjunto de Ícones',
+      import: 'Importar Conjunto de Ícones',
+      builder: 'Construir Conjunto de Ícones',
+      already_loaded: 'Você já importou esse conjunto de ícones :)',
+    },
 
-		about: {
-			title: "Sobre",
-			version: "versão",
-			version_tagline: "\"Crie Mundos Hex-traordinários com Hexfriend!\"", // It's advised you make this one funny little line for this language, that way you don't have to come back and change it for every version. Maybe a hexagon pun or something?
-			
-			// These messages are stiched together with a link in the middle in the form start + link + end
-			credits: { 
-				start: "Por Aidymouse e todos os maravilhos",
-				contributorlink: "contribuidores",
-				end: ""
-			},
-			guts: {
-				start: "Hexfriend foi feito com Svelte, Pixi JS e Typescript. Dé uma olhada no ",
-				github_link: "Github",
-				end: ""
-			},
-			socials: {
-				start: "Achou um bug? Tem ideias? Dë um Oi no ",
-				discord_link: "Discord do Hexfriend",
-				end: ""
-			},
-			money: {
-				start: "Você pode doar seu dinheiro suado em ",
-				kofi_link: "Ko-fi.",
-				end: ""
-			},
-		},
+    generators: {
+      title: 'Geradores',
+      terrain: 'Gerador de Terreno',
+      icon: 'Gerador de Ícones',
+    },
 
-	},
+    changelog: 'Registro de Alterações',
 
+    about: {
+      title: 'Sobre',
+      version: 'versão',
+      version_tagline: '"Crie Mundos Hex-traordinários com Hexfriend!"', // It's advised you make this one funny little line for this language, that way you don't have to come back and change it for every version. Maybe a hexagon pun or something?
 
-	builders: {
+      // These messages are stiched together with a link in the middle in the form start + link + end
+      credits: {
+        start: 'Por Aidymouse e todos os maravilhos',
+        contributorlink: 'contribuidores',
+        end: '',
+      },
+      guts: {
+        start: 'Hexfriend foi feito com Svelte, Pixi JS e Typescript. Dé uma olhada no ',
+        github_link: 'Github',
+        end: '',
+      },
+      socials: {
+        start: 'Achou um bug? Tem ideias? Dë um Oi no ',
+        discord_link: 'Discord do Hexfriend',
+        end: '',
+      },
+      money: {
+        start: 'Você pode doar seu dinheiro suado em ',
+        kofi_link: 'Ko-fi.',
+        end: '',
+      },
+    },
+  },
 
-		author: "Autor",
-		author_placeholder: "Você!",
-		version: "Versão",
-		change_orientation: "Alterar Orientação do Hex",
-		duplicate: "Duplicar este Hex",
-		tileset_builder: {
-			delete: "Apagar este Hex",
-			exit: "Sair do Construtor de Conjuntos de Hexágonos",
-			name: "Nome do Conjunto de Hexánogos",
-			name_placeholder: "Nome do Conjunto",
-			helptext: "Selecione uma peça ou crie uma nova!",
-			helpsubtitle: "Para obter melhores resultados, use imagens brancas de 100 x 100 pixels para símbolos.",
-			background: "Fundo",
-			upload_symbol: "Carregar Símbolo",
-			symbol: "Símbolo",
-			symbol_scale: "Escala dos Símbolos",
-		},
-		icon_set_builder: {
-			delete: "Apagar este Ícone",
-			exit: "Sair do Construtor de Conjunto de Ícones",
-			name: "Nome do Conjunto de Ícones",
-			name_placeholder: "Novo Conjunto de Ícones",
-			author: "Autor",
-			version: "Versão",
-			helptext: "Selecione um ícone ou crie um novo!",
-			helpsubtitle: "Para obter melhores resultados, use imagens brancas de 100 x 100 pixels.",
-			helpsubsubtitle: "Dica: você pode fazer upload de várias imagens de uma vez!",
-			tint: "Matiz",
-			scale: "Escala de Ícone",
-		}
-	},
+  builders: {
+    author: 'Autor',
+    author_placeholder: 'Você!',
+    version: 'Versão',
+    change_orientation: 'Alterar Orientação do Hex',
+    duplicate: 'Duplicar este Hex',
+    tileset_builder: {
+      delete: 'Apagar este Hex',
+      exit: 'Sair do Construtor de Conjuntos de Hexágonos',
+      name: 'Nome do Conjunto de Hexánogos',
+      name_placeholder: 'Nome do Conjunto',
+      helptext: 'Selecione uma peça ou crie uma nova!',
+      helpsubtitle: 'Para obter melhores resultados, use imagens brancas de 100 x 100 pixels para símbolos.',
+      background: 'Fundo',
+      upload_symbol: 'Carregar Símbolo',
+      symbol: 'Símbolo',
+      symbol_scale: 'Escala dos Símbolos',
+    },
+    icon_set_builder: {
+      delete: 'Apagar este Ícone',
+      exit: 'Sair do Construtor de Conjunto de Ícones',
+      name: 'Nome do Conjunto de Ícones',
+      name_placeholder: 'Novo Conjunto de Ícones',
+      author: 'Autor',
+      version: 'Versão',
+      helptext: 'Selecione um ícone ou crie um novo!',
+      helpsubtitle: 'Para obter melhores resultados, use imagens brancas de 100 x 100 pixels.',
+      helpsubsubtitle: 'Dica: você pode fazer upload de várias imagens de uma vez!',
+      tint: 'Matiz',
+      scale: 'Escala de Ícone',
+    },
+  },
 
-	generators: {
-		animate: "Animação",
-		generate: "Gerar",
-		close: "Fechar",
-		clear: "Limpar",
-		seed: "Semente",
-		seed_generation: "Geração de Semente",
-		clear_confirmation: "Você tem Certeza?",
-		clear_before_generation: "Limpar Antes de Gerar",
-		icon_generator: {
-			place_in_center: "Colocar no Centro do Hex",
-			generation_chance: "Chance da Geração",
-			out_of_connector: "em",
-			icon_scale: "Escala",
-		},
-		terrain_generator: {
-			preset: "Predefinição",
-		}
-	},
-
-
-
+  generators: {
+    animate: 'Animação',
+    generate: 'Gerar',
+    close: 'Fechar',
+    clear: 'Limpar',
+    seed: 'Semente',
+    seed_generation: 'Geração de Semente',
+    clear_confirmation: 'Você tem Certeza?',
+    clear_before_generation: 'Limpar Antes de Gerar',
+    icon_generator: {
+      place_in_center: 'Colocar no Centro do Hex',
+      generation_chance: 'Chance da Geração',
+      out_of_connector: 'em',
+      icon_scale: 'Escala',
+    },
+    terrain_generator: {
+      preset: 'Predefinição',
+    },
+  },
 }

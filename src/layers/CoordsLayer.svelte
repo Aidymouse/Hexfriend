@@ -1,249 +1,283 @@
 <script lang="ts">
-	// Small random bug that i'll come investigate later: if you change orientation, then raised col/indented row, then change orientation again, hex at (col.row) (1.0) or (1.1) will be duplicated??
-	import { coords_cubeToWorld, genHexId } from '../helpers/hexHelpers';
-	import { coords_cubeToq, coords_cubeTor } from '../helpers/hexHelpers';
-	
-	import { data_coordinates } from '../stores/data';
+  // Small random bug that i'll come investigate later: if you change orientation, then raised col/indented row, then change orientation again, hex at (col.row) (1.0) or (1.1) will be duplicated??
+  import { coords_cubeToWorld, genHexId } from '../helpers/hexHelpers'
+  import { coords_cubeToq, coords_cubeTor } from '../helpers/hexHelpers'
 
-	import { tfield } from '../stores/tfield';
-	
-	import { store_has_unsaved_changes } from '../stores/flags';
-	import { coord_system } from '../types/coordinates';
-	import type { coordinates_data } from '../types/data';
-	import type { TerrainHex, terrain_field } from '../types/terrain';
-	import type { hex_id } from '../types/toolData';
-	import * as PIXI from 'pixi.js';
-	import { onMount } from 'svelte';
-	import { map_shape } from '../types/settings';
+  import { data_coordinates } from '../stores/data'
 
-	interface coordText {
-		pixiText: PIXI.Text;
-		parts: number[];
-	}
+  import { tfield } from '../stores/tfield'
 
-	$: {
-		Object.entries(coordTexts).forEach(([hexId, text]) => {
-			text.pixiText.style = $data_coordinates.style;
-			text.pixiText.resolution = 4;
-		});
+  import { store_has_unsaved_changes } from '../stores/flags'
+  import { coord_system } from '../types/coordinates'
+  import type { coordinates_data } from '../types/data'
+  import type { TerrainHex, terrain_field } from '../types/terrain'
+  import type { hex_id } from '../types/toolData'
+  import * as PIXI from 'pixi.js'
+  import { onMount } from 'svelte'
+  import { map_shape } from '../types/settings'
 
-		cont_textContainer.visible = $data_coordinates.shown
-	}
+  interface coordText {
+    pixiText: PIXI.Text
+    parts: number[]
+  }
 
-	let coordTexts: { [key: hex_id]: coordText } = {}; // hex id: coordText
+  $: {
+    Object.entries(coordTexts).forEach(([hexId, text]) => {
+      text.pixiText.style = $data_coordinates.style
+      text.pixiText.resolution = 4
+    })
 
-	export let cont_coordinates;
-	let cont_textContainer = new PIXI.Container();
-	cont_coordinates.addChild(cont_textContainer);
+    cont_textContainer.visible = $data_coordinates.shown
+  }
 
-	function breakDownHexID(hexId: hex_id) {
-		let brokenId = hexId.split(':');
-		return { q: Number(brokenId[0]), r: Number(brokenId[1]), s: Number(brokenId[2]) };
-	}
+  let coordTexts: { [key: hex_id]: coordText } = {} // hex id: coordText
 
-	function coordTextExists(hexId: hex_id) {
-		return coordTexts[hexId] != null;
-	}
+  export let cont_coordinates
+  let cont_textContainer = new PIXI.Container()
+  cont_coordinates.addChild(cont_textContainer)
 
-	function generateAllCoords(system: coord_system) {
-		Object.keys($tfield.hexes).forEach((hexId: hex_id) => {
-			generateNewCoord(hexId, system);
-		});
-		$store_has_unsaved_changes = true;
-	}
+  function breakDownHexID(hexId: hex_id) {
+    let brokenId = hexId.split(':')
+    return { q: Number(brokenId[0]), r: Number(brokenId[1]), s: Number(brokenId[2]) }
+  }
 
-	export function populateBlankHexes() {
-		Object.keys($tfield.hexes).forEach((hexId: hex_id) => {
-			if (!coordTextExists(hexId)) generateNewCoord(hexId);
-		});
+  function coordTextExists(hexId: hex_id) {
+    return coordTexts[hexId] != null
+  }
 
-		if ($tfield.mapShape == map_shape.FLOWER && $data_coordinates.system == coord_system.LETTERNUMBER) {
-			updateAllCoordsText();
-		}
-		$store_has_unsaved_changes = true;
-	}
+  function generateAllCoords(system: coord_system) {
+    Object.keys($tfield.hexes).forEach((hexId: hex_id) => {
+      generateNewCoord(hexId, system)
+    })
+    $store_has_unsaved_changes = true
+  }
 
-	export function generateNewCoord(hexId: hex_id, system: coord_system = $data_coordinates.system) {
-		if (coordTextExists(hexId)) {
-			console.log(`You already have a text at ${hexId}! Use updateCoord() instead, goofball.`);
-		}
+  export function populateBlankHexes() {
+    Object.keys($tfield.hexes).forEach((hexId: hex_id) => {
+      if (!coordTextExists(hexId)) generateNewCoord(hexId)
+    })
 
-		coordTexts[hexId] = { pixiText: new PIXI.Text('', $data_coordinates.style), parts: [] };
-		coordTexts[hexId].pixiText.anchor.x = 0.5;
-		coordTexts[hexId].pixiText.anchor.y = 1;
-		cont_textContainer.addChild(coordTexts[hexId].pixiText);
+    if ($tfield.mapShape == map_shape.FLOWER && $data_coordinates.system == coord_system.LETTERNUMBER) {
+      updateAllCoordsText()
+    }
+    $store_has_unsaved_changes = true
+  }
 
-		let generated = generateCoordTextAndParts(hexId);
+  export function generateNewCoord(hexId: hex_id, system: coord_system = $data_coordinates.system) {
+    if (coordTextExists(hexId)) {
+      console.log(`You already have a text at ${hexId}! Use updateCoord() instead, goofball.`)
+    }
 
-		coordTexts[hexId].pixiText.text = generated.text;
-		coordTexts[hexId].parts = [...generated.parts];
+    coordTexts[hexId] = { pixiText: new PIXI.Text('', $data_coordinates.style), parts: [] }
+    coordTexts[hexId].pixiText.anchor.x = 0.5
+    coordTexts[hexId].pixiText.anchor.y = 1
+    cont_textContainer.addChild(coordTexts[hexId].pixiText)
 
-		updateCoordPosition(hexId);
-		$store_has_unsaved_changes = true;
-	}
+    let generated = generateCoordTextAndParts(hexId)
 
-	export function updateAllCoordPositions() {
-		Object.keys(coordTexts).forEach((hexId: hex_id) => {
-			updateCoordPosition(hexId);
-		});
+    coordTexts[hexId].pixiText.text = generated.text
+    coordTexts[hexId].parts = [...generated.parts]
 
-		if ($data_coordinates.system == coord_system.LETTERNUMBER) {
-			updateAllCoordsText();
-		}
+    updateCoordPosition(hexId)
+    $store_has_unsaved_changes = true
+  }
 
-		$store_has_unsaved_changes = true;
-	}
+  export function updateAllCoordPositions() {
+    Object.keys(coordTexts).forEach((hexId: hex_id) => {
+      updateCoordPosition(hexId)
+    })
 
-	function updateCoordPosition(hexId: hex_id) {
-		let text = coordTexts[hexId];
+    if ($data_coordinates.system == coord_system.LETTERNUMBER) {
+      updateAllCoordsText()
+    }
 
-		let idParts = breakDownHexID(hexId);
-		let newPos = coords_cubeToWorld(idParts.q, idParts.r, idParts.s, $tfield.orientation, $tfield.hexWidth + $tfield.grid.gap, $tfield.hexHeight + $tfield.grid.gap, $tfield.grid.gap);
+    $store_has_unsaved_changes = true
+  }
 
-		text.pixiText.position.x = newPos.x;
-		text.pixiText.position.y = newPos.y + $tfield.hexHeight / 2 - $data_coordinates.gap;
-	}
+  function updateCoordPosition(hexId: hex_id) {
+    let text = coordTexts[hexId]
 
-	export function eliminateCoord(hexId: hex_id) {
-		cont_textContainer.removeChild(coordTexts[hexId].pixiText);
-		coordTexts[hexId].pixiText.destroy();
-		delete coordTexts[hexId];
+    let idParts = breakDownHexID(hexId)
+    let newPos = coords_cubeToWorld(
+      idParts.q,
+      idParts.r,
+      idParts.s,
+      $tfield.orientation,
+      $tfield.hexWidth + $tfield.grid.gap,
+      $tfield.hexHeight + $tfield.grid.gap,
+      $tfield.grid.gap,
+    )
 
-		$store_has_unsaved_changes = true;
-	}
+    text.pixiText.position.x = newPos.x
+    text.pixiText.position.y = newPos.y + $tfield.hexHeight / 2 - $data_coordinates.gap
+  }
 
-	function generateCoordTextAndParts(hexId: hex_id, system: coord_system = $data_coordinates.system): { parts: number[]; text: string } {
+  export function eliminateCoord(hexId: hex_id) {
+    cont_textContainer.removeChild(coordTexts[hexId].pixiText)
+    coordTexts[hexId].pixiText.destroy()
+    delete coordTexts[hexId]
 
-		
+    $store_has_unsaved_changes = true
+  }
 
-		switch (system) {
-			case coord_system.CUBE: {
-				let idParts = breakDownHexID(hexId);
+  function generateCoordTextAndParts(
+    hexId: hex_id,
+    system: coord_system = $data_coordinates.system,
+  ): { parts: number[]; text: string } {
+    switch (system) {
+      case coord_system.CUBE: {
+        let idParts = breakDownHexID(hexId)
 
-				let parts = [
-					idParts.q + $data_coordinates.offsets.cube.q,
-					idParts.r + $data_coordinates.offsets.cube.r,
-					idParts.s + $data_coordinates.offsets.cube.s];
+        let parts = [
+          idParts.q + $data_coordinates.offsets.cube.q,
+          idParts.r + $data_coordinates.offsets.cube.r,
+          idParts.s + $data_coordinates.offsets.cube.s,
+        ]
 
-				return {
-					parts: [idParts.q, idParts.r, idParts.s],
-					text: `${parts[0]}${$data_coordinates.seperator}${parts[1]}${$data_coordinates.seperator}${parts[2]}`,
-				};
-			}
+        return {
+          parts: [idParts.q, idParts.r, idParts.s],
+          text: `${parts[0]}${$data_coordinates.seperator}${parts[1]}${$data_coordinates.seperator}${parts[2]}`,
+        }
+      }
 
-			case coord_system.ROWCOL: {
-				let cube = breakDownHexID(hexId);
-				let idParts =
-					$tfield.orientation == 'flatTop'
-						? coords_cubeToq($tfield.raised, cube.q, cube.r, cube.s)
-						: coords_cubeTor($tfield.raised, cube.q, cube.r, cube.s);
+      case coord_system.ROWCOL: {
+        let cube = breakDownHexID(hexId)
+        let idParts =
+          $tfield.orientation == 'flatTop'
+            ? coords_cubeToq($tfield.raised, cube.q, cube.r, cube.s)
+            : coords_cubeTor($tfield.raised, cube.q, cube.r, cube.s)
 
-				let parts = [idParts.col + $data_coordinates.offsets.row_col.row, idParts.row + $data_coordinates.offsets.row_col.col];
+        let parts = [
+          idParts.col + $data_coordinates.offsets.row_col.row,
+          idParts.row + $data_coordinates.offsets.row_col.col,
+        ]
 
-				return {
-					parts: [idParts.col, idParts.row],
-					text: `${ (parts[0] < 10 && parts[0] >= 0) ? 0 : ''}${parts[0]}${$data_coordinates.seperator}${(parts[1] < 10 && parts[1] >= 0) ? 0 : ''}${parts[1]}`,
-				};
-			}
+        return {
+          parts: [idParts.col, idParts.row],
+          text: `${parts[0] < 10 && parts[0] >= 0 ? 0 : ''}${parts[0]}${$data_coordinates.seperator}${parts[1] < 10 && parts[1] >= 0 ? 0 : ''}${parts[1]}`,
+        }
+      }
 
-			case coord_system.AXIAL: {
-				let cube = breakDownHexID(hexId);
+      case coord_system.AXIAL: {
+        let cube = breakDownHexID(hexId)
 
-				let parts = [cube.q + $data_coordinates.offsets.cube.q, cube.r + $data_coordinates.offsets.cube.r];
+        let parts = [cube.q + $data_coordinates.offsets.cube.q, cube.r + $data_coordinates.offsets.cube.r]
 
-				return {
-					parts: [cube.q, cube.r],
-					text: `${parts[0]}${$data_coordinates.seperator}${parts[1]}`,
-				};
-			}
+        return {
+          parts: [cube.q, cube.r],
+          text: `${parts[0]}${$data_coordinates.seperator}${parts[1]}`,
+        }
+      }
 
-			case coord_system.LETTERNUMBER: {
-				let row_offset = 0
-				let col_offset = 0
+      case coord_system.LETTERNUMBER: {
+        let row_offset = 0
+        let col_offset = 0
 
-				if ($tfield.mapShape == map_shape.FLOWER) {
-					row_offset = $tfield.hexesOut
-					col_offset = $tfield.hexesOut
-				}
+        if ($tfield.mapShape == map_shape.FLOWER) {
+          row_offset = $tfield.hexesOut
+          col_offset = $tfield.hexesOut
+        }
 
-				let cube = breakDownHexID(hexId);
+        let cube = breakDownHexID(hexId)
 
-				let idParts = $tfield.orientation == 'flatTop'
-						? coords_cubeToq($tfield.raised, cube.q, cube.r, cube.s)
-						: coords_cubeTor($tfield.raised, cube.q, cube.r, cube.s);
-				
-				
+        let idParts =
+          $tfield.orientation == 'flatTop'
+            ? coords_cubeToq($tfield.raised, cube.q, cube.r, cube.s)
+            : coords_cubeTor($tfield.raised, cube.q, cube.r, cube.s)
 
-				// Convert column to letter
-				let parts = [ 
-					num_to_alphabet(idParts.col+col_offset+1 + Math.max($data_coordinates.offsets.row_col.row, 0)),
-					idParts.row+row_offset+1+$data_coordinates.offsets.row_col.col ];
+        // Convert column to letter
+        let parts = [
+          num_to_alphabet(idParts.col + col_offset + 1 + Math.max($data_coordinates.offsets.row_col.row, 0)),
+          idParts.row + row_offset + 1 + $data_coordinates.offsets.row_col.col,
+        ]
 
-				return {
-					parts: parts,
-					text: `${parts[0]}${$data_coordinates.seperator}${parts[1]}`
-				}
-				
-			}
-		}
+        return {
+          parts: parts,
+          text: `${parts[0]}${$data_coordinates.seperator}${parts[1]}`,
+        }
+      }
+    }
 
-		$store_has_unsaved_changes = true;
-	}
+    $store_has_unsaved_changes = true
+  }
 
-	function num_to_alphabet(num) {
-		let n = num
-		let col_name = "";
-		let alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I","J","K", "L", "M", "N", "O", "P","Q", "R", "S", "T","U", "V", "W", "X", "Y", "Z"];
+  function num_to_alphabet(num) {
+    let n = num
+    let col_name = ''
+    let alphabet = [
+      'A',
+      'B',
+      'C',
+      'D',
+      'E',
+      'F',
+      'G',
+      'H',
+      'I',
+      'J',
+      'K',
+      'L',
+      'M',
+      'N',
+      'O',
+      'P',
+      'Q',
+      'R',
+      'S',
+      'T',
+      'U',
+      'V',
+      'W',
+      'X',
+      'Y',
+      'Z',
+    ]
 
-		while (n > 0) {
-			let mod = (n-1) % 26;
-			col_name = alphabet[mod] + col_name;
-			n = Math.round((n - mod) / 26);
-			//console.log(n)
-		}
+    while (n > 0) {
+      let mod = (n - 1) % 26
+      col_name = alphabet[mod] + col_name
+      n = Math.round((n - mod) / 26)
+      //console.log(n)
+    }
 
+    return col_name
+  }
 
-		return col_name;
+  export function updateAllCoordsText() {
+    Object.keys(coordTexts).forEach((hexId: hex_id) => {
+      updateCoordText(hexId)
+    })
+    $store_has_unsaved_changes = true
+  }
 
+  export function updateCoordText(hexId: hex_id) {
+    let generated = generateCoordTextAndParts(hexId, $data_coordinates.system)
+    coordTexts[hexId].parts = [...generated.parts]
+    coordTexts[hexId].pixiText.text = generated.text
+    $store_has_unsaved_changes = true
+  }
 
-	}
+  export function cullUnusedCoordinates() {
+    Object.keys(coordTexts).forEach((hexId: hex_id) => {
+      if ($tfield.hexes[hexId] == null) {
+        eliminateCoord(hexId)
+      }
+    })
 
-	export function updateAllCoordsText() {
-		Object.keys(coordTexts).forEach((hexId: hex_id) => {
-			updateCoordText(hexId);
-		});
-		$store_has_unsaved_changes = true;
-	}
+    if ($tfield.mapShape == map_shape.FLOWER && $data_coordinates.system == coord_system.LETTERNUMBER) {
+      updateAllCoordsText()
+    }
 
-	export function updateCoordText(hexId: hex_id) {
-		let generated = generateCoordTextAndParts(hexId, $data_coordinates.system);
-		coordTexts[hexId].parts = [...generated.parts];
-		coordTexts[hexId].pixiText.text = generated.text;
-		$store_has_unsaved_changes = true;
-	}
+    $store_has_unsaved_changes = true
+  }
 
-	export function cullUnusedCoordinates() {
-		Object.keys(coordTexts).forEach((hexId: hex_id) => {
-			if ($tfield.hexes[hexId] == null) {
-				eliminateCoord(hexId);
-			}
-		});
+  onMount(() => {
+    cont_coordinates.removeChildren(0)
 
-		if ($tfield.mapShape == map_shape.FLOWER && $data_coordinates.system == coord_system.LETTERNUMBER) {
-			updateAllCoordsText();
-		}
+    cont_textContainer = new PIXI.Container()
+    cont_coordinates.addChild(cont_textContainer)
 
-		$store_has_unsaved_changes = true;
-	}
-
-	onMount(() => {
-		cont_coordinates.removeChildren(0);
-
-		cont_textContainer = new PIXI.Container();
-		cont_coordinates.addChild(cont_textContainer);
-
-		cullUnusedCoordinates();
-		generateAllCoords($data_coordinates.system);
-	});
+    cullUnusedCoordinates()
+    generateAllCoords($data_coordinates.system)
+  })
 </script>
-

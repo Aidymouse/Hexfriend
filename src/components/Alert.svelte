@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let severity: 'warn' | 'error';
+  export let severity: 'warn' | 'error'
 </script>
 
 <p class={`alert ${severity}`}>
@@ -17,5 +17,4 @@
     background-color: #ffdb4d;
     color: #804d00;
   }
-
 </style>

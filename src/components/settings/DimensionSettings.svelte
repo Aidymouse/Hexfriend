@@ -106,7 +106,7 @@
   function flower_processTypedNumber(e) {
     const typed = parseInt(e.target.value)
 
-    if (isNaN(typed)) { 
+    if (isNaN(typed)) {
       //document.querySelector("#hexes-out-input").setAttribute('value', `${$tfield.hexesOut}`)
       $tfield.hexesOut = $tfield.hexesOut
       return
@@ -115,10 +115,10 @@
     const diff = typed - $tfield.hexesOut
 
     if (typed > 200) {
-      if (!confirm($tl.settings.shape.high_hexesout_warning)) { 
-	//document.querySelector("#hexes-out-input").setAttribute('value', `${$tfield.hexesOut}`)
-	$tfield.hexesOut = $tfield.hexesOut
-	return
+      if (!confirm($tl.settings.shape.high_hexesout_warning)) {
+        //document.querySelector("#hexes-out-input").setAttribute('value', `${$tfield.hexesOut}`)
+        $tfield.hexesOut = $tfield.hexesOut
+        return
       }
     }
 
@@ -134,23 +134,22 @@
   function flower_expandHexesOut(amount, record_action = true) {
     if (record_action) {
       record_undo_action({
-	type: UndoActions.ExpandDimensionsFlower,
-	hexes_expanded: amount
+        type: UndoActions.ExpandDimensionsFlower,
+        hexes_expanded: amount,
       })
     }
 
     comp_terrainLayer.flower_expandHexesOut(amount)
   }
 
-  function flower_reduceHexesOut(amount, record_action=true) {
-
+  function flower_reduceHexesOut(amount, record_action = true) {
     const removed_hexes = comp_terrainLayer.flower_reduceHexesOut(amount)
 
     if (record_action) {
       record_undo_action({
-	type: UndoActions.ReduceDimensionsFlower,
-	hexes_reduced: amount,
-	terrain_removed: removed_hexes, 
+        type: UndoActions.ReduceDimensionsFlower,
+        hexes_reduced: amount,
+        terrain_removed: removed_hexes,
       })
     }
   }
@@ -174,38 +173,39 @@
   export const handle_undo = (action: UndoAction) => {
     switch (action.type) {
       case UndoActions.ExpandDimensionsFlower: {
-	flower_reduceHexesOut(action.hexes_expanded, false)
-	break
+        flower_reduceHexesOut(action.hexes_expanded, false)
+        break
       }
       case UndoActions.ReduceDimensionsFlower: {
-	flower_expandHexesOut(action.hexes_reduced, false)
-	for (const [hexId, tile] of Object.entries(action.terrain_removed)) {
-	  comp_terrainLayer.paintFromTile(hexId, tile)
-	}
-	break
+        flower_expandHexesOut(action.hexes_reduced, false)
+        for (const [hexId, tile] of Object.entries(action.terrain_removed)) {
+          comp_terrainLayer.paintFromTile(hexId, tile)
+        }
+        break
       }
-      case UndoActions.ExpandDimensionsSquare: {}
-      case UndoActions.ReduceDimensionsSquare: {}
+      case UndoActions.ExpandDimensionsSquare: {
+      }
+      case UndoActions.ReduceDimensionsSquare: {
+      }
     }
   }
 
   export const handle_redo = (action: UndoAction) => {
     switch (action.type) {
       case UndoActions.ExpandDimensionsFlower: {
-	flower_expandHexesOut(action.hexes_expanded, false)
-	break
+        flower_expandHexesOut(action.hexes_expanded, false)
+        break
       }
       case UndoActions.ReduceDimensionsFlower: {
-	flower_reduceHexesOut(action.hexes_reduced, false)
-	break
+        flower_reduceHexesOut(action.hexes_reduced, false)
+        break
       }
-      case UndoActions.ExpandDimensionsSquare: {}
-      case UndoActions.ReduceDimensionsSquare: {}
+      case UndoActions.ExpandDimensionsSquare: {
+      }
+      case UndoActions.ReduceDimensionsSquare: {
+      }
     }
   }
-
-
-
 </script>
 
 <div class="settings-grid">
@@ -318,7 +318,7 @@
       </button>
 
       <div id="counter-container">
-	<input id="hexes-out-input" type="number" value={$tfield.hexesOut} on:change={flower_processTypedNumber}>
+        <input id="hexes-out-input" type="number" value={$tfield.hexesOut} on:change={flower_processTypedNumber} />
       </div>
 
       <button
@@ -368,7 +368,6 @@
     grid-template-columns: 60px 1fr 60px;
     width: 100%;
   }
-
 
   #flower-dimensions-controls-grid button {
     height: 60px;

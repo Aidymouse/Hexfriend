@@ -65,11 +65,11 @@
   let terrainSprites: { [key: hex_id]: PIXI.Sprite } = {}
 
   // Since all placed terrain must be one tile, we can just store the tile.
-  let placed_terrain: { tile: Tile, hex_ids: string[] } = { 
+  let placed_terrain: { tile: Tile; hex_ids: string[] } = {
     tile: compress_tile(DEFAULTTILESET.tiles[0]),
-    hex_ids: []
+    hex_ids: [],
   }
-  let replaced_terrain: {[hexid: string]: Tile} = {}
+  let replaced_terrain: { [hexid: string]: Tile } = {}
 
   let pan: pan_state
   store_panning.store.subscribe((newPan) => {
@@ -613,18 +613,16 @@
 
     if ($tfield.hexesOut == 0) return
 
-    let removed_hexes: {[k: string]: Tile} = {}
+    let removed_hexes: { [k: string]: Tile } = {}
 
     for (let curRing = 0; curRing < amount; curRing++) {
       let idsToAdd = getRing('0:0:0', $tfield.hexesOut)
 
       idsToAdd.forEach((hexId) => {
-
-	if ($tfield.hexes[hexId].tile !== null) {
-	  removed_hexes[hexId] = {...$tfield.hexes[hexId].tile}
-	}
+        if ($tfield.hexes[hexId].tile !== null) {
+          removed_hexes[hexId] = { ...$tfield.hexes[hexId].tile }
+        }
         eliminateHex(hexId)
-
       })
 
       $tfield.hexesOut -= 1
@@ -879,15 +877,14 @@
 
       // Update undo registers
       if (hexExists(clickedId) && replaced_terrain[clickedId] === undefined) {
-	const existing_tile = $tfield.hexes[clickedId].tile
-	replaced_terrain[clickedId] = existing_tile ? compress_tile(existing_tile) : null
-	placed_terrain.hex_ids = placed_terrain.hex_ids.concat(clickedId) 
-	placed_terrain.tile = compress_tile($data_terrain.tile)
+        const existing_tile = $tfield.hexes[clickedId].tile
+        replaced_terrain[clickedId] = existing_tile ? compress_tile(existing_tile) : null
+        placed_terrain.hex_ids = placed_terrain.hex_ids.concat(clickedId)
+        placed_terrain.tile = compress_tile($data_terrain.tile)
       }
 
-      // Paint the tilee	
+      // Paint the tilee
       paintFromTile(clickedId, $data_terrain.tile)
-
     }
   }
 
@@ -1114,20 +1111,18 @@
     return visitedIDs
   }
 
-  let mouse_lock: { locked: boolean, lock_action: null | 'terrain' } = {
-  	locked: false,
-	lock_action: null
+  let mouse_lock: { locked: boolean; lock_action: null | 'terrain' } = {
+    locked: false,
+    lock_action: null,
   }
 
-
   export function pointerdown() {
-
     // Start a mouse lock, released when mouse events stop.
     // During a mouse lock, events are collated into event records (assembled undo actions I spose?)
     // When mouse lock is released, the event record is committed to undo history
 
     // Actually, instead of keeping a locked state, I can just collate everything that happens on mouse down, and remove it on mouse up.
-    
+
     if ($data_terrain.usingEyedropper) {
       eyedrop()
     } else if ($data_terrain.usingPaintbucket && $data_terrain.usingEraser) {
@@ -1142,25 +1137,23 @@
   }
 
   export function pointerup(e) {
-      // Get placed terrain, etc, and put into undo record
+    // Get placed terrain, etc, and put into undo record
 
-      if (e.button === 0) { // Left Mouse
-	console.log(placed_terrain, replaced_terrain)
+    if (e.button === 0) {
+      // Left Mouse
+      console.log(placed_terrain, replaced_terrain)
 
-	
-	if (placed_terrain.hex_ids.length > 0) {
-	  record_undo_action({
-	    type: UndoActions.PlaceTerrain,
-	    placed_terrain: {...placed_terrain},
-	    replaced_terrain: {...replaced_terrain}
-	  })
-	}
-	
-
-	placed_terrain.hex_ids = []
-	replaced_terrain = {}
+      if (placed_terrain.hex_ids.length > 0) {
+        record_undo_action({
+          type: UndoActions.PlaceTerrain,
+          placed_terrain: { ...placed_terrain },
+          replaced_terrain: { ...replaced_terrain },
+        })
       }
 
+      placed_terrain.hex_ids = []
+      replaced_terrain = {}
+    }
   }
 
   export function clearTerrainSprites() {
@@ -1225,13 +1218,13 @@
   export const handle_undo = (action: UndoAction) => {
     switch (action.type) {
       case UndoActions.PlaceTerrain: {
-	for (const [hex_id, tile] of Object.entries(action.replaced_terrain)) {
-	  if (tile === null) {
-	    eraseHex(hex_id as HexId)
-	  } else {
-	    paintFromTile(hex_id as HexId, tile)
-	  }
-	}
+        for (const [hex_id, tile] of Object.entries(action.replaced_terrain)) {
+          if (tile === null) {
+            eraseHex(hex_id as HexId)
+          } else {
+            paintFromTile(hex_id as HexId, tile)
+          }
+        }
       }
     }
   }
@@ -1239,9 +1232,9 @@
   export const handle_redo = (action: UndoAction) => {
     switch (action.type) {
       case UndoActions.PlaceTerrain: {
-	for (const hex_id of action.placed_terrain.hex_ids) {
-	  paintFromTile(hex_id as HexId, action.placed_terrain.tile)
-	}
+        for (const hex_id of action.placed_terrain.hex_ids) {
+          paintFromTile(hex_id as HexId, action.placed_terrain.tile)
+        }
       }
     }
   }

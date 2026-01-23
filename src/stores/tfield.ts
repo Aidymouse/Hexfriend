@@ -1,6 +1,6 @@
-import type { terrain_field } from '../types/terrain';
-import { writable } from 'svelte/store';
+import type { terrain_field } from '../types/terrain'
+import { writable } from 'svelte/store'
 
-let t: terrain_field;
+let t: terrain_field
 
-export let tfield = writable(t);
+export let tfield = writable(t)

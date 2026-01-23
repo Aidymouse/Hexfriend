@@ -1,15 +1,15 @@
-import type { Tile } from './tilesets';
+import type { Tile } from './tilesets'
 
 export enum tools {
-	TERRAIN = 'terrain',
-	ICON = 'icon',
-	PATH = 'path',
-	TEXT = 'text',
-	ERASER = 'eraser',
-	OVERLAY = 'overlay'
+  TERRAIN = 'terrain',
+  ICON = 'icon',
+  PATH = 'path',
+  TEXT = 'text',
+  ERASER = 'eraser',
+  OVERLAY = 'overlay',
 }
 
-type HexId = `${number}:${number}:${number}`;
+type HexId = `${number}:${number}:${number}`
 
 /*
 interface ToolData {
@@ -36,4 +36,4 @@ interface ToolData {
 }
 */
 
-export type { HexId };
+export type { HexId }

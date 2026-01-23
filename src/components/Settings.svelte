@@ -164,19 +164,19 @@
       case UndoActions.ToggleGrid:
       case UndoActions.ChangeGridThickness:
       case UndoActions.ChangeGridColor:
-      case UndoActions.ChangeGridGap: 
-      case UndoActions.ToggleGridLargeHexes: 
-      case UndoActions.ChangeGridLargeHexSize: 
-      case UndoActions.ChangeGridLargeHexColor: 
-      case UndoActions.ChangeGridLargeHexWidth: 
-      case UndoActions.ChangeGridLargeHexOffset: 
+      case UndoActions.ChangeGridGap:
+      case UndoActions.ToggleGridLargeHexes:
+      case UndoActions.ChangeGridLargeHexSize:
+      case UndoActions.ChangeGridLargeHexColor:
+      case UndoActions.ChangeGridLargeHexWidth:
+      case UndoActions.ChangeGridLargeHexOffset:
       case UndoActions.ToggleGridLargeHexEdgeEncompass: {
         comp_grid.handle_undo(action)
       }
 
       case UndoActions.ChangeHexBlankColor:
       case UndoActions.ChangeHexOrientation:
-      case UndoActions.ChangeHexDimensions: 
+      case UndoActions.ChangeHexDimensions:
       case UndoActions.ChangeHexRaisedIndented: {
         comp_hexes.handle_undo(action)
         break
@@ -191,7 +191,7 @@
       }
 
       default: {
-	console.warn("Unhandled Settings Undo", action)
+        console.warn('Unhandled Settings Undo', action)
       }
     }
   }
@@ -201,12 +201,12 @@
       case UndoActions.ToggleGrid:
       case UndoActions.ChangeGridThickness:
       case UndoActions.ChangeGridColor:
-      case UndoActions.ChangeGridGap: 
-      case UndoActions.ToggleGridLargeHexes: 
-      case UndoActions.ChangeGridLargeHexSize: 
-      case UndoActions.ChangeGridLargeHexColor: 
-      case UndoActions.ChangeGridLargeHexWidth: 
-      case UndoActions.ChangeGridLargeHexOffset: 
+      case UndoActions.ChangeGridGap:
+      case UndoActions.ToggleGridLargeHexes:
+      case UndoActions.ChangeGridLargeHexSize:
+      case UndoActions.ChangeGridLargeHexColor:
+      case UndoActions.ChangeGridLargeHexWidth:
+      case UndoActions.ChangeGridLargeHexOffset:
       case UndoActions.ToggleGridLargeHexEdgeEncompass: {
         comp_grid.handle_redo(action)
         break
@@ -229,7 +229,7 @@
       }
 
       default: {
-	console.warn("Unhandled Settings Redo", action)
+        console.warn('Unhandled Settings Redo', action)
       }
     }
   }
@@ -435,7 +435,13 @@
     <SettingHeading text={$tl.settings.shape.title} bind:toggle={hidden_settings.dimensions} />
     <div class="settings-hider" class:hidden={hidden_settings.dimensions}>
       <div class="hider">
-        <DimensionSettings bind:this={comp_shape} bind:comp_terrainLayer bind:comp_iconLayer bind:comp_textLayer bind:comp_pathLayer />
+        <DimensionSettings
+          bind:this={comp_shape}
+          bind:comp_terrainLayer
+          bind:comp_iconLayer
+          bind:comp_textLayer
+          bind:comp_pathLayer
+        />
       </div>
     </div>
   </div>
@@ -466,7 +472,7 @@
     <div class="settings-hider" class:hidden={hidden_settings.tilesets}>
       <div class="hider">
         <TilesetSettings
-	  bind:this={comp_tilesets}
+          bind:this={comp_tilesets}
           bind:loadedSave
           bind:loadedTilesets
           bind:comp_terrainLayer

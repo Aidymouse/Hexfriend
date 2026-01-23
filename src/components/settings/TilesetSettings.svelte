@@ -42,15 +42,15 @@
 
       /* Check that set hasn't already been imported */
       if (set_already_imported != null) {
-	if (confirm($tl.settings.tilesets.make_copy_confirmation)) {
-		let new_id = `${setToImport.id}_copy`
-		let counter = 0
-		while (loadedTilesets.find( ts => ts.id === new_id) ) {
-			counter += 1;
-			new_id = `${setToImport.id}_copy_${counter}`
-		}
-		setToImport = copy_tileset(setToImport, new_id);
-	}
+        if (confirm($tl.settings.tilesets.make_copy_confirmation)) {
+          let new_id = `${setToImport.id}_copy`
+          let counter = 0
+          while (loadedTilesets.find((ts) => ts.id === new_id)) {
+            counter += 1
+            new_id = `${setToImport.id}_copy_${counter}`
+          }
+          setToImport = copy_tileset(setToImport, new_id)
+        }
       }
 
       setToImport = await convert_tileset_to_latest(setToImport)
@@ -83,7 +83,6 @@
     // Maybe we should remove tiles here, because otherwise the tiles just... fail to load.
     // Check if these tiles are being used anywere
   }
-
 </script>
 
 <div id="tilesets">
@@ -110,7 +109,6 @@
           <img src="/assets/img/tools/trash.png" alt={'Trash'} title={'Remove Tileset'} />
         </button>
       {/if}
-
     </div>
   {/each}
 

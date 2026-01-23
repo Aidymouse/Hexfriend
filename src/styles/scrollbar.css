@@ -2,26 +2,26 @@
 
 /* width */
 ::-webkit-scrollbar {
-	width: 0.5em;
+  width: 0.5em;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-	display: none;
+  display: none;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-	background-color: var(--light-background);
-	border-radius: var(--large-radius);
-	width: 0.5em;
+  background-color: var(--light-background);
+  border-radius: var(--large-radius);
+  width: 0.5em;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-	background-color: var(--lighter-background);
+  background-color: var(--lighter-background);
 }
 
 ::-webkit-scrollbar-thumb:active {
-	background-color: var(--lightest-background);
+  background-color: var(--lightest-background);
 }

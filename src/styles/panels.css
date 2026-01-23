@@ -1,16 +1,16 @@
 #panel-quadrant {
-	width: 19em;
-	position: fixed;
-	top: 1em;
-	right: 1em;
+  width: 19em;
+  position: fixed;
+  top: 1em;
+  right: 1em;
 }
 
 .panel {
-	background-color: var(--primary-background);
-	border-radius: var(--large-radius);
-	overflow: hidden;
-	box-sizing: border-box;
+  background-color: var(--primary-background);
+  border-radius: var(--large-radius);
+  overflow: hidden;
+  box-sizing: border-box;
 
-	max-height: 80%;
-	height: auto;
+  max-height: 80%;
+  height: auto;
 }

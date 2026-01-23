@@ -144,7 +144,14 @@
   }
 
   const get_tile_previews = async (tile: Tile) => {
-    const previews = await generate_tile_previews(tile, preview_hex_info, previewSprite, previewGraphics, previewContainer, app)
+    const previews = await generate_tile_previews(
+      tile,
+      preview_hex_info,
+      previewSprite,
+      previewGraphics,
+      previewContainer,
+      app,
+    )
     return previews
   }
 
@@ -309,7 +316,6 @@
         selectedTile.preview_pointyTop = newpreviews.pointyTop
         workingTileset = workingTileset
       }
-
     }
   })
 </script>
