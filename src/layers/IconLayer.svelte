@@ -244,8 +244,8 @@
     const { iconX, iconY } = get_icon_position()
     const icon_scale = get_icon_scale_for_hex($data_icon.icon, $tfield)
 
-    spr_floating_icon.visible = false
-    console.log('Updating floating icon')
+    //debugger
+    //spr_floating_icon.visible = false
     spr_floating_icon.visible =
       !$data_icon.usingEraser &&
       $store_selected_tool == tools.ICON &&
@@ -253,6 +253,7 @@
       !$data_icon.dragMode &&
       draggedIcon == null &&
       !$data_icon.usingEyedropper
+
     spr_floating_icon.texture = get_icon_texture($data_icon.icon.texId)
     spr_floating_icon.tint = $data_icon.icon.color
 
@@ -264,6 +265,8 @@
     spr_floating_icon.y = iconY
     spr_floating_icon.tint = $data_icon.icon.color
     // spr_floating_icon.eventMode = 'static' // !!! TODO
+
+    console.log('Updated floating icon', spr_floating_icon)
   }
 
   /** Hide floating icon when tool is changed */
@@ -363,6 +366,9 @@
 
   function updateDraggedIcon() {
     const { iconX, iconY } = get_icon_position()
+
+    draggedIcon.x = iconX;
+    draggedIcon.y = iconY;
 
     icons = icons
     $store_has_unsaved_changes = true

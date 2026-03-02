@@ -3,6 +3,9 @@ For Techy People
 
 # Version 3.0 - Found your feet, Hexfriend
 
+## Version 3.2.1
+ - Fix dragging icons
+
 ## Version 3.2
  - Hexfriend now works offline
  - Iconset converter now finds the textures width and height for old iconsets
