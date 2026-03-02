@@ -54,8 +54,7 @@ self.addEventListener("install", (event) => {
 	event.waitUntil(
 		addResourcesToCache([
 			"/",
-			"/index.html",
-			"/src/main.ts"
+			"/index.html"
 		]),
 	);
 });
