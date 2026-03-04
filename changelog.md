@@ -3,6 +3,10 @@ For Techy People
 
 # Version 3.0 - Found your feet, Hexfriend
 
+## Version 3.2.2
+ - Fix drag re-ordering in the Tileset and Iconset creators
+ - Let button panels scroll in Tileset and Iconset creators
+
 ## Version 3.2.1
  - Fix dragging icons
 
