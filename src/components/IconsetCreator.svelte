@@ -230,7 +230,10 @@
 
   function dragButton(e: DragEvent, icon: Icon) {
     phantomIconButtonId = icon.id
-    e.dataTransfer.setData('text/json', JSON.stringify(icon))
+    const s = JSON.stringify(icon)
+    console.log("Stringified", s)
+    e.dataTransfer.setData("text/json", s)
+    console.log("Retrieved", e.dataTransfer.getData("text/json"))
   }
 
   function dropButton(e: DragEvent) {
@@ -238,16 +241,17 @@
   }
 
   function draggedOverButton(e: DragEvent, icon: Icon) {
-    if (icon.id == phantomIconButtonId) return
+    if (icon.id == phantomIconButtonId) { return }
 
     let draggedOverIndex = workingIconset.icons.indexOf(icon)
+    const draggedIcon = workingIconset.icons.find(i => i.id === phantomIconButtonId)
     workingIconset.icons = workingIconset.icons.filter((i) => i.id != phantomIconButtonId)
 
     // If phantom is on the left, switch them. Otherwise, proceed as normal
     if (draggedOverIndex != 0 && workingIconset.icons[draggedOverIndex - 1].id == phantomIconButtonId) {
-      workingIconset.icons.splice(draggedOverIndex + 1, 0, JSON.parse(e.dataTransfer.getData('text/json')))
+      workingIconset.icons.splice(draggedOverIndex + 1, 0, draggedIcon)
     } else {
-      workingIconset.icons.splice(draggedOverIndex, 0, JSON.parse(e.dataTransfer.getData('text/json')))
+      workingIconset.icons.splice(draggedOverIndex, 0, draggedIcon)
     }
 
     workingIconset = workingIconset
@@ -356,6 +360,7 @@
     </div>
 
     <!-- ICON BUTTONS -->
+    <div id="icon-buttons-ctr">
     <div
       id="icon-buttons"
       on:dragover={(e) => {
@@ -399,6 +404,7 @@
           }}
         />
       </button>
+    </div>
     </div>
   </nav>
 
@@ -597,8 +603,11 @@
   }
 
   nav {
-    height: 100%;
+    height: 100vh;
+    max-height: 100%;
     background-color: var(--light-background);
+    display: grid;
+    grid-auto-rows: auto 1fr;
   }
 
   #creator-hex-controls {
@@ -664,6 +673,10 @@
     opacity: 0;
   }
 
+  #icon-buttons-ctr {
+    overflow-y: auto;
+  }
+
   #icon-buttons {
     padding: 0.625em;
     display: grid;
@@ -687,7 +700,6 @@
     max-height: 90%;
     width: auto;
     height: auto;
-    draggable: false;
   }
 
   #editor-placeholder {

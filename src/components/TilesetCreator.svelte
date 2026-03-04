@@ -247,13 +247,14 @@
     if (tile.id == phantomTileButtonId) return
 
     let draggedOverIndex = workingTileset.tiles.indexOf(tile)
+    const draggedTile = workingTileset.tiles.find(t => t.id === phantomTileButtonId)
     workingTileset.tiles = workingTileset.tiles.filter((i) => i.id != phantomTileButtonId)
 
     // If phantom is on the left, switch them. Otherwise, proceed as normal
     if (draggedOverIndex != 0 && workingTileset.tiles[draggedOverIndex - 1].id == phantomTileButtonId) {
-      workingTileset.tiles.splice(draggedOverIndex + 1, 0, JSON.parse(e.dataTransfer.getData('text/json')))
+      workingTileset.tiles.splice(draggedOverIndex + 1, 0, draggedTile)
     } else {
-      workingTileset.tiles.splice(draggedOverIndex, 0, JSON.parse(e.dataTransfer.getData('text/json')))
+      workingTileset.tiles.splice(draggedOverIndex, 0, draggedTile)
     }
 
     workingTileset = workingTileset
@@ -364,6 +365,7 @@
       </div>
     </div>
 
+    <div id="tile-buttons-ctr">
     <div
       id="tile-buttons"
       on:dragover={(e) => {
@@ -393,7 +395,7 @@
           }}
           title={tile.display}
         >
-          <img src={tile[`preview_${preview_hex_info.orientation}`]} alt={tile.display} />
+          <img src={tile[`preview_${preview_hex_info.orientation}`]} draggable="false" alt={tile.display} />
         </button>
       {/each}
 
@@ -403,6 +405,7 @@
           newTile()
         }}>+</button
       >
+    </div>
     </div>
   </nav>
 
@@ -738,8 +741,14 @@
   }
 
   nav {
-    height: 100%;
+    height: 100vh;
     background-color: #222222;
+    display: grid;
+    grid-template-rows: auto 1fr;
+  }
+
+  #tile-buttons-ctr {
+    overflow-y: auto;
   }
 
   #tile-buttons {
