@@ -303,7 +303,12 @@
   }
 
   .icon-button img {
-    width: 90%;
+    max-width: 90%;
+    max-height: 90%;
+    width: auto;
     height: auto;
+    /*height: 90%;*/
+    /*height: auto;*/
+    /*aspect-ratio: 1/1;*/
   }
 </style>

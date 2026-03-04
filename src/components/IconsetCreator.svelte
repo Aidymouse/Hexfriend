@@ -683,7 +683,11 @@
   }
 
   .icon-button img {
-    width: 100%;
+    max-width: 90%;
+    max-height: 90%;
+    width: auto;
+    height: auto;
+    draggable: false;
   }
 
   #editor-placeholder {
