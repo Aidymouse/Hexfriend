@@ -23,6 +23,9 @@
   export let loadedSave
   export let loadedTilesets: Tileset[]
 
+
+  console.log(loadedTilesets)
+
   export let appState
 
   let tilesetFiles: FileList
@@ -50,6 +53,8 @@
 			new_id = `${setToImport.id}_copy_${counter}`
 		}
 		setToImport = copy_tileset(setToImport, new_id);
+	} else {
+	  return;
 	}
       }
 

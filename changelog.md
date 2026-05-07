@@ -6,6 +6,7 @@ For Techy People
 ## Version 3.2.3
  - Fix tileset previews failing to generate and therefore save and therefore show up when imported
  - Reorganize icon type to make split clearer + fix type issue in Tileset creator
+ - Fix bug where duplicate tileset will try to load when you click cancel on the warning
 
 ## Version 3.2.2
  - Fix drag re-ordering in the Tileset and Iconset creators
