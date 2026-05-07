@@ -266,7 +266,6 @@
     spr_floating_icon.tint = $data_icon.icon.color
     // spr_floating_icon.eventMode = 'static' // !!! TODO
 
-    console.log('Updated floating icon', spr_floating_icon)
   }
 
   /** Hide floating icon when tool is changed */
