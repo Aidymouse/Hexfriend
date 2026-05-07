@@ -4,7 +4,7 @@
   import { get_icon_scale_for_hex } from '../helpers/imageSizing'
   import { generate_icon_preview, type PreviewHexInfo } from '../helpers/iconFns'
   import { generate_tile_previews } from '../helpers/tileFns'
-  import { load_tileset_textures } from '../lib/texture_loader.ts'
+  import { load_tileset_textures } from '../lib/texture_loader'
 
   let preview_hex_info: PreviewHexInfo = {
     hexWidth: 50 * 6,
@@ -144,7 +144,7 @@
   }
 
   const get_tile_previews = async (tile: Tile) => {
-    const previews = await generate_tile_previews(tile, preview_hex_info, previewSprite, previewGraphics, previewContainer, app)
+    const previews = await generate_tile_previews(tile, preview_hex_info, previewSprite, previewGraphics, previewContainer, app, true)
     return previews
   }
 
@@ -194,7 +194,7 @@
       tile.tileset_id = export_tileset.id
     })
 
-    console.log(export_tileset)
+    console.log("Tileset I'm exporting: ", export_tileset)
     download(JSON.stringify(export_tileset), `${export_tileset.id}.hfts`, 'application/json')
   }
 
@@ -213,7 +213,7 @@
 
       setToImport = await convert_tileset_to_latest(setToImport)
 
-      console.log(setToImport)
+      console.log("Tileset I'm importing: ", setToImport)
 
       load_tileset_textures(setToImport)
 
