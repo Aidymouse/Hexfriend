@@ -2,7 +2,7 @@ import { ScaleMode } from '../helpers/imageSizing'
 import type { Iconset } from '../types/icon'
 import * as PIXI from 'pixi.js'
 
-const convert_v1_to_v2 = async (old: Iconset): Iconset => {
+const convert_v1_to_v2 = async (old: Iconset): Promise<Iconset> => {
   let new_iconset = {...old}
   
   // Icon Updates
