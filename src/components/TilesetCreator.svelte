@@ -28,6 +28,7 @@
   import { convert_tileset_to_latest } from '../lib/tilesetConverter'
   import { ScaleMode } from '../helpers/imageSizing'
   import PreviewHexControls from './PreviewHexControls.svelte'
+  import type { ByDimensionIcon, RelativeIcon } from '../types/icon'
 
   let app = new PIXI.Application({
     height: 300,
@@ -261,17 +262,17 @@
   }
 
   const update_symbol_scalemode = (new_mode: string) => {
-    delete selectedTile.symbol.pHex
-    delete selectedTile.symbol.pWidth
-    delete selectedTile.symbol.pHeight
+    delete (selectedTile.symbol as RelativeIcon).pHex
+    delete (selectedTile.symbol as ByDimensionIcon).pWidth
+    delete (selectedTile.symbol as ByDimensionIcon).pHeight
 
     if (new_mode === ScaleMode.RELATIVE) {
-      selectedTile.symbol.scaleMode = new_mode
-      selectedTile.symbol.pHex = 80
+      selectedTile.symbol.scaleMode = new_mode;
+      (selectedTile.symbol as RelativeIcon).pHex = 80;
     } else {
-      selectedTile.symbol.scaleMode = new_mode as ScaleMode
-      selectedTile.symbol.pWidth = 100
-      selectedTile.symbol.pHeight = 100
+      selectedTile.symbol.scaleMode = new_mode as ScaleMode;
+      (selectedTile.symbol as ByDimensionIcon).pWidth = 100;
+      (selectedTile.symbol as ByDimensionIcon).pHeight = 100;
     }
   }
 
