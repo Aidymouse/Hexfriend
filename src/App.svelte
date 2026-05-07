@@ -33,7 +33,7 @@
   import ToolButtons from './components/ToolButtons.svelte'
   import TooltipsPane from './components/TooltipsPane.svelte'
 
-  import UndoStack from './components/debug/UndoStack.svelte'
+  import UndoPanel from './components/debug/UndoPanel.svelte'
 
   // Layers
   import CoordsLayer from './layers/CoordsLayer.svelte'
@@ -885,7 +885,7 @@
 
 
     {#if DEV_MODE}
-      <UndoStack />
+      <UndoPanel />
     {/if}
   
 
