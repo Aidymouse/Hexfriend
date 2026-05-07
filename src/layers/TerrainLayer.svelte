@@ -47,6 +47,7 @@
   import type { PreviewHexInfo } from '../helpers/iconFns'
   import { generate_tile_previews } from '../helpers/tileFns'
 
+  import { push_undo_state } from '../lib'
   export let cont_terrain: PIXI.Container
 
   export let changeTool: Function
@@ -238,6 +239,8 @@
     //for (var i = symbolsContainer.children.length - 1; i >= 0; i--) {symbolsContainer.removeChild(symbolsContainer.children[i]);};
     clearTerrainSprites()
     renderAllHexes()
+
+
   }
 
   export function square_expandMapDimension(direction: 'left' | 'right' | 'top' | 'bottom', amount: number) {
@@ -647,6 +650,8 @@
         // Might cause hex overlaps though... preventable?
         break
     }
+
+    push_undo_state({ TerrainField: $tfield })
 
     comp_coordsLayer.cullUnusedCoordinates()
   }
