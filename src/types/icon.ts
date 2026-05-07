@@ -4,7 +4,7 @@ import { HexOrientation } from "./terrain"
 export const LATEST_ICONSET_FORMAT_VERSION = 2
 export const LATEST_DEFAULT_ICONSET_VERSION = 6
 
-export type Icon = {
+export type IconBase = {
     display: string;
     id: string; // Within iconset id
     texId: string; // Id of loaded texture
@@ -15,17 +15,20 @@ export type Icon = {
     texWidth: number;
     texHeight: number;
     rotation: number;
-    scaleMode: ScaleMode // Needed?
-} & ({
+}
+
+export type RelativeIcon = IconBase & {
     scaleMode: ScaleMode.RELATIVE,
     pHex: number // percent of total hex taken up, where 1 = 100% of hexes shortest dimension
-} | {
+}
+
+export type ByDimensionIcon = IconBase & {
     scaleMode: ScaleMode.BYDIMENSION,
     pWidth: number,
     pHeight: number
+}
 
-})
-
+export type Icon = RelativeIcon | ByDimensionIcon
 
 /* SAVE DATA */
 export type IconLayerIcon = Icon & {
