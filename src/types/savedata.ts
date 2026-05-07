@@ -8,7 +8,7 @@ import type { Tileset } from './tilesets';
 const LATESTSAVEDATAVERSION = 13;
 const LATEST_DEFAULT_ICONS_VERSION = 5;
 
-interface save_data {
+export type SaveData = {
 	saveVersion: number;
 	title: string;
 
@@ -30,5 +30,4 @@ interface save_data {
 	text_styles: listed_text_style[];
 }
 
-export type { save_data }
 export { LATEST_DEFAULT_ICONS_VERSION, LATESTSAVEDATAVERSION }

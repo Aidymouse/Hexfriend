@@ -4,7 +4,6 @@
 		- undo / redo
 		- tooltips
 		- keyboard shortcuts - make sure all are working
-		- find more of a fix for why PIXI objects stick around when a new map is loaded - does this still happen ??
 		- textured hex backgrounds
 		- put all data into stores
 		- update to latest version of tileset
@@ -18,10 +17,8 @@
 		- text sucks - increase internal resolution ?
 
 		// BUGS //
-		- symbol size is weird in preview when hex size is big
-		- cant erase icon below text
 		- releasing right or left mouse over a panel results in its action getting stuck on
-			- add mouseup event to panels to fix
+		- add mouseup event to panels to fix
 	*/
 
   // Components
@@ -35,6 +32,8 @@
   import TilesetCreator from './components/TilesetCreator.svelte'
   import ToolButtons from './components/ToolButtons.svelte'
   import TooltipsPane from './components/TooltipsPane.svelte'
+
+  import UndoStack from './components/debug/UndoStack.svelte'
 
   // Layers
   import CoordsLayer from './layers/CoordsLayer.svelte'
@@ -57,6 +56,7 @@
   // Lib
   import * as texture_loader from './lib/texture_loader'
   import { convert_tileset_to_latest } from './lib/tilesetConverter'
+  import { push_undo_state, reset_undo_stack, undo_stack } from './lib/undoManager'
 
   // Panels
   import IconPanel from './panels/IconPanel.svelte'
@@ -95,7 +95,7 @@
   import type { eraser_data, terrain_data, text_data } from './types/data'
   import { LATEST_ICONSET_FORMAT_VERSION, type Iconset } from './types/icon'
   import type { pan_state } from './types/panning'
-  import type { save_data } from './types/savedata'
+  import type { SaveData } from './types/savedata'
   // Constants
   import { map_shape } from './types/settings'
   import type { terrain_field } from './types/terrain'
@@ -115,7 +115,8 @@
     id: null,
   }
 
-  let loadedSave: save_data = null
+  let loadedSave: SaveData = null
+  /* ID of the loaded map, fetched from Dexie. Null if no map has been loaded */
   let loadedId: number | null = null
 
   enum app_state {
@@ -167,6 +168,7 @@
   })
 
   // Enable PixiJS dev tools in development
+  const DEV_MODE = process.env.NODE_ENV === 'development'
   if (process.env.NODE_ENV == 'development') {
     // @ts-ignore
     globalThis.__PIXI_APP__ = app
@@ -396,6 +398,14 @@
             save_map(loadedSave, loadedId)
             break
 
+	  case 'undo':
+	    console.log("TODO: Undo")
+	    break
+
+	  case 'redo':
+	    console.log("TODO: Redo")
+	    break
+
           case 'toggleViewMaps':
             showSavedMaps = !showSavedMaps
             break
@@ -561,14 +571,12 @@
   /* DATA LOAD */
   function createNewMap() {
     load_map(JSON.parse(JSON.stringify(DEFAULTSAVEDATA)), null)
-
-    // setTimeout(() => {
-    //   do_load(dataToLoad.data, dataToLoad.id)
-    // }, 150)
   }
 
-  // Null if map is new. Can be set to null to force save a new map
-  async function save_map(data_to_save: save_data, save_id: number | null, preview_override: string | null = null) {
+  /*
+  * @param save_id - Null if map is new. Can be set to null to force save a new map
+  */
+  async function save_map(data_to_save: SaveData, save_id: number | null, preview_override: string | null = null) {
     // = asyncExtract(app, offsetContainer)
     if (data_to_save.title === '') {
       let t = prompt('Map Title:')
@@ -586,13 +594,13 @@
     return saveToDexie(data_to_save, save_id, preview_override ?? p)
   }
 
-  async function asyncExtract(app, container): Promise<string> {
-    await null // Why did I do this
-    return new Promise((r) => r(app.renderer.extract.base64(container)))
+  async function asyncExtract(app: PIXI.Application, container: PIXI.Container): Promise<string> {
+    //await null // Why did I do this
+    return await app.renderer.extract.base64(container)
   }
 
   /** Saves the map to dexie + updates the currently loaded ID */
-  async function saveToDexie(data: save_data, id: number | null, preview_base64: string): Promise<number> {
+  async function saveToDexie(data: SaveData, id: number | null, preview_base64: string): Promise<number> {
     let c = JSON.stringify(data)
 
     let curSave = undefined
@@ -613,7 +621,7 @@
 
       console.log(`Updated saved map with id ${id}`)
     } else {
-      const id = await db.mapSaves.add({
+      const id_after_save = await db.mapSaves.add({
         mapTitle: data.title,
         previewBase64: preview_base64,
         saveVersion: data.saveVersion,
@@ -623,8 +631,8 @@
         mapString: c,
       })
 
-      console.log(`Added map with id ${id}`)
-      loadedId = Number(id)
+      console.log(`Added map with id ${id_after_save}`)
+      loadedId = Number(id_after_save)
     }
 
     $store_has_unsaved_changes = false
@@ -644,7 +652,7 @@
     return loadedId
   }
 
-  async function do_load(data: save_data, id: number | null) {
+  async function do_load(data: SaveData, id: number | null) {
     console.log('Initiate load', id)
     loadedTilesets = data.tilesets
     loadedIconsets = data.iconsets
@@ -686,7 +694,12 @@
     $data_overlay = data.overlay
     if ($store_selected_tool == tools.OVERLAY && $data_overlay.base64 == '') $store_selected_tool = tools.TERRAIN
 
+    reset_undo_stack()
+
     loadedSave = data
+
+    push_undo_state(loadedSave)
+
     loadedId = id
 
     console.log('Loaded Sets', loadedTilesets)
@@ -743,7 +756,7 @@
     console.log('Loaded, ready')
   }
 
-  function load_map(data: save_data, id: number | null) {
+  function load_map(data: SaveData, id: number | null) {
     // Clean up
     if (id) {
       console.log(`Loading ${id}`)
@@ -775,24 +788,6 @@
       do_load(data, id)
     }, 150)
   }
-
-  //$: appState, andSave()
-
-  // function loadAndSave(data: save_data, id: number | null) {
-  //   do_load(data, id)
-  //   loadAndSaving = true
-  //   // also triggers andSave()
-  // }
-  //
-  // function andSave() {
-  //   // when app_state becomes NORMAL again, then trigger save
-  //   if (loadAndSaving) {
-  //     if (appState == app_state.NORMAL) {
-  //       saveInit()
-  //       loadAndSaving = false
-  //     }
-  //   }
-  // }
 
   /* Order matters */
   /* TODO: Put this somewhere better, add other layers */
@@ -887,6 +882,12 @@
     {:else if $store_selected_tool == tools.OVERLAY}
       <OverlayPanel />
     {/if}
+
+
+    {#if DEV_MODE}
+      <UndoStack />
+    {/if}
+  
 
     <div id="tool-buttons" on:mouseup={pointerup}>
       <ToolButtons {changeTool} />

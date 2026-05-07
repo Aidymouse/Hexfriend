@@ -1,7 +1,7 @@
 <script lang="ts">
   import '../../styles/settings.css'
 
-  import { LATEST_DEFAULT_ICONS_VERSION, type save_data } from '../../types/savedata'
+  import { LATEST_DEFAULT_ICONS_VERSION, type SaveData } from '../../types/savedata'
   import { type Iconset } from '../../types/icon'
 
   import { store_has_unsaved_changes } from '../../stores/flags'
@@ -12,7 +12,7 @@
 
   import { convert_iconset_to_latest } from '../../lib/iconsetConverter'
   import SettingHeading from './SettingHeading.svelte'
-  export let loadedSave: save_data
+  export let loadedSave: SaveData
   export let loadedIconsets: Iconset[]
 
   export let appState

@@ -1,10 +1,10 @@
 import { LATESTSAVEDATAVERSION } from '../types/savedata';
-import type { save_data } from '../types/savedata';
+import type { SaveData } from '../types/savedata';
 import { HexRaised } from '../types/terrain';
 import { ScaleMode } from '../helpers/imageSizing';
 
 /** I better make sure I like these names because they can NEVER CHANGE! Or old save versions will need to know what they used to be */
-function convert_v1_to_v5(oldData: save_data): save_data {
+function convert_v1_to_v5(oldData: SaveData): SaveData {
 	console.log("Converting save: v4- to v5")
 
 	if (!oldData.TerrainField.largehexes) {
@@ -65,12 +65,12 @@ function convert_v1_to_v5(oldData: save_data): save_data {
 	return oldData
 }
 
-function convert_v5_to_v6(oldData: save_data): save_data {
+function convert_v5_to_v6(oldData: SaveData): SaveData {
 	console.log("Converting save: v5 to v6")
 	// Changes in this version:
 	//	- tiles got set IDs seperate from their individual ID
 	//  - symbol ID is not the same as tile ID anymore, rather they are sorted out by the tilesetcreator
-	let new_data: save_data = JSON.parse(JSON.stringify(oldData));
+	let new_data: SaveData = JSON.parse(JSON.stringify(oldData));
 
 
 
@@ -79,10 +79,10 @@ function convert_v5_to_v6(oldData: save_data): save_data {
 
 }
 
-function convert_v6_to_v7(oldData: save_data): save_data {
+function convert_v6_to_v7(oldData: SaveData): SaveData {
 	console.log("Converting save: v6 to v7")
 
-	let new_data: save_data = JSON.parse(JSON.stringify(oldData));
+	let new_data: SaveData = JSON.parse(JSON.stringify(oldData));
 
     //@ts-ignore - Pre v13 it was called pathStyles
 	new_data.pathStyles = new_data.pathStyles.map(ps => { return { ...ps, style: { ...ps.style, dashed: false, dash_length: 15, dash_gap: 10 } } })
@@ -100,10 +100,10 @@ function convert_v6_to_v7(oldData: save_data): save_data {
 	return new_data;
 }
 
-function convert_v7_to_v8(old_data: save_data): save_data {
+function convert_v7_to_v8(old_data: SaveData): SaveData {
 	console.log("Converting save: v7 to v8")
 
-	let new_data: save_data = JSON.parse(JSON.stringify(old_data))
+	let new_data: SaveData = JSON.parse(JSON.stringify(old_data))
 
 	new_data.TerrainField.grid.gap = 0
 
@@ -111,10 +111,10 @@ function convert_v7_to_v8(old_data: save_data): save_data {
 	return new_data;
 }
 
-function convert_v8_to_v9(old_data: save_data): save_data {
+function convert_v8_to_v9(old_data: SaveData): SaveData {
 	console.log("Converting save: v8 to v9")
 
-	let new_data: save_data = JSON.parse(JSON.stringify(old_data))
+	let new_data: SaveData = JSON.parse(JSON.stringify(old_data))
 
 	new_data.icon_hex_size_percentage = 80
 
@@ -132,9 +132,9 @@ function convert_v8_to_v9(old_data: save_data): save_data {
 	return new_data
 }
 
-function convert_v9_to_v10(old_data: save_data): save_data {
+function convert_v9_to_v10(old_data: SaveData): SaveData {
 	console.log("Converting save: v9 to v10")
-	let new_data: save_data = JSON.parse(JSON.stringify(old_data))
+	let new_data: SaveData = JSON.parse(JSON.stringify(old_data))
 
 	Object.keys(new_data.TerrainField.hexes).forEach(hex_id => {
 		let hex = new_data.TerrainField.hexes[hex_id]
@@ -175,7 +175,7 @@ function convert_v9_to_v10(old_data: save_data): save_data {
 	return new_data
 }
 
-function convert_v10_to_v11(old_data: save_data): save_data {
+function convert_v10_to_v11(old_data: SaveData): SaveData {
 	console.log("Converting save: v10 to v11")
 
 	if (old_data.coords.offsets == null) {
@@ -193,7 +193,7 @@ function convert_v10_to_v11(old_data: save_data): save_data {
 
 }
 
-function convert_v11_to_v12(old_data: save_data): save_data {
+function convert_v11_to_v12(old_data: SaveData): SaveData {
 	console.log("Converting save: v11 to v12")
 	Object.entries(old_data.TerrainField.hexes).forEach(([hex_id, hex]) => {
 		if (hex.tile && hex.tile.symbol) hex.tile.symbol.rotation = 0;
@@ -204,7 +204,7 @@ function convert_v11_to_v12(old_data: save_data): save_data {
 	return old_data;
 }
 
-function convert_v12_to_v13(old_data: save_data): save_data {
+function convert_v12_to_v13(old_data: SaveData): SaveData {
     console.log("Coverting save: v12 -> v13")
  
     /** Path Styles become Listed Path Styles */
@@ -234,9 +234,9 @@ function convert_v12_to_v13(old_data: save_data): save_data {
 	return old_data;
 }
 
-export function convertSaveDataToLatest(oldData: save_data): save_data {
+export function convertSaveDataToLatest(oldData: SaveData): SaveData {
 	// Update to latest version
-	let newData: save_data = JSON.parse(JSON.stringify(oldData));
+	let newData: SaveData = JSON.parse(JSON.stringify(oldData));
 
 	if (newData.saveVersion < 5) { newData = convert_v1_to_v5(newData) }
 	if (newData.saveVersion == 5) { newData = convert_v5_to_v6(newData) }

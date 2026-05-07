@@ -7,6 +7,9 @@ export let shortcuts: shortcut_data[] = [
 	// Keycodes that work anywhere
 	// These will override tool specific commands
 	{ keycode: 'control+s', function: 'save', tool: null, display: 'Save Current Map' },
+	{ keycode: 'control+z', function: 'undo', tool: null, display: 'Undo' },
+	{ keycode: 'control+shift+z', function: 'redo', tool: null, display: 'Redo' },
+
 	// { keycode: 'control+z', function: 'undo', tool: null, display: 'Undo <wip>' },
 	// { keycode: 'control+shift+z', function: 'redo', tool: null, display: 'Redo <wip>' },
 	{ keycode: 'shift+m', function: 'toggleViewMaps', tool: null, display: 'Toggle Maps' },

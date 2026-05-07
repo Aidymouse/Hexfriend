@@ -2,7 +2,7 @@ import { coords_qToCube, genHexId } from '../helpers/hexHelpers';
 import { coord_system } from '../types/coordinates';
 import type { coordinates_data } from '../types/data';
 import type { Iconset } from '../types/icon';
-import type { save_data } from '../types/savedata';
+import type { SaveData } from '../types/savedata';
 import { LATESTSAVEDATAVERSION } from '../types/savedata';
 import { map_shape } from '../types/settings';
 import { HexOrientation, HexRaised } from '../types/terrain';
@@ -11,7 +11,7 @@ import { DEFAULTICONSET } from './defaultIconset';
 import { DEFAULTTILESET } from './defaultTileset';
 import { LINE_CAP, LINE_JOIN } from 'pixi.js';
 
-let DEFAULTSAVEDATA: save_data = {
+let DEFAULTSAVEDATA: SaveData = {
 	saveVersion: LATESTSAVEDATAVERSION,
 	title: '',
 

@@ -7,7 +7,7 @@
   import type TextLayer from '../layers/TextLayer.svelte'
   import type TerrainPanel from '../panels/TerrainPanel.svelte'
   import type { Iconset } from '../types/icon'
-  import type { save_data } from '../types/savedata'
+  import type { SaveData } from '../types/savedata'
   import type { Tileset } from '../types/tilesets'
   import { Map_Exports } from '../types/export'
 
@@ -37,7 +37,7 @@
   import { map_shape } from '../types/settings'
   import SavedMaps from './SavedMaps.svelte'
 
-  export let loadedSave: save_data
+  export let loadedSave: SaveData
   export let showSettings: boolean
   export let appState
   export let showTerrainGenerator: boolean
