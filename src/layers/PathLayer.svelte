@@ -2,7 +2,7 @@
   import type { path_data } from '../types/data'
   import type { pan_state } from '../types/panning'
   import type { path_layer_path } from '../types/path'
-  import type { HexRaised, terrain_field } from '../types/terrain'
+  import type { HexRaised, TerrainField } from '../types/terrain'
   import type { shortcut_data } from '../types/inputs'
   import type { tools } from '../types/toolData'
 
@@ -14,7 +14,6 @@
 
   import * as store_panning from '../stores/panning'
   import { tfield } from '../stores/tfield'
-  import { resize_parameters } from '../stores/resize_parameters'
 
   import { store_inputs } from '../stores/inputs'
   import { store_selected_tool } from '../stores/tools'
@@ -285,23 +284,23 @@
       let p3LeftLine = { start: p3Left, end: Vector.add(p3Left, Vector.multiply(lineSeg2, 5)) }
       let newPointRight = findIntersectionPoint(p1RightLine, p3LeftLine)
 
-      /* 
-			
+      /*
+
 			g.lineStyle(2, 0x0000ff);
 			g.moveTo(p1LeftLine.start.x, p1LeftLine.start.y)
 			g.lineTo(p1LeftLine.end.x, p1LeftLine.end.y)
-			
+
 			g.lineStyle(2, 0x00ff00);
 			g.moveTo(p3LeftLine.start.x, p3LeftLine.start.y)
 			g.lineTo(p3LeftLine.end.x, p3LeftLine.end.y)
-			
+
 			*/
 
       /*
 			g.lineStyle(2, 0x000088);
 			g.moveTo(p1RightLine.start.x, p1RightLine.start.y)
 			g.lineTo(p1RightLine.end.x, p1RightLine.end.y)
-			
+
 			g.lineStyle(2, 0x008800);
 			g.moveTo(p3RightLine.start.x, p3RightLine.start.y)
 			g.lineTo(p3RightLine.end.x, p3RightLine.end.y)

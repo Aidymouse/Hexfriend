@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { icon_data } from '../types/data'
   import type { Icon, Iconset } from '../types/icon'
-  import type { terrain_field } from '../types/terrain'
+  import type { TerrainField } from '../types/terrain'
   import type { PreviewHexInfo } from '../helpers/iconFns'
   import { ScaleMode } from '../helpers/imageSizing'
 

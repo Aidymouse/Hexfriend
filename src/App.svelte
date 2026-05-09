@@ -56,7 +56,7 @@
   // Lib
   import * as texture_loader from './lib/texture_loader'
   import { convert_tileset_to_latest } from './lib/tilesetConverter'
-  import { push_undo_state, reset_undo_stack, undo_stack } from './lib/undoManager'
+  import { push_undo_state, reset_undo_stack, undo } from './lib/undoManager'
 
   // Panels
   import IconPanel from './panels/IconPanel.svelte'
@@ -82,6 +82,7 @@
     data_text,
   } from './stores/data'
   import { tl } from './stores/translation'
+  import { store_components } from './stores/components'
 
   // GLOBAL STYLES
   import './styles/inputs.css'
@@ -98,7 +99,7 @@
   import type { SaveData } from './types/savedata'
   // Constants
   import { map_shape } from './types/settings'
-  import type { terrain_field } from './types/terrain'
+  import type { TerrainField } from './types/terrain'
   import { LATEST_TILESET_FORMAT_VERSION, type Tileset } from './types/tilesets'
   // Enums
   import { tools } from './types/toolData'
@@ -140,7 +141,9 @@
   let offsetContainer = new PIXI.Container()
 
   /* STUFF TO BIND TO */
-  let comp_terrainLayer: TerrainLayer
+
+  console.log($store_components)
+
   let comp_iconLayer: IconLayer
   let comp_pathLayer: PathLayer
   let comp_textLayer: TextLayer
@@ -249,7 +252,7 @@
 
   function redrawEntireMap() {
     // Refreshes all hexes and coordinates
-    comp_terrainLayer.renderAllHexes()
+    $store_components.terrainLayer.renderAllHexes()
   }
 
   /* TOOL METHODS */
@@ -283,7 +286,7 @@
     if ($store_inputs.mouseDown[0]) {
       switch ($store_selected_tool) {
         case tools.TERRAIN:
-          comp_terrainLayer.pointerdown()
+          $store_components.terrainLayer.pointerdown()
           break
 
         case tools.ICON:
@@ -300,7 +303,7 @@
 
         case tools.ERASER:
           if ($data_eraser.eraseTerrain) {
-            comp_terrainLayer.eraseAtMouse()
+            $store_components.terrainLayer.eraseAtMouse()
           }
           /* Icons are handled in the IconLayer */
           break
@@ -335,7 +338,7 @@
 
     switch ($store_selected_tool) {
       case tools.TERRAIN:
-        if ($store_inputs.mouseDown[0]) comp_terrainLayer.pointerdown()
+        if ($store_inputs.mouseDown[0]) $store_components.terrainLayer.pointerdown()
         break
 
       case tools.ICON:
@@ -348,7 +351,7 @@
 
       case tools.ERASER:
         if ($store_inputs.mouseDown[0]) {
-          if ($data_eraser.eraseTerrain) comp_terrainLayer.eraseAtMouse()
+          if ($data_eraser.eraseTerrain) $store_components.terrainLayer.eraseAtMouse()
         }
         /* Icons are handled differently in the icon handler */
         break
@@ -398,13 +401,13 @@
             save_map(loadedSave, loadedId)
             break
 
-	  case 'undo':
-	    console.log("TODO: Undo")
-	    break
+          case 'undo':
+            undo($store_components.terrainLayer)
+            break
 
-	  case 'redo':
-	    console.log("TODO: Redo")
-	    break
+          case 'redo':
+            console.log('TODO: Redo')
+            break
 
           case 'toggleViewMaps':
             showSavedMaps = !showSavedMaps
@@ -460,7 +463,7 @@
         break
 
       case tools.TERRAIN:
-        comp_terrainLayer.handleKeyboardShortcut(shortcutData)
+        $store_components.terrainLayer.handleKeyboardShortcut(shortcutData)
         break
 
       case tools.ICON:
@@ -510,7 +513,7 @@
     // Some more active keyboard listeners require these methods to be called
     switch ($store_selected_tool) {
       case tools.TERRAIN: {
-        comp_terrainLayer.keydown(e)
+        $store_components.terrainLayer.keydown(e)
         break
       }
 
@@ -541,7 +544,7 @@
 
     switch ($store_selected_tool) {
       case tools.TERRAIN: {
-        comp_terrainLayer.keyup(e)
+        $store_components.terrainLayer.keyup(e)
         break
       }
 
@@ -574,8 +577,8 @@
   }
 
   /*
-  * @param save_id - Null if map is new. Can be set to null to force save a new map
-  */
+   * @param save_id - Null if map is new. Can be set to null to force save a new map
+   */
   async function save_map(data_to_save: SaveData, save_id: number | null, preview_override: string | null = null) {
     // = asyncExtract(app, offsetContainer)
     if (data_to_save.title === '') {
@@ -698,7 +701,7 @@
 
     loadedSave = data
 
-    push_undo_state(loadedSave)
+    push_undo_state(loadedSave, 'Initial Load')
 
     loadedId = id
 
@@ -848,14 +851,14 @@
         pointerOffLayers(e)
       }}
       on:blur={() => {
-        console.log('Sheeit')
+        console.log('Blurring Now')
       }}
       on:keydown={keyDown}
       on:keyup={keyUp}
     >
       <CanvasHolder {app} />
 
-      <TerrainLayer bind:cont_terrain bind:this={comp_terrainLayer} {changeTool} {comp_coordsLayer} />
+      <TerrainLayer bind:cont_terrain bind:this={$store_components.terrainLayer} {changeTool} {comp_coordsLayer} />
       <PathLayer bind:this={comp_pathLayer} bind:cont_all_paths bind:paths={loadedSave.paths} />
       <IconLayer bind:this={comp_iconLayer} bind:icons={loadedSave.icons} bind:cont_icon />
       <CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} />
@@ -866,7 +869,7 @@
 
     <!-- Panels -->
     {#if showTerrainGenerator}
-      <TerrainGenerator {loadedTilesets} {comp_terrainLayer} bind:showTerrainGenerator />
+      <TerrainGenerator {loadedTilesets} comp_terrainLayer={$store_components.terrainLayer} bind:showTerrainGenerator />
     {:else if show_icon_generator}
       <IconGenerator {loadedIconsets} {comp_iconLayer} bind:show_icon_generator />
     {:else if $store_selected_tool == tools.TERRAIN}
@@ -883,11 +886,9 @@
       <OverlayPanel />
     {/if}
 
-
     {#if DEV_MODE}
       <UndoPanel />
     {/if}
-  
 
     <div id="tool-buttons" on:mouseup={pointerup}>
       <ToolButtons {changeTool} />
@@ -958,17 +959,17 @@
       bind:show_icon_generator
       bind:loadedTilesets
       bind:loadedIconsets
-      {comp_terrainLayer}
+      comp_terrainLayer={$store_components.terrainLayer}
       {comp_coordsLayer}
       {comp_iconLayer}
       {comp_pathLayer}
       {comp_textLayer}
       {comp_terrain_panel}
       renderAllHexes={() => {
-        comp_terrainLayer.renderAllHexes()
+        $store_components.terrainLayer.renderAllHexes()
       }}
       renderGrid={() => {
-        comp_terrainLayer.renderGrid()
+        $store_components.terrainLayer.renderGrid()
       }}
       redrawEntireMap={() => {
         redrawEntireMap()

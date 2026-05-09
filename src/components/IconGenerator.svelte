@@ -9,7 +9,7 @@
   import { tfield } from '../stores/tfield'
   import { tl } from '../stores/translation'
 
-  import type { TerrainHex, terrain_field } from '../types/terrain'
+  import type { TerrainHex, TerrainField } from '../types/terrain'
   import type { Tile, Tileset } from '../types/tilesets'
   import type { coords_cubeToWorld } from '../helpers/hexHelpers'
   import type { Iconset, Icon } from '../types/icon'

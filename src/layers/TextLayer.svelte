@@ -9,7 +9,6 @@
   import * as store_panning from '../stores/panning'
   import { store_has_unsaved_changes } from '../stores/flags'
   import { tfield } from '../stores/tfield'
-  import { resize_parameters } from '../stores/resize_parameters'
   import { data_text } from '../stores/data'
 
   // LIB

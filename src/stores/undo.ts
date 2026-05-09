@@ -1,8 +1,12 @@
-import { get, writable, type Writable } from 'svelte/store';
-import type { UndoState } from '../types';
+import { get, writable, type Writable } from 'svelte/store'
+import type { UndoState, UndoStoreType } from '../types'
 
-
-export let store_undo: Writable<{undo_stack: UndoState[], undo_pointer: number}> = writable({
+export const DefaultUndoStore: UndoStoreType = {
   undo_stack: [],
-  undo_pointer: -1
+  undo_pointer: -1,
+  suppress: false,
+}
+
+export let store_undo: Writable<UndoStoreType> = writable({
+  ...DefaultUndoStore,
 })

@@ -3,7 +3,7 @@
   import type { IconLayerIcon, Icon } from '../types/icon'
   import type { shortcut_data } from '../types/inputs'
   import type { pan_state } from '../types/panning'
-  import type { HexPosition, HexRaised, terrain_field } from '../types/terrain'
+  import type { HexPosition, HexRaised, TerrainField } from '../types/terrain'
   import type { cube_coords } from '../types/coordinates'
   import { HexOrientation } from '../types/terrain'
 
@@ -16,7 +16,6 @@
   import { store_inputs } from '../stores/inputs'
   import { store_selected_tool } from '../stores/tools'
   import { data_icon, data_eraser } from '../stores/data'
-  import { resize_parameters } from '../stores/resize_parameters'
 
   import {
     coords_cubeToWorld,
@@ -265,7 +264,6 @@
     spr_floating_icon.y = iconY
     spr_floating_icon.tint = $data_icon.icon.color
     // spr_floating_icon.eventMode = 'static' // !!! TODO
-
   }
 
   /** Hide floating icon when tool is changed */
@@ -366,8 +364,8 @@
   function updateDraggedIcon() {
     const { iconX, iconY } = get_icon_position()
 
-    draggedIcon.x = iconX;
-    draggedIcon.y = iconY;
+    draggedIcon.x = iconX
+    draggedIcon.y = iconY
 
     icons = icons
     $store_has_unsaved_changes = true

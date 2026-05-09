@@ -6,7 +6,7 @@
   import { get_symbol_texture } from '../lib/texture_loader'
 
   import type { terrain_data } from '../types/data'
-  import type { terrain_field } from '../types/terrain'
+  import type { TerrainField } from '../types/terrain'
   import { HexOrientation } from '../types/terrain'
   import type { Tile, Tileset } from '../types/tilesets'
   import type { Icon } from '../types/icon'

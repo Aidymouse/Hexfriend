@@ -1,6 +1,6 @@
 <script lang="ts">
   // TYPE
-  import type { TerrainHex, terrain_field } from '../types/terrain'
+  import type { TerrainHex, TerrainField } from '../types/terrain'
   import type { Tile, Tileset } from '../types/tilesets'
   import type { hex_id } from '../types/toolData'
 

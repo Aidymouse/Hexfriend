@@ -3,7 +3,7 @@
   import type { terrain_data } from '../types/data'
   import type { shortcut_data } from '../types/inputs'
   import type { pan_state } from '../types/panning'
-  import type { TerrainHex, terrain_field } from '../types/terrain'
+  import type { TerrainHex, TerrainField } from '../types/terrain'
   import type { Tile } from '../types/tilesets'
   import type { hex_id } from '../types/toolData'
   import { tools } from '../types/toolData'
@@ -208,20 +208,16 @@
     renderAllHexes()
   }
 
-  function square_changeOrientation() {
+  function square_changeOrientation(to: HexOrientation) {
     let newHexes = {}
 
     for (let col = 0; col < $tfield.columns; col++) {
       for (let row = 0; row < $tfield.rows; row++) {
         let newHexCoords =
-          $tfield.orientation == 'flatTop'
-            ? coords_qToCube($tfield.raised, col, row)
-            : coords_rToCube($tfield.raised, col, row)
+          to == 'flatTop' ? coords_qToCube($tfield.raised, col, row) : coords_rToCube($tfield.raised, col, row)
 
         let sourceHexCoords =
-          $tfield.orientation == 'flatTop'
-            ? coords_rToCube($tfield.raised, col, row)
-            : coords_qToCube($tfield.raised, col, row)
+          to == 'flatTop' ? coords_rToCube($tfield.raised, col, row) : coords_qToCube($tfield.raised, col, row)
         let sourceHex: TerrainHex = $tfield.hexes[genHexId_coordsObj(sourceHexCoords)]
 
         let newHex = {
@@ -239,8 +235,6 @@
     //for (var i = symbolsContainer.children.length - 1; i >= 0; i--) {symbolsContainer.removeChild(symbolsContainer.children[i]);};
     clearTerrainSprites()
     renderAllHexes()
-
-
   }
 
   export function square_expandMapDimension(direction: 'left' | 'right' | 'top' | 'bottom', amount: number) {
@@ -636,24 +630,24 @@
     }
   }
 
-  export function changeOrientation() {
+  /* One and only source of truth fn for changing hex orientation
+   * @param to - The orientation to change to
+   */
+  export function applyOrientationChange(to: HexOrientation) {
     $store_has_unsaved_changes = true
 
     switch ($tfield.mapShape) {
       case map_shape.SQUARE:
-        square_changeOrientation()
+        square_changeOrientation(to)
         break
 
       case map_shape.FLOWER:
+        // We don't actually need to change anything for flower maps, we just have to re-render
         renderAllHexes()
         // Perhaps... a flower orientation change algorithm that finds the closest hex in screen space after transformation and maps shit like that
         // Might cause hex overlaps though... preventable?
         break
     }
-
-    push_undo_state({ TerrainField: $tfield })
-
-    comp_coordsLayer.cullUnusedCoordinates()
   }
 
   export function changeMapShape(newMapShape: map_shape) {
@@ -1180,6 +1174,21 @@
     renderAllHexes()
     renderGrid()
   })
+
+  export function applyTerrainField(newField: TerrainField) {
+    console.log('Applying terran field', newField, $tfield)
+    let redraw = false
+
+    if ($tfield.orientation !== newField.orientation) {
+      console.log("These'm gotta change!")
+      //changeOrientation()
+      redraw = true
+    }
+
+    if (redraw) {
+      renderAllHexes()
+    }
+  }
 </script>
 
 <!--

@@ -16,6 +16,8 @@
   import { get_radius_from_width_height, get_width_height_from_radius } from '../../helpers/hexHelpers'
   import { data_terrain } from '../../stores/data'
 
+  import { push_undo_state } from '../../lib'
+
   export let comp_coordsLayer
   export let comp_terrainLayer
 
@@ -32,15 +34,32 @@
 
   export let retainIconScale: boolean
 
-  function changeOrientation() {
+  function changeOrientation(to: HexOrientation) {
+    //$tfield.hexWidth, $tfield.hexHeight = $tfield.hexHeight, $tfield.hexWidth
+
     let t = $tfield.hexWidth
     $tfield.hexWidth = $tfield.hexHeight
     $tfield.hexHeight = t
-    //$tfield.hexWidth, $tfield.hexHeight = $tfield.hexHeight, $tfield.hexWidth
+    $tfield.orientation = to
 
-    comp_terrainLayer.changeOrientation()
+    comp_terrainLayer.applyOrientationChange(to)
 
     $store_has_unsaved_changes = true
+
+    $data_terrain.genPreview = true
+
+    comp_coordsLayer.cullUnusedCoordinates()
+    comp_coordsLayer.updateAllCoordPositions()
+    comp_coordsLayer.updateAllCoordsText()
+    comp_coordsLayer.populateBlankHexes()
+
+    retain_positions_orientation_change()
+    retain_scale()
+
+    // Width and Height flip so we save the old params
+    save_old_resize_parameters()
+
+    push_undo_state({ TerrainField: $tfield }, `Change Orientation - ${$tfield.orientation}`)
 
     //redrawEntireMap()
   }
@@ -72,22 +91,11 @@
         { title: 'Flat Top', value: HexOrientation.FLATTOP, filename: 'flatTop' },
         { title: 'Pointy Top', value: HexOrientation.POINTYTOP, filename: 'pointyTop' },
       ]}
-      bind:value={$tfield.orientation}
+      value={$tfield.orientation}
       on:change={() => {
-        changeOrientation()
-
-        $data_terrain.genPreview = true
-
-        comp_coordsLayer.cullUnusedCoordinates()
-        comp_coordsLayer.updateAllCoordPositions()
-        comp_coordsLayer.updateAllCoordsText()
-        comp_coordsLayer.populateBlankHexes()
-
-        retain_positions_orientation_change()
-        retain_scale()
-
-        // Width and Height flip so we save the old params
-        save_old_resize_parameters()
+        changeOrientation(
+          $tfield.orientation === HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP,
+        )
       }}
     />
   </div>
