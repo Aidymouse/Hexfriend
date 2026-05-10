@@ -704,12 +704,9 @@
 
     console.log('Loaded Sets', loadedTilesets)
     let firstTile = loadedTilesets[0].tiles[0]
-    $data_terrain.tile = {
-      ...firstTile,
-      symbol: firstTile.symbol ? { ...firstTile.symbol } : null,
-    }
-
-    $data_icon.icon = { ...loadedIconsets[0].icons[0] }
+    $data_terrain.tile = structuredClone(firstTile)
+    const first_icon = { ...loadedIconsets[0].icons[0] }
+    $data_icon.icon = structuredClone(firstIcon)
 
     // Center the map
     let tf = loadedSave.TerrainField
@@ -738,6 +735,7 @@
       return pan
     })
 
+    // I suspect this causes the layers to re-mount, making their onMount code run again
     appState = app_state.NORMAL
 
     // Final Layer Setup
