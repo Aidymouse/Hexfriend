@@ -102,6 +102,9 @@
     if (retainTextPosition) comp_textLayer.retain_text_position_on_hex_resize(old_hex_size, new_hex_size)
   }
 
+  /* Maintains the relative X and Y position to the hex for icons, text and paths
+   * Note that this keeps icons in the same hex coordinates, which for flower maps means they rotate around with the map
+   */
   const retain_positions_on_orientation_change = () => {
     if ($tfield.mapShape === map_shape.FLOWER) {
       retain_positions_on_resize() // Equiv. because Orientation is tracked in resize params
@@ -139,13 +142,12 @@
     if (retain_icon_scale) comp_iconLayer.retain_icon_scale(new_hex_size)
   }
 
+  /* Takes the current attribs from terrain field and keeps them in a store so we can use them as comparison later */
   function save_old_resize_parameters() {
     $resize_parameters.old_hex_width = $tfield.hexWidth
     $resize_parameters.old_hex_height = $tfield.hexHeight
     $resize_parameters.old_gap = $tfield.grid.gap
     $resize_parameters.old_orientation = $tfield.orientation
-
-    //console.log(resize_parameters)
   }
 
   // Imports

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { store_undo } from '../../stores'
+  import { store_undo, tfield } from '../../stores'
 </script>
 
 <div class="panel" style="right: 21em; padding: 0.5em;">
@@ -7,6 +7,8 @@
 
   Len: {$store_undo.undo_stack.length}
   Pointer: {$store_undo.undo_pointer}
+
+  <button on:click={(e) => console.log($store_undo)}>Log Undo Stack</button>
 
   <hr />
 

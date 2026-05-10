@@ -32,7 +32,7 @@
 
   let coordTexts: { [key: hex_id]: coordText } = {} // hex id: coordText
 
-  export let cont_coordinates
+  export let cont_coordinates: PIXI.Container
   let cont_textContainer = new PIXI.Container()
   cont_coordinates.addChild(cont_textContainer)
 

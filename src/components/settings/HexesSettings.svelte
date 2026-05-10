@@ -56,10 +56,13 @@
     retain_positions_orientation_change()
     retain_scale()
 
-    // Width and Height flip so we save the old params
+    // Width and Height flip so we save them as old params
     save_old_resize_parameters()
 
-    push_undo_state({ TerrainField: $tfield }, `Change Orientation - ${$tfield.orientation}`)
+    push_undo_state(
+      { TerrainField: { hexWidth: $tfield.hexWidth, hexHeight: $tfield.hexHeight, orientation: to } },
+      `Change Orientation - ${$tfield.orientation}`,
+    )
 
     //redrawEntireMap()
   }
@@ -70,6 +73,9 @@
   <div style="display: flex; gap: 0.25em; align-items: center;">
     <ColorInputPixi
       bind:value={$tfield.blankHexColor}
+      on:input={() => {
+        push_undo_state({ TerrainField: { blankHexColor: $tfield.blankHexColor } })
+      }}
       on:change={() => {
         renderAllHexes()
       }}

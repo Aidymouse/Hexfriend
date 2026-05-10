@@ -48,6 +48,7 @@
   import { generate_tile_previews } from '../helpers/tileFns'
 
   import { push_undo_state } from '../lib'
+  import type { Partialize } from '../types'
   export let cont_terrain: PIXI.Container
 
   export let changeTool: Function
@@ -716,11 +717,11 @@
   }
 
   /* RENDER FUNCTIONS */
-  export function renderGrid() {
+  export function renderGrid(grid: TerrainField['grid'] = $tfield.grid) {
     gridGraphics.clear()
-    if (!$tfield.grid.shown) return
+    if (!grid.shown) return
 
-    gridGraphics.lineStyle($tfield.grid.thickness, $tfield.grid.stroke)
+    gridGraphics.lineStyle(grid.thickness, grid.stroke)
 
     Object.keys($tfield.hexes).forEach((hexId: hex_id) => {
       let hex = $tfield.hexes[hexId]
@@ -732,17 +733,11 @@
         $tfield.orientation,
         $tfield.hexWidth,
         $tfield.hexHeight,
-        $tfield.grid.gap,
+        grid.gap,
       )
 
       gridGraphics.drawPolygon(
-        getHexPath(
-          $tfield.hexWidth + $tfield.grid.gap,
-          $tfield.hexHeight + $tfield.grid.gap,
-          $tfield.orientation,
-          hexC.x,
-          hexC.y,
-        ),
+        getHexPath($tfield.hexWidth + grid.gap, $tfield.hexHeight + grid.gap, $tfield.orientation, hexC.x, hexC.y),
       )
     })
   }
@@ -1175,19 +1170,23 @@
     renderGrid()
   })
 
-  export function applyTerrainField(newField: TerrainField) {
+  /* Takes a terrain field and performs actions / updates state so that we match that state */
+  export function applyTerrainField(newField: Partialize<TerrainField>) {
+    // WARN: NAIVE
     console.log('Applying terran field', newField, $tfield)
-    let redraw = false
 
-    if ($tfield.orientation !== newField.orientation) {
-      console.log("These'm gotta change!")
-      //changeOrientation()
-      redraw = true
-    }
+    $tfield = { ...$tfield, ...newField }
+    renderAllHexes()
+    $data_terrain.genPreview = true
 
-    if (redraw) {
-      renderAllHexes()
-    }
+    // Orientation is kind of tricky because it messes with icons n stuff.
+    // However, applying a terrain field usually happens during undo. So icons and all that will have their own state to return to.
+    // So really, we don't need to care about applying changes in reverse as long as all state we can about is reflected in save data
+    // if ($tfield.orientation !== newField.orientation) {
+    //   console.log("These'm gotta change!")
+    //   //changeOrientation()
+    //   redraw = true
+    // }
   }
 </script>
 

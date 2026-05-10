@@ -1,4 +1,4 @@
-import { type SaveData, type UndoState } from '../types'
+import { type LayerComponents, type SaveData, type UndoData, type UndoState } from '../types'
 //import crypto from 'cryptojs'
 import { DefaultUndoStore } from '../stores'
 
@@ -22,14 +22,15 @@ export const reset_undo_stack = () => {
 let local_undo
 store_undo.subscribe((u) => (local_undo = u))
 
-export const push_undo_state = (saveData: Partial<SaveData>, label?: string) => {
+export const push_undo_state = (undoData: UndoData, label?: string) => {
   if (local_undo.suppress) {
     return
   }
 
+  // TODO: clear the stack when pushing a new undo action
   const undo_state: UndoState = {
     label: label ?? 'Undo',
-    save_data: structuredClone(saveData),
+    data: structuredClone(undoData),
   }
   debug && console.log('Pushing Data: ', undo_state)
 
@@ -52,7 +53,7 @@ const reduceToChanges = (old_data: UndoState, new_data: UndoState) => {
   return new_data
 }
 
-export const undo = (terrainLayer: TerrainLayer) => {
+export const undo = (layers: LayerComponents) => {
   console.log(local_undo.undo_stack)
 
   if (local_undo.undo_pointer === 0) {
@@ -61,16 +62,25 @@ export const undo = (terrainLayer: TerrainLayer) => {
 
   const stateToReturnTo = local_undo.undo_stack[local_undo.undo_pointer - 1]
 
-  apply_undo_state(stateToReturnTo, terrainLayer)
+  store_undo.update((o) => ({ ...o, suppress: true }))
+  apply_undo_state(stateToReturnTo, layers)
+  store_undo.update((o) => ({ ...o, suppress: false, undo_pointer: o.undo_pointer - 1 }))
 }
 
-export const apply_undo_state = (state: UndoState, terrainLayer: TerrainLayer) => {
-  store_undo.update((o) => ({ ...o, suppress: true }))
-
-  debug && console.log('Applying Undo State: ', state)
-  if (state.save_data.TerrainField) {
-    terrainLayer.applyTerrainField(state.save_data.TerrainField)
+export const redo = (layers: LayerComponents) => {
+  if (local_undo.undo_pointer === local_undo.undo_stack.length - 1) {
+    return
   }
+  const state_to_move_to = local_undo.undo_stack[local_undo.undo_pointer + 1]
 
-  store_undo.update((o) => ({ ...o, suppress: false }))
+  store_undo.update((o) => ({ ...o, suppress: true }))
+  apply_undo_state(state_to_move_to, layers)
+  store_undo.update((o) => ({ ...o, suppress: false, undo_pointer: o.undo_pointer + 1 }))
+}
+
+export const apply_undo_state = (state: UndoState, layers: LayerComponents) => {
+  debug && console.log('Applying Undo State: ', state)
+  if (state.data.TerrainField) {
+    layers.terrainLayer.applyTerrainField(state.data.TerrainField)
+  }
 }

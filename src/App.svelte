@@ -56,7 +56,7 @@
   // Lib
   import * as texture_loader from './lib/texture_loader'
   import { convert_tileset_to_latest } from './lib/tilesetConverter'
-  import { push_undo_state, reset_undo_stack, undo } from './lib/undoManager'
+  import { push_undo_state, reset_undo_stack, undo, redo } from './lib/undoManager'
 
   // Panels
   import IconPanel from './panels/IconPanel.svelte'
@@ -399,11 +399,11 @@
             break
 
           case 'undo':
-            undo(comp_terrainLayer)
+            undo({ terrainLayer: comp_terrainLayer })
             break
 
           case 'redo':
-            console.log('TODO: Redo')
+            redo({ terrainLayer: comp_terrainLayer })
             break
 
           case 'toggleViewMaps':

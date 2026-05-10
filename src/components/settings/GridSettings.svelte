@@ -10,6 +10,7 @@
 
   import { map_shape } from '../../types/settings'
   import { HexOrientation } from '../../types/terrain'
+  import { push_undo_state } from '../../lib'
 
   export let comp_terrainLayer
   export let comp_coordsLayer
@@ -23,7 +24,14 @@
 <div class="settings-grid">
   <label for="showGrid">{$tl.settings.grid.show}</label>
   <!-- Weird bug where the grid wont render if you turn it off then resize the hex flower map ?? -->
-  <Checkbox bind:checked={$tfield.grid.shown} id={'showGrid'} on:change={comp_terrainLayer.renderGrid} />
+  <Checkbox
+    bind:checked={$tfield.grid.shown}
+    id={'showGrid'}
+    on:change={() => {
+      push_undo_state({ TerrainField: { grid: $tfield.grid } })
+      comp_terrainLayer.renderGrid()
+    }}
+  />
   {#if $tfield.grid.shown}
     <label for="gridThickness">{$tl.settings.grid.thickness}</label>
     <input
