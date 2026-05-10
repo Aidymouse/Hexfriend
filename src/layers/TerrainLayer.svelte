@@ -1171,11 +1171,12 @@
   })
 
   /* Takes a terrain field and performs actions / updates state so that we match that state */
-  export function applyTerrainField(newField: Partialize<TerrainField>) {
+  export function applyTerrainField(newField: Partial<TerrainField>) {
     // WARN: NAIVE
     console.log('Applying terran field', newField, $tfield)
 
     $tfield = { ...$tfield, ...newField }
+    // TODO: only render all hexes if we change something related to the hexes (e.g. tiles, hex spacing, etc)
     renderAllHexes()
     $data_terrain.genPreview = true
 
