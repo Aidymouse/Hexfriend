@@ -28,6 +28,8 @@ export const push_undo_state = (undoData: UndoData, label?: string) => {
   }
 
   // TODO: clear the stack when pushing a new undo action
+  // WARN: Be careful here, svelte state management code can manipulate objects that we might have stored references to on the undo stack. We clone to stop this
+  // TODO: we could save a clone if we store undo states as stringifed states. Then we just parse when we apply the data, which does the clone.
   const undo_state: UndoState = {
     label: label ?? 'Undo',
     data: structuredClone(undoData),
@@ -80,7 +82,11 @@ export const redo = (layers: LayerComponents) => {
 
 export const apply_undo_state = (state: UndoState, layers: LayerComponents) => {
   debug && console.log('Applying Undo State: ', state)
-  if (state.data.TerrainField) {
-    layers.terrainLayer.applyTerrainField(state.data.TerrainField)
+  
+  // we have to make this a structured clone as well, otherwise svelte state can end up changing objects in old undo states! (well, only if they have objects in them)
+  const applied_data = structuredClone(state.data)
+
+  if (applied_data.TerrainField) {
+    layers.terrainLayer.applyTerrainField(applied_data.TerrainField)
   }
 }
