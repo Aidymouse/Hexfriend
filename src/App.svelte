@@ -403,11 +403,17 @@
             break
 
           case 'undo':
-            undo({ terrainLayer: comp_terrainLayer })
+            undo({ 
+	      terrainLayer: comp_terrainLayer,
+	      iconLayer: comp_iconLayer
+	    })
             break
 
           case 'redo':
-            redo({ terrainLayer: comp_terrainLayer })
+            redo({ 
+	      terrainLayer: comp_terrainLayer,
+	      iconLayer: comp_iconLayer
+	    })
             break
 
           case 'toggleViewMaps':

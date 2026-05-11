@@ -66,6 +66,7 @@ export const undo = (layers: LayerComponents) => {
     return
   }
 
+  // SPECIAL: Tiles we're re-placing when undoing are actually stored in the set we're coming FROM
   const currentState: UndoState = local_undo.undo_stack[local_undo.undo_pointer]
 
   const stateToReturnTo: UndoState = structuredClone(local_undo.undo_stack[local_undo.undo_pointer - 1])
@@ -106,6 +107,10 @@ export const apply_undo_state = (state: UndoState, layers: LayerComponents) => {
 
   if (applied_data.tiles) {
     layers.terrainLayer.applyUndoTiles(applied_data.tiles.placed)
+  }
+
+  if (applied_data.icons) {
+    layers.iconLayer.applyIcons(applied_data.icons)
   }
 }
 

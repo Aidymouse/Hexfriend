@@ -1,10 +1,12 @@
 import type TerrainLayer from '../layers/TerrainLayer.svelte'
+import type IconLayer from '../layers/IconLayer.svelte'
 import type { SaveData } from './savedata'
 import type { Tile } from './tilesets'
 import type { HexId } from './toolData'
 
 export type LayerComponents = {
   terrainLayer: TerrainLayer
+  iconLayer: IconLayer
   // TODO:
 }
 
