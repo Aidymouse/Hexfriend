@@ -1,5 +1,5 @@
 import type { HexOrientation } from "../types/terrain"
-import { getHexPath } from "./hexHelpers"
+import { coords_cubeToWorld, coords_worldToCube, getHexPath } from "./hexHelpers"
 import * as PIXI from 'pixi.js'
 import { type Icon } from "../types/icon"
 import { get_icon_texture } from '../lib/texture_loader'
@@ -108,4 +108,31 @@ export const copy_iconset = (set: Iconset, new_id: string)  => {
 	// }
 
 	return new_iconset
+}
+
+export const getIconPositionFor = (x: number, y: number, hexInfo: Omit<PreviewHexInfo, 'color'> & {gap: number}, snap: boolean): { x: number, y: number } => {
+
+  if (!snap) {
+    return {x, y}
+  } 
+
+  let clickedHexCoords = coords_worldToCube(
+    x,
+    y,
+    hexInfo.orientation,
+    hexInfo.hexWidth,
+    hexInfo.hexHeight,
+    hexInfo.gap,
+  )
+  let iconCoords = coords_cubeToWorld(
+    clickedHexCoords.q,
+    clickedHexCoords.r,
+    clickedHexCoords.s,
+    hexInfo.orientation,
+    hexInfo.hexWidth,
+    hexInfo.hexHeight,
+    hexInfo.gap,
+  )
+  return iconCoords
+
 }

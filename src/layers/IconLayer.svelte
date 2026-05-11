@@ -36,6 +36,9 @@
     type HexSizeParams,
   } from '../lib/map_resize'
   import HexesSettings from '../components/settings/HexesSettings.svelte'
+  import { getIconPositionFor } from '../helpers/iconFns'
+  import { push_undo_state } from '../lib'
+  import type { SaveData } from '../types'
   export let icons: IconLayerIcon[] = []
   let pixi_icons: { [icon_id: number]: PIXI.Sprite } = {} // keeps up to date with icons
 
@@ -109,40 +112,33 @@
     icons = icons
   }
 
+  /* Gets icon position for the mouse and current terrain */
   function get_icon_position(): { iconX: number; iconY: number } {
-    let iconX = store_panning.curWorldX()
-    let iconY = store_panning.curWorldY()
 
-    if ($data_icon.snapToHex) {
-      let clickedHexCoords = coords_worldToCube(
-        store_panning.curWorldX(),
-        store_panning.curWorldY(),
-        $tfield.orientation,
-        $tfield.hexWidth,
-        $tfield.hexHeight,
-        $tfield.grid.gap,
-      )
-      let iconCoords = coords_cubeToWorld(
-        clickedHexCoords.q,
-        clickedHexCoords.r,
-        clickedHexCoords.s,
-        $tfield.orientation,
-        $tfield.hexWidth,
-        $tfield.hexHeight,
-        $tfield.grid.gap,
-      )
-      iconX = iconCoords.x
-      iconY = iconCoords.y
-    }
+    let icon_pos = getIconPositionFor(
+      store_panning.curWorldX(),
+      store_panning.curWorldY(),
+      {
+	orientation: $tfield.orientation,
+	hexWidth: $tfield.hexWidth,
+        hexHeight: $tfield.hexHeight,
+        gap: $tfield.grid.gap
+      },
+      $data_icon.snapToHex
+    )
 
-    return { iconX, iconY }
+    return {iconX: icon_pos.x, iconY: icon_pos.y}
+
   }
 
-  /** Used to place an icon externally, like from the icon generator */
+  /** Used to place an icon externally, like from the icon generator
+  * TODO: this is a mess and should be refactored to take all things as inputs!
+  */
   export function emplaceIcon(
     icon: Icon,
     position: HexPosition,
     icon_scale: { x: number; y: number } | undefined = undefined,
+    snap: boolean = false
   ) {
     const icon_pos = coords_cubeToWorld(
       position.q,
@@ -171,9 +167,11 @@
     $store_has_unsaved_changes = true
   }
 
+  /* Places the icon in data onto the map at the clicked coords */
   export function placeIcon() {
     const { iconX, iconY } = get_icon_position()
 
+    /*
     let newIcon: IconLayerIcon = {
       ...$data_icon.icon,
       x: iconX,
@@ -183,10 +181,17 @@
       rotation: $data_icon.icon.rotation,
       scale: get_icon_scale_for_hex($data_icon.icon, { hexWidth: $tfield.hexWidth, hexHeight: $tfield.hexHeight }),
     }
+    */
 
-    icons.push(newIcon)
-    iconId++
-    icons = icons
+    const iconHexPos = coords_worldToCube(iconX, iconY, $tfield.orientation, $tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap)
+
+    emplaceIcon($data_icon.icon, iconHexPos)
+
+    push_undo_state({ icons }, "Place Icon")
+
+    //icons.push(newIcon)
+    //iconId++
+    //icons = icons
 
     $store_has_unsaved_changes = true
   }
@@ -211,7 +216,6 @@
     if ($data_icon.usingEyedropper) return
 
     placeIcon()
-    //createFloatingIcon();
   }
 
   export function pointerup() {
@@ -421,6 +425,11 @@
       }
     })
   })
+
+  export function applyIcons(icons_to_apply: SaveData['icons']) {
+    // Wow.
+    icons = icons_to_apply
+  }
 
   onMount(() => {
     cont_icon.removeChildren(0)
