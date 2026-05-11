@@ -1,5 +1,7 @@
 import type TerrainLayer from '../layers/TerrainLayer.svelte'
 import type { SaveData } from './savedata'
+import type { Tile } from './tilesets'
+import type { HexId } from './toolData'
 
 export type LayerComponents = {
   terrainLayer: TerrainLayer
@@ -13,6 +15,15 @@ export type LayerComponents = {
 
 export type UndoData = {
   [k in keyof SaveData]?: Partial<SaveData[k]>
+} & {
+  tiles?: UndoDataTiles
+}
+
+export type UndoDataTiles = {
+    // Terrain that was placed. 
+    placed: {[hexId: HexId]: Tile | null}
+    // Terrain that was replaced, used in Undo
+    replaced: {[hexId: HexId]: Tile | null}
 }
 
 type Stringified<T> = string

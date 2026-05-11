@@ -1,5 +1,5 @@
 import type { TerrainHex } from '../types/terrain';
-import type { hex_id } from '../types/toolData';
+import type { HexId } from '../types/toolData';
 import type { cube_coords } from '../types/coordinates';
 import { HexOrientation } from '../types/terrain';
 
@@ -84,16 +84,16 @@ export function getHexPathRadius(radius: number, orientation: HexOrientation = H
 	return getHexPath(w, h, orientation, centerX, centerY);
 }
 
-export function id_to_coords(hex_id: hex_id): cube_coords {
+export function id_to_coords(hex_id: HexId): cube_coords {
 	let id_parts = hex_id.split(":")
 	return {q: +id_parts[0], r: +id_parts[1], s: +id_parts[2]}
 }
 
-export function genHexId(q: number, r: number, s: number): hex_id {
+export function genHexId(q: number, r: number, s: number): HexId {
 	return `${q}:${r}:${s}`;
 }
 
-export function genHexId_coordsObj(coords: cube_coords): hex_id {
+export function genHexId_coordsObj(coords: cube_coords): HexId {
 	let q = coords.q;
 	let r = coords.r;
 	let s = coords.s;
@@ -106,7 +106,7 @@ export function genHexId_tfieldHex(hex: TerrainHex) {
 
 }
 
-export function genCoordsObj(hexId: hex_id): cube_coords {
+export function genCoordsObj(hexId: HexId): cube_coords {
 	let idParts = hexId.split(':');
 
 	return {
@@ -117,7 +117,7 @@ export function genCoordsObj(hexId: hex_id): cube_coords {
 }
 
 /* NEIGHBOURS */
-export function getRing(centerId: hex_id, radius: number): hex_id[] {
+export function getRing(centerId: HexId, radius: number): HexId[] {
 	if (radius == 0) {
 		return [centerId]
 	}
@@ -147,7 +147,7 @@ function cube_add(c1: cube_coords, c2: cube_coords): cube_coords {
 	return { q: c1.q + c2.q, r: c1.r + c2.r, s: c1.s + c2.s };
 }
 
-export function getNeighbours(q: number, r: number, s: number): hex_id[] {
+export function getNeighbours(q: number, r: number, s: number): HexId[] {
 	return [
 		genHexId(q + 1, r, s - 1),
 		genHexId(q + 1, r - 1, s),

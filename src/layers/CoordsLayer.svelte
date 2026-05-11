@@ -11,7 +11,7 @@
   import { coord_system } from '../types/coordinates'
   import type { coordinates_data } from '../types/data'
   import type { TerrainHex, TerrainField } from '../types/terrain'
-  import type { hex_id } from '../types/toolData'
+  import type { HexId } from '../types/toolData'
   import * as PIXI from 'pixi.js'
   import { onMount } from 'svelte'
   import { map_shape } from '../types/settings'
@@ -30,30 +30,30 @@
     cont_textContainer.visible = $data_coordinates.shown
   }
 
-  let coordTexts: { [key: hex_id]: coordText } = {} // hex id: coordText
+  let coordTexts: { [key: HexId]: coordText } = {} // hex id: coordText
 
   export let cont_coordinates: PIXI.Container
   let cont_textContainer = new PIXI.Container()
   cont_coordinates.addChild(cont_textContainer)
 
-  function breakDownHexID(hexId: hex_id) {
+  function breakDownHexID(hexId: HexId) {
     let brokenId = hexId.split(':')
     return { q: Number(brokenId[0]), r: Number(brokenId[1]), s: Number(brokenId[2]) }
   }
 
-  function coordTextExists(hexId: hex_id) {
+  function coordTextExists(hexId: HexId) {
     return coordTexts[hexId] != null
   }
 
   function generateAllCoords(system: coord_system) {
-    Object.keys($tfield.hexes).forEach((hexId: hex_id) => {
+    Object.keys($tfield.hexes).forEach((hexId: HexId) => {
       generateNewCoord(hexId, system)
     })
     $store_has_unsaved_changes = true
   }
 
   export function populateBlankHexes() {
-    Object.keys($tfield.hexes).forEach((hexId: hex_id) => {
+    Object.keys($tfield.hexes).forEach((hexId: HexId) => {
       if (!coordTextExists(hexId)) generateNewCoord(hexId)
     })
 
@@ -63,7 +63,7 @@
     $store_has_unsaved_changes = true
   }
 
-  export function generateNewCoord(hexId: hex_id, system: coord_system = $data_coordinates.system) {
+  export function generateNewCoord(hexId: HexId, system: coord_system = $data_coordinates.system) {
     if (coordTextExists(hexId)) {
       console.log(`You already have a text at ${hexId}! Use updateCoord() instead, goofball.`)
     }
@@ -83,7 +83,7 @@
   }
 
   export function updateAllCoordPositions() {
-    Object.keys(coordTexts).forEach((hexId: hex_id) => {
+    Object.keys(coordTexts).forEach((hexId: HexId) => {
       updateCoordPosition(hexId)
     })
 
@@ -94,7 +94,7 @@
     $store_has_unsaved_changes = true
   }
 
-  function updateCoordPosition(hexId: hex_id) {
+  function updateCoordPosition(hexId: HexId) {
     let text = coordTexts[hexId]
 
     let idParts = breakDownHexID(hexId)
@@ -112,7 +112,7 @@
     text.pixiText.position.y = newPos.y + $tfield.hexHeight / 2 - $data_coordinates.gap
   }
 
-  export function eliminateCoord(hexId: hex_id) {
+  export function eliminateCoord(hexId: HexId) {
     cont_textContainer.removeChild(coordTexts[hexId].pixiText)
     coordTexts[hexId].pixiText.destroy()
     delete coordTexts[hexId]
@@ -121,7 +121,7 @@
   }
 
   function generateCoordTextAndParts(
-    hexId: hex_id,
+    hexId: HexId,
     system: coord_system = $data_coordinates.system,
   ): { parts: number[]; text: string } {
     switch (system) {
@@ -244,13 +244,13 @@
   }
 
   export function updateAllCoordsText() {
-    Object.keys(coordTexts).forEach((hexId: hex_id) => {
+    Object.keys(coordTexts).forEach((hexId: HexId) => {
       updateCoordText(hexId)
     })
     $store_has_unsaved_changes = true
   }
 
-  export function updateCoordText(hexId: hex_id) {
+  export function updateCoordText(hexId: HexId) {
     let generated = generateCoordTextAndParts(hexId, $data_coordinates.system)
     coordTexts[hexId].parts = [...generated.parts]
     coordTexts[hexId].pixiText.text = generated.text
@@ -258,7 +258,7 @@
   }
 
   export function cullUnusedCoordinates() {
-    Object.keys(coordTexts).forEach((hexId: hex_id) => {
+    Object.keys(coordTexts).forEach((hexId: HexId) => {
       if ($tfield.hexes[hexId] == null) {
         eliminateCoord(hexId)
       }

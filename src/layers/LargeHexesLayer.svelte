@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { pan_state } from '../types/panning'
-  import type { hex_id } from '../types/toolData'
   import type { TerrainField } from '../types/terrain'
 
   import { HexOrientation, HexRaised } from '../types/terrain'

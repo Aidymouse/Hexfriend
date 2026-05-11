@@ -27,12 +27,16 @@ export const push_undo_state = (undoData: UndoData, label?: string) => {
     return
   }
 
+  const to_push = structuredClone(undoData)
+
+  if (to_push.TerrainField?.hexes) { delete to_push.TerrainField.hexes }
+
   // TODO: clear the stack when pushing a new undo action
   // WARN: Be careful here, svelte state management code can manipulate objects that we might have stored references to on the undo stack. We clone to stop this
   // TODO: we could save a clone if we store undo states as stringifed states. Then we just parse when we apply the data, which does the clone.
   const undo_state: UndoState = {
     label: label ?? 'Undo',
-    data: structuredClone(undoData),
+    data: to_push
   }
   debug && console.log('Pushing Data: ', undo_state)
 
@@ -62,7 +66,17 @@ export const undo = (layers: LayerComponents) => {
     return
   }
 
-  const stateToReturnTo = local_undo.undo_stack[local_undo.undo_pointer - 1]
+  const currentState: UndoState = local_undo.undo_stack[local_undo.undo_pointer]
+
+  const stateToReturnTo: UndoState = structuredClone(local_undo.undo_stack[local_undo.undo_pointer - 1])
+  if (currentState.data.tiles) {
+    stateToReturnTo.data.tiles = structuredClone({
+      replaced: {},
+      placed: currentState.data.tiles.replaced
+    })
+  }
+
+  debug && console.log("Returning To" ,structuredClone(stateToReturnTo))
 
   store_undo.update((o) => ({ ...o, suppress: true }))
   apply_undo_state(stateToReturnTo, layers)
@@ -73,7 +87,7 @@ export const redo = (layers: LayerComponents) => {
   if (local_undo.undo_pointer === local_undo.undo_stack.length - 1) {
     return
   }
-  const state_to_move_to = local_undo.undo_stack[local_undo.undo_pointer + 1]
+  const state_to_move_to = structuredClone(local_undo.undo_stack[local_undo.undo_pointer + 1])
 
   store_undo.update((o) => ({ ...o, suppress: true }))
   apply_undo_state(state_to_move_to, layers)
@@ -84,9 +98,14 @@ export const apply_undo_state = (state: UndoState, layers: LayerComponents) => {
   debug && console.log('Applying Undo State: ', state)
   
   // we have to make this a structured clone as well, otherwise svelte state can end up changing objects in old undo states! (well, only if they have objects in them)
-  const applied_data = structuredClone(state.data)
+  const applied_data = state.data
 
   if (applied_data.TerrainField) {
     layers.terrainLayer.applyTerrainField(applied_data.TerrainField)
   }
+
+  if (applied_data.tiles) {
+    layers.terrainLayer.applyUndoTiles(applied_data.tiles.placed)
+  }
 }
+

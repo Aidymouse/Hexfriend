@@ -2,7 +2,6 @@
   // TYPE
   import type { TerrainHex, TerrainField } from '../types/terrain'
   import type { Tile, Tileset } from '../types/tilesets'
-  import type { hex_id } from '../types/toolData'
 
   type hex_key = string
   interface rule {

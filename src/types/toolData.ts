@@ -9,7 +9,7 @@ export enum tools {
 	OVERLAY = 'overlay'
 }
 
-type hex_id = `${number}:${number}:${number}`;
+export type HexId = `${number}:${number}:${number}`;
 
 /*
 interface ToolData {
@@ -35,5 +35,3 @@ interface ToolData {
 	};
 }
 */
-
-export type { hex_id };

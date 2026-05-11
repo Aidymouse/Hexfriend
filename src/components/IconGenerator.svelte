@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { hex_id } from '../types/toolData'
 
   import { genHexId, genHexId_tfieldHex, getNeighbours } from '../helpers/hexHelpers'
   import { download } from '../lib/download2'
@@ -12,7 +11,7 @@
   import type { TerrainHex, TerrainField } from '../types/terrain'
   import type { Tile, Tileset } from '../types/tilesets'
   import type { coords_cubeToWorld } from '../helpers/hexHelpers'
-  import type { Iconset, Icon } from '../types/icon'
+  import type { Iconset, Icon, RelativeIcon } from '../types/icon'
   import Checkbox from './Checkbox.svelte'
   import { get_image_scaled_for_hex_relative, ScaleMode } from '../helpers/imageSizing'
 
@@ -90,7 +89,7 @@
         hex_pos = { q: new_q, r: new_r, s: -new_q - new_r }
       }
 
-      let rand_icon: Icon
+      let rand_icon: RelativeIcon
 
       if (current_ruleset.icon_chances.length > 0) {
         rand_icon = pick_from_weighted(current_ruleset.icon_chances, rand_func)

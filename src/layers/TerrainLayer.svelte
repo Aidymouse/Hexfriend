@@ -5,7 +5,7 @@
   import type { pan_state } from '../types/panning'
   import type { TerrainHex, TerrainField } from '../types/terrain'
   import type { Tile } from '../types/tilesets'
-  import type { hex_id } from '../types/toolData'
+  import type { HexId } from '../types/toolData'
   import { tools } from '../types/toolData'
   import type CoordsLayer from './CoordsLayer.svelte'
 
@@ -48,7 +48,7 @@
   import { generate_tile_previews } from '../helpers/tileFns'
 
   import { push_undo_state } from '../lib'
-  import type { Partialize } from '../types'
+  import type { UndoDataTiles } from '../types'
   export let cont_terrain: PIXI.Container
 
   export let changeTool: Function
@@ -61,11 +61,12 @@
   cont_terrain.addChild(symbolsContainer)
   cont_terrain.addChild(gridGraphics)
 
-  let terrainSprites: { [key: hex_id]: PIXI.Sprite } = {}
+  let terrainSprites: { [key: HexId]: PIXI.Sprite } = {}
 
   // Keeps a live record of terrain being placed during this mouse movement (what I have dubbed a 'placement')
   // When the mouse is lifted, all these tiles are inserted into an undo state action
-  let tiles_this_placement: { [key: hex_id]: Tile } = {}
+  let tiles_this_placement: { [key: HexId]: Tile } = {}
+  let replaced_this_placement: { [key: HexId]: Tile } = {}
 
   let pan: pan_state
   store_panning.store.subscribe((newPan) => {
@@ -86,7 +87,7 @@
       for (let col = 1; col < $tfield.columns; col += 2) {
         // Create hex at bottom of column
         let newHexCoords: cube_coords = coords_qToCube('odd', col, $tfield.rows - 1)
-        let newId: hex_id = genHexId_coordsObj(newHexCoords)
+        let newId: HexId = genHexId_coordsObj(newHexCoords)
         $tfield.hexes[newId] = {
           q: newHexCoords.q,
           r: newHexCoords.r,
@@ -715,7 +716,7 @@
   }
 
   function eliminateAllHexes() {
-    Object.keys($tfield.hexes).forEach((hexId: hex_id) => {
+    Object.keys($tfield.hexes).forEach((hexId: HexId) => {
       eliminateHex(hexId)
     })
   }
@@ -727,7 +728,7 @@
 
     gridGraphics.lineStyle(grid.thickness, grid.stroke)
 
-    Object.keys($tfield.hexes).forEach((hexId: hex_id) => {
+    Object.keys($tfield.hexes).forEach((hexId: HexId) => {
       let hex = $tfield.hexes[hexId]
 
       let hexC = coords_cubeToWorld(
@@ -748,20 +749,20 @@
 
   export function renderSelectiveHexes(callback: Function) {
     // Re-renders hexes that pass true
-    Object.keys($tfield.hexes).forEach((hexId: hex_id) => {
+    Object.keys($tfield.hexes).forEach((hexId: HexId) => {
       if (callback($tfield.hexes[hexId])) renderHex(hexId)
     })
   }
 
   export async function renderAllHexes() {
     terrainGraphics.clear()
-    Object.keys($tfield.hexes).forEach((hexId: hex_id) => {
+    Object.keys($tfield.hexes).forEach((hexId: HexId) => {
       renderHex(hexId)
     })
     renderGrid()
   }
 
-  export function renderHex(hexId: hex_id) {
+  export function renderHex(hexId: HexId) {
     let hex = $tfield.hexes[hexId]
     let hexWorldCoords = coords_cubeToWorld(
       hex.q,
@@ -826,25 +827,23 @@
   }
 
   /* PAINT */
-  export function paintFromTile(hexId: hex_id, tile: Tile, render: boolean = true) {
-    if (!hexExists(hexId)) return
+  /* 
+  * @returns true if the tile was placed, false otherwise
+  */
+  export function paintFromTile(hexId: HexId, tile: Tile, render: boolean = true): boolean {
+    if (!hexExists(hexId)) return false
 
-    if (tiles_match($tfield.hexes[hexId].tile, tile)) return
+    $tfield.hexes[hexId].tile = tile ? getStoreableTile(tile) : null
 
-    $tfield.hexes[hexId].tile = tile
-      ? getStoreableTile(tile)
-      : null
+    if (render) { renderHex(hexId) }
 
-      tiles_this_placement[hexId] = structuredClone(tile)
-
-    if (render) renderHex(hexId)
+    return true
   }
 
+  /* Paints the tile from data at the mouses position */
   export function placeTerrain() {
     $store_has_unsaved_changes = true
 
-    //$data_terrain = $data_terrain
-    // Needs checking if terrain matches what we're trying to place already
     if ($store_inputs.mouseDown[0]) {
       let x = store_panning.curWorldX()
       let y = store_panning.curWorldY()
@@ -858,17 +857,27 @@
       )
 
       let clickedId = genHexId(clickedCoords.q, clickedCoords.r, clickedCoords.s)
+      if (!hexExists(clickedId)) { return }
 
-      paintFromTile(clickedId, $data_terrain.tile)
+      const clickedTile: Tile | null = $tfield.hexes[clickedId].tile === null ? null : structuredClone($tfield.hexes[clickedId].tile)
+
+      if (tiles_match($tfield.hexes[clickedId].tile, $data_terrain.tile)) { return }
+
+      const wasPainted = paintFromTile(clickedId, $data_terrain.tile)
+
+      if (wasPainted) {
+	const placed_tile = getStoreableTile($data_terrain.tile)
+	tiles_this_placement[clickedId] = structuredClone(placed_tile)
+	replaced_this_placement[clickedId] = clickedTile
+      }
 
     }
   }
 
-  function paintHexFromData(hexId: hex_id) {
+  function paintHexFromData(hexId: HexId) {
     $store_has_unsaved_changes = true
-
-    //$data_terrain = $data_terrain
-
+    if (!hexExists(hexId)) { return }
+    if (tiles_match($tfield.hexes[hexId].tile, $data_terrain.tile)) { return }
     paintFromTile(hexId, $data_terrain.tile)
   }
 
@@ -877,11 +886,11 @@
     return null == Object.entries($tfield.hexes).find(([id, hex]) => hex.tile != null)
   }
 
-  export function hexExists(hexId: hex_id): boolean {
+  export function hexExists(hexId: HexId): boolean {
     return $tfield.hexes[hexId] != undefined
   }
 
-  function hexesMatch(hexId1: hex_id, hexId2: hex_id): boolean {
+  function hexesMatch(hexId1: HexId, hexId2: HexId): boolean {
     if (!hexExists(hexId1)) return false
     if (!hexExists(hexId2)) return false
 
@@ -891,7 +900,7 @@
     return tiles_match(hex1.tile, hex2.tile)
   }
 
-  function hexMatchesData(hexId: hex_id): boolean {
+  function hexMatchesData(hexId: HexId): boolean {
     if (!hexExists(hexId)) return false
 
     let hex = $tfield.hexes[hexId]
@@ -903,7 +912,7 @@
   export function removeAllTilesOfSet(setId: string) {
     $store_has_unsaved_changes = true
 
-    Object.entries($tfield.hexes).forEach(([hexId, hex]: [hex_id, TerrainHex]) => {
+    Object.entries($tfield.hexes).forEach(([hexId, hex]: [HexId, TerrainHex]) => {
       if (!hex.tile) return
 
       let hexSetId = hex.tile.tileset_id
@@ -965,7 +974,7 @@
     if (hexExists(clickedId)) eraseHex(clickedId)
   }
 
-  export function eraseHex(hexId: hex_id) {
+  export function eraseHex(hexId: HexId) {
     $tfield.hexes[hexId].tile = null
     renderHex(hexId)
   }
@@ -989,7 +998,7 @@
     // Check if hex in data matches the clicked style. If it does, abort painting!
     // Should be done in paint terrain as well
 
-    getContiguousHexIdsOfSameType(clickedId).forEach((hexId: hex_id) => {
+    getContiguousHexIdsOfSameType(clickedId).forEach((hexId: HexId) => {
       paintHexFromData(hexId)
     })
 
@@ -1014,14 +1023,14 @@
     if ($tfield.hexes[clickedId].tile == null) return
 
     let hexes = getContiguousHexIdsOfSameType(clickedId)
-    hexes.forEach((hexId: hex_id) => {
+    hexes.forEach((hexId: HexId) => {
       eraseHex(hexId)
     })
 
     $store_has_unsaved_changes = true
   }
 
-  function eliminateHex(hexId: hex_id) {
+  function eliminateHex(hexId: HexId) {
     if (terrainSprites[hexId]) {
       symbolsContainer.removeChild(terrainSprites[hexId])
       terrainSprites[hexId].destroy()
@@ -1041,11 +1050,12 @@
       id: 'noset_blank',
       tileset_id: 'noset_blank',
       symbol: null,
-      preview: '',
+      preview_flatTop: '',
+      preview_pointyTop: '',
     }
   }
 
-  export function get_existant_neighbours(hex_id: hex_id): TerrainHex[] {
+  export function get_existant_neighbours(hex_id: HexId): TerrainHex[] {
     let coords = id_to_coords(hex_id)
 
     let neighbourIds = getNeighbours(coords.q, coords.r, coords.s)
@@ -1055,13 +1065,13 @@
     return valid_neighbour_ids.map((id) => get_hex(id))
   }
 
-  function get_hex(hex_id: hex_id): TerrainHex {
+  function get_hex(hex_id: HexId): TerrainHex {
     if (hexExists(hex_id)) return $tfield.hexes[hex_id]
 
     return null
   }
 
-  function getContiguousHexIdsOfSameType(hexId: hex_id): hex_id[] {
+  function getContiguousHexIdsOfSameType(hexId: HexId): HexId[] {
     let startHex = { ...$tfield.hexes[hexId] } // Any neighbours with the same style (same bgColor, symbol and symbolColor) will be changed and their neighbours will be added to the list
 
     let seenIds = [genHexId(startHex.q, startHex.r, startHex.s)] // Seen hexes have been added to the hex stack
@@ -1073,7 +1083,7 @@
 
       // Add only matching neighbours to hexStack
       let neighbourIds = getNeighbours(currentHex.q, currentHex.r, currentHex.s)
-      neighbourIds.forEach((nId: hex_id) => {
+      neighbourIds.forEach((nId: HexId) => {
         if (!hexExists(nId)) return
         if (seenIds.find((sId) => sId == nId)) return
 
@@ -1104,8 +1114,21 @@
     }
   }
 
+  export function pointerup() {
+    // Save the terrain placed in an undo state
+    if (Object.keys(tiles_this_placement).length > 0) {
+      push_undo_state({tiles: {
+	placed: structuredClone(tiles_this_placement),
+	replaced: structuredClone(replaced_this_placement),
+      }}, `Placed Tiles - ${Object.keys(tiles_this_placement).length}`)
+    }
+
+    tiles_this_placement = {}
+    replaced_this_placement = {}
+  }
+
   export function clearTerrainSprites() {
-    Object.keys(terrainSprites).forEach((hexId: hex_id) => {
+    Object.keys(terrainSprites).forEach((hexId: HexId) => {
       symbolsContainer.removeChild(terrainSprites[hexId])
       terrainSprites[hexId].destroy()
       delete terrainSprites[hexId]
@@ -1174,8 +1197,8 @@
   })
 
   /* Takes a terrain field and performs actions / updates state so that we match that state */
+  // WARN: NAIVE
   export function applyTerrainField(newField: Partial<TerrainField>) {
-    // WARN: NAIVE
     console.log('Applying terran field', newField, $tfield)
 
     $tfield = { ...$tfield, ...newField }
@@ -1185,7 +1208,8 @@
 
     // Orientation is kind of tricky because it messes with icons n stuff.
     // However, applying a terrain field usually happens during undo. So icons and all that will have their own state to return to.
-    // So really, we don't need to care about applying changes in reverse as long as all state we can about is reflected in save data
+    // So really, we don't need to care about applying such changes in reverse as long as all state we can about is reflected in save data
+
     // if ($tfield.orientation !== newField.orientation) {
     //   console.log("These'm gotta change!")
     //   //changeOrientation()
@@ -1193,7 +1217,15 @@
     // }
   }
 
-  //export function applyTiles( added: 
+  export function applyUndoTiles(tiles_to_place: {[hexId: HexId]: Tile | null}) {
+    console.log("Undoing tiles", tiles_to_place)
+
+
+    for (const [hex_id, tile] of Object.entries(tiles_to_place)) {
+      paintFromTile(hex_id, tile)
+    }
+  }
+
 </script>
 
 <!--
@@ -1206,11 +1238,9 @@
 <Container instance={symbolsContainer} />
 
 {#if $tfield.grid.shown}
-	<Graphics
-		instance={gridGraphics}
-		draw={(g) => {
-			/* too slow to draw here! we have to handle it manually. See the render methods */
-		}}
-	/>
+  <Graphics
+    instance={gridGraphics}
+    draw={(g) => { /* too slow to draw here! we have to handle it manually. See the render methods */ }}
+  />
 {/if}
 -->

@@ -316,6 +316,10 @@
     if (!$store_inputs.mouseDown[2]) store_panning.handlers.endPan()
 
     switch ($store_selected_tool) {
+      case tools.TERRAIN:
+	comp_terrainLayer.pointerup()
+	break
+
       case tools.ICON:
         comp_iconLayer.pointerup()
         break
@@ -706,7 +710,7 @@
     let firstTile = loadedTilesets[0].tiles[0]
     $data_terrain.tile = structuredClone(firstTile)
     const first_icon = { ...loadedIconsets[0].icons[0] }
-    $data_icon.icon = structuredClone(firstIcon)
+    $data_icon.icon = structuredClone(first_icon)
 
     // Center the map
     let tf = loadedSave.TerrainField
