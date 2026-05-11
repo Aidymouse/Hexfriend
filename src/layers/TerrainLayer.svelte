@@ -15,7 +15,7 @@
   import { tfield } from '../stores/tfield'
   import { store_inputs } from '../stores/inputs'
 
-  import { tiles_match } from '../helpers/tiles'
+  import { tiles_match, getStoreableTile } from '../helpers/tiles'
   import {
     coords_cubeToWorld,
     coords_qToCube,
@@ -62,6 +62,10 @@
   cont_terrain.addChild(gridGraphics)
 
   let terrainSprites: { [key: hex_id]: PIXI.Sprite } = {}
+
+  // Keeps a live record of terrain being placed during this mouse movement (what I have dubbed a 'placement')
+  // When the mouse is lifted, all these tiles are inserted into an undo state action
+  let tiles_this_placement: { [key: hex_id]: Tile } = {}
 
   let pan: pan_state
   store_panning.store.subscribe((newPan) => {
@@ -828,13 +832,11 @@
     if (tiles_match($tfield.hexes[hexId].tile, tile)) return
 
     $tfield.hexes[hexId].tile = tile
-      ? {
-          ...tile,
-          preview_flatTop: '',
-          preview_pointyTop: '',
-          symbol: tile.symbol ? { ...tile.symbol, base64: '' } : null,
-        }
+      ? getStoreableTile(tile)
       : null
+
+      tiles_this_placement[hexId] = structuredClone(tile)
+
     if (render) renderHex(hexId)
   }
 
@@ -858,6 +860,7 @@
       let clickedId = genHexId(clickedCoords.q, clickedCoords.r, clickedCoords.s)
 
       paintFromTile(clickedId, $data_terrain.tile)
+
     }
   }
 
@@ -1189,6 +1192,8 @@
     //   redraw = true
     // }
   }
+
+  //export function applyTiles( added: 
 </script>
 
 <!--
