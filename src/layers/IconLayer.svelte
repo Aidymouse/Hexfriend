@@ -380,12 +380,13 @@
 
     // Update icons to be in line with state
     icons.forEach((icon) => {
-      // if the icon doesn't exist
+      // if the icon doesn't exist, create it
       if (!pixi_icons[icon.onLayerId]) {
-        // Create icon
+        // Create sprite
         let new_icon = new PIXI.Sprite(get_icon_texture(icon.texId))
         new_icon.anchor.x = 0.5
         new_icon.anchor.y = 0.5
+
         // register icon events
         new_icon.on('pointerdown', (e) => {
           icon_pointerdown(e, icon)
@@ -407,17 +408,13 @@
       pixi_icons[icon.onLayerId].x = icon.x
       pixi_icons[icon.onLayerId].y = icon.y
       pixi_icons[icon.onLayerId].tint = icon.color
-      //pixi_icons[icon.onLayerId].scale.x = icon.scale.x
-      //pixi_icons[icon.onLayerId].scale.y = icon.scale.y
-      //pixi_icons[icon.onLayerId].rotation = PIXI.DEG_TO_RAD * (icon.rotation ?? 0)
-      pixi_icons[icon.onLayerId].eventMode =
-        $store_selected_tool == tools.ICON || $store_selected_tool == tools.ERASER ? 'static' : 'auto'
+      pixi_icons[icon.onLayerId].eventMode = $store_selected_tool == tools.ICON || $store_selected_tool == tools.ERASER ? 'static' : 'auto'
 
       marked_for_saving.push(icon.onLayerId)
     })
 
     Object.keys(pixi_icons).forEach((icon_id) => {
-      if (!marked_for_saving.includes(+icon_id)) {
+      if (!marked_for_saving.includes(parseInt(icon_id))) {
         // this can be slow when using the generator
         cont_icon.removeChild(pixi_icons[icon_id])
         // this is not the problem
