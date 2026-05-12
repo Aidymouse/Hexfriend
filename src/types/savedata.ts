@@ -5,7 +5,7 @@ import type { TerrainField } from './terrain'
 import type { ListedTextStyle, TextLayerText } from './text'
 import type { Tileset } from './tilesets'
 
-const LATESTSAVEDATAVERSION = 13
+const LATESTSAVEDATAVERSION = 14
 const LATEST_DEFAULT_ICONS_VERSION = 5
 
 export type SaveData = {

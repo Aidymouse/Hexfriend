@@ -19,6 +19,7 @@ let DEFAULTSAVEDATA: SaveData = {
     hexWidth: 50,
     hexHeight: 43.3,
     orientation: HexOrientation.FLATTOP,
+    gap: 0,
 
     rows: 20,
     columns: 20,
@@ -29,7 +30,7 @@ let DEFAULTSAVEDATA: SaveData = {
 
     blankHexColor: 0xf2f2f2,
 
-    grid: { stroke: 0x333333, thickness: 1, gap: 0, shown: true },
+    grid: { stroke: 0x333333, thickness: 1, shown: true },
 
     largehexes: {
       shown: false,

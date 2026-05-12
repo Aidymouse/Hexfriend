@@ -35,7 +35,7 @@ export type TerrainField = {
   hexHeight: number
 
   // TODO: move gap out of grid
-  grid: { stroke: number; thickness: number; gap: number; shown: boolean }
+  grid: { stroke: number; thickness: number; shown: boolean }
 
   mapShape: map_shape
   largehexes: {
@@ -55,10 +55,10 @@ export type TerrainField = {
   columns: number
   raised: HexRaised
 
-
   // TODO: put hex size params into their own hex size param object, HexSizeInfo
   orientation: HexOrientation
   blankHexColor: number
+  gap: number
 
   hexes: { [key: HexId]: TerrainHex }
 }

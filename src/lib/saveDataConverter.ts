@@ -221,6 +221,18 @@ function convert_v12_to_v13(old_data: SaveData): SaveData {
   return old_data
 }
 
+/* it occurs to me that the best thing to do would be save old versions of the save data types, but that means copying a LOT of other nested types. And I'm lazy. */
+const convert_v13_to_v14 = (oldData: SaveData): SaveData => {
+  // @ts-ignore
+  oldData.TerrainField.gap = oldData.TerrainField.grid.gap
+  // @ts-ignore
+  delete oldData.TerrainField.grid.gap
+
+  oldData.saveVersion = 14
+
+  return oldData
+}
+
 export function convertSaveDataToLatest(oldData: SaveData): SaveData {
   // Update to latest version
   let newData: SaveData = JSON.parse(JSON.stringify(oldData))
@@ -251,6 +263,9 @@ export function convertSaveDataToLatest(oldData: SaveData): SaveData {
   }
   if (newData.saveVersion == 12) {
     newData = convert_v12_to_v13(newData)
+  }
+  if (newData.saveVersion == 13) {
+    newData = convert_v13_to_v14(newData)
   }
 
   return newData
