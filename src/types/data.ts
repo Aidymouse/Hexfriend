@@ -1,7 +1,7 @@
 import { type Icon } from './icon'
 import type { coord_system } from './coordinates'
-import type { path_layer_path, path_style } from './path'
-import type { text_layer_text, text_style } from './text'
+import type { PathLayerPath, PathStyle } from './path'
+import type { TextLayerText, TextStyle } from './text'
 import type { Tile } from './tilesets'
 import type * as PIXI from 'pixi.js'
 
@@ -36,8 +36,8 @@ export interface coordinates_data {
 }
 
 export type text_data = {
-  style: text_style
-  selectedText?: text_layer_text
+  style: TextStyle
+  selectedText?: TextLayerText
   alpha: number
   editorRef: any
   usingTextTool: boolean
@@ -45,11 +45,11 @@ export type text_data = {
 }
 
 export type path_data = {
-  selectedPath?: path_layer_path
-  hoveredPath?: path_layer_path
+  selectedPath?: PathLayerPath
+  hoveredPath?: PathLayerPath
   dontSelectPaths: boolean
   snap: boolean
-  style: path_style
+  style: PathStyle
   contextPathId?: number
   add_to: 'start' | 'end' // Which side of the path to add to
 }

@@ -1,5 +1,7 @@
 import type TerrainLayer from '../layers/TerrainLayer.svelte'
 import type IconLayer from '../layers/IconLayer.svelte'
+import type TextLayer from '../layers/IconLayer.svelte'
+import type PathLayer from '../layers/IconLayer.svelte'
 import type { SaveData } from './savedata'
 import type { Tile } from './tilesets'
 import type { HexId } from './toolData'
@@ -7,7 +9,8 @@ import type { HexId } from './toolData'
 export type LayerComponents = {
   terrainLayer: TerrainLayer
   iconLayer: IconLayer
-  // TODO:
+  textLayer: TextLayer
+  pathLayer: PathLayer
 }
 
 // Too fancy with it
@@ -22,10 +25,10 @@ export type UndoData = {
 }
 
 export type UndoDataTiles = {
-    // Terrain that was placed. 
-    placed: {[hexId: HexId]: Tile | null}
-    // Terrain that was replaced, used in Undo
-    replaced: {[hexId: HexId]: Tile | null}
+  // Terrain that was placed.
+  placed: { [hexId: HexId]: Tile | null }
+  // Terrain that was replaced, used in Undo
+  replaced: { [hexId: HexId]: Tile | null }
 }
 
 type Stringified<T> = string

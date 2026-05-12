@@ -29,14 +29,16 @@ export const push_undo_state = (undoData: UndoData, label?: string) => {
 
   const to_push = structuredClone(undoData)
 
-  if (to_push.TerrainField?.hexes) { delete to_push.TerrainField.hexes }
+  if (to_push.TerrainField?.hexes) {
+    delete to_push.TerrainField.hexes
+  }
 
   // TODO: clear the stack when pushing a new undo action
   // WARN: Be careful here, svelte state management code can manipulate objects that we might have stored references to on the undo stack. We clone to stop this
   // TODO: we could save a clone if we store undo states as stringifed states. Then we just parse when we apply the data, which does the clone.
   const undo_state: UndoState = {
     label: label ?? 'Undo',
-    data: to_push
+    data: to_push,
   }
   debug && console.log('Pushing Data: ', undo_state)
 
@@ -73,11 +75,11 @@ export const undo = (layers: LayerComponents) => {
   if (currentState.data.tiles) {
     stateToReturnTo.data.tiles = structuredClone({
       replaced: {},
-      placed: currentState.data.tiles.replaced
+      placed: currentState.data.tiles.replaced,
     })
   }
 
-  debug && console.log("Returning To" ,structuredClone(stateToReturnTo))
+  debug && console.log('Returning To', structuredClone(stateToReturnTo))
 
   store_undo.update((o) => ({ ...o, suppress: true }))
   apply_undo_state(stateToReturnTo, layers)
@@ -97,7 +99,7 @@ export const redo = (layers: LayerComponents) => {
 
 export const apply_undo_state = (state: UndoState, layers: LayerComponents) => {
   debug && console.log('Applying Undo State: ', state)
-  
+
   // we have to make this a structured clone as well, otherwise svelte state can end up changing objects in old undo states! (well, only if they have objects in them)
   const applied_data = state.data
 
@@ -112,5 +114,12 @@ export const apply_undo_state = (state: UndoState, layers: LayerComponents) => {
   if (applied_data.icons) {
     layers.iconLayer.applyIcons(applied_data.icons)
   }
-}
 
+  if (applied_data.texts) {
+    layers.textLayer.applyTexts(applied_data.texts)
+  }
+
+  if (applied_data.paths) {
+    layers.pathLayer.applyTexts(applied_data.texts)
+  }
+}

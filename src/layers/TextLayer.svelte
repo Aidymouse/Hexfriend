@@ -3,7 +3,7 @@
   import type { text_data } from '../types/data'
   import type { shortcut_data } from '../types/inputs'
   import type { pan_state } from '../types/panning'
-  import type { text_layer_text } from '../types/text'
+  import type { TextLayerText } from '../types/text'
 
   // STORES
   import * as store_panning from '../stores/panning'
@@ -14,6 +14,7 @@
   // LIB
   import * as PIXI from 'pixi.js'
   import { afterUpdate, onMount } from 'svelte'
+  import { push_undo_state } from '../lib/undoManager'
 
   // Helpers
   import { coords_cubeToWorld, coords_worldToCube } from '../helpers/hexHelpers'
@@ -51,7 +52,7 @@
   let dragX // offset from the
   let dragY
 
-  export let texts: text_layer_text[] = [
+  export let texts: TextLayerText[] = [
     // {text: string, style: object }
   ]
 
@@ -186,9 +187,12 @@
     texts = texts
     $data_text.selectedText = texts[texts.length - 1]
     $store_has_unsaved_changes = true
+
+    push_undo_state({texts}, "Place New Text")
+
   }
 
-  export function deleteText(text: text_layer_text) {
+  export function deleteText(text: TextLayerText) {
     if (text == $data_text.selectedText) $data_text.selectedText = null
     let i = texts.indexOf(text)
     texts.splice(i, 1)
@@ -196,12 +200,12 @@
     $store_has_unsaved_changes = true
   }
 
-  function getTextWidth(text: text_layer_text): number {
+  function getTextWidth(text: TextLayerText): number {
     let tm = PIXI.TextMetrics.measureText(text.text, new PIXI.TextStyle(text.style))
     return tm.width
   }
 
-  function getTextHeight(text: text_layer_text): number {
+  function getTextHeight(text: TextLayerText): number {
     let tm = PIXI.TextMetrics.measureText(text.text, new PIXI.TextStyle(text.style))
     return tm.height
   }
@@ -241,11 +245,15 @@
     }
   }
 
-  let pixi_texts = {}
+  let pixi_texts: {[text_id: string]: PIXI.Text} = {}
   let cont_pixi_text = new PIXI.Container()
   let grph_selector = new PIXI.Graphics()
 
   cont_all_text.addChild(cont_pixi_text, grph_selector)
+
+  export function applyTexts(new_texts: TextLayerText[]) {
+    texts = new_texts
+  }
 
   afterUpdate(() => {
     for (const [text_id, pixi_text] of Object.entries(pixi_texts)) {

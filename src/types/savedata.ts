@@ -1,8 +1,8 @@
 import type { coordinates_data, overlay_data } from './data'
 import type { IconLayerIcon, Iconset } from './icon'
-import type { listed_path_style, path_style } from './path'
+import type { ListedPathStyle, PathLayerPath, PathStyle } from './path'
 import type { TerrainField } from './terrain'
-import type { listed_text_style } from './text'
+import type { ListedTextStyle, TextLayerText } from './text'
 import type { Tileset } from './tilesets'
 
 const LATESTSAVEDATAVERSION = 13
@@ -22,12 +22,12 @@ export type SaveData = {
 
   overlay: overlay_data
 
-  paths: []
-  texts: []
+  paths: PathLayerPath[]
+  texts: TextLayerText[]
   icons: IconLayerIcon[]
 
-  path_styles: listed_path_style[]
-  text_styles: listed_text_style[]
+  path_styles: ListedPathStyle[]
+  text_styles: ListedTextStyle[]
 }
 
 export { LATEST_DEFAULT_ICONS_VERSION, LATESTSAVEDATAVERSION }

@@ -3,7 +3,7 @@
   import ColorInputPixi from '../components/ColorInputPixi.svelte'
   import SelectGrid from '../components/SelectGrid.svelte'
   import type PathLayer from '../layers/PathLayer.svelte'
-  import type { listed_path_style, path_style } from '../types/path'
+  import type { ListedPathStyel, PathStyle } from '../types/path'
   import * as PIXI from 'pixi.js'
   import { tl } from '../stores/translation'
 
@@ -14,7 +14,7 @@
 
   /* Path Style Management */
 
-  export let loaded_path_styles: listed_path_style[] = []
+  export let loaded_path_styles: ListedPathStyle[] = []
 
   // Idk why this makes the matching fn update but it does
   data_path.subscribe((n) => {
@@ -26,7 +26,7 @@
     pathID = Math.max(pathID, pathStyle.id + 1)
   })
 
-  function styleMatchesData(pathStyle: path_style): boolean {
+  function styleMatchesData(pathStyle: PathStyle): boolean {
     return JSON.stringify(pathStyle) == JSON.stringify($data_path.style)
   }
 

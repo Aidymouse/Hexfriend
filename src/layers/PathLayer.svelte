@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { path_data } from '../types/data'
   import type { pan_state } from '../types/panning'
-  import type { path_layer_path } from '../types/path'
+  import type { PathLayerPath } from '../types/path'
   import type { HexRaised, TerrainField } from '../types/terrain'
   import type { shortcut_data } from '../types/inputs'
   import type { tools } from '../types/toolData'
@@ -36,7 +36,7 @@
     pan = newPan
   })
 
-  export let paths: path_layer_path[] = []
+  export let paths: PathLayerPath[] = []
   export let cont_all_paths: PIXI.Container
 
   export function retain_path_position_on_hex_resize(old_hex_size: HexSizeParams, new_hex_size: HexSizeParams) {
@@ -93,7 +93,7 @@
 
   updatePathId()
 
-  function appendPoint(path: path_layer_path, x: number, y: number) {
+  function appendPoint(path: PathLayerPath, x: number, y: number) {
     if ($data_path.add_to == 'end') {
       path.points = [...path.points, x, y]
     } else if ($data_path.add_to == 'start') {
@@ -128,7 +128,7 @@
     }
   }
 
-  export function remove_latest_point(path: path_layer_path) {
+  export function remove_latest_point(path: PathLayerPath) {
     if ($data_path.add_to == 'end') {
       path.points.pop()
       path.points.pop()
@@ -142,7 +142,7 @@
     $store_has_unsaved_changes = true
   }
 
-  export function deletePath(path: path_layer_path) {
+  export function deletePath(path: PathLayerPath) {
     $data_path.selectedPath = null
 
     let pathIndex = paths.indexOf(path)
@@ -209,7 +209,7 @@
     $store_has_unsaved_changes = true
   }
 
-  function pathPointsToPoints(path: path_layer_path) {
+  function pathPointsToPoints(path: PathLayerPath) {
     let points = []
     for (let pI = 0; pI < path.points.length; pI += 2) {
       points.push(new Vector(path.points[pI], path.points[pI + 1]))
@@ -218,7 +218,7 @@
   }
 
   /* HIT AREA */
-  function findHitArea(path: path_layer_path) {
+  function findHitArea(path: PathLayerPath) {
     let boxWidth = 5 + path.style.width
 
     if (path.points.length < 4)
@@ -443,6 +443,10 @@
   let dashed_lines = {} // path id: dashed line object
 
   cont_all_paths.addChild(cont_pixi_paths, grph_hovered_path, grph_selected_path)
+
+  export function applyPaths(new_paths: PathLayerPath[]) {
+    paths = new_paths
+  }
 
   afterUpdate(() => {
     if (!$data_path) return
