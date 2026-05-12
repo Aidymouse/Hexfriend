@@ -71,43 +71,57 @@
 
   <!-- LARGE HEXES -->
   <label for="showOverlay">{$tl.settings.grid.large_hexes.title}</label>
-  <Checkbox bind:checked={$tfield.largehexes.shown} on:change={e => {
-      push_undo_state({ TerrainField: { largehexes: $tfield.largehexes } }, "Toggle Large Hexes")
+  <Checkbox checked={$tfield.largehexes.shown} on:change={e => {
+      startUndoState({ TerrainField: { largehexes: $tfield.largehexes } }, "Toggle Large Hexes")
+      $tfield.largehexes.shown = !$tfield.largehexes.shown
+      completeUndoState({ TerrainField: { largehexes: $tfield.largehexes } })
   }} id="showOverlay" />
 
   {#if $tfield.largehexes.shown}
     <label for="overlayDiameter">{$tl.settings.grid.large_hexes.size}</label>
-    <input type="number" id="overlayDiameter" min={2} bind:value={$tfield.largehexes.diameterInHexes} on:change={() => { 
-      push_undo_state({ TerrainField: { largehexes: $tfield.largehexes } }, "Change Large Hex Size")
+    <input type="number" id="overlayDiameter" min={2} value={$tfield.largehexes.diameterInHexes} on:change={(e) => { 
+      startUndoState({ TerrainField: { largehexes: $tfield.largehexes } }, "Change Large Hex Size")
+      $tfield.largehexes.diameterInHexes = e.target.valueAsNumber
+      completeUndoState({ TerrainField: { largehexes: $tfield.largehexes } })
     }} />
-
+startUndoState
     <label for="overlayColor">{$tl.settings.grid.large_hexes.color}</label>
-    <ColorInputPixi id={'overlayColor'} bind:value={$tfield.largehexes.style.color} on:input={() => {
-      push_undo_state({ TerrainField: { largehexes: $tfield.largehexes } }, "Change Large Hex Color")
+    <ColorInputPixi id={'overlayColor'} value={$tfield.largehexes.style.color} on:input={(e) => {
+      startUndoState({ TerrainField: { largehexes: $tfield.largehexes } }, "Change Large Hex Color")
+      $tfield.largehexes.style.color = e.detail.number
+      completeUndoState({ TerrainField: { largehexes: $tfield.largehexes } }, "Change Large Hex Color")
     }} />
 
     <label for="overlayThickness">{$tl.settings.grid.large_hexes.outline_thickness}</label>
-    <input type="number" id={'overlayThickness'} bind:value={$tfield.largehexes.style.width} on:change={() => {
-      push_undo_state({ TerrainField: { largehexes: $tfield.largehexes } }, "Change Large Hex Outline Thickness")
+    <input type="number" id={'overlayThickness'} value={$tfield.largehexes.style.width} on:change={(e) => {
+      startUndoState({ TerrainField: { largehexes: $tfield.largehexes } }, "Change Large Hex Outline Thickness")
+      $tfield.largehexes.style.width = e.target.valueAsNumber
+      completeUndoState({ TerrainField: { largehexes: $tfield.largehexes } })
     }}/>
 
     <label for="overlayOffsetX" title={$tl.settings.grid.large_hexes.horizontal_offset_tooltip}>
       {$tl.settings.grid.large_hexes.horizontal_offset}
     </label>
-    <input type="number" bind:value={$tfield.largehexes.offset.x} min={0} step={0.25} on:change={() => {
-      push_undo_state({ TerrainField: { largehexes: $tfield.largehexes } }, "Change Large Hex X Offset")
+    <input type="number" value={$tfield.largehexes.offset.x} min={0} step={0.25} on:change={(e) => {
+      startUndoState({ TerrainField: { largehexes: $tfield.largehexes } }, "Change Large Hex X Offset")
+      $tfield.largehexes.offset.x = e.target.valueAsNumber
+      completeUndoState({ TerrainField: { largehexes: $tfield.largehexes } })
     }} />
 
     <label for="overlayOffsetY" title={$tl.settings.grid.large_hexes.vertical_offset_tooltip}>
       {$tl.settings.grid.large_hexes.vertical_offset}
     </label>
-    <input type="number" bind:value={$tfield.largehexes.offset.y} min={0} step={0.25} on:change={() => {
-      push_undo_state({ TerrainField: { largehexes: $tfield.largehexes } }, "Change Large Hex Y Offset")
+    <input type="number" value={$tfield.largehexes.offset.y} min={0} step={0.25} on:change={(e) => {
+      startUndoState({ TerrainField: { largehexes: $tfield.largehexes } }, "Change Large Hex Y Offset")
+      $tfield.largehexes.offset.y = e.target.valueAsNumber
+      compelteUndoState({ TerrainField: { largehexes: $tfield.largehexes } })
     }} />
 
     <label for="overlayEncompass">{$tl.settings.grid.large_hexes.encompasedges}</label>
-    <Checkbox bind:checked={$tfield.largehexes.encompassEdges} id="overlayEncompass" on:change={() => {
-      push_undo_state({ TerrainField: { largehexes: $tfield.largehexes } }, "Change Large Hex Edge Encompass")
+    <Checkbox checked={$tfield.largehexes.encompassEdges} id="overlayEncompass" on:change={() => {
+      startUndoState({ TerrainField: { largehexes: $tfield.largehexes } }, "Change Large Hex Edge Encompass")
+      $tfield.largehexes.encompassEdges = !$tfield.largehexes.encompassEdges
+      completeUndoState({ TerrainField: { largehexes: $tfield.largehexes } })
     }} />
 
     {#if $tfield.mapShape == map_shape.SQUARE}
@@ -130,9 +144,11 @@
               filename: `${$tfield.orientation == HexOrientation.FLATTOP ? 'bigraisedcolumn' : 'bigindentedrow'}odd`,
             },
           ]}
-          bind:value={$tfield.largehexes.raised}
-	  on:change={() => {
-	    push_undo_state({ TerrainField: { largehexes: $tfield.largehexes } }, "Change Large Hex Raised")
+          value={$tfield.largehexes.raised}
+	  on:change={(e) => {
+	    startUndoState({ TerrainField: { largehexes: $tfield.largehexes } }, "Change Large Hex Raised")
+            $tfield.largehexes.raised = e.detail.value
+	    completeUndoState({ TerrainField: { largehexes: $tfield.largehexes } })
 	  }}
         />
       </span>
