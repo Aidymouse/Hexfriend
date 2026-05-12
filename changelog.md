@@ -1,6 +1,12 @@
 # Changelog
 For Techy People
 
+# Version 4.0 - Hexfriend through time
+
+## Version 4.0
+- Added undo / redo
+- Moved the Gap setting from grid settings into hex settings
+
 # Version 3.0 - Found your feet, Hexfriend
 
 ## Version 3.2.3
