@@ -20,7 +20,6 @@
     "vite": "^4.3.9"
   },
   "dependencies": {
-    "cryptojs": "^2.5.3",
     "dexie": "^3.2.4",
     "ghpages": "^0.0.10",
     "pixi-dashed-line": "^1.4.2",
