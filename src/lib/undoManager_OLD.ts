@@ -37,13 +37,6 @@ data_path.subscribe(d => local_data_path = d)
 // data_text.subscribe(d => local_data_text = d)
 //
 
-// the 'before' state of whatever action. applied when undoing this state
-export const startUndoState = (data: UndoData) => {
-}
-
-// the 'after' state of whatever action. applied when re-doing this state
-export const completeUndoState = (data: UndoData, label?: string) => {
-}
 
 export const push_undo_state = (undoData: UndoData, label?: string) => {
   if (local_undo.suppress) {

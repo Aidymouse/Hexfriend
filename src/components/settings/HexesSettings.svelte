@@ -212,6 +212,36 @@
     </select>
     -->
 
+
+  <label for="gridGap">{$tl.settings.grid.gap}</label>
+  <input
+    id="gap"
+    type="number"
+    min="0"
+    max="99"
+    value={$tfield.grid.gap}
+    on:focus={() => {}}
+    on:change={(e) => {
+
+      //let undoStartState = {TerrainField: { grid: $tfield.grid } }
+      //startUndoState(undoStartState, `Change Grid Gap`)
+
+      $tfield.grid.gap = e.target.valueAsNumber
+
+      redrawEntireMap()
+      comp_coordsLayer.updateAllCoordPositions()
+      retain_positions()
+
+      
+
+      // TODO: handle updated icons
+      //push_undo_state({ TerrainField: { grid: $tfield.grid } }, "Change Grid Gap")
+
+      //completeUndoState({TerrainField: { grid: $tfield.grid } }, `Change Grid Gap`)
+      save_old_resize_parameters()
+    }}
+  />
+
   <label title={$tl.settings.hexes.retain_position_explanation}>
     {$tl.settings.hexes.retain_position}
     <sup id="retain-position-tip" title={$tl.settings.hexes.retain_position_explanation}>?</sup>

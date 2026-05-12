@@ -12,6 +12,8 @@
   import { HexOrientation } from '../../types/terrain'
   import { push_undo_state } from '../../lib'
 
+  import { completeUndoState, startUndoState } from '../../lib/undoManager'
+  import type { IconLayerIcon } from '../../types'
   export let comp_terrainLayer
   export let comp_coordsLayer
 
@@ -19,16 +21,20 @@
   export let redrawEntireMap: Function
   export let retain_positions: Function
   export let save_old_resize_parameters: Function
+
+
 </script>
 
 <div class="settings-grid">
   <label for="showGrid">{$tl.settings.grid.show}</label>
   <!-- Weird bug where the grid wont render if you turn it off then resize the hex flower map ?? -->
   <Checkbox
-    bind:checked={$tfield.grid.shown}
+    checked={$tfield.grid.shown}
     id={'showGrid'}
     on:change={() => {
-      push_undo_state({ TerrainField: { grid: $tfield.grid } }, "Toggle Grid")
+      startUndoState({TerrainField: { grid: $tfield.grid } }, "Toggle Grid")
+      $tfield.grid.shown = !$tfield.grid.shown
+      completeUndoState({TerrainField: { grid: $tfield.grid } }, "Toggle Grid")
       comp_terrainLayer.renderGrid()
     }}
   />
@@ -39,18 +45,22 @@
       type="number"
       min="0"
       max="99"
-      bind:value={$tfield.grid.thickness}
-      on:change={() => {
-	push_undo_state({ TerrainField: { grid: $tfield.grid } }, "Change Grid Thickness")
+      value={$tfield.grid.thickness}
+      on:change={(e) => {
+	startUndoState({TerrainField: { grid: $tfield.grid } }, `Change Grid Thickness ${$tfield.grid.thickness} -> ${e.target.valueAsNumber}`)
+	$tfield.grid.thickness = e.target.valueAsNumber
+	completeUndoState({TerrainField: { grid: $tfield.grid } })
         renderGrid()
       }}
     />
 
     <label for="gridColor">{$tl.settings.grid.color}</label>
     <ColorInputPixi
-      bind:value={$tfield.grid.stroke}
-      on:input={() => {
-	push_undo_state({ TerrainField: { grid: $tfield.grid } }, "Grid Stroke Color")
+      value={$tfield.grid.stroke}
+      on:input={(e) => {
+	startUndoState({TerrainField: { grid: $tfield.grid } }, `Change Grid Stroke`)
+	$tfield.grid.stroke = e.detail.number
+	completeUndoState({TerrainField: { grid: $tfield.grid } })
       }}
       on:change={() => {
         renderGrid()
@@ -58,26 +68,6 @@
       id={'gridColor'}
     />
   {/if}
-
-  <label for="gridGap">{$tl.settings.grid.gap}</label>
-  <input
-    id="gap"
-    type="number"
-    min="0"
-    max="99"
-    bind:value={$tfield.grid.gap}
-    on:focus={() => {}}
-    on:change={() => {
-      redrawEntireMap()
-      comp_coordsLayer.updateAllCoordPositions()
-      retain_positions()
-
-      // TODO: handle updated icons
-      push_undo_state({ TerrainField: { grid: $tfield.grid } }, "Change Grid Gap")
-
-      save_old_resize_parameters()
-    }}
-  />
 
   <!-- LARGE HEXES -->
   <label for="showOverlay">{$tl.settings.grid.large_hexes.title}</label>
