@@ -27,7 +27,9 @@
   } from '../lib/map_resize'
   import HexesSettings from '../components/settings/HexesSettings.svelte'
   import type { HexOrientation, HexRaised } from '../types/terrain'
+  import { getTextHeight, getTextWidth, textsMatch } from '../helpers/textHelpers'
 
+  import TextPanel from '../panels/TextPanel.svelte'
   //import { Transformer, TransformerHandle } from "@pixi-essentials/transformer"
 
   /*
@@ -46,7 +48,9 @@
 
   export let cont_all_text
 
-  let hoveredText
+  let hoveredText: TextLayerText | null
+  let just_created_id: number | null = null // Set to the ID of a newly created text when it is placed
+  let text_prior_to_changes: TextLayerText | null = null
 
   let dragText
   let dragX // offset from the
@@ -141,16 +145,33 @@
     dragX = store_panning.curWorldX() - hoveredText.x
     dragY = store_panning.curWorldY() - hoveredText.y
 
+    text_prior_to_changes = structuredClone(hoveredText)
+
     //trsfm_text.group[0] = (pixi_texts[$data_text.selectedText.id])
   }
+
+  
 
   function deselectText() {
     if (!$data_text.selectedText) return
 
-    if ($data_text.selectedText.text == '') deleteText($data_text.selectedText)
-    $data_text.selectedText = null
 
-    //trsfm_text.group = []
+
+    if ($data_text.selectedText.text == '') { 
+      deleteText($data_text.selectedText)
+      return // okay to return as delete will also deselect
+    }
+
+
+    if (just_created_id === $data_text.selectedText.id) {
+      push_undo_state({texts: texts}, `Create Text ${$data_text.selectedText.id}`)
+      just_created_id = null
+    } else if (!textsMatch(text_prior_to_changes, $data_text.selectedText)) {
+      push_undo_state({texts: texts}, `Edit Text ${$data_text.selectedText.id}`)
+      text_prior_to_changes = null
+    }
+
+    $data_text.selectedText = null
   }
 
   export function pointerup() {
@@ -169,11 +190,11 @@
   }
 
   function newText() {
-    let new_text = {
+    let new_text: TextLayerText = {
       id: textId,
       text: '',
       alpha: $data_text.alpha,
-      style: { ...$data_text.style },
+      style: structuredClone($data_text.style),
       x: store_panning.curWorldX(),
       y: store_panning.curWorldY(),
       rotation: 0,
@@ -182,33 +203,23 @@
     new_text.y = new_text.y - getTextHeight(new_text)
 
     texts.push(new_text)
+    just_created_id = new_text.id
 
     textId++
     texts = texts
     $data_text.selectedText = texts[texts.length - 1]
     $store_has_unsaved_changes = true
 
-    push_undo_state({texts}, "Place New Text")
-
   }
 
   export function deleteText(text: TextLayerText) {
-    if (text == $data_text.selectedText) $data_text.selectedText = null
+    if (text == $data_text.selectedText) { $data_text.selectedText = null }
     let i = texts.indexOf(text)
     texts.splice(i, 1)
     texts = texts
     $store_has_unsaved_changes = true
   }
 
-  function getTextWidth(text: TextLayerText): number {
-    let tm = PIXI.TextMetrics.measureText(text.text, new PIXI.TextStyle(text.style))
-    return tm.width
-  }
-
-  function getTextHeight(text: TextLayerText): number {
-    let tm = PIXI.TextMetrics.measureText(text.text, new PIXI.TextStyle(text.style))
-    return tm.height
-  }
 
   let alignMap = {
     left: { x: 0, y: 0 },
@@ -245,7 +256,7 @@
     }
   }
 
-  let pixi_texts: {[text_id: string]: PIXI.Text} = {}
+  let pixi_texts: {[text_id: string]: PIXI.Text & {marked_for_death?: boolean}} = {}
   let cont_pixi_text = new PIXI.Container()
   let grph_selector = new PIXI.Graphics()
 
@@ -253,6 +264,19 @@
 
   export function applyTexts(new_texts: TextLayerText[]) {
     texts = new_texts
+
+    for (const text of texts) {
+      if (!pixi_texts[text.id]) {
+	continue // This will be done in afterUpdate
+      }
+
+      let pixi_text = pixi_texts[text.id]
+
+      // The pointerover event still points at the old object. We need to remove the old event and apply a new one
+      pixi_text.off('pointerover')
+      pixi_text.on('pointerover', (e) => { hoveredText = text }) 
+
+    }
   }
 
   afterUpdate(() => {
@@ -262,16 +286,18 @@
 
     for (const text of texts) {
       if (!pixi_texts[text.id]) {
-        let new_text = new PIXI.Text()
-        new_text.on('pointerover', (e) => {
+	console.log(`Making new text for ${text.id}`)
+        let new_pixi_text = new PIXI.Text()
+        new_pixi_text.on('pointerover', (e) => {
+	  console.log('Hovered')
           hoveredText = text
         })
-        new_text.on('pointerout', (e) => {
+        new_pixi_text.on('pointerout', (e) => {
           hoveredText = null
         })
 
-        pixi_texts[text.id] = new_text
-        cont_pixi_text.addChild(new_text)
+        pixi_texts[text.id] = new_pixi_text
+        cont_pixi_text.addChild(new_pixi_text)
       }
 
       let pixi_text = pixi_texts[text.id]
@@ -281,14 +307,16 @@
       pixi_text.text = text.text
       pixi_text.style = text.style
       pixi_text.anchor = alignMap[text.style.align]
-      pixi_text.marked_for_death = false
       pixi_text.alpha = text.alpha ? text.alpha : 1
       pixi_text.rotation = text.rotation ? text.rotation : 0
       pixi_text.eventMode = $store_selected_tool == tools.TEXT ? 'static' : 'auto'
+
+      pixi_text.marked_for_death = false
     }
 
     for (const [text_id, pixi_text] of Object.entries(pixi_texts)) {
       if (pixi_text.marked_for_death) {
+	console.log(`Deleting text ${text_id}`)
         cont_pixi_text.removeChild(pixi_text)
         delete pixi_texts[text_id]
       }
