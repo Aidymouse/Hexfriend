@@ -47,7 +47,7 @@
   import type { PreviewHexInfo } from '../helpers/iconFns'
   import { generate_tile_previews } from '../helpers/tileFns'
 
-  import { push_undo_state } from '../lib'
+  import { completeUndoState, startUndoState } from '../lib'
   import type { UndoDataTiles } from '../types'
   export let cont_terrain: PIXI.Container
 
@@ -1117,10 +1117,8 @@
   export function pointerup() {
     // Save the terrain placed in an undo state
     if (Object.keys(tiles_this_placement).length > 0) {
-      push_undo_state({tiles: {
-	placed: structuredClone(tiles_this_placement),
-	replaced: structuredClone(replaced_this_placement),
-      }}, `Placed Tiles - ${Object.keys(tiles_this_placement).length}`)
+      startUndoState({tiles: replaced_this_placement}, `Placed Tiles - ${Object.keys(tiles_this_placement).length}`)
+      completeUndoState({tiles: tiles_this_placement})
     }
 
     tiles_this_placement = {}
