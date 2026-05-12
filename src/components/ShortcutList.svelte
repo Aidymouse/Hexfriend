@@ -1,17 +1,17 @@
 <script lang="ts">
 	/* I am sure there's a data strcuture out there that will make this more efficient, but it works for now */
 	import { shortcuts } from '../lib/keyboardShortcuts';
-	import { tools } from '../types/toolData';
+	import { Tools } from '../types/toolData';
 
 	const GENERALHEADING: string = 'General Keybinds';
 
 	let toolHeadings = [
 		{ tool: null, heading: GENERALHEADING },
-		{ tool: tools.TERRAIN, heading: 'Terrain Tool' },
-		{ tool: tools.ICON, heading: 'Icon Tool' },
-		{ tool: tools.PATH, heading: 'Path Tool' },
-		{ tool: tools.TEXT, heading: 'Text Tool' },
-		{ tool: tools.ERASER, heading: 'Eraser Tool' },
+		{ tool: Tools.TERRAIN, heading: 'Terrain Tool' },
+		{ tool: Tools.ICON, heading: 'Icon Tool' },
+		{ tool: Tools.PATH, heading: 'Path Tool' },
+		{ tool: Tools.TEXT, heading: 'Text Tool' },
+		{ tool: Tools.ERASER, heading: 'Eraser Tool' },
 	];
 
 	let keysDown: string[] = [];

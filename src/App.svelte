@@ -101,7 +101,7 @@
   import type { TerrainField } from './types/terrain'
   import { LATEST_TILESET_FORMAT_VERSION, type Tileset } from './types/tilesets'
   // Enums
-  import { tools } from './types/toolData'
+  import { Tools } from './types/toolData'
   import * as PIXI from 'pixi.js'
   import { afterUpdate, onMount } from 'svelte'
   import { Map_Exports } from './types/export'
@@ -197,7 +197,7 @@
   /* These should probably be stores huh */
 
   store_selected_tool.subscribe((n) => {
-    $data_text.usingTextTool = n == tools.TEXT
+    $data_text.usingTextTool = n == Tools.TEXT
   })
 
   let ignored_keys: string[] = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
@@ -254,7 +254,7 @@
 
   /* TOOL METHODS */
   /** TODO: refactor this into seperate tool store subscribes in respective layers */
-  function changeTool(newTool: tools) {
+  function changeTool(newTool: Tools) {
     // A list of stuff that needs to happen every tool change
     data_path.update((n) => {
       n.contextPathId = null
@@ -282,23 +282,23 @@
 
     if ($store_inputs.mouseDown[0]) {
       switch ($store_selected_tool) {
-        case tools.TERRAIN:
+        case Tools.TERRAIN:
           comp_terrainLayer.pointerdown()
           break
 
-        case tools.ICON:
+        case Tools.ICON:
           comp_iconLayer.pointerdown()
           break
 
-        case tools.PATH:
+        case Tools.PATH:
           comp_pathLayer.pointerdown()
           break
 
-        case tools.TEXT:
+        case Tools.TEXT:
           comp_textLayer.pointerdown()
           break
 
-        case tools.ERASER:
+        case Tools.ERASER:
           if ($data_eraser.eraseTerrain) {
             comp_terrainLayer.eraseAtMouse()
           }
@@ -316,19 +316,19 @@
     if (!$store_inputs.mouseDown[2]) store_panning.handlers.endPan()
 
     switch ($store_selected_tool) {
-      case tools.TERRAIN:
+      case Tools.TERRAIN:
 	comp_terrainLayer.pointerup()
 	break
 
-      case tools.ICON:
+      case Tools.ICON:
         comp_iconLayer.pointerup()
         break
 
-      case tools.TEXT:
+      case Tools.TEXT:
         comp_textLayer.pointerup()
         break
 
-      case tools.OVERLAY:
+      case Tools.OVERLAY:
         comp_overlayLayer.pointerup()
         break
     }
@@ -338,26 +338,26 @@
     store_panning.handlers.handle(e)
 
     switch ($store_selected_tool) {
-      case tools.TERRAIN:
+      case Tools.TERRAIN:
         if ($store_inputs.mouseDown[0]) comp_terrainLayer.pointerdown()
         break
 
-      case tools.ICON:
+      case Tools.ICON:
         comp_iconLayer.pointermove()
         break
 
-      case tools.TEXT:
+      case Tools.TEXT:
         comp_textLayer.pointermove()
         break
 
-      case tools.ERASER:
+      case Tools.ERASER:
         if ($store_inputs.mouseDown[0]) {
           if ($data_eraser.eraseTerrain) comp_terrainLayer.eraseAtMouse()
         }
         /* Icons are handled differently in the icon handler */
         break
 
-      case tools.OVERLAY:
+      case Tools.OVERLAY:
         comp_overlayLayer.pointermove()
         break
     }
@@ -365,7 +365,7 @@
 
   function pointerOffLayers(e: PointerEvent) {
     switch ($store_selected_tool) {
-      case tools.ICON:
+      case Tools.ICON:
         comp_iconLayer.pointerout(e)
         break
     }
@@ -408,7 +408,7 @@
 	      iconLayer: comp_iconLayer,
 	      textLayer: comp_textLayer,
 	      pathLayer: comp_pathLayer
-	    })
+	    }, changeTool)
             break
 
           case 'redo':
@@ -417,7 +417,7 @@
 	      iconLayer: comp_iconLayer,
 	      textLayer: comp_textLayer,
 	      pathLayer: comp_pathLayer
-	    })
+	    }, changeTool)
             break
 
           case 'toggleViewMaps':
@@ -445,22 +445,22 @@
             break
 
           case 'changeTool_terrain':
-            changeTool(tools.TERRAIN)
+            changeTool(Tools.TERRAIN)
             break
           case 'changeTool_icon':
-            changeTool(tools.ICON)
+            changeTool(Tools.ICON)
             break
           case 'changeTool_path':
-            changeTool(tools.PATH)
+            changeTool(Tools.PATH)
             break
           case 'changeTool_text':
-            changeTool(tools.TEXT)
+            changeTool(Tools.TEXT)
             break
           case 'changeTool_eraser':
-            changeTool(tools.ERASER)
+            changeTool(Tools.ERASER)
             break
           case 'changeTool_overlay':
-            if ($data_overlay.base64 != '') changeTool(tools.OVERLAY)
+            if ($data_overlay.base64 != '') changeTool(Tools.OVERLAY)
             break
 
           case 'toggle_overlay':
@@ -473,19 +473,19 @@
 
         break
 
-      case tools.TERRAIN:
+      case Tools.TERRAIN:
         comp_terrainLayer.handleKeyboardShortcut(shortcutData)
         break
 
-      case tools.ICON:
+      case Tools.ICON:
         comp_iconLayer.handleKeyboardShortcut(shortcutData)
         break
 
-      case tools.PATH:
+      case Tools.PATH:
         comp_pathLayer.handleKeyboardShortcut(shortcutData)
         break
 
-      case tools.TEXT:
+      case Tools.TEXT:
         comp_textLayer.handleKeyboardShortcut(shortcutData)
         break
     }
@@ -523,22 +523,22 @@
 
     // Some more active keyboard listeners require these methods to be called
     switch ($store_selected_tool) {
-      case tools.TERRAIN: {
+      case Tools.TERRAIN: {
         comp_terrainLayer.keydown(e)
         break
       }
 
-      case tools.ICON: {
+      case Tools.ICON: {
         comp_iconLayer.keydown(e)
         break
       }
 
-      case tools.PATH: {
+      case Tools.PATH: {
         comp_pathLayer.keydown(e)
         break
       }
 
-      case tools.ERASER: {
+      case Tools.ERASER: {
         if (e.key == 'Shift') $data_eraser.eraseTerrain = false
         if (e.key == 'Control') $data_eraser.eraseIcons = false
         break
@@ -554,22 +554,22 @@
     }
 
     switch ($store_selected_tool) {
-      case tools.TERRAIN: {
+      case Tools.TERRAIN: {
         comp_terrainLayer.keyup(e)
         break
       }
 
-      case tools.ICON: {
+      case Tools.ICON: {
         comp_iconLayer.keyup(e)
         break
       }
 
-      case tools.PATH: {
+      case Tools.PATH: {
         comp_pathLayer.keyup(e)
         break
       }
 
-      case tools.ERASER: {
+      case Tools.ERASER: {
         if (e.key == 'Shift') $data_eraser.eraseTerrain = true
         if (e.key == 'Control') $data_eraser.eraseIcons = true
         break
@@ -706,7 +706,7 @@
     $data_coordinates = data.coords
 
     $data_overlay = data.overlay
-    if ($store_selected_tool == tools.OVERLAY && $data_overlay.base64 == '') $store_selected_tool = tools.TERRAIN
+    if ($store_selected_tool == Tools.OVERLAY && $data_overlay.base64 == '') $store_selected_tool = Tools.TERRAIN
 
     reset_undo_stack()
 
@@ -881,17 +881,17 @@
       <TerrainGenerator {loadedTilesets} {comp_terrainLayer} bind:showTerrainGenerator />
     {:else if show_icon_generator}
       <IconGenerator {loadedIconsets} {comp_iconLayer} bind:show_icon_generator />
-    {:else if $store_selected_tool == tools.TERRAIN}
+    {:else if $store_selected_tool == Tools.TERRAIN}
       <TerrainPanel bind:this={comp_terrain_panel} {loadedTilesets} {app} />
-    {:else if $store_selected_tool == tools.ICON}
+    {:else if $store_selected_tool == Tools.ICON}
       <IconPanel {app} {loadedIconsets} />
-    {:else if $store_selected_tool == tools.PATH}
+    {:else if $store_selected_tool == Tools.PATH}
       <PathPanel {comp_pathLayer} bind:loaded_path_styles={loadedSave.path_styles} />
-    {:else if $store_selected_tool == tools.TEXT}
+    {:else if $store_selected_tool == Tools.TEXT}
       <TextPanel {comp_textLayer} bind:loaded_text_styles={loadedSave.text_styles} />
-    {:else if $store_selected_tool == tools.ERASER}
+    {:else if $store_selected_tool == Tools.ERASER}
       <EraserPanel bind:loaded_save={loadedSave} />
-    {:else if $store_selected_tool == tools.OVERLAY}
+    {:else if $store_selected_tool == Tools.OVERLAY}
       <OverlayPanel />
     {/if}
 

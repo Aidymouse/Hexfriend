@@ -1,3 +1,4 @@
+import type { PreviewHexInfo } from '../helpers/iconFns'
 import type { map_shape } from './settings'
 import type { Tile } from './tilesets'
 import type { HexId } from './toolData'
@@ -58,3 +59,5 @@ export type TerrainField = {
 
   hexes: { [key: HexId]: TerrainHex }
 }
+
+export type HexSizeInfo = Omit<PreviewHexInfo, 'color'> & { gap: number }

@@ -7,7 +7,7 @@
     import { store_has_unsaved_changes } from "../../stores/flags";
     import { tl } from "../../stores/translation";
 
-    import { tools } from "../../types/toolData";
+    import { Tools } from "../../types/toolData";
 
     export let showSettings;
 
@@ -24,7 +24,7 @@
 			$data_overlay.scale.x = 1;
 			$data_overlay.scale.y = 1;
 			showSettings = false;
-			store_selected_tool.update((n) => tools.OVERLAY);
+			store_selected_tool.update((n) => Tools.OVERLAY);
 
 			$store_has_unsaved_changes = true;
 		};

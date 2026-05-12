@@ -1,6 +1,6 @@
 import type { Tile } from './tilesets';
 
-export enum tools {
+export enum Tools {
 	TERRAIN = 'terrain',
 	ICON = 'icon',
 	PATH = 'path',

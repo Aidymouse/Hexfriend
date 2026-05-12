@@ -4,7 +4,6 @@
   import type { PathLayerPath } from '../types/path'
   import type { HexRaised, TerrainField } from '../types/terrain'
   import type { shortcut_data } from '../types/inputs'
-  import type { tools } from '../types/toolData'
 
   // ENUMS
   import { HexOrientation } from '../types/terrain'
@@ -30,14 +29,22 @@
     find_new_pos_through_resize,
     type HexSizeParams,
   } from '../lib/map_resize'
+  import { push_undo_state } from '../lib/undoManager'
+  import { findHitArea, getPathSnapPoint } from '../helpers/pathHelpers'
+  import type { UndoDataPathPoint } from '../types'
 
   let pan: pan_state
-  store_panning.store.subscribe((newPan) => {
-    pan = newPan
-  })
+  store_panning.store.subscribe((newPan) => { pan = newPan })
+
+  // When we've added the first point, we don't want to push the undo state *yet*
+  //let state_in_the_chamber: UndoDataPathPoint | null = null
 
   export let paths: PathLayerPath[] = []
   export let cont_all_paths: PIXI.Container
+
+  export function debug_logPathState() {
+    console.log(paths)
+  }
 
   export function retain_path_position_on_hex_resize(old_hex_size: HexSizeParams, new_hex_size: HexSizeParams) {
     paths.forEach((path) => {
@@ -93,15 +100,35 @@
 
   updatePathId()
 
-  function appendPoint(path: PathLayerPath, x: number, y: number) {
-    if ($data_path.add_to == 'end') {
+  function appendPoint(path: PathLayerPath, x: number, y: number, path_end: 'start' | 'end') {
+    if (path_end == 'end') {
       path.points = [...path.points, x, y]
-    } else if ($data_path.add_to == 'start') {
+    } else if (path_end == 'start') {
       path.points = [x, y, ...path.points]
     }
 
     paths = paths
+
+    /*
+    push_undo_state({
+      path_point: {path_id: path.id,
+      point: {x, y},
+      path_end: $data_path.add_to,
+      action: 'add',
+      grab_selection: path.points.length === 2,
+    } }, `Add path point to ${path.id}`)
+    */
+
+    push_undo_state({ paths }, `Update Path ${path.id}`)
+
     $store_has_unsaved_changes = true
+  }
+
+  export function deselectPath() {
+    if ($data_path.selectedPath.points.length <= 2) { 
+      deletePath($data_path.selectedPath)
+    }
+    $data_path.selectedPath = null
   }
 
   export function pointerdown() {
@@ -117,7 +144,7 @@
           pY = sP.y
         }
 
-        appendPoint($data_path.selectedPath, pX, pY)
+        appendPoint($data_path.selectedPath, pX, pY, $data_path.add_to)
       } else if ($data_path.hoveredPath && !$data_path.dontSelectPaths) {
         $data_path.selectedPath = paths[paths.indexOf($data_path.hoveredPath)]
         $data_path.style = { ...$data_path.selectedPath.style }
@@ -128,16 +155,41 @@
     }
   }
 
-  export function remove_latest_point(path: PathLayerPath) {
-    if ($data_path.add_to == 'end') {
-      path.points.pop()
-      path.points.pop()
-    } else if ($data_path.add_to == 'start') {
+  /* @returns the point removed */
+  function remove_point_from(path: PathLayerPath, remove_from: 'start' | 'end'): {x: number, y: number} {
+    let ret_point: {x: number, y: number} = {x: -1, y: -1}
+    if (remove_from == 'end') {
+      ret_point.y = path.points.pop()
+      ret_point.x = path.points.pop()
+    } else if (remove_from == 'start') {
+      ret_point = {x: path.points[0], y: path.points[1]}
       path.points.splice(0, 2)
     }
+
+    return ret_point
+  }
+
+  export function remove_latest_point(path: PathLayerPath) {
+    const removed_point = remove_point_from(path, $data_path.add_to)
     paths = paths
 
-    if (path.points.length == 0) deletePath(path)
+
+    /*
+    push_undo_state({path_point: {
+      path_id: path.id,
+      action: 'remove',
+      point: removed_point,
+      path_end: $data_path.add_to,
+      grab_selection: path.points.length === 0,
+    }}, `Remove point from path ${path.id}`)
+    */
+
+    if (path.points.length == 0) {
+      deletePath(path)
+    } else {
+      push_undo_state({ paths }, `Remove Point From ${path.id}`)
+    }
+
 
     $store_has_unsaved_changes = true
   }
@@ -150,36 +202,24 @@
 
     paths = paths
 
+    push_undo_state({ paths }, `Remove path ${path.id}`)
+
+    // TODO: if the path has 1 point, make this a point undo state, otherwise do the whole path
+
     $store_has_unsaved_changes = true
   }
 
   function getSnapPoint() {
-    // Overlay a grid of smaller opposite orientation hexes and it lines up perfectly!
 
-    let snap_grid_orientation =
-      $tfield.orientation == HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP
-    let snap_grid_hexWidth =
-      ($tfield.hexWidth + $tfield.grid.gap) / ($tfield.orientation == HexOrientation.FLATTOP ? 2 : 1.5)
-    let snap_grid_hexHeight =
-      ($tfield.hexHeight + $tfield.grid.gap) / ($tfield.orientation == HexOrientation.FLATTOP ? 1.5 : 2)
-
-    let snap_coords = coords_worldToCube(
-      store_panning.curWorldX(),
-      store_panning.curWorldY(),
-      snap_grid_orientation,
-      snap_grid_hexWidth,
-      snap_grid_hexHeight,
-      $tfield.grid.gap,
-    )
-
-    return coords_cubeToWorld(
-      snap_coords.q,
-      snap_coords.r,
-      snap_coords.s,
-      snap_grid_orientation,
-      snap_grid_hexWidth,
-      snap_grid_hexHeight,
-      $tfield.grid.gap,
+    return getPathSnapPoint(
+	store_panning.curWorldX(), 
+	store_panning.curWorldY(),
+	{
+	  orientation: $tfield.orientation,
+	  hexWidth: $tfield.hexWidth,
+	  hexHeight: $tfield.hexHeight,
+	  gap: $tfield.grid.gap,
+	}
     )
   }
 
@@ -196,186 +236,21 @@
     paths.push({
       id: pathId,
       style: { ...$data_path.style },
-      points: [pX, pY],
+      //points: [pX, pY],
+      points: [],
       hitboxes: [],
+      // TODO: what goin on with this ??
       dashes: $data_path.dashed ? [...$data_path.dashes] : null,
     })
-    paths = paths
+    //paths = paths
     pathId++
     $data_path.selectedPath = paths[paths.length - 1]
     $data_path.hoveredPath = null
     //console.log(paths);
 
+    appendPoint(paths.at(-1)!, pX, pY, $data_path.add_to)
+
     $store_has_unsaved_changes = true
-  }
-
-  function pathPointsToPoints(path: PathLayerPath) {
-    let points = []
-    for (let pI = 0; pI < path.points.length; pI += 2) {
-      points.push(new Vector(path.points[pI], path.points[pI + 1]))
-    }
-    return points
-  }
-
-  /* HIT AREA */
-  function findHitArea(path: PathLayerPath) {
-    let boxWidth = 5 + path.style.width
-
-    if (path.points.length < 4)
-      return new PIXI.Polygon([
-        path.points[0] - boxWidth,
-        path.points[1] - boxWidth,
-        path.points[0] - boxWidth,
-        path.points[1] + boxWidth,
-        path.points[0] + boxWidth,
-        path.points[1] + boxWidth,
-        path.points[0] + boxWidth,
-        path.points[1] - boxWidth,
-      ])
-
-    let pathPoints = pathPointsToPoints(path)
-
-    // Add first point
-
-    // 0 radians = straight right
-    // PI/2 radians = straight down
-    // PI radians = straight left
-    // -PI/2 radians = straight up
-
-    // Set up initial two prior points
-
-    // Names need some cleaning up, but i'll handle that later. Use the draw functions to help!
-
-    let newPolyPoints = []
-    let pointStack = []
-
-    let firstSeg = Vector.subtract(pathPoints[1], pathPoints[0])
-    let perpFirstSegDir = new Vector(firstSeg.y, -firstSeg.x).normalize()
-    let firstPointLeft = Vector.add(pathPoints[0], Vector.multiply(perpFirstSegDir, boxWidth))
-    let firstPointRight = Vector.add(pathPoints[0], Vector.multiply(perpFirstSegDir, -boxWidth))
-
-    newPolyPoints.push(firstPointLeft)
-    pointStack.push(firstPointRight)
-
-    // Find points for corners
-    for (let pI = 1; pI < pathPoints.length - 1; pI++) {
-      let p1 = pathPoints[pI - 1]
-      let p2 = pathPoints[pI]
-      let p3 = pathPoints[pI + 1]
-
-      let lineSeg1 = Vector.subtract(p2, p1)
-      let lineSeg2 = Vector.subtract(p2, p3)
-
-      let perpLine1Dir = new Vector(lineSeg1.y, -lineSeg1.x).normalize()
-      let perpLine2Dir = new Vector(lineSeg2.y, -lineSeg2.x).normalize()
-
-      let p1Left = Vector.add(p1, Vector.multiply(perpLine1Dir, boxWidth))
-      let p1Right = Vector.add(p1, Vector.multiply(perpLine1Dir, -boxWidth))
-
-      let p3Left = Vector.add(p3, Vector.multiply(perpLine2Dir, boxWidth))
-      let p3Right = Vector.add(p3, Vector.multiply(perpLine2Dir, -boxWidth))
-
-      // Find intersection Point between left lines
-      let p1LeftLine = { start: p1Left, end: Vector.add(p1Left, Vector.multiply(lineSeg1, 5)) }
-      let p3RightLine = { start: p3Right, end: Vector.add(p3Right, Vector.multiply(lineSeg2, 5)) }
-      let newPointLeft = findIntersectionPoint(p1LeftLine, p3RightLine)
-
-      let p1RightLine = { start: p1Right, end: Vector.add(p1Right, Vector.multiply(lineSeg1, 5)) }
-      let p3LeftLine = { start: p3Left, end: Vector.add(p3Left, Vector.multiply(lineSeg2, 5)) }
-      let newPointRight = findIntersectionPoint(p1RightLine, p3LeftLine)
-
-      /*
-
-			g.lineStyle(2, 0x0000ff);
-			g.moveTo(p1LeftLine.start.x, p1LeftLine.start.y)
-			g.lineTo(p1LeftLine.end.x, p1LeftLine.end.y)
-
-			g.lineStyle(2, 0x00ff00);
-			g.moveTo(p3LeftLine.start.x, p3LeftLine.start.y)
-			g.lineTo(p3LeftLine.end.x, p3LeftLine.end.y)
-
-			*/
-
-      /*
-			g.lineStyle(2, 0x000088);
-			g.moveTo(p1RightLine.start.x, p1RightLine.start.y)
-			g.lineTo(p1RightLine.end.x, p1RightLine.end.y)
-
-			g.lineStyle(2, 0x008800);
-			g.moveTo(p3RightLine.start.x, p3RightLine.start.y)
-			g.lineTo(p3RightLine.end.x, p3RightLine.end.y)
-			*/
-
-      newPolyPoints.push(newPointLeft)
-      pointStack.push(newPointRight)
-    }
-
-    let lastPoint = pathPoints[pathPoints.length - 1]
-    let secondLastPoint = pathPoints[pathPoints.length - 2]
-
-    let lastSeg = Vector.subtract(lastPoint, secondLastPoint)
-    let perpLastSegDir = new Vector(lastSeg.y, -lastSeg.x).normalize()
-    let lastPointLeft = Vector.add(lastPoint, Vector.multiply(perpLastSegDir, boxWidth))
-    let lastPointRight = Vector.add(lastPoint, Vector.multiply(perpLastSegDir, -boxWidth))
-
-    newPolyPoints.push(lastPointLeft)
-    pointStack.push(lastPointRight)
-
-    while (pointStack.length > 0) {
-      newPolyPoints.push(pointStack.pop())
-    }
-
-    let newPolyParse = []
-    newPolyPoints.forEach((point) => {
-      if (point) newPolyParse.push(point.x, point.y)
-    })
-
-    let poly = new PIXI.Polygon(newPolyParse)
-    /*
-		g.lineStyle(3, 0xff0000);
-		g.drawPolygon(poly)
-		*/
-
-    return poly
-  }
-
-  function findIntersectionPoint(line1, line2) {
-    // Check if none of the lines are of length 0
-    if (
-      (line1.start.x === line1.end.x && line1.start.y === line1.end.y) ||
-      (line2.start.x === line2.end.x && line2.start.y === line2.end.y)
-    ) {
-      return false
-    }
-
-    let denominator =
-      (line2.end.y - line2.start.y) * (line1.end.x - line1.start.x) -
-      (line2.end.x - line2.start.x) * (line1.end.y - line1.start.y)
-
-    // Lines are parallel
-    if (denominator === 0) {
-      return false
-    }
-
-    let ua =
-      ((line2.end.x - line2.start.x) * (line1.start.y - line2.start.y) -
-        (line2.end.y - line2.start.y) * (line1.start.x - line2.start.x)) /
-      denominator
-    let ub =
-      ((line1.end.x - line1.start.x) * (line1.start.y - line2.start.y) -
-        (line1.end.y - line1.start.y) * (line1.start.x - line2.start.x)) /
-      denominator
-
-    // is the intersection along the segments
-    if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
-      return false
-    }
-
-    // Return a object with the x and y coordinates of the intersection
-    let x = line1.start.x + ua * (line1.end.x - line1.start.x)
-    let y = line1.start.y + ua * (line1.end.y - line1.start.y)
-
-    return { x, y }
   }
 
   /* idk */
@@ -432,10 +307,10 @@
     }
   }
 
-  const HOVEREDSELECTORSTYLE: PIXI.LineStyle = { width: 1, color: 0x555555 }
-  const SELECTEDSELECTORSTYLE: PIXI.LineStyle = { width: 2, color: 0x333333 }
+  const HOVEREDSELECTORSTYLE: Partial<PIXI.LineStyle> = { width: 1, color: 0x555555 }
+  const SELECTEDSELECTORSTYLE: Partial<PIXI.LineStyle> = { width: 2, color: 0x333333 }
 
-  let path_containers = {}
+  let path_containers: {[id: string]: PIXI.Container & {marked_for_death?: boolean}} = {}
   let cont_pixi_paths = new PIXI.Container()
   let grph_hovered_path = new PIXI.Graphics()
   let grph_selected_path = new PIXI.Graphics()
@@ -444,15 +319,93 @@
 
   cont_all_paths.addChild(cont_pixi_paths, grph_hovered_path, grph_selected_path)
 
+
+  /* Specially, because of the limited nature of path interactions, we can be pretty efficient with how we handle undo */
+  /*
+  export function handleUndo(point_data: UndoDataPathPoint) {
+    const path = paths.find(p => p.id === point_data.path_id)
+
+    if (point_data.action === 'add') {
+      if (path.points.length === 2) {
+	deletePath(path)
+      } else {
+	remove_point_from(path, point_data.path_end)
+      }
+    } else if (point_data.action === 'remove') {
+      if (path === undefined) {
+	appendPoint(path, point_data.point.x, point_data.point.y, point_data.path_end)
+      }
+    }
+
+    paths = paths
+  }
+
+  export function handle_redo(point_data: UndoDataPathPoint) {
+    const path = paths.find(p => p.id === point_data.path_id)
+    if (point_data.action === 'add') {
+      appendPoint(path, point_data.point.x, point_data.point.y, point_data.path_end)
+    } else if (point_data.action === 'remove') {
+      remove_point_from(path, point_data.path_end)
+    }
+
+    paths = paths
+  }
+  */
+
   export function applyPaths(new_paths: PathLayerPath[]) {
     paths = new_paths
+
+    const path_that_was_selected = structuredClone($data_path.selectedPath)
+    $data_path.selectedPath = null
+
+    for (const path of paths) {
+        const cont_path = path_containers[path.id]
+	if (!cont_path) { 
+	  continue 
+	}
+
+	if ((path_that_was_selected?.id ?? 'never') === path.id) {
+	  $data_path.selectedPath = path
+	}
+
+        cont_path.off('pointerover')
+        cont_path.on('pointerover', () => { $data_path.hoveredPath = path })
+    }
+
+    if (paths.at(-1)?.points.length === 2) {
+      $data_path.selectedPath = paths.at(-1)
+    }
+  }
+
+  function updatePathHandles() {
+    grph_selected_path.clear()
+
+    if ($data_path.selectedPath) {
+      grph_selected_path.lineStyle(SELECTEDSELECTORSTYLE)
+      grph_selected_path.beginFill(0xf2f2f2)
+
+      let points = $data_path.selectedPath.points
+
+      for (let pI = 0; pI < points.length; pI += 2) {
+        grph_selected_path.drawCircle(points[pI], points[pI + 1], 4)
+      }
+
+      grph_selected_path.beginFill(0x8cc63f)
+      if ($data_path.add_to == 'start') {
+        grph_selected_path.drawCircle(points[0], points[1], 4)
+      } else {
+        grph_selected_path.drawCircle(points[points.length - 2], points[points.length - 1], 4)
+      }
+
+      grph_selected_path.endFill()
+    }
   }
 
   afterUpdate(() => {
     if (!$data_path) return
 
     if ($data_path.selectedPath) {
-      $data_path.selectedPath.style = { ...$data_path.style }
+      $data_path.selectedPath.style = structuredClone($data_path.style)
     }
 
     for (const [path_id, cont_path] of Object.entries(path_containers)) {
@@ -463,9 +416,7 @@
     for (const path of paths) {
       if (!path_containers[path.id]) {
         let cont_path = new PIXI.Container()
-        cont_path.on('pointerover', () => {
-          $data_path.hoveredPath = path
-        })
+        cont_path.on('pointerover', () => { $data_path.hoveredPath = path })
         cont_path.on('pointerout', () => {
           $data_path.hoveredPath = null
         })
@@ -486,7 +437,7 @@
         }
 
         let cont_path = path_containers[path.id]
-        let grph_path = cont_path.children[0]
+        let grph_path = cont_path.children[0] as PIXI.Graphics // we know it's graphics cos we only put one thing in the container
         dashed_lines[path.id] = new DashLine(grph_path, {
           dash: [path.style.dash_length, path.style.dash_gap],
         })
@@ -502,7 +453,7 @@
       cont_path.eventMode = $store_selected_tool == 'path' && !$data_path.selectedPath ? 'static' : 'auto'
       cont_path.hitArea = findHitArea(path)
 
-      let grph_path = cont_path.children[0]
+      let grph_path = cont_path.children[0] as PIXI.Graphics
       grph_path.clear()
       grph_path.lineStyle(path.style)
 
@@ -525,26 +476,7 @@
     }
 
     /* Selector Graphics */
-    grph_selected_path.clear()
-    if ($data_path.selectedPath) {
-      grph_selected_path.lineStyle(SELECTEDSELECTORSTYLE)
-      grph_selected_path.beginFill(0xf2f2f2)
-
-      let points = $data_path.selectedPath.points
-
-      for (let pI = 0; pI < points.length; pI += 2) {
-        grph_selected_path.drawCircle(points[pI], points[pI + 1], 4)
-      }
-
-      grph_selected_path.beginFill(0x8cc63f)
-      if ($data_path.add_to == 'start') {
-        grph_selected_path.drawCircle(points[0], points[1], 4)
-      } else {
-        grph_selected_path.drawCircle(points[points.length - 2], points[points.length - 1], 4)
-      }
-
-      grph_selected_path.endFill()
-    }
+    updatePathHandles()
 
     grph_hovered_path.clear()
     if ($data_path.hoveredPath && !$data_path.dontSelectPaths) {

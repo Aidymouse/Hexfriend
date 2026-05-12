@@ -3,7 +3,7 @@
   import ColorInputPixi from '../components/ColorInputPixi.svelte'
   import SelectGrid from '../components/SelectGrid.svelte'
   import type PathLayer from '../layers/PathLayer.svelte'
-  import type { ListedPathStyel, PathStyle } from '../types/path'
+  import type { ListedPathStyle, PathStyle } from '../types/path'
   import * as PIXI from 'pixi.js'
   import { tl } from '../stores/translation'
 
@@ -11,6 +11,8 @@
   import { data_path } from '../stores/data'
 
   export let comp_pathLayer: PathLayer
+
+  const DEV_MODE = true
 
   /* Path Style Management */
 
@@ -53,7 +55,7 @@
   function updateStyleToMatch() {
     if ($data_path.contextPathId == null) return
 
-    let styleToEdit: listed_path_style = loaded_path_styles.find((ps) => ps.id == $data_path.contextPathId)
+    let styleToEdit: ListedPathStyle = loaded_path_styles.find((ps) => ps.id == $data_path.contextPathId)
 
     styleToEdit.style = { ...$data_path.style }
     //styleToEdit = styleToEdit
@@ -76,7 +78,7 @@
   function renameStyle() {
     if ($data_path.contextPathId == null) return
 
-    let styleToEdit: listed_path_style = loaded_path_styles.find((ps) => ps.id == $data_path.contextPathId)
+    let styleToEdit: ListedPathStyle = loaded_path_styles.find((ps) => ps.id == $data_path.contextPathId)
     $data_path.contextPathId = null
 
     let styleName = prompt($tl.path_panel.rename_path_style_prompt)
@@ -90,12 +92,11 @@
 
   // Path Controls
   function deselectPath() {
-    if ($data_path.selectedPath.points.length <= 2) comp_pathLayer.deletePath($data_path.selectedPath)
-    $data_path.selectedPath = null
+    comp_pathLayer.deselectPath()
   }
 
   function duplicateStyle() {
-    let contextPathStyle: listed_path_style = loaded_path_styles.find((ps) => ps.id == $data_path.contextPathId)
+    let contextPathStyle: ListedPathStyle = loaded_path_styles.find((ps) => ps.id == $data_path.contextPathId)
 
     pathID += 1
     loaded_path_styles = [
@@ -196,6 +197,12 @@
       </span>
     {/if}
   </div>
+
+  {#if DEV_MODE}
+  <div>
+    <button on:click={() => comp_pathLayer.debug_logPathState()}>Log Text State</button>
+  </div>
+  {/if}
 
   {#if $data_path.selectedPath}
     <div id="selected-path-controls">

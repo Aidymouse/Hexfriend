@@ -6,7 +6,7 @@
   import type { TerrainHex, TerrainField } from '../types/terrain'
   import type { Tile } from '../types/tilesets'
   import type { HexId } from '../types/toolData'
-  import { tools } from '../types/toolData'
+  import { Tools } from '../types/toolData'
   import type CoordsLayer from './CoordsLayer.svelte'
 
   import { data_terrain } from '../stores/data'
@@ -942,7 +942,7 @@
       let cHex = $tfield.hexes[clickedId]
 
       if (cHex.tile == null) {
-        changeTool(tools.ERASER)
+        changeTool(Tools.ERASER)
         $data_terrain.usingEyedropper = false
         return
       }

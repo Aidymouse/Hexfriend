@@ -1,7 +1,7 @@
 <script lang="ts">
   // TYPES
   import type { eraser_data, icon_data, overlay_data, path_data, terrain_data, text_data } from '../types/data'
-  import { tools } from '../types/toolData'
+  import { Tools } from '../types/toolData'
 
   import { data_eraser, data_overlay, data_text } from '../stores/data'
 
@@ -100,18 +100,18 @@
   <Tooltip control={'Right Mouse'} tip={'Pan'} />
   <Tooltip control={'Scroll Mouse'} tip={'Zoom'} />
 
-  {#if $store_selected_tool == tools.TERRAIN}
+  {#if $store_selected_tool == Tools.TERRAIN}
     <Tooltip control={'Left Mouse'} tip={c_terrain.leftMouse} />
-  {:else if $store_selected_tool == tools.ICON}
+  {:else if $store_selected_tool == Tools.ICON}
     <Tooltip control={'Left Mouse'} tip={c_icon.leftMouse} />
-  {:else if $store_selected_tool == tools.PATH}
+  {:else if $store_selected_tool == Tools.PATH}
     <Tooltip control={'Left Mouse'} tip={c_path.leftMouse} />
-  {:else if $store_selected_tool == tools.TEXT}
+  {:else if $store_selected_tool == Tools.TEXT}
     <Tooltip control={'Left Mouse'} tip={c_text.leftMouse} />
     <Tooltip control={'Click and Drag'} tip={c_text.clickAndDrag} />
-  {:else if $store_selected_tool == tools.ERASER}
+  {:else if $store_selected_tool == Tools.ERASER}
     <Tooltip control={'Left Mouse'} tip={c_eraser.leftMouse} />
-  {:else if $store_selected_tool == tools.OVERLAY}
+  {:else if $store_selected_tool == Tools.OVERLAY}
     <Tooltip control={'Click and Drag'} tip={c_overlay.clickAndDrag} />
   {/if}
 

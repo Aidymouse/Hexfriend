@@ -19,7 +19,7 @@
   // Helpers
   import { coords_cubeToWorld, coords_worldToCube } from '../helpers/hexHelpers'
   import { store_selected_tool } from '../stores/tools'
-  import { tools } from '../types/toolData'
+  import { Tools } from '../types/toolData'
   import {
     find_new_pos_square_orientation_change,
     find_new_pos_through_resize,
@@ -262,7 +262,15 @@
 
   cont_all_text.addChild(cont_pixi_text, grph_selector)
 
+  // TODO: if you're making a new text and deselect the textbox and hit undo, the new text is not an undo action and so will be ignored.
+  // This is kind of weird, but such an edge case I hope it never matters.
+  // The fix would be intercepting the undo key event if we're currently making a new text, a state identifiable by checking just_created_id
   export function applyTexts(new_texts: TextLayerText[]) {
+
+    if ($data_text.selectedText) { 
+      deselectText() 
+    }
+
     texts = new_texts
 
     for (const text of texts) {
@@ -309,7 +317,7 @@
       pixi_text.anchor = alignMap[text.style.align]
       pixi_text.alpha = text.alpha ? text.alpha : 1
       pixi_text.rotation = text.rotation ? text.rotation : 0
-      pixi_text.eventMode = $store_selected_tool == tools.TEXT ? 'static' : 'auto'
+      pixi_text.eventMode = $store_selected_tool == Tools.TEXT ? 'static' : 'auto'
 
       pixi_text.marked_for_death = false
     }

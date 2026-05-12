@@ -1,4 +1,4 @@
-import type { tools } from './toolData';
+import type { Tools } from './toolData';
 
 export interface input_state {
 	mouseDown: boolean[];
@@ -13,7 +13,7 @@ export interface input_state {
 export interface shortcut_data {
 	keycode: string;
 	function: string;
-	tool?: tools;
+	tool?: Tools;
 	display: string;
 	displayKeycode?: string;
 }

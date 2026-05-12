@@ -6,14 +6,14 @@
     import { tl } from "../stores/translation";
 
     import type { overlay_data } from "../types/data";
-    import { tools } from "../types/toolData";
+    import { Tools } from "../types/toolData";
 
     import { data_overlay } from "../stores/data";
 
     function remove_overlay() {
         if (confirm($tl.overlay_panel.remove_confirmation)) {
             $data_overlay.base64 = "";
-            store_selected_tool.update((n) => tools.TERRAIN);
+            store_selected_tool.update((n) => Tools.TERRAIN);
             $store_has_unsaved_changes = true;
         }
     }

@@ -1,21 +1,21 @@
 <script lang="ts">
     
     import * as PIXI from 'pixi.js';
-	import { afterUpdate, onMount } from 'svelte';
+    import { afterUpdate, onMount } from 'svelte';
     
     import { store_selected_tool } from '../stores/tools';
-	import * as store_panning from '../stores/panning';
-	import { store_inputs } from '../stores/inputs';
+    import * as store_panning from '../stores/panning';
+    import { store_inputs } from '../stores/inputs';
 	
     import { store_has_unsaved_changes } from '../stores/flags';
 
     import type { input_state } from '../types/inputs';
-	import type { overlay_data } from '../types/data';
-	import type { pan_state } from '../types/panning';
+    import type { overlay_data } from '../types/data';
+    import type { pan_state } from '../types/panning';
     
     import { data_overlay } from '../stores/data';
 
-	import { tools } from '../types/toolData';
+    import { Tools } from '../types/toolData';
 
 
     export let cont_overlay: PIXI.Container;
@@ -23,14 +23,14 @@
     export let app: PIXI.Application;
     
     // Stores
-    let selected_tool: tools;
+    let selected_tool: Tools;
     store_selected_tool.subscribe(n => selected_tool = n)
     $: { selected_tool = selected_tool }
     
     let pan: pan_state;
     store_panning.store.subscribe((newPan) => {
-		pan = newPan;
-	});
+	pan = newPan;
+      });
     
 
     // Local
@@ -182,12 +182,12 @@
         spr_overlay_image.y = $data_overlay.y        
         spr_overlay_image.scale.x = $data_overlay.scale.x
         spr_overlay_image.scale.y = $data_overlay.scale.y
-        spr_overlay_image.eventMode = (selected_tool == tools.OVERLAY) ? 'static' : 'auto'
+        spr_overlay_image.eventMode = (selected_tool == Tools.OVERLAY) ? 'static' : 'auto'
 
 
         // Resizer
         grph_resizer.clear();
-        grph_resizer.visible = $data_overlay.shown && selected_tool == tools.OVERLAY
+        grph_resizer.visible = $data_overlay.shown && selected_tool == Tools.OVERLAY
         
         grph_resizer.lineStyle(3/pan.zoomScale, 0x333333, 1)
         let resizer_width = spr_overlay_image.width + 10
@@ -197,7 +197,7 @@
         // Resizer Handles
         handles.forEach(handle => {
             
-            handle.sprite.visible = selected_tool == tools.OVERLAY && $data_overlay.shown
+            handle.sprite.visible = selected_tool == Tools.OVERLAY && $data_overlay.shown
             handle.sprite.x = $data_overlay.x - resizer_width/2 + handle.x*resizer_width
             handle.sprite.y = $data_overlay.y - resizer_height/2 + handle.y*resizer_height
             handle.sprite.scale.x = 1/pan.zoomScale

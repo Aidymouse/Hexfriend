@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { eraser_data, icon_data, overlay_data, path_data, terrain_data } from '../types/data'
   import { HexOrientation } from '../types/terrain'
-  import { tools } from '../types/toolData'
+  import { Tools } from '../types/toolData'
   import { afterUpdate, onMount } from 'svelte'
   import { data_path, data_icon, data_overlay, data_terrain, data_eraser } from '../stores/data'
   import { store_selected_tool } from '../stores/tools'
@@ -42,7 +42,7 @@
   let buttons = [
     {
       display: 'Terrain',
-      toolCode: tools.TERRAIN,
+      toolCode: Tools.TERRAIN,
 
       miniButtons: [
         {
@@ -87,7 +87,7 @@
 
     {
       display: 'Icon',
-      toolCode: tools.ICON,
+      toolCode: Tools.ICON,
       miniButtons: [
         {
           display: $tl.tools.icon_drag,
@@ -144,7 +144,7 @@
 
     {
       display: 'Path',
-      toolCode: tools.PATH,
+      toolCode: Tools.PATH,
       miniButtons: [
         {
           display: $tl.tools.path_snap,
@@ -162,12 +162,12 @@
     },
     {
       display: 'Text',
-      toolCode: tools.TEXT,
+      toolCode: Tools.TEXT,
       miniButtons: [],
     },
     {
       display: 'Eraser',
-      toolCode: tools.ERASER,
+      toolCode: Tools.ERASER,
       miniButtons: [
         {
           display: $tl.tools.eraser_terrain,
@@ -197,7 +197,7 @@
     },
     {
       display: 'Overlay',
-      toolCode: tools.OVERLAY,
+      toolCode: Tools.OVERLAY,
       miniButtons: [],
     },
   ]
@@ -245,7 +245,7 @@
         }}
         title={`${b.display} Tool`}
         class="tool-button"
-        class:hidden={b.toolCode == tools.OVERLAY && $data_overlay.base64 == ''}
+        class:hidden={b.toolCode == Tools.OVERLAY && $data_overlay.base64 == ''}
         id={`tool-button-${b.toolCode}`}
       >
         <!-- Button Image 
@@ -257,7 +257,7 @@
 
         <div
           class="tool-icon"
-          class:rotated90={(b.toolCode == tools.TERRAIN || b.toolCode == tools.OVERLAY) &&
+          class:rotated90={(b.toolCode == Tools.TERRAIN || b.toolCode == Tools.OVERLAY) &&
             $tfield.orientation == HexOrientation.POINTYTOP}
           style={`-webkit-mask: url(/assets/img/tools/${b.toolCode}.svg) no-repeat center`}
         />
@@ -273,7 +273,7 @@
         }}
         title={`${b.display} Tool`}
         class="tool-button"
-        class:hidden={b.toolCode == tools.OVERLAY && $data_overlay.base64 == ''}
+        class:hidden={b.toolCode == Tools.OVERLAY && $data_overlay.base64 == ''}
         id={`b-tool-button-${b.toolCode}`}
       >
         <!-- Button Image 
@@ -285,7 +285,7 @@
 
         <div
           class="tool-icon"
-          class:rotated90={(b.toolCode == tools.TERRAIN || b.toolCode == tools.OVERLAY) &&
+          class:rotated90={(b.toolCode == Tools.TERRAIN || b.toolCode == Tools.OVERLAY) &&
             $tfield.orientation == HexOrientation.POINTYTOP}
           style={`-webkit-mask: url(/assets/img/tools/${b.toolCode}.svg) no-repeat center`}
         />

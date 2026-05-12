@@ -22,6 +22,7 @@ export type UndoData = {
   [k in keyof SaveData]?: Partial<SaveData[k]>
 } & {
   tiles?: UndoDataTiles
+  path_point?: UndoDataPathPoint
 }
 
 export type UndoDataTiles = {
@@ -30,6 +31,15 @@ export type UndoDataTiles = {
   // Terrain that was replaced, used in Undo
   replaced: { [hexId: HexId]: Tile | null }
 }
+
+export type UndoDataPathPoint = {
+  path_id: number,
+  point: {x: number, y: number }
+  action: 'add' | 'remove'
+  path_end: 'start' | 'end'
+  // If true, when this point is placed, it will grab the selection. Good for if its the first point
+  grab_selection: boolean
+} 
 
 type Stringified<T> = string
 

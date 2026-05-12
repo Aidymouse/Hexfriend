@@ -7,7 +7,7 @@
   import type { cube_coords } from '../types/coordinates'
   import { HexOrientation } from '../types/terrain'
 
-  import { tools } from '../types/toolData'
+  import { Tools } from '../types/toolData'
   import { map_shape } from '../types/settings'
   import { store_has_unsaved_changes } from '../stores/flags'
 
@@ -251,7 +251,7 @@
     //spr_floating_icon.visible = false
     spr_floating_icon.visible =
       !$data_icon.usingEraser &&
-      $store_selected_tool == tools.ICON &&
+      $store_selected_tool == Tools.ICON &&
       cursorOnLayer &&
       !$data_icon.dragMode &&
       draggedIcon == null &&
@@ -272,7 +272,7 @@
 
   /** Hide floating icon when tool is changed */
   store_selected_tool.subscribe((n) => {
-    if (n !== tools.ICON) {
+    if (n !== Tools.ICON) {
       spr_floating_icon.visible = false
     } else {
       spr_floating_icon.visible = true
@@ -340,7 +340,7 @@
   }
 
   function shouldEraseIcons(): boolean {
-    return ($store_selected_tool == tools.ERASER && $data_eraser.eraseIcons) || $data_icon.usingEraser
+    return ($store_selected_tool == Tools.ERASER && $data_eraser.eraseIcons) || $data_icon.usingEraser
   }
 
   let dragOffsetX = 0
@@ -408,7 +408,7 @@
       pixi_icons[icon.onLayerId].x = icon.x
       pixi_icons[icon.onLayerId].y = icon.y
       pixi_icons[icon.onLayerId].tint = icon.color
-      pixi_icons[icon.onLayerId].eventMode = $store_selected_tool == tools.ICON || $store_selected_tool == tools.ERASER ? 'static' : 'auto'
+      pixi_icons[icon.onLayerId].eventMode = $store_selected_tool == Tools.ICON || $store_selected_tool == Tools.ERASER ? 'static' : 'auto'
 
       marked_for_saving.push(icon.onLayerId)
     })
