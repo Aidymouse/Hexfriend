@@ -21,8 +21,9 @@ export type LayerComponents = {
 export type UndoData = {
   [k in keyof SaveData]?: Partial<SaveData[k]>
 } & {
-  tiles?: UndoDataTiles
-  path_point?: UndoDataPathPoint
+  tiles?: {[hexId: HexId]: Tile | null}
+  //tiles?: UndoDataTiles
+  //path_point?: UndoDataPathPoint
 }
 
 export type UndoDataTiles = {
@@ -46,7 +47,8 @@ type Stringified<T> = string
 /* Contains save data for map state + meta information, if needed */
 export type UndoState = {
   label?: string
-  data: UndoData
+  before: UndoData
+  after: UndoData
 }
 
 export type UndoStoreType = {
