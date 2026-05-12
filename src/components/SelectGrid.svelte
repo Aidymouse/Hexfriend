@@ -10,7 +10,7 @@
 	function changeValue(newValue: any) {
 		if (value == newValue) return;
 		value = newValue;
-		dispatch('change', {});
+		dispatch('change', {value: newValue});
 	}
 </script>
 
