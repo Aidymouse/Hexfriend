@@ -120,6 +120,6 @@ export const apply_undo_state = (state: UndoState, layers: LayerComponents) => {
   }
 
   if (applied_data.paths) {
-    layers.pathLayer.applyTexts(applied_data.texts)
+    layers.pathLayer.applyPaths(applied_data.texts)
   }
 }

@@ -405,14 +405,18 @@
           case 'undo':
             undo({ 
 	      terrainLayer: comp_terrainLayer,
-	      iconLayer: comp_iconLayer
+	      iconLayer: comp_iconLayer,
+	      textLayer: comp_textLayer,
+	      pathLayer: comp_pathLayer
 	    })
             break
 
           case 'redo':
             redo({ 
 	      terrainLayer: comp_terrainLayer,
-	      iconLayer: comp_iconLayer
+	      iconLayer: comp_iconLayer,
+	      textLayer: comp_textLayer,
+	      pathLayer: comp_pathLayer
 	    })
             break
 
