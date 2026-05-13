@@ -5,7 +5,7 @@ For Techy People
 
 ## Version 4.0
 - Added undo / redo
-- Moved the Gap setting from grid settings into hex settings
+- Moved the Gap setting from grid settings into hex settings (+ altered the translation type, but changes have been applied to existing translations)
 
 # Version 3.0 - Found your feet, Hexfriend
 
