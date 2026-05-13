@@ -36,6 +36,8 @@
   import type { HexSizeParams } from '../lib/map_resize'
   import { map_shape } from '../types/settings'
   import SavedMaps from './SavedMaps.svelte'
+  import { startUndoState, completeUndoState } from '../lib/undoManager'
+  import { rand } from '../helpers'
 
   export let loadedSave: SaveData
   export let showSettings: boolean
@@ -179,12 +181,6 @@
   let petting_hexfriend = false
   let hexfriend_hearts = false
 
-  function getRandomInt(min: number, max: number) {
-    min = Math.ceil(min)
-    max = Math.floor(max)
-    return Math.floor(Math.random() * (max - min) + min) // The maximum is exclusive and the minimum is inclusive
-  }
-
   function hexfriend_blink() {
     // console.log(petting_hexfriend)
     if (!(petting_hexfriend || hexfriend_hearts)) {
@@ -196,7 +192,7 @@
         }
       }, 400)
     }
-    setTimeout(hexfriend_blink, getRandomInt(60, 120) * 1000)
+    setTimeout(hexfriend_blink, rand(60, 120) * 1000)
   }
 
   function hexfriend_pet() {
