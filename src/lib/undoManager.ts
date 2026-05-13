@@ -10,17 +10,44 @@ export const reset_undo_stack = () => {
 }
 
 // the 'before' state of whatever action. applied when undoing this state. You typically record this before you perform the operation on state
-export const startUndoState = (data: UndoData, label: string = 'Undo') => {
+/*
+ * @param allow_override - If true, new states that get pushed will override the one waiting to be finished. This is useful in some circumstances but error prone, so be default we throw an error if this is attempted. Changing hex color is an example of when we'd want to do this, see {@link HexesSettings.svelte}
+ */
+// type StartUndoStateOptions = {
+//   allow_override: boolean
+// }
+//
+// const DefaultStartUndoStateOptions: StartUndoStateOptions = {
+//   allow_override: true,
+// }
+
+export const startUndoState = (
+  data: UndoData,
+  label: string = 'Undo',
+  options: { allow_override: boolean } = { allow_override: false },
+) => {
   if (get(store_undo).suppress) {
     return
   }
 
   const new_state: UndoState = { label, before: structuredClone(data), after: {} }
 
-  store_undo.update((u) => {
-    u.undo_stack.push(new_state)
-    return u
-  })
+  if (get(store_undo).awaiting_completion) {
+    if (!options.allow_override) {
+      throw Error(`Trying to push undo state when we haven't completed the last one`)
+    }
+    store_undo.update((u) => {
+      u.undo_stack[u.undo_stack.length - 1] = new_state
+      return u
+    })
+  } else {
+    store_undo.update((u) => {
+      // TODO: cut off newer readings
+      u.undo_stack.push(new_state)
+      u.awaiting_completion = true
+      return u
+    })
+  }
 }
 
 // the 'after' state of whatever action. applied when re-doing this state
@@ -34,6 +61,7 @@ export const completeUndoState = (data: UndoData, label?: string) => {
   store_undo.update((u) => {
     u.undo_stack[u.undo_pointer + 1].after = structuredClone(data)
     u.undo_pointer += 1
+    u.awaiting_completion = false
     return u
   })
 }

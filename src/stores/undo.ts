@@ -5,6 +5,7 @@ export const DefaultUndoStore: UndoStoreType = {
   undo_stack: [],
   undo_pointer: -1,
   suppress: false,
+  awaiting_completion: false,
 }
 
 export let store_undo: Writable<UndoStoreType> = writable({

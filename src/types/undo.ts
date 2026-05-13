@@ -21,7 +21,7 @@ export type LayerComponents = {
 export type UndoData = {
   [k in keyof SaveData]?: Partial<SaveData[k]>
 } & {
-  tiles?: {[hexId: HexId]: Tile | null}
+  tiles?: { [hexId: HexId]: Tile | null }
   //tiles?: UndoDataTiles
   //path_point?: UndoDataPathPoint
 }
@@ -34,13 +34,13 @@ export type UndoDataTiles = {
 }
 
 export type UndoDataPathPoint = {
-  path_id: number,
-  point: {x: number, y: number }
+  path_id: number
+  point: { x: number; y: number }
   action: 'add' | 'remove'
   path_end: 'start' | 'end'
   // If true, when this point is placed, it will grab the selection. Good for if its the first point
   grab_selection: boolean
-} 
+}
 
 type Stringified<T> = string
 
@@ -58,4 +58,6 @@ export type UndoStoreType = {
   undo_pointer: number
   /* If true, pushes to the undo stack are ignored */
   suppress: boolean
+  /* True if we've opened a new state and haven't completed it yet */
+  awaiting_completion: boolean
 }
