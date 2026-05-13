@@ -294,10 +294,10 @@
 
     for (const text of texts) {
       if (!pixi_texts[text.id]) {
-	console.log(`Making new text for ${text.id}`)
+	//console.log(`Making new text for ${text.id}`)
         let new_pixi_text = new PIXI.Text()
         new_pixi_text.on('pointerover', (e) => {
-	  console.log('Hovered')
+	  //console.log('Hovered')
           hoveredText = text
         })
         new_pixi_text.on('pointerout', (e) => {
@@ -324,7 +324,7 @@
 
     for (const [text_id, pixi_text] of Object.entries(pixi_texts)) {
       if (pixi_text.marked_for_death) {
-	console.log(`Deleting text ${text_id}`)
+	//console.log(`Deleting text ${text_id}`)
         cont_pixi_text.removeChild(pixi_text)
         delete pixi_texts[text_id]
       }
