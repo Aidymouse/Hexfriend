@@ -998,9 +998,16 @@
     // Check if hex in data matches the clicked style. If it does, abort painting!
     // Should be done in paint terrain as well
 
+    let replaced: {[h: HexId]: Tile | null} = {}
+    let placed: {[h: HexId]: Tile | null} = {}
     getContiguousHexIdsOfSameType(clickedId).forEach((hexId: HexId) => {
+      replaced[hexId] = structuredClone($tfield.hexes[hexId].tile)
       paintHexFromData(hexId)
+      placed[hexId] = structuredClone($tfield.hexes[hexId].tile)
     })
+
+    startUndoState({tiles: replaced}, "Paintbucket Hexes")
+    completeUndoState({tiles: placed})
 
     $store_has_unsaved_changes = true
   }
@@ -1022,10 +1029,17 @@
     if (!hexExists(clickedId)) return
     if ($tfield.hexes[clickedId].tile == null) return
 
+    let replaced: {[h: HexId]: Tile | null} = {}
+    let placed: {[h: HexId]: null} = {}
     let hexes = getContiguousHexIdsOfSameType(clickedId)
     hexes.forEach((hexId: HexId) => {
+      replaced[hexId] = structuredClone($tfield.hexes[hexId].tile)
       eraseHex(hexId)
+      placed[hexId] = null
     })
+
+    startUndoState({tiles: replaced}, "Erase Paintbucket")
+    completeUndoState({tiles: placed})
 
     $store_has_unsaved_changes = true
   }
