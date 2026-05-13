@@ -8,11 +8,7 @@ const debug = true
 export const reset_undo_stack = () => {
   store_undo.update((o) => structuredClone(DefaultUndoStore))
 }
-
-// the 'before' state of whatever action. applied when undoing this state. You typically record this before you perform the operation on state
-/*
- * @param allow_override - If true, new states that get pushed will override the one waiting to be finished. This is useful in some circumstances but error prone, so be default we throw an error if this is attempted. Changing hex color is an example of when we'd want to do this, see {@link HexesSettings.svelte}
- */
+//
 // type StartUndoStateOptions = {
 //   allow_override: boolean
 // }
@@ -21,10 +17,15 @@ export const reset_undo_stack = () => {
 //   allow_override: true,
 // }
 
+// the 'before' state of whatever action. applied when undoing this state. You typically record this before you perform the operation on state
+/*
+ * @param allow_override - If true, new states that get pushed will override the one waiting to be finished. This is useful in some circumstances but error prone, so be default we throw an error if this is attempted. 
+ * @param bounce - If true, new states that try to get pushed while one is awaiting completion will harmlessly be ignored, rather than throwing an error. Changing hex color is an example of when we'd want to do this, see {@link HexesSettings.svelte}
+ */
 export const startUndoState = (
   data: UndoData,
   label: string = 'Undo',
-  options: { allow_override: boolean } = { allow_override: false },
+  options: { allow_override?: boolean, bounce?: boolean } = { allow_override: false, bounce: false },
 ) => {
   if (get(store_undo).suppress) {
     return
@@ -33,13 +34,16 @@ export const startUndoState = (
   const new_state: UndoState = { label, before: structuredClone(data), after: {} }
 
   if (get(store_undo).awaiting_completion) {
-    if (!options.allow_override) {
+    if (options.bounce) {
+      return
+    } else if (options.allow_override) {
+      store_undo.update((u) => {
+	u.undo_stack[u.undo_stack.length - 1] = new_state
+	return u
+      })
+    } else {
       throw Error(`Trying to push undo state when we haven't completed the last one`)
     }
-    store_undo.update((u) => {
-      u.undo_stack[u.undo_stack.length - 1] = new_state
-      return u
-    })
   } else {
     store_undo.update((u) => {
       // TODO: cut off newer readings
