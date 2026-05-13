@@ -36,41 +36,29 @@
     type HexSizeParams,
   } from '../lib/map_resize'
   import HexesSettings from '../components/settings/HexesSettings.svelte'
-  import { getIconPositionFor } from '../helpers/iconFns'
-  import { push_undo_state } from '../lib'
+  import { getIconPositionFor, iconsMatch } from '../helpers/iconFns'
+  import {  cancelProspectiveUndoState, completeUndoState, startUndoState } from '../lib'
   import type { SaveData } from '../types'
   export let icons: IconLayerIcon[] = []
   let pixi_icons: { [icon_id: number]: PIXI.Sprite } = {} // keeps up to date with icons
 
   export let cont_icon: PIXI.Container
 
-  // seems unused - check back later?
-  // let pan: pan_state;
-  // store_panning.store.subscribe((newPan) => {
-  // 	pan = newPan;
-  // });
-
-  //let floatingIcon: IconLayerIcon | null = null
   let draggedIcon: IconLayerIcon | null = null
 
   let iconId: number = 0
-  icons.forEach((i) => (iconId = Math.max(iconId, i.onLayerId)))
-  iconId++
+
+  function find_icon_id_on_load() {
+    icons.forEach((i) => (iconId = Math.max(iconId, i.onLayerId)))
+    iconId++
+  }
+
+  find_icon_id_on_load()
 
   let spr_floating_icon = new PIXI.Sprite()
   spr_floating_icon.anchor.x = 0.5
   spr_floating_icon.anchor.y = 0.5
   spr_floating_icon.alpha = 0.5
-
-  $: {
-    // Ideally, this would only trigger on a load. It can trigger on any update for now though...
-    icons.forEach((i) => (iconId = Math.max(iconId, i.onLayerId)))
-    iconId++
-  }
-
-  $: {
-    //$store_selected_tool = $store_selected_tool
-  }
 
   export function retain_icon_position_on_hex_resize(old_hex_size: HexSizeParams, new_hex_size: HexSizeParams) {
     icons.forEach((icon: IconLayerIcon) => {
@@ -171,27 +159,11 @@
   export function placeIcon() {
     const { iconX, iconY } = get_icon_position()
 
-    /*
-    let newIcon: IconLayerIcon = {
-      ...$data_icon.icon,
-      x: iconX,
-      y: iconY,
-      onLayerId: iconId,
-      texId: $data_icon.icon.texId,
-      rotation: $data_icon.icon.rotation,
-      scale: get_icon_scale_for_hex($data_icon.icon, { hexWidth: $tfield.hexWidth, hexHeight: $tfield.hexHeight }),
-    }
-    */
-
     const iconHexPos = coords_worldToCube(iconX, iconY, $tfield.orientation, $tfield.hexWidth, $tfield.hexHeight, $tfield.gap)
 
+    startUndoState({ icons }, "Place Icon")
     emplaceIcon($data_icon.icon, iconHexPos)
-
-    push_undo_state({ icons }, "Place Icon")
-
-    //icons.push(newIcon)
-    //iconId++
-    //icons = icons
+    completeUndoState({ icons })
 
     $store_has_unsaved_changes = true
   }
@@ -218,12 +190,22 @@
     placeIcon()
   }
 
-  export function pointerup() {
-    draggedIcon = null
-    //if ($data_icon.usingEraser) return;
+  let icon_before_drag: IconLayerIcon | null = null
 
-    //newIcon();
-    //destroyFloatingIcon();
+  export function pointerup() {
+    if (draggedIcon !== null) {
+      if (!iconsMatch(draggedIcon, icon_before_drag)) {
+	completeUndoState({icons})
+      } else {
+	cancelProspectiveUndoState()
+      }
+      icon_before_drag = null
+      draggedIcon = null
+    }
+
+    if (shouldEraseIcons()) {
+      completeUndoState({icons})
+    }
   }
 
   export function pointermove() {
@@ -241,7 +223,7 @@
   }
 
   // Floating icons have a few bugs / polish requried:
-  // - Icon appears weirdly when icon layer is switched too, will need to update when layer is switched to - still true?
+  // - Icon appears weirdly when icon layer is switched too, will need to update when layer is switched to
 
   function updateFloatingIcon() {
     const { iconX, iconY } = get_icon_position()
@@ -249,13 +231,12 @@
 
     //debugger
     //spr_floating_icon.visible = false
-    spr_floating_icon.visible =
-      !$data_icon.usingEraser &&
-      $store_selected_tool == Tools.ICON &&
-      cursorOnLayer &&
-      !$data_icon.dragMode &&
-      draggedIcon == null &&
-      !$data_icon.usingEyedropper
+    spr_floating_icon.visible = !$data_icon.usingEraser 
+      && $store_selected_tool == Tools.ICON 
+      && cursorOnLayer 
+      && !$data_icon.dragMode 
+      && draggedIcon == null 
+      && !$data_icon.usingEyedropper
 
     spr_floating_icon.texture = get_icon_texture($data_icon.icon.texId)
     spr_floating_icon.tint = $data_icon.icon.color
@@ -347,12 +328,20 @@
   let dragOffsetY = 0
   function icon_pointerdown(e: PIXI.FederatedPointerEvent, clicked_icon: IconLayerIcon) {
     if (shouldEraseIcons()) {
+
+      startUndoState({icons}, "Erase Icons")
+
       deleteIcon(clicked_icon)
       $store_has_unsaved_changes = true
     } else if ($data_icon.dragMode && draggedIcon == null) {
+
       draggedIcon = clicked_icon
+      icon_before_drag = structuredClone(clicked_icon)
       dragOffsetX = store_panning.curWorldX() - clicked_icon.x
       dragOffsetY = store_panning.curWorldY() - clicked_icon.y
+
+      startUndoState({icons}, "Drag Icon")
+
     } else if ($data_icon.usingEyedropper) {
       $data_icon.icon = { ...clicked_icon }
       $data_icon.usingEyedropper = false
@@ -373,6 +362,25 @@
 
     icons = icons
     $store_has_unsaved_changes = true
+  }
+
+  export function applyIcons(icons_to_apply: SaveData['icons']) {
+    // Wow.
+    icons = icons_to_apply
+
+    for (const icon of icons) {
+      const pixi_icon = pixi_icons[icon.onLayerId]
+      if (pixi_icon) {
+	pixi_icon.off('pointerdown')
+	pixi_icon.off('pointerover')
+        pixi_icon.on('pointerdown', (e) => {
+          icon_pointerdown(e, icon)
+        })
+        pixi_icon.on('pointerover', (e) => {
+          icon_pointerover(e, icon)
+        })
+      }
+    }
   }
 
   afterUpdate(() => {
@@ -423,10 +431,6 @@
     })
   })
 
-  export function applyIcons(icons_to_apply: SaveData['icons']) {
-    // Wow.
-    icons = icons_to_apply
-  }
 
   onMount(() => {
     cont_icon.removeChildren(0)

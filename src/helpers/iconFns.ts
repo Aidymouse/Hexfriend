@@ -1,7 +1,7 @@
 import type { HexOrientation } from "../types/terrain"
 import { coords_cubeToWorld, coords_worldToCube, getHexPath } from "./hexHelpers"
 import * as PIXI from 'pixi.js'
-import { type Icon } from "../types/icon"
+import { type Icon, type IconLayerIcon } from "../types/icon"
 import { get_icon_texture } from '../lib/texture_loader'
 import { get_icon_scale_for_hex, get_image_scaled_for_hex_relative, ScaleMode } from "./imageSizing"
 import { type Iconset } from "../types/icon"
@@ -134,5 +134,27 @@ export const getIconPositionFor = (x: number, y: number, hexInfo: Omit<PreviewHe
     hexInfo.gap,
   )
   return iconCoords
+
+}
+
+/* Basic helper fn to see if an icon has changed */
+export const iconsMatch = (icon1: IconLayerIcon, icon2: IconLayerIcon) => {
+  for (const [k, v] of Object.entries(icon1)) {
+    if (k === 'scale') {
+      if ((v as IconLayerIcon['scale']).x !== icon2.scale.x || (v as IconLayerIcon['scale']).y !== icon2.scale.y) { 
+	console.log(v, icon2.scale)
+	debugger
+	return false
+      }
+      continue
+    }
+
+    if (v !== icon2[k]) { 
+      console.log(k)
+      return false
+    }
+  }
+
+  return true
 
 }
