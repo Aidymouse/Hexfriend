@@ -311,7 +311,6 @@
           {renderGrid}
           {redrawEntireMap}
           retain_positions={retain_positions_on_resize}
-	  retain_icon_positions={retainIconPosition}
           {save_old_resize_parameters}
         />
       </div>

@@ -157,18 +157,24 @@
     id="hexWidth"
     type="number"
     min={1}
-    bind:value={$tfield.hexWidth}
+    value={$tfield.hexWidth}
     on:change={(e) => {
       if (Number.isNaN(e.currentTarget.valueAsNumber)) {
         $tfield.hexWidth = $resize_parameters.old_hex_width
         return
       }
 
+      startUndoState({TerrainField: {hexWidth: $tfield.hexWidth}}, "Change Hex Width")
+
+      $tfield.hexWidth = e.target.valueAsNumber
+
       redrawEntireMap()
       comp_coordsLayer.updateAllCoordPositions()
       retain_positions()
       retain_scale()
       save_old_resize_parameters()
+
+      completeUndoState({TerrainField: {hexWidth: $tfield.hexWidth}}, "Change Hex Width")
     }}
   />
 
@@ -177,17 +183,23 @@
     id="hexHeight"
     type="number"
     min={1}
-    bind:value={$tfield.hexHeight}
+    value={$tfield.hexHeight}
     on:change={(e) => {
       if (Number.isNaN(e.currentTarget.valueAsNumber)) {
         $tfield.hexHeight = $resize_parameters.old_hex_height
         return
       }
+      startUndoState({TerrainField: {hexHeight: $tfield.hexHeight}}, "Change Hex Height")
+
+      $tfield.hexHeight = e.target.valueAsNumber
+
       redrawEntireMap()
       comp_coordsLayer.updateAllCoordPositions()
       retain_positions()
       retain_scale()
       save_old_resize_parameters()
+
+      completeUndoState({TerrainField: {hexHeight: $tfield.hexHeight}}, "Change Hex Height")
     }}
   />
 
@@ -201,6 +213,8 @@
         console.log(radius)
         if (Number.isNaN(radius) || radius < 1) return
 
+	startUndoState({TerrainField: {hexWidth: $tfield.hexWidth, hexHeight: $tfield.hexHeight }}, "Set Hex Size by Radius")
+
         let new_dims = get_width_height_from_radius(radius, $tfield.orientation)
 
         $tfield.hexWidth = new_dims.width
@@ -213,6 +227,7 @@
         save_old_resize_parameters()
 
         comp_coordsLayer.updateAllCoordPositions()
+	completeUndoState({TerrainField: {hexWidth: $tfield.hexWidth, hexHeight: $tfield.hexHeight }})
       }}>Set</button
     >
   </span>
@@ -237,21 +252,16 @@
     on:change={(e) => {
 
       //let undoStartState = {TerrainField: { grid: $tfield.grid } }
-      //startUndoState(undoStartState, `Change Grid Gap`)
+      startUndoState({TerrainField: {gap: $tfield.gap}}, `Change Grid Gap`)
 
       $tfield.gap = e.target.valueAsNumber
 
       redrawEntireMap()
       comp_coordsLayer.updateAllCoordPositions()
       retain_positions()
-
-      
-
-      // TODO: handle updated icons
-      //push_undo_state({ TerrainField: { grid: $tfield.grid } }, "Change Grid Gap")
-
-      //completeUndoState({TerrainField: { grid: $tfield.grid } }, `Change Grid Gap`)
       save_old_resize_parameters()
+
+      completeUndoState({TerrainField: { gap: $tfield.gap } })
     }}
   />
 
