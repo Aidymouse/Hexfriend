@@ -7,6 +7,8 @@
 	export let options: { title: string; value: string; filename: string }[] = [];
 	export let value: any;
 
+	export let id: string | undefined = undefined;
+
 	function changeValue(newValue: any) {
 		if (value == newValue) return;
 		value = newValue;
