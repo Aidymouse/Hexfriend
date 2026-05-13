@@ -34,19 +34,24 @@ export const startUndoState = (
   const new_state: UndoState = { label, before: structuredClone(data), after: {} }
 
   if (get(store_undo).awaiting_completion) {
+
     if (options.bounce) {
       return
+
     } else if (options.allow_override) {
       store_undo.update((u) => {
 	u.undo_stack[u.undo_stack.length - 1] = new_state
 	return u
       })
+
     } else {
       throw Error(`Trying to push undo state when we haven't completed the last one`)
     }
+
   } else {
     store_undo.update((u) => {
       // TODO: cut off newer readings
+      u.undo_stack.splice(u.undo_pointer+1)
       u.undo_stack.push(new_state)
       u.awaiting_completion = true
       return u
