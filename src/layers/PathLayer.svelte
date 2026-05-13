@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { path_data } from '../types/data'
   import type { pan_state } from '../types/panning'
   import type { PathLayerPath } from '../types/path'
   import type { HexRaised, TerrainField } from '../types/terrain'
@@ -208,6 +207,23 @@
     $store_has_unsaved_changes = true
   }
 
+  export function updatePathStylePanelControl(path: PathLayerPath, style: PathLayerPath['style']) {
+    startUndoState({paths}, `Restyle path ${path.id}`)
+    //$data_path.style = style
+    path.style = structuredClone(style)
+    completeUndoState({paths})
+  }
+
+  export function deletePathPanelControl(path: PathLayerPath) {
+    if (path.points.length === 2) {
+      deselectPath()
+    } else {
+      startUndoState({paths}, `Delete Path ${path.id}`)
+      deletePath(path)
+      completeUndoState({paths})
+    }
+  }
+
   export function deletePath(path: PathLayerPath) {
     $data_path.selectedPath = null
 
@@ -237,7 +253,7 @@
     let pX = store_panning.curWorldX()
     let pY = store_panning.curWorldY()
 
-    startUndoState({paths}, "Add Path")
+    startUndoState({paths, selected_tool: Tools.PATH}, "Add Path")
 
     if ($data_path.snap) {
       let snapPoint = getSnapPoint()
@@ -386,6 +402,10 @@
     if (paths.at(-1)?.points.length === 2) {
       $data_path.selectedPath = paths.at(-1)
     }
+
+    if ($data_path.selectedPath) {
+      $data_path.style = structuredClone($data_path.selectedPath.style)
+    }
   }
 
   function updatePathHandles() {
@@ -415,9 +435,11 @@
   afterUpdate(() => {
     if (!$data_path) return
 
+    /*
     if ($data_path.selectedPath) {
       $data_path.selectedPath.style = structuredClone($data_path.style)
     }
+    */
 
     for (const [path_id, cont_path] of Object.entries(path_containers)) {
       cont_path.marked_for_death = true

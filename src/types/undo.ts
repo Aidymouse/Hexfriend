@@ -5,6 +5,7 @@ import PathLayer from '../layers/PathLayer.svelte'
 import type { SaveData } from './savedata'
 import type { Tile } from './tilesets'
 import type { HexId, Tools } from './toolData'
+import type { PathData } from './data'
 
 export type LayerComponents = {
   terrainLayer: TerrainLayer
@@ -23,6 +24,9 @@ export type UndoData = {
 } & {
   tiles?: { [hexId: HexId]: Tile | null }
   selected_tool?: Tools
+
+  path_data?: Partial<PathData>
+
   //tiles?: UndoDataTiles
   //path_point?: UndoDataPathPoint
 }

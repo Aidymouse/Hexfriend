@@ -1,4 +1,4 @@
-import type { coordinates_data, eraser_data, icon_data, overlay_data, path_data, terrain_data, text_data } from "../types/data";
+import type { coordinates_data, eraser_data, icon_data, overlay_data, PathData, terrain_data, text_data } from "../types/data";
 import { coord_system } from "../types/coordinates";
 import { type Icon } from "../types/icon";
 import { DEFAULTICONSET } from "../lib/defaultIconset";
@@ -15,7 +15,7 @@ export let data_terrain: Writable<terrain_data> = writable({
     genPreview: false,
 })
 
-export let data_path: Writable<path_data> = writable({
+export let data_path: Writable<PathData> = writable({
     style: { color: 0, width: 3, cap: PIXI.LINE_CAP.ROUND, join: PIXI.LINE_JOIN.ROUND, dashed: false, dash_length: 10, dash_gap: 5 },
     hoveredPath: null,
     selectedPath: null,

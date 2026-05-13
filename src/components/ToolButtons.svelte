@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { eraser_data, icon_data, overlay_data, path_data, terrain_data } from '../types/data'
+  import type { eraser_data, icon_data, PathData, terrain_data } from '../types/data'
   import { HexOrientation } from '../types/terrain'
   import { Tools } from '../types/toolData'
   import { afterUpdate, onMount } from 'svelte'
@@ -10,7 +10,7 @@
   import { tl } from '../stores/translation'
 
   /* These proxies keep the buttons responsive */
-  let data_path_proxy: path_data
+  let data_path_proxy: PathData
   data_path.subscribe((n) => {
     data_path_proxy = n
   })

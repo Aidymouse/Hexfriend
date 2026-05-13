@@ -44,7 +44,7 @@ export type text_data = {
   contextStyleId?: number
 }
 
-export type path_data = {
+export type PathData = {
   selectedPath?: PathLayerPath
   hoveredPath?: PathLayerPath
   dontSelectPaths: boolean

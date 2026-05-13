@@ -1,6 +1,6 @@
 <script lang="ts">
   // TYPES
-  import type { eraser_data, icon_data, overlay_data, path_data, terrain_data, text_data } from '../types/data'
+  import type { icon_data } from '../types/data'
   import { Tools } from '../types/toolData'
 
   import { data_eraser, data_overlay, data_text } from '../stores/data'

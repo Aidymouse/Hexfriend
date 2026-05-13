@@ -6,6 +6,8 @@
   import type { ListedPathStyle, PathStyle } from '../types/path'
   import * as PIXI from 'pixi.js'
   import { tl } from '../stores/translation'
+  
+  import { startUndoState, completeUndoState } from '../lib/undoManager'
 
   import { store_has_unsaved_changes } from '../stores/flags'
   import { data_path } from '../stores/data'
@@ -57,7 +59,7 @@
 
     let styleToEdit: ListedPathStyle = loaded_path_styles.find((ps) => ps.id == $data_path.contextPathId)
 
-    styleToEdit.style = { ...$data_path.style }
+    applyStyle({ ...$data_path.style })
     //styleToEdit = styleToEdit
     loaded_path_styles = loaded_path_styles
 
@@ -112,6 +114,18 @@
 
     $store_has_unsaved_changes = true
   }
+
+  /* Applies provided style + keeps data up to date */
+  const applyStyle = (style: Partial<PathStyle>) => {
+    /* TODO: replace with real matching fn */
+    if(JSON.stringify(style) === JSON.stringify($data_path.style)) { return }
+
+    $data_path.style = {...$data_path.style, ...style}
+
+    if ($data_path.selectedPath) {
+      comp_pathLayer.updatePathStylePanelControl($data_path.selectedPath, $data_path.style)
+    }  
+  }
 </script>
 
 <div
@@ -122,8 +136,8 @@
 >
   <div id="controls">
     <span>
-      <ColorInputPixi bind:value={$data_path.style.color} id={'pathColor'} />
-      <input id="pathThickness" type="number" min={1} bind:value={$data_path.style.width} />
+      <ColorInputPixi value={$data_path.style.color} id={'pathColor'} on:change={e => {applyStyle({color: e.detail.number})}} />
+      <input id="pathThickness" type="number" min={1} value={$data_path.style.width} on:change={e => applyStyle({width: e.target.valueAsNumber}) } />
     </span>
 
     <span class="path-control-grid">
@@ -147,7 +161,10 @@
               filename: 'lineendsquare',
             },
           ]}
-          bind:value={$data_path.style.cap}
+          value={$data_path.style.cap}
+	  on:change={e => {
+	    applyStyle({cap: e.detail.value})
+	  }}
         />
       </span>
     </span>
@@ -173,7 +190,10 @@
               filename: 'linecornerbevel',
             },
           ]}
-          bind:value={$data_path.style.join}
+          value={$data_path.style.join}
+	  on:change={(e) => {
+	    applyStyle({join: e.detail.value})
+	  }}
         />
       </span>
     </span>
@@ -181,25 +201,27 @@
     <span class="path-control-grid">
       <label for="dashed-line">{$tl.path_panel.dashed_line}</label>
       <Checkbox
-        bind:checked={$data_path.style.dashed}
-        on:change={(e) => {
-          $data_path = $data_path
-        }}
+        checked={$data_path.style.dashed}
+        on:change={(e) => { applyStyle({dashed: !$data_path.style.dashed}) }}
       />
     </span>
 
     {#if $data_path.style.dashed}
       <span class="path-control-grid" id="dash-param-grid">
         <label for="dash-length">Dash</label>
-        <input id="dash-length" type="number" bind:value={$data_path.style.dash_length} min={1} />
+        <input id="dash-length" type="number" value={$data_path.style.dash_length} min={1} on:change={e => {
+	  applyStyle({dash_length: e.target.valueAsNumber})
+	}} />
         <label for="dash-gap">Gap</label>
-        <input id="dash-gap" type="number" bind:value={$data_path.style.dash_gap} min={1} />
+        <input id="dash-gap" type="number" value={$data_path.style.dash_gap} min={1} on:change={e => {
+	  applyStyle({dash_gap: e.target.valueAsNumber})
+	}} />
       </span>
     {/if}
   </div>
 
   {#if DEV_MODE}
-  <div>
+  <div style="background-color: maroon; padding: 0.5em">
     <button on:click={() => comp_pathLayer.debug_logPathState()}>Log Text State</button>
   </div>
   {/if}
@@ -226,7 +248,7 @@
       <button
         class="evil"
         on:click={() => {
-          comp_pathLayer.deletePath($data_path.selectedPath)
+          comp_pathLayer.deletePathPanelControl($data_path.selectedPath)
         }}>{$tl.path_panel.delete_path}</button
       >
     </div>
@@ -239,9 +261,7 @@
       {#each loaded_path_styles as pb (pb.id)}
         <button
           on:click={() => {
-            $data_path.style = {
-              ...pb.style,
-            }
+	    applyStyle(pb.style)
           }}
           class:selected={styleMatchesData(pb.style)}
           on:contextmenu={(e) => {

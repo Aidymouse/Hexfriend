@@ -1,5 +1,5 @@
 import { Tools, type LayerComponents, type UndoData, type UndoState } from '../types'
-import { DefaultUndoStore } from '../stores'
+import { data_path, DefaultUndoStore } from '../stores'
 import { get } from 'svelte/store'
 
 import { store_undo, store_selected_tool } from '../stores'
@@ -148,12 +148,18 @@ export const apply_state_data = (applied_data: UndoData, layers: LayerComponents
     layers.textLayer.applyTexts(applied_data.texts)
   }
 
+  // Do data first cos selected might update
+  // if (applied_data.path_data) {
+  //   data_path.update(d => ({...d, ...applied_data.path_data}))
+  // }
+
   if (applied_data.paths) {
     // if (applied_data.paths.at(-1)?.points.length === 2) {
     //   changeTool(Tools.PATH)
     // }
     layers.pathLayer.applyPaths(applied_data.paths)
   }
+
 
   if (applied_data.selected_tool) {
     store_selected_tool.update(t => applied_data.selected_tool)

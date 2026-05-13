@@ -256,12 +256,17 @@
   /** TODO: refactor this into seperate tool store subscribes in respective layers */
   function changeTool(newTool: Tools) {
     // A list of stuff that needs to happen every tool change
+    if ($data_path.selectedPath) {
+      comp_pathLayer.deselectPath()
+    }
+
     data_path.update((n) => {
       n.contextPathId = null
       n.selectedPath = null
 
       return n
     })
+
 
     //$data_path.contextPathId = null;
     $data_text.contextStyleId = null
