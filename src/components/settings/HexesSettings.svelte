@@ -16,7 +16,7 @@
   import { get_radius_from_width_height, get_width_height_from_radius } from '../../helpers/hexHelpers'
   import { data_terrain } from '../../stores/data'
 
-  import { push_undo_state } from '../../lib'
+  import { startUndoState, completeUndoState } from '../../lib'
 
   export let comp_coordsLayer
   export let comp_terrainLayer
@@ -68,12 +68,12 @@
     <ColorInputPixi
       value={$tfield.blankHexColor}
       on:input={(e) => {
-        startUndoState({ TerrainField: { blankHexColor: $tfield.blankHexColor } }, "Change Blank Hex Color", {allow_override: true})
+        startUndoState({ TerrainField: { blankHexColor: $tfield.blankHexColor } }, "Change Blank Hex Color", {bounce: true})
         $tfield.blankHexColor = e.detail.number
+        renderAllHexes()
       }}
       on:change={() => {
         completeUndoState({ TerrainField: { blankHexColor: $tfield.blankHexColor } })
-        renderAllHexes()
       }}
       id={'blankHexColor'}
     />
@@ -88,30 +88,44 @@
     >
   </div>
 
-  <label>{$tl.settings.hexes.orientation}</label>
+  <label for="hex-orientation-select-grid">{$tl.settings.hexes.orientation}</label>
   <div style={'height: 100%; display: flex; align-items: center;'}>
     <SelectGrid
+      id="hex-orientation-select-grid"
       options={[
         { title: 'Flat Top', value: HexOrientation.FLATTOP, filename: 'flatTop' },
         { title: 'Pointy Top', value: HexOrientation.POINTYTOP, filename: 'pointyTop' },
       ]}
       value={$tfield.orientation}
       on:change={() => {
-        startUndoState({ TerrainField: { orientation: $tfield.orientation } }, "Change Orientation")
+        startUndoState({ 
+	  TerrainField: {
+	    hexWidth: $tfield.hexWidth,
+	    hexHeight: $tfield.hexHeight,
+	    orientation: $tfield.orientation 
+	  }
+	}, "Change Orientation")
+
         changeOrientation($tfield.orientation === HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP)
-        completeUndoState({ TerrainField: { orientation: $tfield.orientation } })
+
+        completeUndoState({
+	  TerrainField: {
+	    hexWidth: $tfield.hexWidth,
+	    hexHeight: $tfield.hexHeight,
+	   orientation: $tfield.orientation 
+	  }
+	})
       }}
     />
   </div>
 
   {#if $tfield.mapShape == map_shape.SQUARE}
-    <label>
-      {$tfield.orientation == HexOrientation.FLATTOP
-        ? $tl.settings.hexes.raised_column
-        : $tl.settings.hexes.indented_row}
+    <label for="raised-select-grid">
+      {$tfield.orientation == HexOrientation.FLATTOP ? $tl.settings.hexes.raised_column : $tl.settings.hexes.indented_row}
     </label>
     <span style={'height: 100%; display: flex; align-items: center;'}>
       <SelectGrid
+	id="raised-select-grid"
         options={[
           {
             title: $tl.general.even,
@@ -126,7 +140,6 @@
         ]}
         value={$tfield.raised}
         on:change={(e) => {
-
           $tfield.raised = e.detail.value
           if ($tfield.orientation == HexOrientation.FLATTOP) {
             comp_terrainLayer.square_updateRaisedColumn()

@@ -58,12 +58,12 @@
     <ColorInputPixi
       value={$tfield.grid.stroke}
       on:input={(e) => {
-	startUndoState({TerrainField: { grid: $tfield.grid } }, `Change Grid Stroke`)
+	startUndoState({TerrainField: { grid: $tfield.grid } }, `Change Grid Stroke`, {bounce: true})
 	$tfield.grid.stroke = e.detail.number
-	completeUndoState({TerrainField: { grid: $tfield.grid } })
+        renderGrid()
       }}
       on:change={() => {
-        renderGrid()
+	completeUndoState({TerrainField: { grid: $tfield.grid } })
       }}
       id={'gridColor'}
     />
@@ -84,7 +84,7 @@
       $tfield.largehexes.diameterInHexes = e.target.valueAsNumber
       completeUndoState({ TerrainField: { largehexes: $tfield.largehexes } })
     }} />
-startUndoState
+
     <label for="overlayColor">{$tl.settings.grid.large_hexes.color}</label>
     <ColorInputPixi id={'overlayColor'} value={$tfield.largehexes.style.color} on:input={(e) => {
       startUndoState({ TerrainField: { largehexes: $tfield.largehexes } }, "Change Large Hex Color")
@@ -114,7 +114,7 @@ startUndoState
     <input type="number" value={$tfield.largehexes.offset.y} min={0} step={0.25} on:change={(e) => {
       startUndoState({ TerrainField: { largehexes: $tfield.largehexes } }, "Change Large Hex Y Offset")
       $tfield.largehexes.offset.y = e.target.valueAsNumber
-      compelteUndoState({ TerrainField: { largehexes: $tfield.largehexes } })
+      completeUndoState({ TerrainField: { largehexes: $tfield.largehexes } })
     }} />
 
     <label for="overlayEncompass">{$tl.settings.grid.large_hexes.encompasedges}</label>
@@ -125,13 +125,14 @@ startUndoState
     }} />
 
     {#if $tfield.mapShape == map_shape.SQUARE}
-      <label
-        >{$tfield.orientation == HexOrientation.FLATTOP
+      <label for="big-raised-select-grid">
+	{$tfield.orientation == HexOrientation.FLATTOP
           ? $tl.settings.grid.large_hexes.large_raised_column
-          : $tl.settings.grid.large_hexes.large_indented_row}</label
-      >
+          : $tl.settings.grid.large_hexes.large_indented_row}
+      </label>
       <span style={'height: 100%; display: flex; align-items: center;'}>
         <SelectGrid
+	  id="big-raised-select-grid"
           options={[
             {
               title: $tl.general.even,
