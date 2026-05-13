@@ -4,7 +4,7 @@ import TextLayer from '../layers/TextLayer.svelte'
 import PathLayer from '../layers/PathLayer.svelte'
 import type { SaveData } from './savedata'
 import type { Tile } from './tilesets'
-import type { HexId } from './toolData'
+import type { HexId, Tools } from './toolData'
 
 export type LayerComponents = {
   terrainLayer: TerrainLayer
@@ -22,6 +22,7 @@ export type UndoData = {
   [k in keyof SaveData]?: Partial<SaveData[k]>
 } & {
   tiles?: { [hexId: HexId]: Tile | null }
+  selected_tool?: Tools
   //tiles?: UndoDataTiles
   //path_point?: UndoDataPathPoint
 }

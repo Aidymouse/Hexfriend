@@ -2,7 +2,7 @@ import { Tools, type LayerComponents, type UndoData, type UndoState } from '../t
 import { DefaultUndoStore } from '../stores'
 import { get } from 'svelte/store'
 
-import { store_undo } from '../stores'
+import { store_undo, store_selected_tool } from '../stores'
 
 const debug = true
 export const reset_undo_stack = () => {
@@ -153,5 +153,9 @@ export const apply_state_data = (applied_data: UndoData, layers: LayerComponents
     //   changeTool(Tools.PATH)
     // }
     layers.pathLayer.applyPaths(applied_data.paths)
+  }
+
+  if (applied_data.selected_tool) {
+    store_selected_tool.update(t => applied_data.selected_tool)
   }
 }
