@@ -29,9 +29,10 @@
     find_new_pos_through_resize,
     type HexSizeParams,
   } from '../lib/map_resize'
-  import { push_undo_state } from '../lib/undoManager'
+  import { completeUndoState, push_undo_state, startUndoState } from '../lib/undoManager'
   import { findHitArea, getPathSnapPoint } from '../helpers/pathHelpers'
-  import type { UndoDataPathPoint } from '../types'
+  import { Tools, type UndoDataPathPoint } from '../types'
+  import { store_undo } from '../stores'
 
   let pan: pan_state
   store_panning.store.subscribe((newPan) => { pan = newPan })
@@ -109,24 +110,14 @@
 
     paths = paths
 
-    /*
-    push_undo_state({
-      path_point: {path_id: path.id,
-      point: {x, y},
-      path_end: $data_path.add_to,
-      action: 'add',
-      grab_selection: path.points.length === 2,
-    } }, `Add path point to ${path.id}`)
-    */
-
-    push_undo_state({ paths }, `Update Path ${path.id}`)
-
     $store_has_unsaved_changes = true
   }
 
   export function deselectPath() {
     if ($data_path.selectedPath.points.length <= 2) { 
+      startUndoState({paths, selected_tool: Tools.PATH}, "Delete path by deselect")
       deletePath($data_path.selectedPath)
+      completeUndoState({paths})
     }
     $data_path.selectedPath = null
   }
@@ -144,7 +135,19 @@
           pY = sP.y
         }
 
+	/* Special: if the path we're appending to is a single point, REMOVE the last undo state! 
+	* This makes it so paths with 2+ points don't have an awkward state where only 1 point exists.
+	*/
+	if ($data_path.selectedPath.points.length === 2) {
+	  $store_undo.undo_stack.pop()
+	  $store_undo.undo_pointer -= 1
+	  startUndoState({paths: paths.filter(p => p.id !== $data_path.selectedPath.id)}, `Add Point to ${$data_path.selectedPath.id}`)
+	} else {
+	  startUndoState({paths}, `Add Point to ${$data_path.selectedPath.id}`)
+	}
+
         appendPoint($data_path.selectedPath, pX, pY, $data_path.add_to)
+	completeUndoState({paths})
       } else if ($data_path.hoveredPath && !$data_path.dontSelectPaths) {
         $data_path.selectedPath = paths[paths.indexOf($data_path.hoveredPath)]
         $data_path.style = { ...$data_path.selectedPath.style }
@@ -170,6 +173,13 @@
   }
 
   export function remove_latest_point(path: PathLayerPath) {
+
+    if (path.points.length === 2){
+      startUndoState({paths, selected_tool: Tools.PATH}, "Remove Path Point")
+    } else {
+      startUndoState({paths}, "Remove Path Point")
+    }
+
     const removed_point = remove_point_from(path, $data_path.add_to)
     paths = paths
 
@@ -186,8 +196,12 @@
 
     if (path.points.length == 0) {
       deletePath(path)
+    } 
+
+    if (path.points.length === 2) {
+      completeUndoState({ paths, selected_tool: Tools.PATH })
     } else {
-      push_undo_state({ paths }, `Remove Point From ${path.id}`)
+      completeUndoState({ paths })
     }
 
 
@@ -201,10 +215,6 @@
     paths.splice(pathIndex, 1)
 
     paths = paths
-
-    push_undo_state({ paths }, `Remove path ${path.id}`)
-
-    // TODO: if the path has 1 point, make this a point undo state, otherwise do the whole path
 
     $store_has_unsaved_changes = true
   }
@@ -227,6 +237,8 @@
     let pX = store_panning.curWorldX()
     let pY = store_panning.curWorldY()
 
+    startUndoState({paths}, "Add Path")
+
     if ($data_path.snap) {
       let snapPoint = getSnapPoint()
       pX = snapPoint.x
@@ -242,15 +254,14 @@
       // TODO: what goin on with this ??
       dashes: $data_path.dashed ? [...$data_path.dashes] : null,
     })
-    //paths = paths
     pathId++
     $data_path.selectedPath = paths[paths.length - 1]
     $data_path.hoveredPath = null
-    //console.log(paths);
 
     appendPoint(paths.at(-1)!, pX, pY, $data_path.add_to)
 
     $store_has_unsaved_changes = true
+    completeUndoState({paths, selected_tool: Tools.PATH})
   }
 
   /* idk */
