@@ -258,20 +258,20 @@
         square_moveAllHexesRight(amount)
 
         if ($tfield.orientation == 'flatTop') {
-          let delta_x = ($tfield.hexWidth + $tfield.grid.gap) * 0.75 * amount
+          let delta_x = ($tfield.hexWidth + $tfield.gap) * 0.75 * amount
           pan.offsetX -= delta_x * pan.zoomScale
           $data_overlay.x += delta_x
 
           if (amount % 2 == 1) {
             $tfield.raised = $tfield.raised == HexRaised.ODD ? HexRaised.EVEN : HexRaised.ODD
             square_updateRaisedColumn()
-            let delta_y = ($tfield.hexHeight + $tfield.grid.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1)
+            let delta_y = ($tfield.hexHeight + $tfield.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1)
             pan.offsetY += delta_y * pan.zoomScale
 
             $data_overlay.y -= delta_y
           }
         } else {
-          let delta_x = ($tfield.hexWidth + $tfield.grid.gap) * amount
+          let delta_x = ($tfield.hexWidth + $tfield.gap) * amount
           pan.offsetX -= delta_x * pan.zoomScale
           $data_overlay.x += delta_x
         }
@@ -287,19 +287,19 @@
         square_moveAllHexesDown(amount)
 
         if ($tfield.orientation == 'flatTop') {
-          let delta_y = ($tfield.hexHeight + $tfield.grid.gap) * amount
+          let delta_y = ($tfield.hexHeight + $tfield.gap) * amount
           pan.offsetY -= delta_y * pan.zoomScale
 
           $data_overlay.y += delta_y
         } else {
-          let delta_y = ($tfield.hexHeight + $tfield.grid.gap) * 0.75 * amount
+          let delta_y = ($tfield.hexHeight + $tfield.gap) * 0.75 * amount
           pan.offsetY -= delta_y * pan.zoomScale
           $data_overlay.y += delta_y
 
           if (amount % 2 == 1) {
             $tfield.raised = $tfield.raised == HexRaised.ODD ? HexRaised.EVEN : HexRaised.ODD
             square_changeIndentedRow()
-            let delta_x = ($tfield.hexWidth + $tfield.grid.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1)
+            let delta_x = ($tfield.hexWidth + $tfield.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1)
             pan.offsetX += delta_x * pan.zoomScale
             $data_overlay.x -= delta_x
           }
@@ -433,9 +433,9 @@
             square_updateRaisedColumn()
           }
 
-          let delta_x = ($tfield.hexWidth + $tfield.grid.gap) * 0.75 * amount
+          let delta_x = ($tfield.hexWidth + $tfield.gap) * 0.75 * amount
           let delta_y =
-            ($tfield.hexHeight + $tfield.grid.gap) *
+            ($tfield.hexHeight + $tfield.gap) *
             0.5 *
             ($tfield.raised == 'odd' ? -1 : 1) *
             (amount % 2 == 0 ? 0 : 1)
@@ -446,7 +446,7 @@
           $data_overlay.x -= delta_x
           $data_overlay.y -= delta_y
         } else {
-          let delta_x = ($tfield.hexWidth + $tfield.grid.gap) * amount
+          let delta_x = ($tfield.hexWidth + $tfield.gap) * amount
           pan.offsetX += delta_x * pan.zoomScale
 
           $data_overlay.x -= delta_x
@@ -481,7 +481,7 @@
           if (amount % 2 == 1) {
             $tfield.raised = $tfield.raised == HexRaised.ODD ? HexRaised.EVEN : HexRaised.ODD
             square_changeIndentedRow()
-            let delta_x = ($tfield.hexWidth + $tfield.grid.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1)
+            let delta_x = ($tfield.hexWidth + $tfield.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1)
             pan.offsetX += delta_x * pan.zoomScale
             $data_overlay.x -= delta_x
           }
@@ -738,11 +738,11 @@
         $tfield.orientation,
         $tfield.hexWidth,
         $tfield.hexHeight,
-        grid.gap,
+        $tfield.gap,
       )
 
       gridGraphics.drawPolygon(
-        getHexPath($tfield.hexWidth + grid.gap, $tfield.hexHeight + grid.gap, $tfield.orientation, hexC.x, hexC.y),
+        getHexPath($tfield.hexWidth + $tfield.gap, $tfield.hexHeight + $tfield.gap, $tfield.orientation, hexC.x, hexC.y),
       )
     })
   }
@@ -771,7 +771,7 @@
       $tfield.orientation,
       $tfield.hexWidth,
       $tfield.hexHeight,
-      $tfield.grid.gap,
+      $tfield.gap,
     )
 
     if (hex.tile === null) {
@@ -853,7 +853,7 @@
         $tfield.orientation,
         $tfield.hexWidth,
         $tfield.hexHeight,
-        $tfield.grid.gap,
+        $tfield.gap,
       )
 
       let clickedId = genHexId(clickedCoords.q, clickedCoords.r, clickedCoords.s)
@@ -932,7 +932,7 @@
         $tfield.orientation,
         $tfield.hexWidth,
         $tfield.hexHeight,
-        $tfield.grid.gap,
+        $tfield.gap,
       )
 
       let clickedId = genHexId(clickedCoords.q, clickedCoords.r, clickedCoords.s)
@@ -966,7 +966,7 @@
       $tfield.orientation,
       $tfield.hexWidth,
       $tfield.hexHeight,
-      $tfield.grid.gap,
+      $tfield.gap,
     )
 
     let clickedId = genHexId(clickedCoords.q, clickedCoords.r, clickedCoords.s)
@@ -988,7 +988,7 @@
       $tfield.orientation,
       $tfield.hexWidth,
       $tfield.hexHeight,
-      $tfield.grid.gap,
+      $tfield.gap,
     )
 
     let clickedId = genHexId_coordsObj(clickedCoords)
@@ -1015,7 +1015,7 @@
         $tfield.orientation,
         $tfield.hexWidth,
         $tfield.hexHeight,
-        $tfield.grid.gap,
+        $tfield.gap,
       ),
     )
 

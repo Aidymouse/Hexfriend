@@ -103,9 +103,9 @@
       idParts.r,
       idParts.s,
       $tfield.orientation,
-      $tfield.hexWidth + $tfield.grid.gap,
-      $tfield.hexHeight + $tfield.grid.gap,
-      $tfield.grid.gap,
+      $tfield.hexWidth + $tfield.gap,
+      $tfield.hexHeight + $tfield.gap,
+      $tfield.gap,
     )
 
     text.pixiText.position.x = newPos.x

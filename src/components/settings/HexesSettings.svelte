@@ -213,20 +213,20 @@
     -->
 
 
-  <label for="gridGap">{$tl.settings.grid.gap}</label>
+  <label for="hexGap">{$tl.settings.hexes.gap}</label>
   <input
-    id="gap"
+    id="hexGap"
     type="number"
     min="0"
     max="99"
-    value={$tfield.grid.gap}
+    value={$tfield.gap}
     on:focus={() => {}}
     on:change={(e) => {
 
       //let undoStartState = {TerrainField: { grid: $tfield.grid } }
       //startUndoState(undoStartState, `Change Grid Gap`)
 
-      $tfield.grid.gap = e.target.valueAsNumber
+      $tfield.gap = e.target.valueAsNumber
 
       redrawEntireMap()
       comp_coordsLayer.updateAllCoordPositions()

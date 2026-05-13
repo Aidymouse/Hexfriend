@@ -218,7 +218,7 @@
 	  orientation: $tfield.orientation,
 	  hexWidth: $tfield.hexWidth,
 	  hexHeight: $tfield.hexHeight,
-	  gap: $tfield.grid.gap,
+	  gap: $tfield.gap,
 	}
     )
   }

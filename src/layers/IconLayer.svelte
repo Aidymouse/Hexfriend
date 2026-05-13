@@ -122,7 +122,7 @@
 	orientation: $tfield.orientation,
 	hexWidth: $tfield.hexWidth,
         hexHeight: $tfield.hexHeight,
-        gap: $tfield.grid.gap
+        gap: $tfield.gap
       },
       $data_icon.snapToHex
     )
@@ -147,7 +147,7 @@
       $tfield.orientation,
       $tfield.hexWidth,
       $tfield.hexHeight,
-      $tfield.grid.gap,
+      $tfield.gap,
     )
 
     let newIcon: IconLayerIcon = {
@@ -183,7 +183,7 @@
     }
     */
 
-    const iconHexPos = coords_worldToCube(iconX, iconY, $tfield.orientation, $tfield.hexWidth, $tfield.hexHeight, $tfield.grid.gap)
+    const iconHexPos = coords_worldToCube(iconX, iconY, $tfield.orientation, $tfield.hexWidth, $tfield.hexHeight, $tfield.gap)
 
     emplaceIcon($data_icon.icon, iconHexPos)
 

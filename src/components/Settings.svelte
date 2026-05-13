@@ -94,7 +94,7 @@
       width: $tfield.hexWidth,
       height: $tfield.hexHeight,
       orientation: $tfield.orientation,
-      gap: $tfield.grid.gap,
+      gap: $tfield.gap,
     }
 
     if (retainIconPosition) comp_iconLayer.retain_icon_position_on_hex_resize(old_hex_size, new_hex_size)
@@ -119,7 +119,7 @@
         width: $tfield.hexWidth,
         height: $tfield.hexHeight,
         orientation: $tfield.orientation,
-        gap: $tfield.grid.gap,
+        gap: $tfield.gap,
       }
 
       if (retainIconPosition)
@@ -137,7 +137,7 @@
       width: $tfield.hexWidth,
       height: $tfield.hexHeight,
       orientation: $tfield.orientation,
-      gap: $tfield.grid.gap,
+      gap: $tfield.gap,
     }
     if (retain_icon_scale) comp_iconLayer.retain_icon_scale(new_hex_size)
   }
@@ -146,7 +146,7 @@
   function save_old_resize_parameters() {
     $resize_parameters.old_hex_width = $tfield.hexWidth
     $resize_parameters.old_hex_height = $tfield.hexHeight
-    $resize_parameters.old_gap = $tfield.grid.gap
+    $resize_parameters.old_gap = $tfield.gap
     $resize_parameters.old_orientation = $tfield.orientation
   }
 
