@@ -24,13 +24,17 @@
     }
     oldStringValue = stringValue
 
-    dispatch('change', { colorString: stringValue, color: value })
+  }
+
+  const change = (e) => {
+    value = PIXI.Color.shared.setValue(stringValue).toNumber()
+    dispatch('change', { string: stringValue, number: value })
   }
 </script>
 
 <span style="width: {w}; height: {h}">
   <div style="--user-input-color: {stringValue};">
-    <input type="color" bind:value={stringValue} {id} />
+    <input type="color" bind:value={stringValue} {id} on:change={change} />
   </div>
 </span>
 
