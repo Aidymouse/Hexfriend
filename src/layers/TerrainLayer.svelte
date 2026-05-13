@@ -971,7 +971,11 @@
 
     let clickedId = genHexId(clickedCoords.q, clickedCoords.r, clickedCoords.s)
 
-    if (hexExists(clickedId)) eraseHex(clickedId)
+    if (hexExists(clickedId) && $tfield.hexes[clickedId].tile !== null) {
+      replaced_this_placement[clickedId] = $tfield.hexes[clickedId].tile
+      eraseHex(clickedId)
+      tiles_this_placement[clickedId] = null
+    }
   }
 
   export function eraseHex(hexId: HexId) {
@@ -1131,7 +1135,7 @@
   export function pointerup() {
     // Save the terrain placed in an undo state
     if (Object.keys(tiles_this_placement).length > 0) {
-      startUndoState({tiles: replaced_this_placement}, `Placed Tiles - ${Object.keys(tiles_this_placement).length}`)
+      startUndoState({tiles: replaced_this_placement}, `${$data_terrain.usingEraser ? 'Erase' : 'Place'} Tiles - ${Object.keys(tiles_this_placement).length}`)
       completeUndoState({tiles: tiles_this_placement})
     }
 
@@ -1234,7 +1238,7 @@
 
 
     for (const [hex_id, tile] of Object.entries(tiles_to_place)) {
-      paintFromTile(hex_id, tile)
+      paintFromTile(hex_id as HexId, tile)
     }
   }
 
