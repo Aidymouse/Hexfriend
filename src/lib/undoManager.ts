@@ -51,9 +51,9 @@ export const startUndoState = (
   } else {
     store_undo.update((u) => {
       // TODO: cut off newer readings
-      u.undo_stack.splice(u.undo_pointer+1)
-      u.undo_stack.push(new_state)
+      //u.undo_stack.push(new_state)
       u.awaiting_completion = true
+      u.prospective_state = new_state
       return u
     })
   }
@@ -68,11 +68,27 @@ export const completeUndoState = (data: UndoData, label?: string) => {
   // TODO: could use a bit more validation
 
   store_undo.update((u) => {
-    u.undo_stack[u.undo_pointer + 1].after = structuredClone(data)
+    const push_state = u.prospective_state
+    push_state.after = structuredClone(data)
+    u.undo_stack.splice(u.undo_pointer+1)
+    u.undo_stack.push(push_state)
     u.undo_pointer += 1
     u.awaiting_completion = false
+    u.prospective_state = null
     return u
   })
+}
+
+export const cancelProspectiveUndoState = () => {
+  if (get(store_undo).prospective_state) {
+    store_undo.update(u => {
+      u.awaiting_completion = false
+      u.prospective_state = null
+      return u
+    })
+  } else {
+    throw Error(`Calling cancel prospective state but you don't have one!`)
+  }
 }
 
 export const push_undo_state = () => {
@@ -82,6 +98,12 @@ export const push_undo_state = () => {
 export const undo = (layers: LayerComponents, changeTool: (new_tool: Tools) => void) => {
   if (get(store_undo).undo_pointer === -1) {
     return
+  }
+
+  if (get(store_undo).awaiting_completion) { 
+    // TODO: one day, for UX reasons, we might come back here and single out specific actions, like
+    // - undoing when erasing an icon
+    return 
   }
 
   // SPECIAL: Tiles we're re-placing when undoing are actually stored in the set we're coming FROM

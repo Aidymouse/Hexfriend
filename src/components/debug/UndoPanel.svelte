@@ -7,6 +7,7 @@
 
   Len: {$store_undo.undo_stack.length}
   Pointer: {$store_undo.undo_pointer}
+  Prospective: {$store_undo.prospective_state?.label ?? '-'}
 
   <button on:click={(e) => console.log($store_undo)}>Log Undo Stack</button>
 

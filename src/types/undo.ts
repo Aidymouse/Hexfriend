@@ -60,4 +60,6 @@ export type UndoStoreType = {
   suppress: boolean
   /* True if we've opened a new state and haven't completed it yet */
   awaiting_completion: boolean
+  /* When we start an undo state, we put it here */
+  prospective_state: UndoState | null
 }
