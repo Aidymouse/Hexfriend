@@ -58,12 +58,6 @@
 
     // Width and Height flip so we save them as old params
     save_old_resize_parameters()
-
-    push_undo_state(
-      { TerrainField: { hexWidth: $tfield.hexWidth, hexHeight: $tfield.hexHeight, orientation: to } },
-      `Change Orientation - ${$tfield.orientation}`,
-    )
-
     //redrawEntireMap()
   }
 </script>
@@ -72,11 +66,13 @@
   <label for="blankHexColor">{$tl.settings.hexes.blank_color}</label>
   <div style="display: flex; gap: 0.25em; align-items: center;">
     <ColorInputPixi
-      bind:value={$tfield.blankHexColor}
-      on:input={() => {
-        push_undo_state({ TerrainField: { blankHexColor: $tfield.blankHexColor } })
+      value={$tfield.blankHexColor}
+      on:input={(e) => {
+        startUndoState({ TerrainField: { blankHexColor: $tfield.blankHexColor } }, "Change Blank Hex Color", {allow_override: true})
+        $tfield.blankHexColor = e.detail.number
       }}
       on:change={() => {
+        completeUndoState({ TerrainField: { blankHexColor: $tfield.blankHexColor } })
         renderAllHexes()
       }}
       id={'blankHexColor'}
@@ -85,7 +81,9 @@
     <button
       style={'height: fit-content;'}
       on:click={() => {
+        startUndoState({ TerrainField: { blankHexColor: $tfield.blankHexColor } }, "Reset Blank Hex Color")
         $tfield.blankHexColor = 0xf2f2f2
+        completeUndoState({ TerrainField: { blankHexColor: $tfield.blankHexColor } })
       }}>{$tl.settings.hexes.blank_color_reset}</button
     >
   </div>
@@ -99,9 +97,9 @@
       ]}
       value={$tfield.orientation}
       on:change={() => {
-        changeOrientation(
-          $tfield.orientation === HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP,
-        )
+        startUndoState({ TerrainField: { orientation: $tfield.orientation } }, "Change Orientation")
+        changeOrientation($tfield.orientation === HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP)
+        completeUndoState({ TerrainField: { orientation: $tfield.orientation } })
       }}
     />
   </div>
@@ -126,8 +124,10 @@
             filename: `${$tfield.orientation == HexOrientation.FLATTOP ? 'raisedcolumn' : 'indentedrow'}odd`,
           },
         ]}
-        bind:value={$tfield.raised}
-        on:change={() => {
+        value={$tfield.raised}
+        on:change={(e) => {
+
+          $tfield.raised = e.detail.value
           if ($tfield.orientation == HexOrientation.FLATTOP) {
             comp_terrainLayer.square_updateRaisedColumn()
           } else {
