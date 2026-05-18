@@ -899,7 +899,7 @@
       <CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} />
       <LargeHexesLayer bind:cont_largehexes />
       <TextLayer bind:cont_all_text bind:this={comp_textLayer} bind:texts={loadedSave.texts} />
-      <OverlayLayer bind:this={comp_overlayLayer} bind:cont_overlay {app} />
+      <OverlayLayer bind:this={comp_overlayLayer} bind:cont_overlay />
     </section>
 
     <!-- Panels -->
