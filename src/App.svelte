@@ -56,7 +56,7 @@
   // Lib
   import * as texture_loader from './lib/texture_loader'
   import { convert_tileset_to_latest } from './lib/tilesetConverter'
-  import { push_undo_state, reset_undo_stack, undo, redo } from './lib/undoManager'
+  import { push_undo_state, reset_undo_stack, undo, redo, startUndoState, cancelProspectiveUndoState, completeUndoState } from './lib/undoManager'
 
   // Panels
   import IconPanel from './panels/IconPanel.svelte'
@@ -108,6 +108,7 @@
   import Scratchpad from './components/scratchpad/Scratchpad.svelte'
   import { convert_iconset_to_latest } from './lib/iconsetConverter'
 
+  import { store_undo } from './stores'
   /* STATE */
 
   let dataToLoad = {
@@ -277,6 +278,19 @@
     store_selected_tool.update((n) => newTool)
   }
 
+  const startUsingEraser = () => {
+    startUndoState({icons: loadedSave.icons}, "Start using eraser")
+  }
+
+  const stopUsingEraser = () => {
+    // VERY SPECIAL! Steal the prospective action
+    const prospective = structuredClone($store_undo.prospective_state)
+    const tiles = comp_terrainLayer.getPlacements()
+    cancelProspectiveUndoState()
+    startUndoState({icons: prospective.before.icons, tiles: tiles.replaced}, "Use Eraser")
+    completeUndoState({icons: loadedSave.icons, tiles: tiles.tiles})
+  }
+
   /* ALL PURPOSE POINTER METHODS */
   function pointerdown(e: PointerEvent) {
     //console.log(`Down: ${e.button} :: ${e.buttons}`)
@@ -305,6 +319,7 @@
           break
 
         case Tools.ERASER:
+	  startUsingEraser()
           if ($data_eraser.eraseTerrain) {
             comp_terrainLayer.eraseAtMouse()
           }
@@ -337,6 +352,11 @@
       case Tools.OVERLAY:
         comp_overlayLayer.pointerup()
         break
+
+      case Tools.ERASER: {
+	stopUsingEraser()
+	break
+      }
     }
   }
 
