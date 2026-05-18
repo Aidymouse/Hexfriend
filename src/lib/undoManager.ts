@@ -1,4 +1,4 @@
-import { Tools, type LayerComponents, type UndoData, type UndoState } from '../types'
+import { Tools, type LayerComponents, type PanelComponents, type UndoData, type UndoState } from '../types'
 import { data_path, DefaultUndoStore } from '../stores'
 import { get } from 'svelte/store'
 
@@ -106,7 +106,8 @@ export const push_undo_state = () => {
   console.warn("YOU CAN'T CALL ME ANYMORE")
 }
 
-export const undo = (layers: LayerComponents, changeTool: (new_tool: Tools) => void) => {
+// TODO: make panels that have changes on them wiggle in the toolbar or something, so the user knows if they undid a panel action
+export const undo = (layers: LayerComponents, panels: PanelComponents) => {
   if (get(store_undo).undo_pointer === -1) {
     return
   }
@@ -127,12 +128,12 @@ export const undo = (layers: LayerComponents, changeTool: (new_tool: Tools) => v
 
   store_undo.update((o) => ({ ...o, suppress: true }))
 
-  apply_state_data(stateToReturnTo.before, layers)
+  apply_state_data(stateToReturnTo.before, layers, panels)
 
   store_undo.update((o) => ({ ...o, suppress: false, undo_pointer: o.undo_pointer - 1 }))
 }
 
-export const redo = (layers: LayerComponents, changeTool: (new_tool: Tools) => void) => {
+export const redo = (layers: LayerComponents, panels: PanelComponents) => {
   if (get(store_undo).undo_pointer === get(store_undo).undo_stack.length - 1) {
     return
   }
@@ -147,11 +148,11 @@ export const redo = (layers: LayerComponents, changeTool: (new_tool: Tools) => v
   const state_to_move_to = structuredClone(get(store_undo).undo_stack[get(store_undo).undo_pointer + 1])
 
   store_undo.update((o) => ({ ...o, suppress: true }))
-  apply_state_data(state_to_move_to.after, layers)
+  apply_state_data(state_to_move_to.after, layers, panels)
   store_undo.update((o) => ({ ...o, suppress: false, undo_pointer: o.undo_pointer + 1 }))
 }
 
-export const apply_state_data = (applied_data: UndoData, layers: LayerComponents) => {
+export const apply_state_data = (applied_data: UndoData, layers: LayerComponents, panels: PanelComponents) => {
   if (applied_data.TerrainField) {
     layers.terrainLayer.applyTerrainField(applied_data.TerrainField)
   }
@@ -180,6 +181,9 @@ export const apply_state_data = (applied_data: UndoData, layers: LayerComponents
     layers.pathLayer.applyPaths(applied_data.paths)
   }
 
+  if (applied_data.text_styles) {
+    panels.text_panel.applyTextStyles(applied_data.text_styles)
+  }
 
   if (applied_data.selected_tool) {
     store_selected_tool.update(t => applied_data.selected_tool)

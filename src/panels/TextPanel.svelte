@@ -11,6 +11,7 @@
   import { tl } from "../stores/translation";
   import ColorInputPixi from "../components/ColorInputPixi.svelte"
   import { textStylesMatch } from "../helpers"
+  import { cancelProspectiveUndoState, completeUndoState, startUndoState } from "../lib"
 
   let annoyance_counter = 0;
   let style_name_retry = [
@@ -92,8 +93,15 @@
 		  }
 		}
 
+		if ($data_text.selectedText) {
+		  //cancelProspectiveUndoState()
+		  comp_textLayer.deselectText()
+		}
+
 		styleId += 1;
 		const new_text_style = structuredClone($data_text.style)
+
+		startUndoState({text_styles: loaded_text_styles}, `Create text style ${name}`)
 
 		loaded_text_styles = [
 		  ...loaded_text_styles,
@@ -103,6 +111,15 @@
 		    id: styleId,
 		  },
 		];
+
+		completeUndoState({text_styles: loaded_text_styles})
+		/*
+		// This method has trouble with if you edit text, then mess with path styles in the middle
+		if ($data_text.selectedText) {
+		  comp_textLayer.selectText($data_text.selectedText)
+		  //comp_textLayer.deselectText()
+		}
+		*/
 		$store_has_unsaved_changes = true;
 	}
 
@@ -112,14 +129,20 @@
 	function updateListedStyleToMatch() {
 		if ($data_text.contextStyleId == null) return;
 
+
 		let styleToUpdate = loaded_text_styles.find(
 			(ts) => ts.id == $data_text.contextStyleId,
 		);
+		if ($data_text.selectedText) {
+		  comp_textLayer.deselectText()
+		}
+		startUndoState({text_styles: loaded_text_styles}, `Updated text style ${styleToUpdate.display} to match`)
 		styleToUpdate.style = { ...$data_text.style };
 
 		loaded_text_styles = loaded_text_styles;
 		$data_text.contextStyleId = null;
 		$store_has_unsaved_changes = true;
+		completeUndoState({text_styles: loaded_text_styles})
 	}
 
 	function renameStyle() {
@@ -131,15 +154,23 @@
 	  let styleName = prompt($tl.text_panel.rename_text_style_prompt);
 	  if (!styleName) return;
 
+	  if ($data_text.selectedText) { comp_textLayer.deselectText() }
+	  startUndoState({text_styles: loaded_text_styles}, `Rename text style ${styleToEdit.display} to ${styleName}`)
+
 	  styleToEdit.display = styleName;
 	  loaded_text_styles = loaded_text_styles;
 	  $store_has_unsaved_changes = true;
+	  completeUndoState({text_styles: loaded_text_styles})
 	}
 
 	function duplicateStyle() {
 	  if ($data_text.contextStyleId == null) return;
 
 	  let styleToDupe = loaded_text_styles.find((ts) => ts.id == $data_text.contextStyleId);
+
+	  if ($data_text.selectedText) { comp_textLayer.deselectText() }
+	  startUndoState({text_styles: loaded_text_styles}, `Delete text style ${styleToDupe.display}`)
+
 	  styleId += 1;
 	  loaded_text_styles = [
 	      ...loaded_text_styles,
@@ -152,14 +183,26 @@
 
 	  $data_text.contextStyleId = null;
 	  $store_has_unsaved_changes = true;
+
+	  completeUndoState({text_styles: loaded_text_styles})
 	}
 
 	function deleteStyle() {
-	  if (!confirm($tl.text_panel.delete_text_style_prompt)) return;
+	  if (!confirm($tl.text_panel.delete_text_style_prompt)) { return }
+
+	  if ($data_text.selectedText) { comp_textLayer.deselectText() }
+	  startUndoState({text_styles: loaded_text_styles}, `Delete text style ${$data_text.contextStyleId}`)
 
 	  loaded_text_styles = loaded_text_styles.filter( (ts) => ts.id != $data_text.contextStyleId);
 	  $data_text.contextStyleId = null;
 	  $store_has_unsaved_changes = true;
+
+	  completeUndoState({text_styles: loaded_text_styles})
+	}
+
+	export function applyTextStyles(styles: ListedTextStyle[]) {
+	  $data_text.contextStyleId = null;
+	  loaded_text_styles = styles
 	}
 </script>
 

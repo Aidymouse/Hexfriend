@@ -122,31 +122,34 @@
   export function pointerdown() {
     $data_text.contextStyleId = null
 
-    if ($data_text.selectedText && hoveredText) {
+    if ($data_text.selectedText && hoveredText?.id === $data_text.selectedText.id) {
       startDraggingHovered()
       setTimeout(() => {
         $data_text.editorRef.focus()
       }, 10) /* I wish I didn't have to do this, and I'm sure it's terrible, but it doesnt work without it :/ */
+    } else if (hoveredText) {
+      if ($data_text.selectedText) {
+	deselectText()
+      }
+      selectText(hoveredText)
+      startDraggingHovered()
     } else if ($data_text.selectedText) {
       deselectText()
-    } else if (hoveredText) {
-      selectText()
-    } else {
+    }
+
+    else {
       newText()
     }
   }
 
-  function selectText() {
-    $data_text.style = { ...hoveredText.style }
-    $data_text.selectedText = hoveredText
+  export function selectText(text: TextLayerText) {
+    $data_text.style = { ...text.style }
+    $data_text.selectedText = text
 
     startUndoState({texts}, `Change Text ${$data_text.selectedText.id}`)
 
-    startDraggingHovered()
+    text_prior_to_changes = structuredClone(text)
 
-    text_prior_to_changes = structuredClone(hoveredText)
-
-    //trsfm_text.group[0] = (pixi_texts[$data_text.selectedText.id])
   }
 
   function startDraggingHovered() {
@@ -157,14 +160,20 @@
 
   
 
-  function deselectText() {
+  export function deselectText() {
     if (!$data_text.selectedText) return
 
     if ($data_text.selectedText.text == '') { 
+      cancelProspectiveUndoState()
       if (just_created_id !== null) {
-	cancelProspectiveUndoState()
+	deleteText($data_text.selectedText)
+      } else {
+	// Bit of ballet here keeping all the states together
+	const indexOfDeleted = texts.findIndex(t => t.id === $data_text.selectedText.id) 
+	startUndoState({texts: texts.toSpliced(indexOfDeleted, 1, structuredClone(text_prior_to_changes))}, `Delete text ${$data_text.selectedText.id} via empty textbox`)
+	deleteText($data_text.selectedText)
+	completeUndoState({texts})
       }
-      deleteText($data_text.selectedText)
       return // okay to return as delete will also deselect
     }
 

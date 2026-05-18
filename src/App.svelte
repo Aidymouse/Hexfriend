@@ -149,6 +149,7 @@
   let comp_shortcutList: ShortcutList
 
   let comp_terrain_panel: TerrainPanel
+  let comp_text_panel: TextPanel
 
   /* MASTER PIXI CONTAINERS */
   let cont_icon = new PIXI.Container()
@@ -413,7 +414,7 @@
 	      iconLayer: comp_iconLayer,
 	      textLayer: comp_textLayer,
 	      pathLayer: comp_pathLayer
-	    }, changeTool)
+	    }, {text_panel: comp_text_panel})
             break
 
           case 'redo':
@@ -422,7 +423,7 @@
 	      iconLayer: comp_iconLayer,
 	      textLayer: comp_textLayer,
 	      pathLayer: comp_pathLayer
-	    }, changeTool)
+	    }, {text_panel: comp_text_panel})
             break
 
           case 'toggleViewMaps':
@@ -893,7 +894,7 @@
     {:else if $store_selected_tool == Tools.PATH}
       <PathPanel {comp_pathLayer} bind:loaded_path_styles={loadedSave.path_styles} />
     {:else if $store_selected_tool == Tools.TEXT}
-      <TextPanel {comp_textLayer} bind:loaded_text_styles={loadedSave.text_styles} />
+      <TextPanel bind:this={comp_text_panel} {comp_textLayer} bind:loaded_text_styles={loadedSave.text_styles} />
     {:else if $store_selected_tool == Tools.ERASER}
       <EraserPanel bind:loaded_save={loadedSave} />
     {:else if $store_selected_tool == Tools.OVERLAY}

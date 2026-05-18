@@ -2,6 +2,7 @@ import TerrainLayer from '../layers/TerrainLayer.svelte'
 import IconLayer from '../layers/IconLayer.svelte'
 import TextLayer from '../layers/TextLayer.svelte'
 import PathLayer from '../layers/PathLayer.svelte'
+import TextPanel from '../panels/TextPanel.svelte'
 import type { SaveData } from './savedata'
 import type { Tile } from './tilesets'
 import type { HexId, Tools } from './toolData'
@@ -12,6 +13,10 @@ export type LayerComponents = {
   iconLayer: IconLayer
   textLayer: TextLayer
   pathLayer: PathLayer
+}
+
+export type PanelComponents = {
+  text_panel: TextPanel
 }
 
 // Too fancy with it
