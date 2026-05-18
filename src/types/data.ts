@@ -38,7 +38,6 @@ export interface coordinates_data {
 export type text_data = {
   style: TextStyle
   selectedText?: TextLayerText
-  alpha: number
   editorRef: any
   usingTextTool: boolean
   contextStyleId?: number

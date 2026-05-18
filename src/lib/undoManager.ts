@@ -91,6 +91,17 @@ export const cancelProspectiveUndoState = () => {
   }
 }
 
+// export const removeLatestState = (passphrase: string) => {
+//   if ([].includes(passphrase))  { 
+//     // store_undo.update(u => {
+//     //   u.undo_pointer -= 1
+//     //   u.undo_stack.pop()
+//     // })
+//   } else {
+//   	throw new Error(`Non specifcially allowed removal of last undo state`)
+//   }
+// }
+
 export const push_undo_state = () => {
   console.warn("YOU CAN'T CALL ME ANYMORE")
 }
@@ -103,6 +114,7 @@ export const undo = (layers: LayerComponents, changeTool: (new_tool: Tools) => v
   if (get(store_undo).awaiting_completion) { 
     // TODO: one day, for UX reasons, we might come back here and single out specific actions, like
     // - undoing when erasing an icon
+    // - undoing while text is selected
     return 
   }
 
@@ -124,6 +136,14 @@ export const redo = (layers: LayerComponents, changeTool: (new_tool: Tools) => v
   if (get(store_undo).undo_pointer === get(store_undo).undo_stack.length - 1) {
     return
   }
+
+  if (get(store_undo).awaiting_completion) { 
+    // TODO: one day, for UX reasons, we might come back here and single out specific actions, like
+    // - undoing when erasing an icon
+    // - undoing while text is selected
+    return 
+  }
+
   const state_to_move_to = structuredClone(get(store_undo).undo_stack[get(store_undo).undo_pointer + 1])
 
   store_undo.update((o) => ({ ...o, suppress: true }))

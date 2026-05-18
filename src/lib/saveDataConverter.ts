@@ -2,6 +2,7 @@ import { LATESTSAVEDATAVERSION } from '../types/savedata'
 import type { SaveData } from '../types/savedata'
 import { HexRaised } from '../types/terrain'
 import { ScaleMode } from '../helpers/imageSizing'
+import * as PIXI from 'pixi.js'
 
 /** I better make sure I like these names because they can NEVER CHANGE! Or old save versions will need to know what they used to be */
 function convert_v1_to_v5(oldData: SaveData): SaveData {
@@ -227,6 +228,31 @@ const convert_v13_to_v14 = (oldData: SaveData): SaveData => {
   oldData.TerrainField.gap = oldData.TerrainField.grid.gap
   // @ts-ignore
   delete oldData.TerrainField.grid.gap
+
+  // Text 'alpha' got moved into style
+  oldData.texts.forEach(t => {
+    // @ts-ignore
+    t.style.alpha = t.alpha ?? 1
+    // @ts-ignore
+    delete t.alpha
+    if (typeof t.style.fill === 'string') {
+      t.style.fill = PIXI.utils.string2hex(t.style.fill)
+    }
+    if (typeof t.style.stroke === 'string') {
+      t.style.stroke = PIXI.utils.string2hex(t.style.stroke)
+    }
+  })
+
+  // Above text changes require update to text styles as well
+  oldData.text_styles.forEach(ts => {
+    if (typeof ts.style.fill === 'string') {
+      ts.style.fill = PIXI.utils.string2hex(t.style.fill)
+    }
+    if (typeof ts.style.stroke === 'string') {
+      ts.style.stroke = PIXI.utils.string2hex(t.style.stroke)
+    }
+    ts.style.alpha = ts.style.alpha ?? 1
+  })
 
   oldData.saveVersion = 14
 

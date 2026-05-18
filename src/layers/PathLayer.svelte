@@ -308,12 +308,14 @@
 
       case 'deletePath':
         if ($data_path.selectedPath) {
+	  startUndoState({paths}, `Delete Path ${$data_path.selectedPath.id}`)
           deletePath($data_path.selectedPath)
+	  completeUndoState({paths})
         }
         break
 
       case 'deselect':
-        $data_path.selectedPath = null
+	deselectPath()
         break
     }
   }

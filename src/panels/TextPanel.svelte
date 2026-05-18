@@ -1,13 +1,44 @@
 <script lang="ts">
-	import ColorInput from "../components/ColorInput.svelte";
-	import CustomValueToggle from "../components/CustomValueToggle.svelte";
-	import SelectGrid from "../components/SelectGrid.svelte";
-	import type TextLayer from "../layers/TextLayer.svelte";
-	import { data_text } from "../stores/data";
-	import type { listed_text_style, text_style } from "../types/text";
-	import { store_has_unsaved_changes } from "../stores/flags";
+  import ColorInput from "../components/ColorInput.svelte";
+  import CustomValueToggle from "../components/CustomValueToggle.svelte";
+  import SelectGrid from "../components/SelectGrid.svelte";
 
-	import { tl } from "../stores/translation";
+  import type TextLayer from "../layers/TextLayer.svelte";
+  import type { ListedTextStyle, TextStyle } from "../types/text";
+
+  import { data_text } from "../stores/data";
+  import { store_has_unsaved_changes } from "../stores/flags";
+  import { tl } from "../stores/translation";
+  import ColorInputPixi from "../components/ColorInputPixi.svelte"
+  import { textStylesMatch } from "../helpers"
+
+  let annoyance_counter = 0;
+  let style_name_retry = [
+    {from: 0, to: 4, string: "No, really, it needs a name."},
+    {from: 5, to: 9, string: "Are you intentionally trying my patience?"},
+    {from: 10, to: 10, string: "How about 'Continent'?"},
+    {from: 11, to: 11, string: "Or 'Title'"},
+    {from: 12, to: 12, string: "Or 'Barony'! No... wait... that one's taken."},
+    {from: 13, to: 13, string: "Fine, I'm leaving while you think of a name."},
+    {from: 14, to: 20, string: ""},
+    {from: 21, to: 21, string: "Still here?"},
+    {from: 22, to: 22, string: "I can't really help you, I can't see your map!"},
+    {from: 23, to: 23, string: "Probably because this dialog is open."},
+    {from: 24, to: 24, string: "Can you please just pick a name?"},
+    {from: 25, to: 25, string: "You've tried to enter blank name 25 times now."},
+    {from: 26, to: 28, string: "..."},
+    {from: 29, to: 29, string: "Welp."},
+    {from: 30, to: 35, string: "..."},
+    {from: 36, to: 36, string: "*Ahem*"},
+    {from: 37, to: 45, string: "..."},
+    {from: 46, to: 46, string: "Okay well..."},
+    {from: 47, to: 47, string: "I'm gonna go..."},
+    {from: 48, to: 48, string: "See ya."},
+    {from: 49, to: 75, string: ""},
+    {from: 76, to: 76, string: "Did you know you can pet me in the settings menu?"},
+    {from: 77, to: 77, string: "Okay I'm really going now. Bye. Do come up with a name, if you can."},
+    {from: 78, to: 78, string: "I love you."},
+  ];
 
 	export let comp_textLayer: TextLayer;
 
@@ -31,23 +62,19 @@
 		"Merriweather",
 	];
 
-	export let loaded_text_styles: listed_text_style[];
+	export let loaded_text_styles: ListedTextStyle[];
 	let styleId = 0;
 	loaded_text_styles.forEach((ts) => { styleId = Math.max(ts.id, styleId) });
 
-	function selectedMatches(style: text_style): boolean {
-		return ( JSON.stringify(style) == JSON.stringify($data_text.style));
+	function selectedMatches(style: TextStyle): boolean {
+	      return textStylesMatch(style, $data_text.style)
 	}
 
-	$: {
-		//$data_text.selectedText =
-		//$data_text.selectedText; /* If this line isn't here the textstyles dont update and the selected button gets stuck. Svelte weirdness?  */
-		loaded_text_styles = loaded_text_styles;
-	}
-
-	function changeTextStyle(style: text_style) {
-		$data_text.style = { ...style };
-		//$data_text = $data_text
+	function changeTextStyle(style: Partial<TextStyle>) {
+		if ($data_text.selectedText) {
+		  comp_textLayer.panelControl_applyTextStyle($data_text.selectedText, {...$data_text.style, ...style})
+		}
+		$data_text.style = { ...$data_text.style, ...style };
 		loaded_text_styles = loaded_text_styles; /* Updates the selected button */
 		$store_has_unsaved_changes = true;
 	}
@@ -55,16 +82,26 @@
 	function newTextStyle() {
 		let name = prompt($tl.text_panel.rename_text_style_prompt);
 		if (name == null) return;
+		while (name === "") {
+		  let retry_string = style_name_retry.find(r => r.from <= annoyance_counter && annoyance_counter <= r.to)?.string ?? ""
+		  let name = prompt(retry_string)
+		  annoyance_counter += 1;
+		  if (name === null) {
+		    annoyance_counter = 0
+		    return
+		  }
+		}
 
 		styleId += 1;
+		const new_text_style = structuredClone($data_text.style)
+
 		loaded_text_styles = [
-			...loaded_text_styles,
-			{
-				display: name,
-                alpha: $data_text.alpha,
-				style: { ...$data_text.style },
-				id: styleId,
-			},
+		  ...loaded_text_styles,
+		  {
+		    display: name,
+		    style: new_text_style,
+		    id: styleId,
+		  },
 		];
 		$store_has_unsaved_changes = true;
 	}
@@ -72,7 +109,7 @@
 	let menuX = 0;
 	let menuY = 0;
 
-	function updateStyle() {
+	function updateListedStyleToMatch() {
 		if ($data_text.contextStyleId == null) return;
 
 		let styleToUpdate = loaded_text_styles.find(
@@ -86,213 +123,145 @@
 	}
 
 	function renameStyle() {
-		if ($data_text.contextStyleId == null) return;
+	  if ($data_text.contextStyleId == null) return;
 
-		let styleToEdit: listed_text_style = loaded_text_styles.find(
-			(ps) => ps.id == $data_text.contextStyleId,
-		);
-		$data_text.contextStyleId = null;
+	  let styleToEdit: ListedTextStyle = loaded_text_styles.find((ps) => ps.id == $data_text.contextStyleId);
+	  $data_text.contextStyleId = null;
 
-		let styleName = prompt($tl.text_panel.rename_text_style_prompt);
-		if (!styleName) return;
+	  let styleName = prompt($tl.text_panel.rename_text_style_prompt);
+	  if (!styleName) return;
 
-		styleToEdit.display = styleName;
-		loaded_text_styles = loaded_text_styles;
-		$store_has_unsaved_changes = true;
+	  styleToEdit.display = styleName;
+	  loaded_text_styles = loaded_text_styles;
+	  $store_has_unsaved_changes = true;
 	}
 
 	function duplicateStyle() {
-		if ($data_text.contextStyleId == null) return;
+	  if ($data_text.contextStyleId == null) return;
 
-		let styleToDupe = loaded_text_styles.find(
-			(ts) => ts.id == $data_text.contextStyleId,
-		);
-		styleId += 1;
-		loaded_text_styles = [
-			...loaded_text_styles,
-			{
-				display: styleToDupe.display,
-                alpha: styleToDupe.alpha,
-				style: { ...styleToDupe.style },
-				id: styleId,
-			},
-		];
+	  let styleToDupe = loaded_text_styles.find((ts) => ts.id == $data_text.contextStyleId);
+	  styleId += 1;
+	  loaded_text_styles = [
+	      ...loaded_text_styles,
+	    {
+	      display: styleToDupe.display,
+	      style: { ...styleToDupe.style },
+	      id: styleId,
+	    },
+	  ];
 
-		$data_text.contextStyleId = null;
-		$store_has_unsaved_changes = true;
+	  $data_text.contextStyleId = null;
+	  $store_has_unsaved_changes = true;
 	}
 
 	function deleteStyle() {
-		if ( !confirm($tl.text_panel.delete_text_style_prompt)) return;
+	  if (!confirm($tl.text_panel.delete_text_style_prompt)) return;
 
-		loaded_text_styles = loaded_text_styles.filter( (ts) => ts.id != $data_text.contextStyleId);
-		$data_text.contextStyleId = null;
-		$store_has_unsaved_changes = true;
+	  loaded_text_styles = loaded_text_styles.filter( (ts) => ts.id != $data_text.contextStyleId);
+	  $data_text.contextStyleId = null;
+	  $store_has_unsaved_changes = true;
 	}
 </script>
 
 <div
-	class="panel"
-	on:pointerdown={() => {
-		if ($data_text.contextStyleId) $data_text.contextStyleId = null;
-	}}
+  class="panel"
+  on:pointerdown={() => { if ($data_text.contextStyleId) $data_text.contextStyleId = null; }}
 >
 	<div id="controls">
 		<section>
-			<ColorInput
-				bind:value={$data_text.style.fill}
-				name="textFill"
-			/>
+			<ColorInputPixi value={$data_text.style.fill} name="textFill" on:change={e => { changeTextStyle({fill: e.detail.string}) }} />
 
-			<input
-				id="fontSize"
-				type="number"
-				bind:value={$data_text.style.fontSize}
-			/>
+			<input id="fontSize" type="number" value={$data_text.style.fontSize} on:change={e => { changeTextStyle({fontSize: e.target.valueAsNumber}) }} />
 
 			<div id="font-style-options">
 				<div class="font-style-option">
-					<CustomValueToggle
-						offValue={"normal"}
-						onValue={"bold"}
-						bind:value={$data_text.style
-							.fontWeight}
-						><b>B</b></CustomValueToggle
-					>
+				      <CustomValueToggle offValue={"normal"} onValue={"bold"} value={$data_text.style.fontWeight} on:change={e => changeTextStyle({fontWeight: e.detail.value})}>
+					<b>B</b>
+				      </CustomValueToggle>
 				</div>
 
 				<div class="font-style-option">
-					<CustomValueToggle
-						offValue={"normal"}
-						onValue={"italic"}
-						bind:value={$data_text.style
-							.fontStyle}
-						><i
-							style="font-family: 'Roboto Mono'"
-							>I</i
-						></CustomValueToggle
-					>
+					<CustomValueToggle offValue={"normal"} onValue={"italic"} value={$data_text.style.fontStyle} on:change={e => changeTextStyle({fontStyle: e.detail.value})}>
+					  <i style="font-family: 'Roboto Mono'">I</i>
+					</CustomValueToggle>
 				</div>
 			</div>
 
 			<SelectGrid
 				options={[
-					{
-						title: $tl.text_panel
-							.align_left,
-						value: "left",
-						filename: "textalignleft",
-					},
-					{
-						title: $tl.text_panel
-							.align_center,
-						value: "center",
-						filename: "textaligncenter",
-					},
-					{
-						title: $tl.text_panel
-							.align_right,
-						value: "right",
-						filename: "textalignright",
-					},
+					{ title: $tl.text_panel.align_left, value: "left", filename: "textalignleft" },
+					{ title: $tl.text_panel.align_center, value: "center", filename: "textaligncenter" },
+					{ title: $tl.text_panel.align_right, value: "right", filename: "textalignright" },
 				]}
-				bind:value={$data_text.style.align}
+				value={$data_text.style.align}
+				on:change={e => changeTextStyle({align: e.detail.value})}
 			/>
 		</section>
 
 		<section>
-			<select
-				id="textFont"
-				bind:value={$data_text.style.fontFamily}
-			>
-				{#each fonts as font}
-					<option value={font}>{font}</option>
-				{/each}
-			</select>
+		  <select id="textFont" value={$data_text.style.fontFamily} on:change={e => changeTextStyle({fontFamily: e.target.value})}>
+		    {#each fonts as font}
+		      <option value={font}>{font}</option>
+		    {/each}
+		  </select>
 		</section>
 
 		<section>
 			<label for="textStroke">{$tl.text_panel.outline}</label>
-			<ColorInput
-				bind:value={$data_text.style.stroke}
-				name="textStroke"
-			/>
-			<input
-				type="number"
-				min="0"
-				step="1"
-				bind:value={$data_text.style.strokeThickness}
-			/>
+			<ColorInputPixi value={$data_text.style.stroke} on:change={e => changeTextStyle({stroke: e.detail.number})} id="textStroke" />
+			<input type="number" min="0" step="1" bind:value={$data_text.style.strokeThickness} />
 		</section>
 
 		<section>
 			<label for="text-alpha">{$tl.text_panel.opacity}</label>
-			<input
-                id="text-alpha"
-				type="range"
-				max="1"
-				min="0.05"
-				step="0.05"
-				bind:value={$data_text.alpha}
-			/>
+			<input id="text-alpha" type="range" max="1" min="0.05" step="0.05" value={$data_text.style.alpha} on:input={e => changeTextStyle({alpha: e.target.valueAsNumber})} />
 		</section>
 	</div>
 
-	{#if $data_text.selectedText}
-		<div id="selected-text-controls">
-			<div id="text-area-wrapper">
-				<textarea
-					bind:value={$data_text.selectedText .text}
-					use:focus
-					bind:this={$data_text.editorRef}
-					on:change={() => { $store_has_unsaved_changes = true; }}
-				/>
-				<!-- The editor ref is literally jsut used to let us focus the text area by clicking on the text. -->
-				<button
-					on:click={() => { comp_textLayer.deleteText( $data_text.selectedText,) }}
-					class="evil" >
-                    {$tl.text_panel.delete_text}
-				</button>
-			</div>
-		</div>
-	{/if}
+  {#if $data_text.selectedText}
+    <div id="selected-text-controls">
+      <div id="text-area-wrapper">
+	<textarea
+	  bind:value={$data_text.selectedText .text}
+	  use:focus
+	  bind:this={$data_text.editorRef}
+	  on:change={() => { $store_has_unsaved_changes = true; }}
+	/>
+	<!-- The editor ref is literally jsut used to let us focus the text area by clicking on the text. -->
+	<button on:click={() => { comp_textLayer.panelControl_deleteText( $data_text.selectedText) }} class="evil" >
+	  {$tl.text_panel.delete_text}
+	</button>
+      </div>
+    </div>
+  {/if}
 
-	<!-- TEXT STYLES -->
-	<div id="text-styles" style={$data_text.selectedText ? "padding-top: 0" : ""} >
-		<div style="display: flex; gap: 0.3125em; flex-wrap: wrap">
-			{#each loaded_text_styles as ts (ts.id)}
-				<button
-					on:click={() => {
-						changeTextStyle(ts.style);
-					}}
-					on:contextmenu={(e) => {
-						e.preventDefault();
-						menuX = e.clientX;
-						menuY = e.clientY;
-						$data_text.contextStyleId =
-							ts.id;
-					}}
-					class:selected={selectedMatches( ts.style)}>{ts.display}</button
-				>
-			{/each}
-			<button
-				class="green-button"
-				style="width: 1.75em;"
-				on:click={() => {
-					newTextStyle();
-				}}
-				title={$tl.text_panel.save_current_style}
-			>
-				+
-			</button>
-		</div>
-	</div>
+  <!-- TEXT STYLES -->
+  <div id="text-styles" style={$data_text.selectedText ? "padding-top: 0" : ""} >
+    <div style="display: flex; gap: 0.3125em; flex-wrap: wrap">
+      {#each loaded_text_styles as ts (ts.id)}
+	<button
+	  on:click={() => { changeTextStyle(ts.style); }}
+	  on:contextmenu={(e) => {
+	    e.preventDefault();
+	    menuX = e.clientX;
+	    menuY = e.clientY;
+	    $data_text.contextStyleId = ts.id;
+	  }}
+	  class:selected={selectedMatches( ts.style)}
+	>
+	  {ts.display}
+	</button >
+      {/each}
+
+      <button class="green-button" style="width: 1.75em;" on:click={() => { newTextStyle(); }} title={$tl.text_panel.save_current_style} > + </button>
+    </div>
+  </div>
 </div>
 
 {#if $data_text.contextStyleId != null}
 	<div class={"context-menu"} style={`top: ${menuY}px; left: ${menuX}px`}>
 		<button
-			on:click={updateStyle}
+			on:click={updateListedStyleToMatch}
 			title={$tl.text_panel.update_style_title}
 			>{$tl.text_panel.update_style}</button
 		>

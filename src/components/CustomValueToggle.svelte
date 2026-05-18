@@ -1,17 +1,25 @@
 <script lang="ts">
-	export let offValue: any;
-	export let onValue: any;
+  import { createEventDispatcher } from 'svelte'
 
-	export let value: any = offValue;
+  export let offValue: any;
+  export let onValue: any;
+
+  export let value: any = offValue;
+
+  let dispatch = createEventDispatcher()
+
+  const change = (e) => {
+    value = value === offValue ? onValue : offValue
+    dispatch('change', { value })
+  }
+
 </script>
 
 <div
 	class="customValueToggle"
 	class:on={value == onValue}
 	class:error={value != onValue && value != offValue}
-	on:click={() => {
-		value = value == offValue ? onValue : offValue;
-	}}
+	on:click={change}
 >
 	<slot />
 </div>
