@@ -63,9 +63,8 @@ export interface eraser_data {
   eraseIcons: boolean
 }
 
-export interface overlay_data {
+export type OverlayData = {
   shown: boolean
-  base64: string
   x: number
   y: number
   scale: { x: number; y: number }

@@ -1,4 +1,4 @@
-import type { coordinates_data, overlay_data } from './data'
+import type { coordinates_data, OverlayData } from './data'
 import type { IconLayerIcon, Iconset } from './icon'
 import type { ListedPathStyle, PathLayerPath, PathStyle } from './path'
 import type { TerrainField } from './terrain'
@@ -20,7 +20,8 @@ export type SaveData = {
 
   icon_hex_size_percentage: number // wtf is this ????
 
-  overlay: overlay_data
+  overlay: OverlayData
+  overlay_base64: string | null
 
   paths: PathLayerPath[]
   texts: TextLayerText[]

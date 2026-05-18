@@ -230,7 +230,7 @@ const convert_v13_to_v14 = (oldData: SaveData): SaveData => {
   delete oldData.TerrainField.grid.gap
 
   // Text 'alpha' got moved into style
-  oldData.texts.forEach(t => {
+  oldData.texts.forEach((t) => {
     // @ts-ignore
     t.style.alpha = t.alpha ?? 1
     // @ts-ignore
@@ -244,7 +244,7 @@ const convert_v13_to_v14 = (oldData: SaveData): SaveData => {
   })
 
   // Above text changes require update to text styles as well
-  oldData.text_styles.forEach(ts => {
+  oldData.text_styles.forEach((ts) => {
     if (typeof ts.style.fill === 'string') {
       ts.style.fill = PIXI.utils.string2hex(t.style.fill)
     }
@@ -253,6 +253,10 @@ const convert_v13_to_v14 = (oldData: SaveData): SaveData => {
     }
     ts.style.alpha = ts.style.alpha ?? 1
   })
+
+  // Overlay moved base64 out of data
+  // @ts-ignore
+  oldData.overlay_base64 = oldData.overlay.base64 === '' ? null : oldData.overlay.base64
 
   oldData.saveVersion = 14
 
