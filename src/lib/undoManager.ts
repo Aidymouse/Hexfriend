@@ -1,5 +1,5 @@
 import { Tools, type LayerComponents, type PanelComponents, type UndoData, type UndoState } from '../types'
-import { data_path, DefaultUndoStore } from '../stores'
+import { data_path, data_overlay, DefaultUndoStore } from '../stores'
 import { get } from 'svelte/store'
 
 import { store_undo, store_selected_tool } from '../stores'
@@ -19,13 +19,13 @@ export const reset_undo_stack = () => {
 
 // the 'before' state of whatever action. applied when undoing this state. You typically record this before you perform the operation on state
 /*
- * @param allow_override - If true, new states that get pushed will override the one waiting to be finished. This is useful in some circumstances but error prone, so be default we throw an error if this is attempted. 
+ * @param allow_override - If true, new states that get pushed will override the one waiting to be finished. This is useful in some circumstances but error prone, so be default we throw an error if this is attempted.
  * @param bounce - If true, new states that try to get pushed while one is awaiting completion will harmlessly be ignored, rather than throwing an error. Changing hex color is an example of when we'd want to do this, see {@link HexesSettings.svelte}
  */
 export const startUndoState = (
   data: UndoData,
   label: string = 'Undo',
-  options: { allow_override?: boolean, bounce?: boolean } = { allow_override: false, bounce: false },
+  options: { allow_override?: boolean; bounce?: boolean } = { allow_override: false, bounce: false },
 ) => {
   if (get(store_undo).suppress) {
     return
@@ -34,20 +34,16 @@ export const startUndoState = (
   const new_state: UndoState = { label, before: structuredClone(data), after: {} }
 
   if (get(store_undo).awaiting_completion) {
-
     if (options.bounce) {
       return
-
     } else if (options.allow_override) {
       store_undo.update((u) => {
-	u.undo_stack[u.undo_stack.length - 1] = new_state
-	return u
+        u.undo_stack[u.undo_stack.length - 1] = new_state
+        return u
       })
-
     } else {
       throw Error(`Trying to push undo state when we haven't completed the last one`)
     }
-
   } else {
     store_undo.update((u) => {
       // TODO: cut off newer readings
@@ -70,7 +66,7 @@ export const completeUndoState = (data: UndoData, label?: string) => {
   store_undo.update((u) => {
     const push_state = u.prospective_state
     push_state.after = structuredClone(data)
-    u.undo_stack.splice(u.undo_pointer+1)
+    u.undo_stack.splice(u.undo_pointer + 1)
     u.undo_stack.push(push_state)
     u.undo_pointer += 1
     u.awaiting_completion = false
@@ -81,7 +77,7 @@ export const completeUndoState = (data: UndoData, label?: string) => {
 
 export const cancelProspectiveUndoState = () => {
   if (get(store_undo).prospective_state) {
-    store_undo.update(u => {
+    store_undo.update((u) => {
       u.awaiting_completion = false
       u.prospective_state = null
       return u
@@ -92,7 +88,7 @@ export const cancelProspectiveUndoState = () => {
 }
 
 // export const removeLatestState = (passphrase: string) => {
-//   if ([].includes(passphrase))  { 
+//   if ([].includes(passphrase))  {
 //     // store_undo.update(u => {
 //     //   u.undo_pointer -= 1
 //     //   u.undo_stack.pop()
@@ -112,11 +108,11 @@ export const undo = (layers: LayerComponents, panels: PanelComponents) => {
     return
   }
 
-  if (get(store_undo).awaiting_completion) { 
+  if (get(store_undo).awaiting_completion) {
     // TODO: one day, for UX reasons, we might come back here and single out specific actions, like
     // - undoing when erasing an icon
     // - undoing while text is selected
-    return 
+    return
   }
 
   // SPECIAL: Tiles we're re-placing when undoing are actually stored in the set we're coming FROM
@@ -138,11 +134,11 @@ export const redo = (layers: LayerComponents, panels: PanelComponents) => {
     return
   }
 
-  if (get(store_undo).awaiting_completion) { 
+  if (get(store_undo).awaiting_completion) {
     // TODO: one day, for UX reasons, we might come back here and single out specific actions, like
     // - undoing when erasing an icon
     // - undoing while text is selected
-    return 
+    return
   }
 
   const state_to_move_to = structuredClone(get(store_undo).undo_stack[get(store_undo).undo_pointer + 1])
@@ -186,6 +182,15 @@ export const apply_state_data = (applied_data: UndoData, layers: LayerComponents
   }
 
   if (applied_data.selected_tool) {
-    store_selected_tool.update(t => applied_data.selected_tool)
+    store_selected_tool.update((t) => applied_data.selected_tool)
+  }
+
+  /* Overlay */
+  if (applied_data.overlay) {
+    data_overlay.update((u) => ({ ...u, ...applied_data.overlay }))
+  }
+
+  if (applied_data.overlay_base64) {
+    layers.overlayLayer.changeOverlayImage(applied_data.overlay_base64)
   }
 }

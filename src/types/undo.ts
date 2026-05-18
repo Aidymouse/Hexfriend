@@ -2,6 +2,7 @@ import TerrainLayer from '../layers/TerrainLayer.svelte'
 import IconLayer from '../layers/IconLayer.svelte'
 import TextLayer from '../layers/TextLayer.svelte'
 import PathLayer from '../layers/PathLayer.svelte'
+import OverlayLayer from '../panels/OverlayLayer.svelte'
 import TextPanel from '../panels/TextPanel.svelte'
 import type { SaveData } from './savedata'
 import type { Tile } from './tilesets'
@@ -13,6 +14,7 @@ export type LayerComponents = {
   iconLayer: IconLayer
   textLayer: TextLayer
   pathLayer: PathLayer
+  overlayLayer: OverlayLayer
 }
 
 export type PanelComponents = {

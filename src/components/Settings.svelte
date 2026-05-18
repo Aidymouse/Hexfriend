@@ -5,6 +5,7 @@
   import type PathLayer from '../layers/PathLayer.svelte'
   import type TerrainLayer from '../layers/TerrainLayer.svelte'
   import type TextLayer from '../layers/TextLayer.svelte'
+  import type OverlayLayer from '../layers/OverlayLayer.svelte'
   import type TerrainPanel from '../panels/TerrainPanel.svelte'
   import type { Iconset } from '../types/icon'
   import type { SaveData } from '../types/savedata'
@@ -71,6 +72,7 @@
   export let comp_pathLayer: PathLayer
   export let comp_textLayer: TextLayer
   export let comp_coordsLayer: CoordsLayer
+  export let comp_overlayLayer: OverlayLayer
 
   export let comp_terrain_panel: TerrainPanel
 
@@ -365,7 +367,7 @@
     <SettingHeading text={$tl.settings.overlay.title} bind:toggle={hidden_settings.overlay} />
     <div class="settings-hider" class:hidden={hidden_settings.overlay}>
       <div class="hider">
-        <OverlaySettings bind:showSettings />
+        <OverlaySettings bind:showSettings {comp_overlayLayer} loaded_base64={loadedSave.overlay_base64}/>
       </div>
     </div>
   </div>

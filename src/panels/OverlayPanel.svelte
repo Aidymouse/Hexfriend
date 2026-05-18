@@ -1,5 +1,6 @@
 <script lang="ts">
     import Checkbox from "../components/Checkbox.svelte";
+    import OverlayLayer from "../components/layers/OverlayLayer.svelte";
     import { store_selected_tool } from "../stores/tools";
 
     import { store_has_unsaved_changes } from "../stores/flags";
@@ -10,9 +11,11 @@
 
     import { data_overlay } from "../stores/data";
 
+    export let comp_overlayLayer: OverlayLayer
+
     function remove_overlay() {
         if (confirm($tl.overlay_panel.remove_confirmation)) {
-            $data_overlay.base64 = "";
+            comp_overlayLayer.panelContorl_changeOverlayImage(null)
             store_selected_tool.update((n) => Tools.TERRAIN);
             $store_has_unsaved_changes = true;
         }
@@ -32,10 +35,9 @@
 </script>
 
 <div class="panel panel-grid">
-    <label for="ov_shown">{$tl.overlay_panel.show}</label><Checkbox
-        id={"ov_shown"}
-        bind:checked={$data_overlay.shown}
-    />
+    <label for="ov_shown">{$tl.overlay_panel.show}</label>
+    <Checkbox id={"ov_shown"} bind:checked={$data_overlay.shown} />
+
     <label for="ov_opacity">{$tl.overlay_panel.opacity}</label><input
         id="ov_opacity"
         type="range"
@@ -44,21 +46,21 @@
         step={0.05}
         bind:value={$data_overlay.opacity}
     />
-    <span class="col-span"
-        ><button class="outline-button" on:click={reset_scale}
-            >{$tl.overlay_panel.reset_scale}</button
-        ></span
-    >
-    <span class="col-span"
-        ><button class="outline-button" on:click={reset_positon}
-            >{$tl.overlay_panel.reset_position}</button
-        ></span
-    >
-    <span class="col-span"
-        ><button class="evil" on:click={remove_overlay}
-            >{$tl.overlay_panel.remove}</button
-        ></span
-    >
+    <span class="col-span">
+        <button class="outline-button" on:click={reset_scale}>
+            {$tl.overlay_panel.reset_scale}
+        </button>
+    </span>
+    <span class="col-span">
+        <button class="outline-button" on:click={reset_positon}>
+            {$tl.overlay_panel.reset_position}
+        </button>
+    </span>
+    <span class="col-span">
+        <button class="evil" on:click={remove_overlay}>
+            {$tl.overlay_panel.remove}
+        </button>
+    </span>
 </div>
 
 <style>

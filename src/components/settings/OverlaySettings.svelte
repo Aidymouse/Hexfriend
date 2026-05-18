@@ -10,31 +10,44 @@
     import { Tools } from "../../types/toolData";
 
     export let showSettings;
+    export let comp_overlayLayer: OverlayLayer;
+    export let loaded_base64: string | null;
 
     let overlay_files: FileList;
-	function import_overlay_image() {
-		if (!overlay_files[0]) return;
 
-		let r = new FileReader();
-		r.readAsDataURL(overlay_files[0]);
-		r.onload = (eb) => {
-			let b64 = r.result as string;
+    function import_overlay_image() {
+	if (!overlay_files[0]) return;
 
-			$data_overlay.base64 = b64;
-			$data_overlay.scale.x = 1;
-			$data_overlay.scale.y = 1;
-			showSettings = false;
-			store_selected_tool.update((n) => Tools.OVERLAY);
+	let r = new FileReader();
+	r.readAsDataURL(overlay_files[0]);
+	r.onload = (eb) => {
+	    let b64 = r.result as string;
 
-			$store_has_unsaved_changes = true;
-		};
-	}
+	    startUndoState({overlay_base64: loaded_base64, overlay: $data_overlay}, "Import Overlay Image")
+
+	    comp_overlayLayer.changeOverlayImage(base64);
+	    $data_overlay.scale.x = 1;
+	    $data_overlay.scale.y = 1;
+
+	    completeUndoState({overlay_base64: base64, overlay: $data_overlay})
+
+	    showSettings = false;
+
+	    store_selected_tool.update((n) => Tools.OVERLAY);
+
+	    $store_has_unsaved_changes = true;
+	};
+    }
 
 </script>
 
 <div class="settings-grid" style={'justify-items: start;'}>
     <button class="file-input-button" style="width: 100%; grid-column: 1/3; min-height: 30px;" >
-	{#if $data_overlay.base64 == ''}{$tl.settings.overlay.load}{:else}{$tl.settings.overlay.replace}{/if}
+	{#if loaded_base64 === null}
+	    {$tl.settings.overlay.load}
+	{:else}
+	    {$tl.settings.overlay.replace}
+	{/if}
         <input
             type="file"
             accept="image/*"

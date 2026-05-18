@@ -731,8 +731,15 @@
 
     $data_coordinates = data.coords
 
+    // Overlay
     $data_overlay = data.overlay
-    if ($store_selected_tool == Tools.OVERLAY && $data_overlay.base64 == '') $store_selected_tool = Tools.TERRAIN
+    if (data.overlay_base64) {
+      comp_overlayLayer.changeOverlayImage(data.overlay_base64)
+    } else {
+      if ($store_selected_tool == Tools.OVERLAY){
+        $store_selected_tool = Tools.TERRAIN
+      }
+    }
 
     reset_undo_stack()
 
@@ -899,7 +906,7 @@
       <CoordsLayer bind:cont_coordinates bind:this={comp_coordsLayer} />
       <LargeHexesLayer bind:cont_largehexes />
       <TextLayer bind:cont_all_text bind:this={comp_textLayer} bind:texts={loadedSave.texts} />
-      <OverlayLayer bind:this={comp_overlayLayer} bind:cont_overlay />
+      <OverlayLayer bind:this={comp_overlayLayer} bind:cont_overlay bind:loaded_base64={loadedSave.overlay_base64} />
     </section>
 
     <!-- Panels -->
@@ -999,6 +1006,7 @@
       {comp_iconLayer}
       {comp_pathLayer}
       {comp_textLayer}
+      {comp_overlayLayer}
       {comp_terrain_panel}
       renderAllHexes={() => {
         comp_terrainLayer.renderAllHexes()

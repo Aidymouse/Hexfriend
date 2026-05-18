@@ -2,35 +2,25 @@
     
     import * as PIXI from 'pixi.js';
     import { afterUpdate, onMount } from 'svelte';
+    import { get } from 'svelte/store'
     
     import { store_selected_tool } from '../stores/tools';
     import * as store_panning from '../stores/panning';
     import { store_inputs } from '../stores/inputs';
-	
+    import { data_overlay } from '../stores/data';
     import { store_has_unsaved_changes } from '../stores/flags';
 
     import type { input_state } from '../types/inputs';
     import type { overlay_data } from '../types/data';
     import type { pan_state } from '../types/panning';
-    
-    import { data_overlay } from '../stores/data';
-
     import { Tools } from '../types/toolData';
-  import { get } from 'svelte/store'
-
+    
+    import { startUndoState, completeUndoState, cancelProspectiveUndoState } from '../lib'
 
     export let cont_overlay: PIXI.Container;
-    
-    // Stores
-    
-    let pan: pan_state;
-    store_panning.store.subscribe((newPan) => {
-	pan = newPan;
-      });
-    
+    export let loaded_base64: string | null;
 
     // Local
-    let current_base64 = "";
     let oldX = -1
     let oldY = -1
     let moving_image = false
@@ -41,9 +31,31 @@
     let OG_width = -1
     let OG_height = -1
     let tex_overlay: PIXI.Texture;
+    let overlay_prior_to_canges: OverlayData | null = null
 
     let spr_overlay_image: PIXI.Sprite;    
     let grph_resizer: PIXI.Graphics;
+
+    export function panelControl_changeOverlayImage = (base64: string | null) => {
+        startUndoState({overlay_base64: loaded_base64}, base64 === null ? "Remove Overlay" : "Change Overlay")
+        changeOverlayImage(base64)
+        completeUndoState({overlay_base64: loaded_base64})
+    }
+
+    export function changeOverlayImage = (base64: string | null) => {
+        if (base64 === null) {
+            tex_overlay = null
+            OG_width = -1
+            OG_height = -1
+        }
+
+        tex_overlay = PIXI.Texture.from(base64)
+        OG_width = tex_overlay.width
+        OG_height = tex_overlay.height
+        spr_overlay_image.texture = tex_overlay
+
+        loaded_base64 = base64
+    }
     
     // Initialized in onMount
     let handles = [
@@ -100,7 +112,7 @@
                     dX = dY*old_ratio
                 }
             }
-            
+
             // X Transform
             if (grabbed_handle.x != 0.5) {
                 new_width = cur_width + (dX * (grabbed_handle.x == 0 ? -1 : 1))
@@ -114,16 +126,15 @@
                 let new_y_scale = new_height / OG_height
                 $data_overlay.scale.y = new_y_scale
                 $data_overlay.y += dY/2
-            }            
+            }
 
             old_handle_x = store_panning.curWorldX();
             old_handle_y = store_panning.curWorldY();
-            
+
             $data_overlay = $data_overlay
 
             $store_has_unsaved_changes = true;
         } 
-
 
     }
 
@@ -131,10 +142,42 @@
         handle_released()
     }
 
+    /* Overlay Events */
+    function overlayGrabbed() {
+        overlay_prior_to_changes = structuredClone($data_overlay)
+        startUndoState({overlay: $data_overlay}, "Move Overlay")
+
+        oldX = store_panning.curWorldX()
+        oldY = store_panning.curWorldY()
+        moving_image = true
+    }
+
+    function overlayReleased() {
+        moving_image = false
+
+        if (!overlayDataMatches(overlay_prior_to_changes, $data_overlay)) {
+            completedUndoState({overlay: $data_overlay})
+        } else {
+            cancelProspectiveUndoState()
+        }
+        overlay_prior_to_changes = null
+    }
+
+    /* Handle Events */
     function handle_grabbed(handle) {
+        overlay_prior_to_changes = structuredClone($data_overlay)
+        startUndoState({overlay: $data_overlay}, "Transform Overlay")
+
         grabbed_handle = handle
         old_handle_x = store_panning.curWorldX()
         old_handle_y = store_panning.curWorldY()
+
+        if (!overlayDataMatches(overlay_prior_to_changes, $data_overlay)) {
+            completedUndoState({overlay: $data_overlay})
+        } else {
+            cancelProspectiveUndoState()
+        }
+        overlay_prior_to_changes = null
     }
 
     function handle_released() {
@@ -142,36 +185,9 @@
         old_handle_x = 0
         old_handle_y = 0
     }
-    
-    $: { pan = pan }
 
     afterUpdate(() => {
 
-        if (current_base64 != $data_overlay.base64) {
-
-            if ($data_overlay.base64 == "") {
-                tex_overlay = null
-                OG_width = -1
-                OG_height = -1
-
-            } else {
-                tex_overlay = PIXI.Texture.from($data_overlay.base64)
-                OG_width = tex_overlay.width
-                OG_height = tex_overlay.height
-            }
-            
-            
-            spr_overlay_image.texture = tex_overlay
-            current_base64 = $data_overlay.base64
-        }
-
-        // Update texture width and height
-        if (tex_overlay && OG_width != tex_overlay.width) {
-            OG_width = tex_overlay.width
-            OG_height = tex_overlay.height
-        }
-
-        
         spr_overlay_image.visible = $data_overlay.shown
         spr_overlay_image.alpha = $data_overlay.opacity
         spr_overlay_image.x = $data_overlay.x
@@ -185,26 +201,25 @@
         grph_resizer.clear();
         grph_resizer.visible = $data_overlay.shown && get(store_selected_tool) == Tools.OVERLAY
         
-        grph_resizer.lineStyle(3/pan.zoomScale, 0x333333, 1)
+        grph_resizer.lineStyle(3/get(store_panning).zoomScale, 0x333333, 1)
         let resizer_width = spr_overlay_image.width + 10
         let resizer_height = spr_overlay_image.height + 10
         grph_resizer.drawRect($data_overlay.x - resizer_width/2, $data_overlay.y - resizer_height/2, resizer_width, resizer_height);
         
         // Resizer Handles
         handles.forEach(handle => {
-            
+
             handle.sprite.visible = get(store_selected_tool) == Tools.OVERLAY && $data_overlay.shown
             handle.sprite.x = $data_overlay.x - resizer_width/2 + handle.x*resizer_width
             handle.sprite.y = $data_overlay.y - resizer_height/2 + handle.y*resizer_height
-            handle.sprite.scale.x = 1/pan.zoomScale
-            handle.sprite.scale.y = 1/pan.zoomScale
-            
-        
+            handle.sprite.scale.x = 1/get(store_panning).zoomScale
+            handle.sprite.scale.y = 1/get(store_panning).zoomScale
+
+
         })
     })
-    
+
     onMount(() => {
-        
 
         cont_overlay.removeChildren(0)
 
@@ -212,13 +227,10 @@
         spr_overlay_image.anchor.x = 0.5
         spr_overlay_image.anchor.y = 0.5
         spr_overlay_image.on("pointerdown", () => { 
-            console.log("Overlay Down")
-            oldX = store_panning.curWorldX()
-            oldY = store_panning.curWorldY()
-            moving_image = true
+            overlayGrabbed()
         } )
         spr_overlay_image.on("pointerup", () => {
-            moving_image = false
+            overlayReleased()
         })
 
         cont_overlay.addChild(spr_overlay_image)
