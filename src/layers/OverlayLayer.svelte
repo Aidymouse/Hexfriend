@@ -9,6 +9,7 @@
     import { store_inputs } from '../stores/inputs';
     import { data_overlay } from '../stores/data';
     import { store_has_unsaved_changes } from '../stores/flags';
+    import { loading_texture } from '../stores'
 
     import type { input_state, OverlayData, pan_state } from '../types';
     import { Tools } from '../types'
@@ -41,8 +42,8 @@
         completeUndoState({overlay_base64: loaded_base64})
     }
 
+
     export function changeOverlayImage(base64: string | null) {
-	debugger
         if (base64 === null) {
             tex_overlay = null
             OG_width = -1
@@ -50,16 +51,23 @@
         }
 
         if (base64 !== null) {
-	    const new_tex = PIXI.Texture.from(base64)
-            tex_overlay = 
-            spr_overlay_image.texture = tex_overlay
-            OG_width = tex_overlay.width
-            OG_height = tex_overlay.height
+	    $loading_texture = true
+	    const new_tex = PIXI.Assets.load(base64).then( tex => {
+	      tex_overlay = tex
+	      spr_overlay_image.texture = tex_overlay
+	      OG_width = tex_overlay.width
+	      OG_height = tex_overlay.height
+	      loaded_base64 = base64
+	      setTimeout(() => {
+		$loading_texture = false
+	      }, 5000)
+	    })
+
         } else {
             spr_overlay_image.texture = null
+	    loaded_base64 = null
         }
 
-        loaded_base64 = base64
     }
     
     // Initialized in onMount

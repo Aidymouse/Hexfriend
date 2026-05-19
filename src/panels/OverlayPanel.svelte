@@ -4,9 +4,10 @@
     import { store_selected_tool } from "../stores/tools";
 
     import { store_has_unsaved_changes } from "../stores/flags";
+    import { loading_texture } from "../stores"
     import { tl } from "../stores/translation";
 
-    import type { overlay_data } from "../types/data";
+    import type { OverlayData } from "../types/data";
     import { Tools } from "../types/toolData";
 
     import { data_overlay } from "../stores/data";
@@ -35,32 +36,36 @@
 </script>
 
 <div class="panel panel-grid">
-    <label for="ov_shown">{$tl.overlay_panel.show}</label>
-    <Checkbox id={"ov_shown"} bind:checked={$data_overlay.shown} />
+    {#if $loading_texture}
+      <p>Loading...</p>
+    {:else}
+      <label for="ov_shown">{$tl.overlay_panel.show}</label>
+      <Checkbox id={"ov_shown"} bind:checked={$data_overlay.shown} />
 
-    <label for="ov_opacity">{$tl.overlay_panel.opacity}</label><input
-        id="ov_opacity"
-        type="range"
-        min={0.05}
-        max={1}
-        step={0.05}
-        bind:value={$data_overlay.opacity}
-    />
-    <span class="col-span">
-        <button class="outline-button" on:click={reset_scale}>
-            {$tl.overlay_panel.reset_scale}
-        </button>
-    </span>
-    <span class="col-span">
-        <button class="outline-button" on:click={reset_positon}>
-            {$tl.overlay_panel.reset_position}
-        </button>
-    </span>
-    <span class="col-span">
-        <button class="evil" on:click={remove_overlay}>
-            {$tl.overlay_panel.remove}
-        </button>
-    </span>
+      <label for="ov_opacity">{$tl.overlay_panel.opacity}</label><input
+	  id="ov_opacity"
+	  type="range"
+	  min={0.05}
+	  max={1}
+	  step={0.05}
+	  bind:value={$data_overlay.opacity}
+      />
+      <span class="col-span">
+	  <button class="outline-button" on:click={reset_scale}>
+	      {$tl.overlay_panel.reset_scale}
+	  </button>
+      </span>
+      <span class="col-span">
+	  <button class="outline-button" on:click={reset_positon}>
+	      {$tl.overlay_panel.reset_position}
+	  </button>
+      </span>
+      <span class="col-span">
+	  <button class="evil" on:click={remove_overlay}>
+	      {$tl.overlay_panel.remove}
+	  </button>
+      </span>
+    {/if}
 </div>
 
 <style>

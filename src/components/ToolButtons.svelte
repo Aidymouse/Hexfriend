@@ -3,36 +3,34 @@
   import type { SaveData } from '../types'
   import { HexOrientation } from '../types/terrain'
   import { Tools } from '../types/toolData'
-  import { afterUpdate, onMount } from 'svelte'
+  import { afterUpdate, onMount, tick } from 'svelte'
   import { data_path, data_icon, data_overlay, data_terrain, data_eraser } from '../stores/data'
   import { store_selected_tool } from '../stores/tools'
+  import { loading_texture } from '../stores'
 
   import { tfield } from '../stores/tfield'
   import { tl } from '../stores/translation'
 
   export let loaded_save: SaveData
 
+  let should_render_overlay: boolean = false
+  $: {
+    should_render_overlay = ($store_selected_tool === Tools.OVERLAY) || $loading_texture || loaded_save.overlay_base64 !== null
+  }
+
   /* These proxies keep the buttons responsive */
   // TODO: these could probably just be *get*
   let data_path_proxy: PathData
-  data_path.subscribe((n) => {
-    data_path_proxy = n
-  })
+  data_path.subscribe((n) => { data_path_proxy = n })
 
   let data_icon_proxy: icon_data
-  data_icon.subscribe((n) => {
-    data_icon_proxy = n
-  })
+  data_icon.subscribe((n) => { data_icon_proxy = n })
 
   let data_terrain_proxy: terrain_data
-  data_terrain.subscribe((n) => {
-    data_terrain_proxy = n
-  })
+  data_terrain.subscribe((n) => { data_terrain_proxy = n })
 
   let data_eraser_proxy: eraser_data
-  data_eraser.subscribe((n) => {
-    data_eraser_proxy = n
-  })
+  data_eraser.subscribe((n) => { data_eraser_proxy = n })
 
   $: {
     data_terrain_proxy = data_terrain_proxy
@@ -209,10 +207,14 @@
   export let changeTool: Function
 
   onMount(() => {
-    store_selected_tool.subscribe((n) => {
+    store_selected_tool.subscribe(async (n) => {
       let el_selected_button = document.getElementById(`tool-button-${n}`)
+      console.log(el_selected_button.offsetLeft)
 
       let clip_layer = document.getElementById('bottom-layer')
+
+      // This little magic here means that when then overlay tool spawns in we can switch to it properly
+      await tick()
 
       let new_clip_path = `circle(1.25em at ${el_selected_button.offsetLeft + el_selected_button.offsetWidth / 2}px ${
         el_selected_button.offsetTop + el_selected_button.offsetHeight / 2
@@ -244,20 +246,12 @@
   <div class="layer" id="top-layer">
     {#each buttons as b}
       <button
-        on:click={() => {
-          changeTool(b.toolCode)
-        }}
+        on:click={() => { changeTool(b.toolCode) }}
         title={`${b.display} Tool`}
         class="tool-button"
-        class:hidden={b.toolCode == Tools.OVERLAY && loaded_save.overlay_base64 === null}
+        class:hidden={b.toolCode == Tools.OVERLAY && !should_render_overlay}
         id={`tool-button-${b.toolCode}`}
       >
-        <!-- Button Image 
-				<span class="tool-img-wrapper" >
-					<img src={`/assets/img/tools/${b.toolCode}.png`} alt={`${b.display} Tool`} />
-					<img src={`/assets/img/tools/w_${b.toolCode}.png`} alt={`${b.display} Tool`} class:see-through={$store_selected_tool != b.toolCode}/>
-				</span>
-				-->
 
         <div
           class="tool-icon"
@@ -277,15 +271,9 @@
         }}
         title={`${b.display} Tool`}
         class="tool-button"
-        class:hidden={b.toolCode == Tools.OVERLAY && loaded_save.overlay_base64 === null}
+        class:hidden={b.toolCode == Tools.OVERLAY && !should_render_overlay}
         id={`b-tool-button-${b.toolCode}`}
       >
-        <!-- Button Image 
-				<span class="tool-img-wrapper" >
-					<img src={`/assets/img/tools/${b.toolCode}.png`} alt={`${b.display} Tool`} />
-					<img src={`/assets/img/tools/w_${b.toolCode}.png`} alt={`${b.display} Tool`} class:see-through={$store_selected_tool != b.toolCode}/>
-				</span>
-				-->
 
         <div
           class="tool-icon"
@@ -297,24 +285,6 @@
     {/each}
   </div>
 
-  <!-- Mini Buttons 
-			{#if $store_selected_tool == b.toolCode && b.miniButtons.length > 0}
-			<div class="mini-button-container">
-				{#each b.miniButtons as mb}
-						<button 
-							class="mini-button"
-							class:selected={ mb.obj ? mb.obj[mb.field] : false }
-							on:click={mb.action}
-							title={mb.display}
-						>
-
-							<img draggable={false} src={mb.image} alt={mb.display}>
-							
-						</button>
-					{/each}
-				</div>
-			{/if}
-			-->
 </main>
 
 <style>
