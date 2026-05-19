@@ -14,6 +14,7 @@
     import type { overlay_data } from '../types/data';
     import type { pan_state } from '../types/panning';
     import { Tools } from '../types/toolData';
+    import { overlayDataMatches } from '../helpers'
     
     import { startUndoState, completeUndoState, cancelProspectiveUndoState } from '../lib'
 
@@ -31,7 +32,7 @@
     let OG_width = -1
     let OG_height = -1
     let tex_overlay: PIXI.Texture;
-    let overlay_prior_to_canges: OverlayData | null = null
+    let overlay_prior_to_changes: OverlayData | null = null
 
     let spr_overlay_image: PIXI.Sprite;    
     let grph_resizer: PIXI.Graphics;
@@ -160,7 +161,7 @@
         moving_image = false
 
         if (!overlayDataMatches(overlay_prior_to_changes, $data_overlay)) {
-            completedUndoState({overlay: $data_overlay})
+            completeUndoState({overlay: $data_overlay})
         } else {
             cancelProspectiveUndoState()
         }
@@ -177,7 +178,7 @@
         old_handle_y = store_panning.curWorldY()
 
         if (!overlayDataMatches(overlay_prior_to_changes, $data_overlay)) {
-            completedUndoState({overlay: $data_overlay})
+            completeUndoState({overlay: $data_overlay})
         } else {
             cancelProspectiveUndoState()
         }
@@ -190,8 +191,7 @@
         old_handle_y = 0
     }
 
-    afterUpdate(() => {
-
+    function update() {
         spr_overlay_image.visible = $data_overlay.shown
         spr_overlay_image.alpha = $data_overlay.opacity
         spr_overlay_image.x = $data_overlay.x
@@ -228,6 +228,10 @@
 
 
         })
+    }
+
+    afterUpdate(() => {
+        update()
     })
 
     onMount(() => {
