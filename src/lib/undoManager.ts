@@ -177,6 +177,10 @@ export const apply_state_data = (applied_data: UndoData, layers: LayerComponents
     layers.pathLayer.applyPaths(applied_data.paths)
   }
 
+  if (applied_data.path_styles) {
+    panels.path_panel.applyPathStyles(applied_data.path_styles)
+  }
+
   if (applied_data.text_styles) {
     panels.text_panel.applyTextStyles(applied_data.text_styles)
   }

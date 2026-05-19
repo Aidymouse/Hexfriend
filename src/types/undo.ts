@@ -4,6 +4,7 @@ import TextLayer from '../layers/TextLayer.svelte'
 import PathLayer from '../layers/PathLayer.svelte'
 import OverlayLayer from '../panels/OverlayLayer.svelte'
 import TextPanel from '../panels/TextPanel.svelte'
+import PathPanel from '../panels/PathPanel.svelte'
 import type { SaveData } from './savedata'
 import type { Tile } from './tilesets'
 import type { HexId, Tools } from './toolData'
@@ -19,6 +20,7 @@ export type LayerComponents = {
 
 export type PanelComponents = {
   text_panel: TextPanel
+  path_panel: PathPanel
 }
 
 // Too fancy with it

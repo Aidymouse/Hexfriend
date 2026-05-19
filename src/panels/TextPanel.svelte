@@ -13,6 +13,8 @@
   import { textStylesMatch } from "../helpers"
   import { cancelProspectiveUndoState, completeUndoState, startUndoState } from "../lib"
 
+  export let show: boolean;
+
   let annoyance_counter = 0;
   let style_name_retry = [
     {from: 0, to: 4, string: $tl.text_panel.annoyed_1},
@@ -83,7 +85,7 @@
 	function newTextStyle() {
 		let name = prompt($tl.text_panel.rename_text_style_prompt);
 		if (name == null) return;
-		while (name === "") {
+		while (name.trim() === "") {
 		  let retry_string = style_name_retry.find(r => r.from <= annoyance_counter && annoyance_counter <= r.to)?.string ?? ""
 		  let name = prompt(retry_string)
 		  annoyance_counter += 1;
@@ -208,6 +210,7 @@
 
 <div
   class="panel"
+  style={show ? "" : "display: none"}
   on:pointerdown={() => { if ($data_text.contextStyleId) $data_text.contextStyleId = null; }}
 >
 	<div id="controls">

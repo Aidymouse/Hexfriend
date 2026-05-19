@@ -13,8 +13,9 @@
   import { data_path } from '../stores/data'
 
   export let comp_pathLayer: PathLayer
+  export let show: boolean
 
-  const DEV_MODE = true
+  const DEV_MODE = false
 
   /* Path Style Management */
 
@@ -35,8 +36,14 @@
   }
 
   function newPathStyle() {
-    let name = prompt('What would you like to name this path style?')
+    let name = ""
+    while (name.trim() === "") {
+      name = prompt('What would you like to name this path style?')
+    }
     if (name == null) return
+
+    startUndoState({path_styles: loaded_path_styles}, "Make path style")
+
 
     loaded_path_styles = [
       ...loaded_path_styles,
@@ -47,6 +54,8 @@
       },
     ]
     pathID += 1
+
+    completeUndoState({path_styles: loaded_path_styles})
 
     $store_has_unsaved_changes = true
   }
@@ -92,6 +101,10 @@
     $store_has_unsaved_changes = true
   }
 
+  export const applyPathStyles = (path_styles: ListedPathStyle[]) => {
+    loaded_path_styles = path_styles
+  }
+
   // Path Controls
   function deselectPath() {
     comp_pathLayer.deselectPath()
@@ -130,6 +143,7 @@
 
 <div
   class="panel"
+  style={show ? "" : "display: none"}
   on:pointerdown={() => {
     if ($data_path.contextPathId) $data_path.contextPathId = null
   }}

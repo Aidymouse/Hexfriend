@@ -151,6 +151,7 @@
 
   let comp_terrain_panel: TerrainPanel
   let comp_text_panel: TextPanel
+  let comp_path_panel: PathPanel
 
   /* MASTER PIXI CONTAINERS */
   let cont_icon = new PIXI.Container()
@@ -435,7 +436,10 @@
 	      textLayer: comp_textLayer,
 	      pathLayer: comp_pathLayer,
 	      overlayLayer: comp_overlayLayer
-	    }, {text_panel: comp_text_panel})
+	    }, {
+	    text_panel: comp_text_panel,
+	    path_panel: comp_path_panel,
+	    })
             break
 
           case 'redo':
@@ -445,7 +449,10 @@
 	      textLayer: comp_textLayer,
 	      pathLayer: comp_pathLayer,
 	      overlayLayer: comp_overlayLayer
-	    }, {text_panel: comp_text_panel})
+	    }, {
+	      text_panel: comp_text_panel,
+	      path_panel: comp_path_panel,
+	    })
             break
 
           case 'toggleViewMaps':
@@ -921,14 +928,16 @@
     {:else if $store_selected_tool == Tools.ICON}
       <IconPanel {app} {loadedIconsets} />
     {:else if $store_selected_tool == Tools.PATH}
-      <PathPanel {comp_pathLayer} bind:loaded_path_styles={loadedSave.path_styles} />
+      <!-- Handled seperately, because this panel must always be instantiated for Undo purposes -->
     {:else if $store_selected_tool == Tools.TEXT}
-      <TextPanel bind:this={comp_text_panel} {comp_textLayer} bind:loaded_text_styles={loadedSave.text_styles} />
     {:else if $store_selected_tool == Tools.ERASER}
       <EraserPanel bind:loaded_save={loadedSave} />
     {:else if $store_selected_tool == Tools.OVERLAY}
-      <OverlayPanel />
+      <OverlayPanel {comp_overlayLayer} loaded_base64={loadedSave.overlay_base64} />
     {/if}
+
+      <PathPanel show={$store_selected_tool === Tools.PATH} bind:this={comp_path_panel} {comp_pathLayer} bind:loaded_path_styles={loadedSave.path_styles} />
+      <TextPanel show={$store_selected_tool === Tools.TEXT} bind:this={comp_text_panel} {comp_textLayer} bind:loaded_text_styles={loadedSave.text_styles} />
 
     {#if DEV_MODE}
       <UndoPanel />
