@@ -96,6 +96,31 @@ export type Translation = {
     delete_style: string
     rename_text_style_prompt: string
     delete_text_style_prompt: string
+
+    annoyed_1: string // Little easter egg if you keep trying to input an empty name for a text style
+    annoyed_2: string
+    annoyed_3: string
+    annoyed_4: string
+    annoyed_5: string
+    annoyed_6: string
+    annoyed_7: string
+    annoyed_8: string
+    annoyed_9: string
+    annoyed_10: string
+    annoyed_11: string
+    annoyed_12: string
+    annoyed_13: string
+    annoyed_14: string
+    annoyed_15: string
+    annoyed_16: string
+    annoyed_17: string
+    annoyed_18: string
+    annoyed_19: string
+    annoyed_20: string
+    annoyed_21: string
+    annoyed_22: string
+    annoyed_23: string
+    annoyed_24: string
   }
 
   eraser_panel: {

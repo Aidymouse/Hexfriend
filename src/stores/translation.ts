@@ -26,16 +26,19 @@ const merge_translation = (translation: Translation, merge: Translation) => {
 }
 
 export const switch_translation = (new_translation: string) => {
+    
+    const debug = false
+
     console.log(`Switching to ${new_translation}`);
     
     // Merge with placeholder
     let translation = translation_map[new_translation].translation
     translation = merge_translation(placeholder_translation, translation)
 
-    console.log(translation)
+    debug && console.log(translation)
 
     tl.set(translation)
-    console.log(tl);
+    debug && console.log(tl);
 }
 
 
