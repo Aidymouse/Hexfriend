@@ -65,12 +65,17 @@
 
   // Keeps a live record of terrain being placed during this mouse movement (what I have dubbed a 'placement')
   // When the mouse is lifted, all these tiles are inserted into an undo state action
-  // Exported so app.svelte can manage undo with the eraser tool 
   let tiles_this_placement: { [key: HexId]: Tile } = {}
   let replaced_this_placement: { [key: HexId]: Tile } = {}
 
+  // Exported so app.svelte can manage undo with the eraser tool 
   export function getPlacements() {
     return { tiles: tiles_this_placement, replaced: replaced_this_placement }
+  }
+
+  export function resetPlacements() {
+    tiles_this_placement = {}
+    replaced_this_placement = {}
   }
 
   let pan: pan_state

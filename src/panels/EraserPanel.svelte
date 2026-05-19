@@ -31,13 +31,13 @@
 </script>
 
 <div class="panel panel-grid">
-    <button class="outline-button" on:click={erase_all_icons}>
+    <button class="outline-button" on:click={erase_all_icons} disabled={loaded_save.icons.length === 0}>
       {$tl.eraser_panel.erase_all_icons}
     </button>
-    <button class="outline-button" on:click={erase_all_paths}>
+    <button class="outline-button" on:click={erase_all_paths} disabled={loaded_save.paths.length === 0}>
       {$tl.eraser_panel.erase_all_paths}
     </button>
-    <button class="outline-button" on:click={erase_all_text}>
+    <button class="outline-button" on:click={erase_all_text} disabled={loaded_save.texts.length === 0}>
       {$tl.eraser_panel.erase_all_text}
     </button>
 </div>

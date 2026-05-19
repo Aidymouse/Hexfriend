@@ -288,8 +288,12 @@
     const prospective = structuredClone($store_undo.prospective_state)
     const tiles = comp_terrainLayer.getPlacements()
     cancelProspectiveUndoState()
+    if (prospective.before.icons.length === loadedSave.icons.length && Object.keys(tiles.replaced).length === 0 && Object.keys(tiles.tiles).length === 0) {
+      return
+    }
     startUndoState({icons: prospective.before.icons, tiles: tiles.replaced}, "Use Eraser")
     completeUndoState({icons: loadedSave.icons, tiles: tiles.tiles})
+    comp_terrainLayer.resetPlacements()
   }
 
   /* ALL PURPOSE POINTER METHODS */
