@@ -933,7 +933,7 @@
     {/if}
 
     <div id="tool-buttons" on:mouseup={pointerup}>
-      <ToolButtons {changeTool} />
+      <ToolButtons {changeTool} loaded_save={loadedSave} />
     </div>
 
     <div id="top-left-floater">
@@ -1023,7 +1023,7 @@
     />
 
     {#if showControls}
-      <TooltipsPane />
+      <TooltipsPane loaded_save={loadedSave} />
     {/if}
 
     {#if showHelp}

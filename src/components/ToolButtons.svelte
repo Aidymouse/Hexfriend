@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { eraser_data, icon_data, PathData, terrain_data } from '../types/data'
+  import type { SaveData } from '../types'
   import { HexOrientation } from '../types/terrain'
   import { Tools } from '../types/toolData'
   import { afterUpdate, onMount } from 'svelte'
@@ -9,7 +10,10 @@
   import { tfield } from '../stores/tfield'
   import { tl } from '../stores/translation'
 
+  export let loaded_save: SaveData
+
   /* These proxies keep the buttons responsive */
+  // TODO: these could probably just be *get*
   let data_path_proxy: PathData
   data_path.subscribe((n) => {
     data_path_proxy = n
@@ -245,7 +249,7 @@
         }}
         title={`${b.display} Tool`}
         class="tool-button"
-        class:hidden={b.toolCode == Tools.OVERLAY && $data_overlay.base64 == ''}
+        class:hidden={b.toolCode == Tools.OVERLAY && loaded_save.overlay_base64 === null}
         id={`tool-button-${b.toolCode}`}
       >
         <!-- Button Image 
@@ -273,7 +277,7 @@
         }}
         title={`${b.display} Tool`}
         class="tool-button"
-        class:hidden={b.toolCode == Tools.OVERLAY && $data_overlay.base64 == ''}
+        class:hidden={b.toolCode == Tools.OVERLAY && loaded_save.overlay_base64 === null}
         id={`b-tool-button-${b.toolCode}`}
       >
         <!-- Button Image 

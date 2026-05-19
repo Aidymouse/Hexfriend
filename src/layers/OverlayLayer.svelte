@@ -36,13 +36,13 @@
     let spr_overlay_image: PIXI.Sprite;    
     let grph_resizer: PIXI.Graphics;
 
-    export function panelControl_changeOverlayImage = (base64: string | null) => {
+    export function panelControl_changeOverlayImage (base64: string | null) {
         startUndoState({overlay_base64: loaded_base64}, base64 === null ? "Remove Overlay" : "Change Overlay")
         changeOverlayImage(base64)
         completeUndoState({overlay_base64: loaded_base64})
     }
 
-    export function changeOverlayImage = (base64: string | null) => {
+    export function changeOverlayImage(base64: string | null) {
         if (base64 === null) {
             tex_overlay = null
             OG_width = -1
@@ -196,12 +196,19 @@
         spr_overlay_image.scale.y = $data_overlay.scale.y
         spr_overlay_image.eventMode = (get(store_selected_tool) == Tools.OVERLAY) ? 'static' : 'auto'
 
+        if (loaded_base64 === null) {
+            grph_resizer.clear();
+            handles.forEach(handle => {
+                handle.sprite.visible = false
+            })
+            return
+        }
 
         // Resizer
         grph_resizer.clear();
         grph_resizer.visible = $data_overlay.shown && get(store_selected_tool) == Tools.OVERLAY
         
-        grph_resizer.lineStyle(3/get(store_panning).zoomScale, 0x333333, 1)
+        grph_resizer.lineStyle(3/get(store_panning.store).zoomScale, 0x333333, 1)
         let resizer_width = spr_overlay_image.width + 10
         let resizer_height = spr_overlay_image.height + 10
         grph_resizer.drawRect($data_overlay.x - resizer_width/2, $data_overlay.y - resizer_height/2, resizer_width, resizer_height);
@@ -209,11 +216,11 @@
         // Resizer Handles
         handles.forEach(handle => {
 
-            handle.sprite.visible = get(store_selected_tool) == Tools.OVERLAY && $data_overlay.shown
+            handle.sprite.visible = $store_selected_tool == Tools.OVERLAY && $data_overlay.shown
             handle.sprite.x = $data_overlay.x - resizer_width/2 + handle.x*resizer_width
             handle.sprite.y = $data_overlay.y - resizer_height/2 + handle.y*resizer_height
-            handle.sprite.scale.x = 1/get(store_panning).zoomScale
-            handle.sprite.scale.y = 1/get(store_panning).zoomScale
+            handle.sprite.scale.x = 1/get(store_panning.store).zoomScale
+            handle.sprite.scale.y = 1/get(store_panning.store).zoomScale
 
 
         })

@@ -1,6 +1,6 @@
 <script lang="ts">
     import Checkbox from "../components/Checkbox.svelte";
-    import OverlayLayer from "../components/layers/OverlayLayer.svelte";
+    import OverlayLayer from "../layers/OverlayLayer.svelte";
     import { store_selected_tool } from "../stores/tools";
 
     import { store_has_unsaved_changes } from "../stores/flags";

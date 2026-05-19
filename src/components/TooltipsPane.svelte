@@ -26,6 +26,8 @@
   import { store_selected_tool } from '../stores/tools'
   import { data_path, data_icon, data_terrain } from '../stores/data'
 
+  export let loaded_save: SaveData
+
   // COMPONENTS
   import Tooltip from './Tooltip.svelte'
 
@@ -115,7 +117,7 @@
     <Tooltip control={'Click and Drag'} tip={c_overlay.clickAndDrag} />
   {/if}
 
-  {#if $data_overlay.base64 != ''}
+  {#if loaded_save.overlay_base64 !== null}
     <Tooltip control="Ctrl+Q" tip="Toggle Overlay" />
   {/if}
 
