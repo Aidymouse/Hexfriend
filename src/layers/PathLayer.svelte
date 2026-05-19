@@ -134,21 +134,10 @@
           pY = sP.y
         }
 
-	/* Special: if the path we're appending to is a single point, REMOVE the last undo state! 
-	* This makes it so paths with 2+ points don't have an awkward state where only 1 point exists.
-	*/
-	if ($data_path.selectedPath.points.length === 2) {
-	  /*
-	  $store_undo.undo_stack.pop()
-	  $store_undo.undo_pointer -= 1
-	  startUndoState({paths: paths.filter(p => p.id !== $data_path.selectedPath.id)}, `Add Point to ${$data_path.selectedPath.id}`)
-	  */
-	} else {
-	}
-
 	startUndoState({paths}, `Add Point to ${$data_path.selectedPath.id}`)
         appendPoint($data_path.selectedPath, pX, pY, $data_path.add_to)
 	completeUndoState({paths})
+
       } else if ($data_path.hoveredPath && !$data_path.dontSelectPaths) {
         $data_path.selectedPath = paths[paths.indexOf($data_path.hoveredPath)]
         $data_path.style = { ...$data_path.selectedPath.style }

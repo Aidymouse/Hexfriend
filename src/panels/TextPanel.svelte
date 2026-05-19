@@ -153,8 +153,12 @@
 	  let styleToEdit: ListedTextStyle = loaded_text_styles.find((ps) => ps.id == $data_text.contextStyleId);
 	  $data_text.contextStyleId = null;
 
-	  let styleName = prompt($tl.text_panel.rename_text_style_prompt);
-	  if (!styleName) return;
+	  let styleName = ""
+	  while (styleName.trim() === "") {
+	    styleName = prompt($tl.text_panel.rename_text_style_prompt);
+	  }
+	  if (styleName === null) return;
+
 
 	  if ($data_text.selectedText) { comp_textLayer.deselectText() }
 	  startUndoState({text_styles: loaded_text_styles}, `Rename text style ${styleToEdit.display} to ${styleName}`)

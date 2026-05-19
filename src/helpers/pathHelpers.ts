@@ -1,9 +1,16 @@
-import { HexOrientation, type HexSizeInfo, type PathLayerPath } from "../types";
+import { HexOrientation, type HexSizeInfo, type PathLayerPath, type PathStyle } from "../types";
 import { coords_cubeToWorld, coords_worldToCube } from "./hexHelpers";
 
 import { Vector } from '../lib/vector2d'
 
 import * as PIXI from 'pixi.js'
+
+export const pathStylesMatch = (style1: PathStyle, style2: PathStyle): boolean => {
+  for (const [k, v] of Object.entries(style1)) {
+    if (v !== style2[k]) { return false }
+  }
+  return true
+}
 
 // Overlay a grid of smaller opposite orientation hexes and it lines up perfectly!
 export const getPathSnapPoint = (x: number, y: number, hex_info: HexSizeInfo) => {

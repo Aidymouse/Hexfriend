@@ -12,6 +12,8 @@
   import { store_has_unsaved_changes } from '../stores/flags'
   import { data_path } from '../stores/data'
 
+  import { textStylesMatch } from '../helpers'
+  import { pathStylesMatch } from '../helpers/pathHelpers'
   export let comp_pathLayer: PathLayer
   export let show: boolean
 
@@ -68,9 +70,13 @@
 
     let styleToEdit: ListedPathStyle = loaded_path_styles.find((ps) => ps.id == $data_path.contextPathId)
 
-    applyStyle({ ...$data_path.style })
+    startUndoState({path_styles: loaded_path_styles}, "Updated path style to match")
+
+    styleToEdit.style = {...$data_path.style}
+    //applyStyle({ ...$data_path.style })
     //styleToEdit = styleToEdit
     loaded_path_styles = loaded_path_styles
+    completeUndoState({path_styles: loaded_path_styles})
 
     $data_path.contextPathId = null
   }
@@ -79,7 +85,9 @@
     if ($data_path.contextPathId == null) return
     if (!confirm($tl.path_panel.delete_path_style_prompt)) return
 
+    startUndoState({path_styles: loaded_path_styles}, "Delete path style")
     loaded_path_styles = loaded_path_styles.filter((ps) => ps.id != $data_path.contextPathId)
+    completeUndoState({path_styles: loaded_path_styles})
 
     $data_path.contextPathId = null
 
@@ -92,16 +100,24 @@
     let styleToEdit: ListedPathStyle = loaded_path_styles.find((ps) => ps.id == $data_path.contextPathId)
     $data_path.contextPathId = null
 
-    let styleName = prompt($tl.path_panel.rename_path_style_prompt)
-    if (!styleName) return
+    let styleName = ""
+    while (styleName.trim() === "") {
+      styleName = prompt($tl.path_panel.rename_path_style_prompt)
+    }
+    if (styleName === null) return
+
+    startUndoState({path_styles: loaded_path_styles}, "Rename path style")
 
     styleToEdit.display = styleName
     loaded_path_styles = loaded_path_styles
 
     $store_has_unsaved_changes = true
+
+    completeUndoState({path_styles: loaded_path_styles})
   }
 
   export const applyPathStyles = (path_styles: ListedPathStyle[]) => {
+    $data_path.contextPathId = null
     loaded_path_styles = path_styles
   }
 
@@ -112,6 +128,8 @@
 
   function duplicateStyle() {
     let contextPathStyle: ListedPathStyle = loaded_path_styles.find((ps) => ps.id == $data_path.contextPathId)
+
+    startUndoState({path_styles: loaded_path_styles}, "Duplicate path style")
 
     pathID += 1
     loaded_path_styles = [
@@ -125,13 +143,15 @@
 
     $data_path.contextPathId = null
 
+    completeUndoState({path_styles: loaded_path_styles})
+
     $store_has_unsaved_changes = true
   }
 
   /* Applies provided style + keeps data up to date */
   const applyStyle = (style: Partial<PathStyle>) => {
     /* TODO: replace with real matching fn */
-    if(JSON.stringify(style) === JSON.stringify($data_path.style)) { return }
+    if (pathStylesMatch({...$data_path.style, ...style}, $data_path.style)) { return }
 
     $data_path.style = {...$data_path.style, ...style}
 
