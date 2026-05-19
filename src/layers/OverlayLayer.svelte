@@ -10,10 +10,8 @@
     import { data_overlay } from '../stores/data';
     import { store_has_unsaved_changes } from '../stores/flags';
 
-    import type { input_state } from '../types/inputs';
-    import type { overlay_data } from '../types/data';
-    import type { pan_state } from '../types/panning';
-    import { Tools } from '../types/toolData';
+    import type { input_state, OverlayData, pan_state } from '../types';
+    import { Tools } from '../types'
     import { overlayDataMatches } from '../helpers'
     
     import { startUndoState, completeUndoState, cancelProspectiveUndoState } from '../lib'
@@ -44,6 +42,7 @@
     }
 
     export function changeOverlayImage(base64: string | null) {
+	debugger
         if (base64 === null) {
             tex_overlay = null
             OG_width = -1
@@ -51,7 +50,8 @@
         }
 
         if (base64 !== null) {
-            tex_overlay = PIXI.Texture.from(base64)
+	    const new_tex = PIXI.Texture.from(base64)
+            tex_overlay = 
             spr_overlay_image.texture = tex_overlay
             OG_width = tex_overlay.width
             OG_height = tex_overlay.height

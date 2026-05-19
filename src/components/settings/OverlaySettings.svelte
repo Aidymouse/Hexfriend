@@ -1,14 +1,16 @@
 <script lang="ts">
 
     import "../../styles/settings.css";
+    import OverlayLayer from '../../layers/OverlayLayer.svelte'
+
+    import { Tools } from "../../types/toolData";
 
     import { data_overlay } from "../../stores/data";
     import { store_selected_tool } from "../../stores/tools";
     import { store_has_unsaved_changes } from "../../stores/flags";
     import { tl } from "../../stores/translation";
-    import { startUndoState, completeUndoState } from "../../lib" 
 
-    import { Tools } from "../../types/toolData";
+    import { startUndoState, completeUndoState } from "../../lib" 
 
     export let showSettings;
     export let comp_overlayLayer: OverlayLayer;
