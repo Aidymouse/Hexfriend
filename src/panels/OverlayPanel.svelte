@@ -11,27 +11,38 @@
     import { Tools } from "../types/toolData";
 
     import { data_overlay } from "../stores/data";
+    import { completeUndoState, startUndoState } from "../lib"
 
     export let comp_overlayLayer: OverlayLayer
+    export let loaded_base64: string | null
 
     function remove_overlay() {
         if (confirm($tl.overlay_panel.remove_confirmation)) {
-            comp_overlayLayer.panelContorl_changeOverlayImage(null)
+	    startUndoState({overlay_base64: loaded_base64}, "Remove Overlay")
+            comp_overlayLayer.panelControl_changeOverlayImage(null)
             store_selected_tool.update((n) => Tools.TERRAIN);
             $store_has_unsaved_changes = true;
+	    // don't need to await changeOverlayImage since changing to null doesn't do anything async
+	    completeUndoState({overlay_base64: loaded_base64})
         }
     }
 
-    function reset_scale() {
+    let old_opacity: number | null = null
+
+    function resetScale() {
+	startUndoState({overlay: $data_overlay}, "Reset Overlay Scale")
         $data_overlay.scale.x = 1;
         $data_overlay.scale.y = 1;
         $store_has_unsaved_changes = true;
+	completeUndoState({overlay: $data_overlay})
     }
 
-    function reset_positon() {
+    function resetPosition() {
+	startUndoState({overlay: $data_overlay}, "Reset Overlay Position")
         $data_overlay.x = 0;
         $data_overlay.y = 0;
         $store_has_unsaved_changes = true;
+	completeUndoState({overlay: $data_overlay})
     }
 </script>
 
@@ -48,15 +59,27 @@
 	  min={0.05}
 	  max={1}
 	  step={0.05}
-	  bind:value={$data_overlay.opacity}
+	  value={$data_overlay.opacity}
+	  on:input={e => {
+	    if (old_opacity === null) { old_opacity = $data_overlay.opacity }
+	    $data_overlay.opacity = e.target.valueAsNumber
+	  }}
+	  on:change={e => {
+	    if (e.target.valueAsNumber !== old_opacity) {
+	      startUndoState({overlay: {...$data_overlay, opacity: old_opacity}}, "Change overlay opacity")
+	      $data_overlay.opacity = e.target.valueAsNumber
+	      completeUndoState({overlay: $data_overlay})
+	    }
+	    old_opacity=null
+	  }}
       />
       <span class="col-span">
-	  <button class="outline-button" on:click={reset_scale}>
+	  <button class="outline-button" on:click={resetScale}>
 	      {$tl.overlay_panel.reset_scale}
 	  </button>
       </span>
       <span class="col-span">
-	  <button class="outline-button" on:click={reset_positon}>
+	  <button class="outline-button" on:click={resetPosition}>
 	      {$tl.overlay_panel.reset_position}
 	  </button>
       </span>

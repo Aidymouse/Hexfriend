@@ -190,7 +190,7 @@ export const apply_state_data = (applied_data: UndoData, layers: LayerComponents
     data_overlay.update((u) => ({ ...u, ...applied_data.overlay }))
   }
 
-  if (applied_data.overlay_base64) {
+  if (applied_data.overlay_base64 !== undefined) {
     layers.overlayLayer.changeOverlayImage(applied_data.overlay_base64)
   }
 }

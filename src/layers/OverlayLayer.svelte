@@ -43,7 +43,8 @@
     }
 
 
-    export function changeOverlayImage(base64: string | null) {
+    /* @param loadedCallback - Runs after the overlay has loaded, or just at the end of the function call if nothing async has to happen */
+    export function changeOverlayImage(base64: string | null, loadedCallback?: () => void) {
         if (base64 === null) {
             tex_overlay = null
             OG_width = -1
@@ -58,14 +59,18 @@
 	      OG_width = tex_overlay.width
 	      OG_height = tex_overlay.height
 	      loaded_base64 = base64
+
+
 	      setTimeout(() => {
 		$loading_texture = false
-	      }, 5000)
+		loadedCallback?.()
+	      }, 2000) // simulates load time lol
 	    })
 
         } else {
             spr_overlay_image.texture = null
 	    loaded_base64 = null
+	    loadedCallback?.()
         }
 
     }
@@ -152,7 +157,7 @@
     }
 
     export function pointerup() {
-        handle_released()
+        if (grabbed_handle) { handle_released() }
     }
 
     /* Overlay Events */
@@ -166,10 +171,12 @@
     }
 
     function overlayReleased() {
+      if (moving_image === false) { return }
         moving_image = false
 
         if (!overlayDataMatches(overlay_prior_to_changes, $data_overlay)) {
             completeUndoState({overlay: $data_overlay})
+	    overlay_prior_to_changes = null
         } else {
             cancelProspectiveUndoState()
         }
@@ -185,18 +192,19 @@
         old_handle_x = store_panning.curWorldX()
         old_handle_y = store_panning.curWorldY()
 
-        if (!overlayDataMatches(overlay_prior_to_changes, $data_overlay)) {
-            completeUndoState({overlay: $data_overlay})
-        } else {
-            cancelProspectiveUndoState()
-        }
-        overlay_prior_to_changes = null
     }
 
     function handle_released() {
+	if (grabbed_handle === null) { return }
         grabbed_handle = null
         old_handle_x = 0
         old_handle_y = 0
+        if (!overlayDataMatches(overlay_prior_to_changes, $data_overlay)) {
+            completeUndoState({overlay: $data_overlay})
+	    overlay_prior_to_changes = null
+        } else {
+            cancelProspectiveUndoState()
+        }
     }
 
     function update() {

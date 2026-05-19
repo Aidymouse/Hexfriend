@@ -26,13 +26,17 @@
 	r.onload = (eb) => {
 	    let b64 = r.result as string;
 
-	    startUndoState({overlay_base64: loaded_base64, overlay: $data_overlay}, "Import Overlay Image")
+	    const old_loaded = structuredClone(loaded_base64)
+	    const old_overlay = structuredClone($data_overlay)
 
-	    comp_overlayLayer.changeOverlayImage(b64); // loads base64 into loadedSave
+	    comp_overlayLayer.changeOverlayImage(b64, () => { 
+	      console.log("loaded yeehaw" )
+	      startUndoState({overlay_base64: old_loaded, overlay: old_overlay}, "Import Overlay Image")
+	      completeUndoState({overlay_base64: b64, overlay: $data_overlay})
+	    }); // loads base64 into loadedSave
+
 	    $data_overlay.scale.x = 1;
 	    $data_overlay.scale.y = 1;
-
-	    completeUndoState({overlay_base64: b64, overlay: $data_overlay})
 
 	    showSettings = false;
 
@@ -41,6 +45,7 @@
 	    $store_has_unsaved_changes = true;
 	};
     }
+
 
 </script>
 

@@ -433,7 +433,8 @@
 	      terrainLayer: comp_terrainLayer,
 	      iconLayer: comp_iconLayer,
 	      textLayer: comp_textLayer,
-	      pathLayer: comp_pathLayer
+	      pathLayer: comp_pathLayer,
+	      overlayLayer: comp_overlayLayer
 	    }, {text_panel: comp_text_panel})
             break
 
@@ -442,7 +443,8 @@
 	      terrainLayer: comp_terrainLayer,
 	      iconLayer: comp_iconLayer,
 	      textLayer: comp_textLayer,
-	      pathLayer: comp_pathLayer
+	      pathLayer: comp_pathLayer,
+	      overlayLayer: comp_overlayLayer
 	    }, {text_panel: comp_text_panel})
             break
 
