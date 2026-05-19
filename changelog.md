@@ -5,7 +5,9 @@ For Techy People
 
 ## Version 4.0
 - Added undo / redo
-- Moved the Gap setting from grid settings into hex settings (+ altered the translation type, but changes have been applied to existing translations)
+- Save Data transitioned to version 14
+   - Moved the Gap setting from grid settings into hex settings (+ altered the translation type, but changes have been applied to existing translations)
+   - Overlay image data now stored on the map rather than in UI state
 
 # Version 3.0 - Found your feet, Hexfriend
 
