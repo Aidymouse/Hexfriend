@@ -6,7 +6,7 @@ export type HexSizeParams = {
 	width: number,
 	height: number,
 	gap: number
-         orientation: HexOrientation
+        orientation: HexOrientation
 }
 
 /** With old and new hex coords we find the position on the grid of new sized hexes that is equiv. to the position on the old grid */

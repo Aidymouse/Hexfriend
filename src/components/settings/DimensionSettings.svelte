@@ -8,15 +8,23 @@
   import { store_has_unsaved_changes } from '../../stores/flags'
   import { tl } from '../../stores/translation'
 
-  export let comp_terrainLayer
-  export let comp_iconLayer
-  export let comp_pathLayer
-  export let comp_textLayer
+  import TerrainLayer from '../../layers/TerrainLayer.svelte'
+  import IconLayer from '../../layers/IconLayer.svelte'
+  import PathLayer from '../../layers/PathLayer.svelte'
+  import TextLayer from '../../layers/TextLayer.svelte'
+  import { completeUndoState, startUndoState } from '../../lib'
+  import { type SaveData, type UndoData } from '../../types'
+
+  export let comp_terrainLayer: TerrainLayer
+  export let comp_iconLayer: IconLayer
+  export let comp_pathLayer: PathLayer
+  export let comp_textLayer: TextLayer
+
+  export let loaded_save: SaveData
 
   let addOrRemoveMapDimensions: 'add' | 'remove' = 'add'
 
-  function square_expandMapDimension(direction, amount) {
-    comp_terrainLayer.square_expandMapDimension(direction, amount)
+  function square_expandMapDimension(direction: 'left' | 'top' | 'right' | 'bottom', amount: number) {
 
     let xMod = 0
     let yMod = 0
@@ -43,9 +51,33 @@
       }
     }
 
-    comp_iconLayer.moveAllIcons(xMod, yMod)
-    comp_pathLayer.moveAllPaths(xMod, yMod)
-    comp_textLayer.moveAllTexts(xMod, yMod)
+    let undoBefore: UndoData = {
+	TerrainField: {hexes: $tfield.hexes},
+    }
+    if (xMod !== 0 || yMod !== 0) {
+      comp_iconLayer.moveAllIcons(xMod, yMod)
+      comp_pathLayer.moveAllPaths(xMod, yMod)
+      comp_textLayer.moveAllTexts(xMod, yMod)
+      undoBefore.icons = loaded_save.icons
+      undoBefore.paths = loaded_save.paths
+      undoBefore.texts = loaded_save.texts
+    }  
+
+    startUndoState(undoBefore, `Expand Square Map by ${amount}`)
+
+    comp_terrainLayer.square_expandMapDimension(direction, amount)
+
+    let undoAfter: UndoData = {
+	TerrainField: {hexes: $tfield.hexes},
+    }
+    if (xMod !== 0 || yMod !== 0) {
+      undoAfter.icons = loaded_save.icons
+      undoAfter.paths = loaded_save.paths
+      undoAfter.texts = loaded_save.texts
+    }  
+
+
+    completeUndoState(undoAfter)
 
     $store_has_unsaved_changes = true
   }
@@ -61,7 +93,6 @@
       if (amount == 0) return
     }
 
-    comp_terrainLayer.square_reduceMapDimension(direction, amount)
 
     let xMod = 0
     let yMod = 0
@@ -94,18 +125,23 @@
       }
     }
 
-    comp_iconLayer.moveAllIcons(xMod, yMod)
-    comp_pathLayer.moveAllPaths(xMod, yMod)
-    comp_textLayer.moveAllTexts(xMod, yMod)
+    if (xMod !== 0 || yMod !== 0) {
+      comp_iconLayer.moveAllIcons(xMod, yMod)
+      comp_pathLayer.moveAllPaths(xMod, yMod)
+      comp_textLayer.moveAllTexts(xMod, yMod)
+    } else {
+    }
+
+    comp_terrainLayer.square_reduceMapDimension(direction, amount)
 
     $store_has_unsaved_changes = true
   }
 
-  function flower_expandHexesOut(amount) {
+  function flower_expandHexesOut(amount: number) {
     comp_terrainLayer.flower_expandHexesOut(amount)
   }
 
-  function flower_reduceHexesOut(amount) {
+  function flower_reduceHexesOut(amount: number) {
     comp_terrainLayer.flower_reduceHexesOut(amount)
   }
 

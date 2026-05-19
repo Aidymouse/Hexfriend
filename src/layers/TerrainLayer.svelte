@@ -49,6 +49,7 @@
 
   import { completeUndoState, startUndoState } from '../lib'
   import type { UndoDataTiles } from '../types'
+  import { getShiftForSquareExpansion } from '../helpers'
   export let cont_terrain: PIXI.Container
 
   export let changeTool: Function
@@ -253,8 +254,25 @@
     renderAllHexes()
   }
 
-  export function square_expandMapDimension(direction: 'left' | 'right' | 'top' | 'bottom', amount: number) {
+  type SquareDimensionShiftResults = {
+    // When we add to the left, we actually add to the right and move to maintain the illusion. Applies to all icons, paths, texts, and the overlay
+    x_shift: number
+    y_shift: number
+    // Transform distance the camera actually moved
+    cam_x_shift: number
+    cam_y_shift: number
+  }
+
+
+  export function square_expandMapDimension(direction: 'left' | 'right' | 'top' | 'bottom', amount: number): SquareDimensionShiftResults {
     $store_has_unsaved_changes = true
+
+    let shift_results: SquareDimensionShiftResults = {
+      x_shift: 0,
+      y_shift: 0,
+      cam_x_shift: 0,
+      cam_y_shift: 0,
+    }
 
     // Will come back here later...
     // Why??
@@ -267,24 +285,26 @@
         square_expandRight(amount)
         square_moveAllHexesRight(amount)
 
-        if ($tfield.orientation == 'flatTop') {
-          let delta_x = ($tfield.hexWidth + $tfield.gap) * 0.75 * amount
-          pan.offsetX -= delta_x * pan.zoomScale
-          $data_overlay.x += delta_x
+	const shift = getShiftForSquareExpansion('left', amount, {
+	  width: $tfield.hexWidth,
+	  height: $tfield.hexHeight,
+	  raised: $tfield.raised,
+	  gap: $tfield.gap,
+	  orientation: $tfield.orientation
+	})
 
-          if (amount % 2 == 1) {
-            $tfield.raised = $tfield.raised == HexRaised.ODD ? HexRaised.EVEN : HexRaised.ODD
+
+	if (shift.new_raised !== $tfield.raised) {
+	    $tfield.raised = shift.new_raised
             square_updateRaisedColumn()
-            let delta_y = ($tfield.hexHeight + $tfield.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1)
-            pan.offsetY += delta_y * pan.zoomScale
+	}
 
-            $data_overlay.y -= delta_y
-          }
-        } else {
-          let delta_x = ($tfield.hexWidth + $tfield.gap) * amount
-          pan.offsetX -= delta_x * pan.zoomScale
-          $data_overlay.x += delta_x
-        }
+	const cam_shift_x = shift.x_shift * pan.zoomScale
+	const cam_shift_y = shift.y_shift * pan.zoomScale
+	pan.offsetX -= cam_shift_x 
+	pan.offsetY -= cam_shift_y 
+	$data_overlay.x += shift.x_shift
+	$data_overlay.y -= shift.y_shift
 
         break
 
@@ -301,6 +321,9 @@
           pan.offsetY -= delta_y * pan.zoomScale
 
           $data_overlay.y += delta_y
+
+	  shift_results.y_shift = delta_y
+	  shift_results.cam_y_shift = delta_y * pan.zoomScale
         } else {
           let delta_y = ($tfield.hexHeight + $tfield.gap) * 0.75 * amount
           pan.offsetY -= delta_y * pan.zoomScale
@@ -312,7 +335,13 @@
             let delta_x = ($tfield.hexWidth + $tfield.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1)
             pan.offsetX += delta_x * pan.zoomScale
             $data_overlay.x -= delta_x
+
+	    shift_results.x_shift = delta_x
+	    shift_results.cam_x_shift = delta_x * pan.zoomScale
           }
+
+	    shift_results.y_shift = delta_y
+	    shift_results.cam_y_shift = delta_y * pan.zoomScale
         }
 
         break
@@ -322,7 +351,10 @@
       return pan
     })
 
+
     renderAllHexes()
+
+    return shift_results
   }
 
   function square_expandRight(amount: number) {
@@ -1234,7 +1266,8 @@
 
     // Orientation is kind of tricky because it messes with icons n stuff.
     // However, applying a terrain field usually happens during undo. So icons and all that will have their own state to return to.
-    // So really, we don't need to care about applying such changes in reverse as long as all state we can about is reflected in save data
+    // So really, we don't need to care about applying such changes in reverse as long as all state we care about is reflected in save data
+    // And it is! Check HexesSettings.svelte for examples.
 
     // if ($tfield.orientation !== newField.orientation) {
     //   console.log("These'm gotta change!")

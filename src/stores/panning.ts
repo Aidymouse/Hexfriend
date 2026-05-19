@@ -7,6 +7,8 @@ import { tfield } from './tfield'
 import * as PIXI from 'pixi.js'
 import { get, writable } from 'svelte/store'
 
+// TODO: this whole situation is so weird, I really oughta clean this out some day
+
 export let store = writable({
   panning: false,
 

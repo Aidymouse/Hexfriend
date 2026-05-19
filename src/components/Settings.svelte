@@ -348,7 +348,7 @@
     <SettingHeading text={$tl.settings.shape.title} bind:toggle={hidden_settings.dimensions} />
     <div class="settings-hider" class:hidden={hidden_settings.dimensions}>
       <div class="hider">
-        <DimensionSettings bind:comp_terrainLayer bind:comp_iconLayer bind:comp_textLayer bind:comp_pathLayer />
+        <DimensionSettings bind:comp_terrainLayer bind:comp_iconLayer bind:comp_textLayer bind:comp_pathLayer loaded_save={loadedSave} />
       </div>
     </div>
   </div>
