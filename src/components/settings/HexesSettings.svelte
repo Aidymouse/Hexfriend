@@ -17,9 +17,11 @@
   import { data_terrain } from '../../stores/data'
 
   import { startUndoState, completeUndoState } from '../../lib'
+  import { type SaveData } from '../../types'
 
   export let comp_coordsLayer
   export let comp_terrainLayer
+  export let loaded_save: SaveData
 
   export let retain_positions: Function
   export let retain_positions_orientation_change: Function
@@ -100,20 +102,28 @@
       on:change={() => {
         startUndoState({ 
 	  TerrainField: {
+	    hexes: $tfield.mapShape === map_shape.SQUARE ? $tfield.hexes : undefined,
 	    hexWidth: $tfield.hexWidth,
 	    hexHeight: $tfield.hexHeight,
 	    orientation: $tfield.orientation 
-	  }
-	}, "Change Orientation")
+	  },
+	  icons: retainIconPosition ? loaded_save.icons : undefined,
+	  paths: retainPathPosition ? loaded_save.paths : undefined,
+	  texts: retainPathPosition ? loaded_save.texts : undefined,
+	}, `Change Orientation [${retainIconPosition ? 'I' : '-'}${retainPathPosition ? 'P' : '-'}${retainTextPosition ? 'T' : '-'}${$tfield.mapShape === map_shape.SQUARE ? 'H' : '-'}]`)
 
         changeOrientation($tfield.orientation === HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP)
 
         completeUndoState({
 	  TerrainField: {
+	    hexes: $tfield.mapShape === map_shape.SQUARE ? $tfield.hexes : undefined,
 	    hexWidth: $tfield.hexWidth,
 	    hexHeight: $tfield.hexHeight,
 	   orientation: $tfield.orientation 
-	  }
+	  },
+	  icons: retainIconPosition ? loaded_save.icons : undefined,
+	  paths: retainPathPosition ? loaded_save.paths : undefined,
+	  texts: retainPathPosition ? loaded_save.texts : undefined,
 	})
       }}
     />
@@ -140,6 +150,8 @@
         ]}
         value={$tfield.raised}
         on:change={(e) => {
+	  // TODO: this could be more efficient I'm sure.
+	  startUndoState({TerrainField: $tfield}, "Change raised")
           $tfield.raised = e.detail.value
           if ($tfield.orientation == HexOrientation.FLATTOP) {
             comp_terrainLayer.square_updateRaisedColumn()
@@ -147,6 +159,7 @@
             comp_terrainLayer.square_changeIndentedRow()
           }
           comp_coordsLayer.cullUnusedCoordinates()
+	  completeUndoState({TerrainField: $tfield})
         }}
       />
     </span>
@@ -164,7 +177,12 @@
         return
       }
 
-      startUndoState({TerrainField: {hexWidth: $tfield.hexWidth}}, "Change Hex Width")
+      startUndoState({
+	TerrainField: {hexWidth: $tfield.hexWidth},
+	icons: retainIconPosition || retainIconScale ? loaded_save.icons : undefined,
+	paths: retainPathPosition ? loaded_save.paths : undefined,
+	texts: retainTextPosition ? loaded_save.texts : undefined,
+      }, "Change Hex Width")
 
       $tfield.hexWidth = e.target.valueAsNumber
 
@@ -174,7 +192,12 @@
       retain_scale()
       save_old_resize_parameters()
 
-      completeUndoState({TerrainField: {hexWidth: $tfield.hexWidth}}, "Change Hex Width")
+      completeUndoState({
+	TerrainField: {hexWidth: $tfield.hexWidth},
+	icons: retainIconPosition || retainIconScale ? loaded_save.icons : undefined,
+	paths: retainPathPosition ? loaded_save.paths : undefined,
+	texts: retainTextPosition ? loaded_save.texts : undefined,
+      })
     }}
   />
 
@@ -189,7 +212,12 @@
         $tfield.hexHeight = $resize_parameters.old_hex_height
         return
       }
-      startUndoState({TerrainField: {hexHeight: $tfield.hexHeight}}, "Change Hex Height")
+      startUndoState({
+	TerrainField: {hexHeight: $tfield.hexHeight},
+	icons: retainIconPosition || retainIconScale ? loaded_save.icons : undefined,
+	paths: retainPathPosition ? loaded_save.paths : undefined,
+	texts: retainTextPosition ? loaded_save.texts : undefined,
+      })
 
       $tfield.hexHeight = e.target.valueAsNumber
 
@@ -199,7 +227,12 @@
       retain_scale()
       save_old_resize_parameters()
 
-      completeUndoState({TerrainField: {hexHeight: $tfield.hexHeight}}, "Change Hex Height")
+      completeUndoState({
+	TerrainField: {hexHeight: $tfield.hexHeight},
+	icons: retainIconPosition || retainIconScale ? loaded_save.icons : undefined,
+	paths: retainPathPosition ? loaded_save.paths : undefined,
+	texts: retainTextPosition ? loaded_save.texts : undefined,
+      })
     }}
   />
 
@@ -213,7 +246,12 @@
         console.log(radius)
         if (Number.isNaN(radius) || radius < 1) return
 
-	startUndoState({TerrainField: {hexWidth: $tfield.hexWidth, hexHeight: $tfield.hexHeight }}, "Set Hex Size by Radius")
+	startUndoState({
+	  TerrainField: {hexWidth: $tfield.hexWidth, hexHeight: $tfield.hexHeight },
+	  icons: retainIconPosition || retainIconScale ? loaded_save.icons : undefined,
+	  paths: retainPathPosition ? loaded_save.paths : undefined,
+	  texts: retainTextPosition ? loaded_save.texts : undefined,
+	  }, "Set Hex Size by Radius")
 
         let new_dims = get_width_height_from_radius(radius, $tfield.orientation)
 
@@ -227,19 +265,16 @@
         save_old_resize_parameters()
 
         comp_coordsLayer.updateAllCoordPositions()
-	completeUndoState({TerrainField: {hexWidth: $tfield.hexWidth, hexHeight: $tfield.hexHeight }})
+
+	completeUndoState({
+	  TerrainField: {hexWidth: $tfield.hexWidth, hexHeight: $tfield.hexHeight },
+	  icons: retainIconPosition || retainIconScale ? loaded_save.icons : undefined,
+	  paths: retainPathPosition ? loaded_save.paths : undefined,
+	  texts: retainTextPosition ? loaded_save.texts : undefined,
+	})
       }}>Set</button
     >
   </span>
-
-  <!--
-    <label for="mapShape">Map Type</label>
-    <select id="mapShape" bind:value={$tfield.mapShape}>
-        <option value={map_shape.SQUARE}>Square</option>
-        <option value={map_shape.RADIAL}>Radial</option>
-    </select>
-    -->
-
 
   <label for="hexGap">{$tl.settings.hexes.gap}</label>
   <input
@@ -252,7 +287,12 @@
     on:change={(e) => {
 
       //let undoStartState = {TerrainField: { grid: $tfield.grid } }
-      startUndoState({TerrainField: {gap: $tfield.gap}}, `Change Grid Gap`)
+      startUndoState({
+	TerrainField: {gap: $tfield.gap},
+	icons: retainIconPosition ? loaded_save.icons : undefined,
+	paths: retainPathPosition ? loaded_save.paths : undefined,
+	texts: retainTextPosition ? loaded_save.texts : undefined,
+      }, `Change Grid Gap`)
 
       $tfield.gap = e.target.valueAsNumber
 
@@ -261,7 +301,12 @@
       retain_positions()
       save_old_resize_parameters()
 
-      completeUndoState({TerrainField: { gap: $tfield.gap } })
+      completeUndoState({
+	TerrainField: { gap: $tfield.gap },
+	icons: retainIconPosition ? loaded_save.icons : undefined,
+	paths: retainPathPosition ? loaded_save.paths : undefined,
+	texts: retainTextPosition ? loaded_save.texts : undefined,
+      })
     }}
   />
 

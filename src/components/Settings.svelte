@@ -332,6 +332,7 @@
           bind:retainTextPosition
           bind:retainIconScale={retain_icon_scale}
           retain_positions={retain_positions_on_resize}
+	  loaded_save={loadedSave}
           {save_old_resize_parameters}
           {renderAllHexes}
           {redrawEntireMap}
