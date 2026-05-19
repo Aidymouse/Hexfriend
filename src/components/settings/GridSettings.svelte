@@ -85,12 +85,18 @@
       completeUndoState({ TerrainField: { largehexes: $tfield.largehexes } })
     }} />
 
-    <label for="overlayColor">{$tl.settings.grid.large_hexes.color}</label>
-    <ColorInputPixi id={'overlayColor'} value={$tfield.largehexes.style.color} on:input={(e) => {
-      startUndoState({ TerrainField: { largehexes: $tfield.largehexes } }, "Change Large Hex Color")
-      $tfield.largehexes.style.color = e.detail.number
-      completeUndoState({ TerrainField: { largehexes: $tfield.largehexes } }, "Change Large Hex Color")
-    }} />
+    <label for="largeHexStroke">{$tl.settings.grid.large_hexes.color}</label>
+    <ColorInputPixi
+      id={'largeHexStroke'}
+      value={$tfield.largehexes.style.color}
+      on:input={(e) => {
+	startUndoState({ TerrainField: { largehexes: $tfield.largehexes } }, "Change Large Hex Color", {bounce: true})
+	$tfield.largehexes.style.color = e.detail.number
+      }} 
+      on:change={e => {
+	completeUndoState({ TerrainField: { largehexes: $tfield.largehexes } })
+      }}
+    />
 
     <label for="overlayThickness">{$tl.settings.grid.large_hexes.outline_thickness}</label>
     <input type="number" id={'overlayThickness'} value={$tfield.largehexes.style.width} on:change={(e) => {
