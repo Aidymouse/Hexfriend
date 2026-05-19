@@ -49,10 +49,14 @@
             OG_height = -1
         }
 
-        tex_overlay = PIXI.Texture.from(base64)
-        OG_width = tex_overlay.width
-        OG_height = tex_overlay.height
-        spr_overlay_image.texture = tex_overlay
+        if (base64 !== null) {
+            tex_overlay = PIXI.Texture.from(base64)
+            spr_overlay_image.texture = tex_overlay
+            OG_width = tex_overlay.width
+            OG_height = tex_overlay.height
+        } else {
+            spr_overlay_image.texture = null
+        }
 
         loaded_base64 = base64
     }

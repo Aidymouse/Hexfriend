@@ -6,6 +6,7 @@
     import { store_selected_tool } from "../../stores/tools";
     import { store_has_unsaved_changes } from "../../stores/flags";
     import { tl } from "../../stores/translation";
+    import { startUndoState, completeUndoState } from "../../lib" 
 
     import { Tools } from "../../types/toolData";
 
@@ -25,11 +26,11 @@
 
 	    startUndoState({overlay_base64: loaded_base64, overlay: $data_overlay}, "Import Overlay Image")
 
-	    comp_overlayLayer.changeOverlayImage(base64);
+	    comp_overlayLayer.changeOverlayImage(b64); // loads base64 into loadedSave
 	    $data_overlay.scale.x = 1;
 	    $data_overlay.scale.y = 1;
 
-	    completeUndoState({overlay_base64: base64, overlay: $data_overlay})
+	    completeUndoState({overlay_base64: b64, overlay: $data_overlay})
 
 	    showSettings = false;
 
