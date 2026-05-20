@@ -24,6 +24,7 @@
     genCoordsObj,
     genHexId,
     genHexId_coordsObj,
+    getHexGridParams,
     getHexPath,
     getNeighbours,
     getRing,
@@ -44,12 +45,13 @@
 
   import { get_symbol_texture } from '../lib/texture_loader'
   import { get_icon_scale_for_hex } from '../helpers/imageSizing'
-  import type { PreviewHexInfo } from '../helpers/iconFns'
+  import type { PreviewHexInfo } from '../types'
   import { generate_tile_previews } from '../helpers/tileFns'
 
   import { completeUndoState, startUndoState } from '../lib'
   import type { UndoDataTiles } from '../types'
   import { getShiftForSquareExpansion } from '../helpers'
+  import { get } from 'svelte/store'
   export let cont_terrain: PIXI.Container
 
   export let changeTool: Function
@@ -69,7 +71,7 @@
   let tiles_this_placement: { [key: HexId]: Tile } = {}
   let replaced_this_placement: { [key: HexId]: Tile } = {}
 
-  // Exported so app.svelte can manage undo with the eraser tool 
+  // Exported so app.svelte can manage undo with the eraser tool
   export function getPlacements() {
     return { tiles: tiles_this_placement, replaced: replaced_this_placement }
   }
@@ -263,8 +265,10 @@
     cam_y_shift: number
   }
 
-
-  export function square_expandMapDimension(direction: 'left' | 'right' | 'top' | 'bottom', amount: number): SquareDimensionShiftResults {
+  export function square_expandMapDimension(
+    direction: 'left' | 'right' | 'top' | 'bottom',
+    amount: number,
+  ): SquareDimensionShiftResults {
     $store_has_unsaved_changes = true
 
     let shift_results: SquareDimensionShiftResults = {
@@ -281,76 +285,52 @@
         square_expandRight(amount)
         break
 
-      case 'left':
+      case 'left': {
         square_expandRight(amount)
         square_moveAllHexesRight(amount)
 
-	const shift = getShiftForSquareExpansion('left', amount, {
-	  width: $tfield.hexWidth,
-	  height: $tfield.hexHeight,
-	  raised: $tfield.raised,
-	  gap: $tfield.gap,
-	  orientation: $tfield.orientation
-	})
+        const shift = getShiftForSquareExpansion('left', amount, getHexGridParams($tfield))
 
+        if (shift.new_raised !== $tfield.raised) {
+          $tfield.raised = shift.new_raised
+          square_updateRaisedColumn()
+        }
 
-	if (shift.new_raised !== $tfield.raised) {
-	    $tfield.raised = shift.new_raised
-            square_updateRaisedColumn()
-	}
-
-	const cam_shift_x = shift.x_shift * pan.zoomScale
-	const cam_shift_y = shift.y_shift * pan.zoomScale
-	pan.offsetX -= cam_shift_x 
-	pan.offsetY -= cam_shift_y 
-	$data_overlay.x += shift.x_shift
-	$data_overlay.y -= shift.y_shift
+        pan.offsetX -= shift.x_shift * pan.zoomScale
+        pan.offsetY -= shift.y_shift * pan.zoomScale
+        $data_overlay.x += shift.x_shift
+        $data_overlay.y -= shift.y_shift
 
         break
+      }
 
       case 'bottom':
         square_expandDown(amount)
         break
 
-      case 'top':
+      case 'top': {
         square_expandDown(amount)
         square_moveAllHexesDown(amount)
 
-        if ($tfield.orientation == 'flatTop') {
-          let delta_y = ($tfield.hexHeight + $tfield.gap) * amount
-          pan.offsetY -= delta_y * pan.zoomScale
+        const shift = getShiftForSquareExpansion('top', amount, getHexGridParams($tfield))
 
-          $data_overlay.y += delta_y
-
-	  shift_results.y_shift = delta_y
-	  shift_results.cam_y_shift = delta_y * pan.zoomScale
-        } else {
-          let delta_y = ($tfield.hexHeight + $tfield.gap) * 0.75 * amount
-          pan.offsetY -= delta_y * pan.zoomScale
-          $data_overlay.y += delta_y
-
-          if (amount % 2 == 1) {
-            $tfield.raised = $tfield.raised == HexRaised.ODD ? HexRaised.EVEN : HexRaised.ODD
-            square_changeIndentedRow()
-            let delta_x = ($tfield.hexWidth + $tfield.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1)
-            pan.offsetX += delta_x * pan.zoomScale
-            $data_overlay.x -= delta_x
-
-	    shift_results.x_shift = delta_x
-	    shift_results.cam_x_shift = delta_x * pan.zoomScale
-          }
-
-	    shift_results.y_shift = delta_y
-	    shift_results.cam_y_shift = delta_y * pan.zoomScale
+        if (shift.new_raised !== $tfield.raised) {
+          $tfield.raised = shift.new_raised
+          square_changeIndentedRow()
         }
 
+        pan.offsetY -= shift.y_shift * pan.zoomScale
+        pan.offsetX += shift.x_shift * pan.zoomScale
+        $data_overlay.y += shift.y_shift
+        $data_overlay.x -= shift.x_shift
+
         break
+      }
     }
 
     store_panning.store.update(() => {
       return pan
     })
-
 
     renderAllHexes()
 
@@ -477,10 +457,7 @@
 
           let delta_x = ($tfield.hexWidth + $tfield.gap) * 0.75 * amount
           let delta_y =
-            ($tfield.hexHeight + $tfield.gap) *
-            0.5 *
-            ($tfield.raised == 'odd' ? -1 : 1) *
-            (amount % 2 == 0 ? 0 : 1)
+            ($tfield.hexHeight + $tfield.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1) * (amount % 2 == 0 ? 0 : 1)
 
           pan.offsetX += delta_x * pan.zoomScale
           pan.offsetY += delta_y * pan.zoomScale
@@ -784,7 +761,13 @@
       )
 
       gridGraphics.drawPolygon(
-        getHexPath($tfield.hexWidth + $tfield.gap, $tfield.hexHeight + $tfield.gap, $tfield.orientation, hexC.x, hexC.y),
+        getHexPath(
+          $tfield.hexWidth + $tfield.gap,
+          $tfield.hexHeight + $tfield.gap,
+          $tfield.orientation,
+          hexC.x,
+          hexC.y,
+        ),
       )
     })
   }
@@ -869,15 +852,17 @@
   }
 
   /* PAINT */
-  /* 
-  * @returns true if the tile was placed, false otherwise
-  */
+  /*
+   * @returns true if the tile was placed, false otherwise
+   */
   export function paintFromTile(hexId: HexId, tile: Tile, render: boolean = true): boolean {
     if (!hexExists(hexId)) return false
 
     $tfield.hexes[hexId].tile = tile ? getStoreableTile(tile) : null
 
-    if (render) { renderHex(hexId) }
+    if (render) {
+      renderHex(hexId)
+    }
 
     return true
   }
@@ -899,27 +884,35 @@
       )
 
       let clickedId = genHexId(clickedCoords.q, clickedCoords.r, clickedCoords.s)
-      if (!hexExists(clickedId)) { return }
+      if (!hexExists(clickedId)) {
+        return
+      }
 
-      const clickedTile: Tile | null = $tfield.hexes[clickedId].tile === null ? null : structuredClone($tfield.hexes[clickedId].tile)
+      const clickedTile: Tile | null =
+        $tfield.hexes[clickedId].tile === null ? null : structuredClone($tfield.hexes[clickedId].tile)
 
-      if (tiles_match($tfield.hexes[clickedId].tile, $data_terrain.tile)) { return }
+      if (tiles_match($tfield.hexes[clickedId].tile, $data_terrain.tile)) {
+        return
+      }
 
       const wasPainted = paintFromTile(clickedId, $data_terrain.tile)
 
       if (wasPainted) {
-	const placed_tile = getStoreableTile($data_terrain.tile)
-	tiles_this_placement[clickedId] = structuredClone(placed_tile)
-	replaced_this_placement[clickedId] = clickedTile
+        const placed_tile = getStoreableTile($data_terrain.tile)
+        tiles_this_placement[clickedId] = structuredClone(placed_tile)
+        replaced_this_placement[clickedId] = clickedTile
       }
-
     }
   }
 
   function paintHexFromData(hexId: HexId) {
     $store_has_unsaved_changes = true
-    if (!hexExists(hexId)) { return }
-    if (tiles_match($tfield.hexes[hexId].tile, $data_terrain.tile)) { return }
+    if (!hexExists(hexId)) {
+      return
+    }
+    if (tiles_match($tfield.hexes[hexId].tile, $data_terrain.tile)) {
+      return
+    }
     paintFromTile(hexId, $data_terrain.tile)
   }
 
@@ -1028,14 +1021,7 @@
   function paintbucket() {
     let x = store_panning.curWorldX()
     let y = store_panning.curWorldY()
-    let clickedCoords = coords_worldToCube(
-      x,
-      y,
-      $tfield.orientation,
-      $tfield.hexWidth,
-      $tfield.hexHeight,
-      $tfield.gap,
-    )
+    let clickedCoords = coords_worldToCube(x, y, $tfield.orientation, $tfield.hexWidth, $tfield.hexHeight, $tfield.gap)
 
     let clickedId = genHexId_coordsObj(clickedCoords)
     if (!hexExists(clickedId)) return
@@ -1044,16 +1030,16 @@
     // Check if hex in data matches the clicked style. If it does, abort painting!
     // Should be done in paint terrain as well
 
-    let replaced: {[h: HexId]: Tile | null} = {}
-    let placed: {[h: HexId]: Tile | null} = {}
+    let replaced: { [h: HexId]: Tile | null } = {}
+    let placed: { [h: HexId]: Tile | null } = {}
     getContiguousHexIdsOfSameType(clickedId).forEach((hexId: HexId) => {
       replaced[hexId] = structuredClone($tfield.hexes[hexId].tile)
       paintHexFromData(hexId)
       placed[hexId] = structuredClone($tfield.hexes[hexId].tile)
     })
 
-    startUndoState({tiles: replaced}, "Paintbucket Hexes")
-    completeUndoState({tiles: placed})
+    startUndoState({ tiles: replaced }, 'Paintbucket Hexes')
+    completeUndoState({ tiles: placed })
 
     $store_has_unsaved_changes = true
   }
@@ -1075,8 +1061,8 @@
     if (!hexExists(clickedId)) return
     if ($tfield.hexes[clickedId].tile == null) return
 
-    let replaced: {[h: HexId]: Tile | null} = {}
-    let placed: {[h: HexId]: null} = {}
+    let replaced: { [h: HexId]: Tile | null } = {}
+    let placed: { [h: HexId]: null } = {}
     let hexes = getContiguousHexIdsOfSameType(clickedId)
     hexes.forEach((hexId: HexId) => {
       replaced[hexId] = structuredClone($tfield.hexes[hexId].tile)
@@ -1084,8 +1070,8 @@
       placed[hexId] = null
     })
 
-    startUndoState({tiles: replaced}, "Erase Paintbucket")
-    completeUndoState({tiles: placed})
+    startUndoState({ tiles: replaced }, 'Erase Paintbucket')
+    completeUndoState({ tiles: placed })
 
     $store_has_unsaved_changes = true
   }
@@ -1177,8 +1163,11 @@
   export function pointerup() {
     // Save the terrain placed in an undo state
     if (Object.keys(tiles_this_placement).length > 0) {
-      startUndoState({tiles: replaced_this_placement}, `${$data_terrain.usingEraser ? 'Erase' : 'Place'} Tiles - ${Object.keys(tiles_this_placement).length}`)
-      completeUndoState({tiles: tiles_this_placement})
+      startUndoState(
+        { tiles: replaced_this_placement },
+        `${$data_terrain.usingEraser ? 'Erase' : 'Place'} Tiles - ${Object.keys(tiles_this_placement).length}`,
+      )
+      completeUndoState({ tiles: tiles_this_placement })
     }
 
     tiles_this_placement = {}
@@ -1276,15 +1265,13 @@
     // }
   }
 
-  export function applyUndoTiles(tiles_to_place: {[hexId: HexId]: Tile | null}) {
-    console.log("Undoing tiles", tiles_to_place)
-
+  export function applyUndoTiles(tiles_to_place: { [hexId: HexId]: Tile | null }) {
+    console.log('Undoing tiles', tiles_to_place)
 
     for (const [hex_id, tile] of Object.entries(tiles_to_place)) {
       paintFromTile(hex_id as HexId, tile)
     }
   }
-
 </script>
 
 <!--
