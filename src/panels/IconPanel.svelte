@@ -2,7 +2,7 @@
   import type { icon_data } from '../types/data'
   import type { Icon, Iconset } from '../types/icon'
   import type { TerrainField } from '../types/terrain'
-  import type { PreviewHexInfo } from '../helpers/iconFns'
+  import type { PreviewHexInfo } from '../types'
   import { ScaleMode } from '../helpers/imageSizing'
 
   import ColorInputPixi from '../components/ColorInputPixi.svelte'
@@ -35,8 +35,8 @@
   tfield.subscribe((n) => {
     hex_info = {
       color: PIXI.utils.hex2string(n.blankHexColor),
-      hexHeight: n.hexHeight,
-      hexWidth: n.hexWidth,
+      height: n.hexHeight,
+      width: n.hexWidth,
       orientation: n.orientation,
     }
 

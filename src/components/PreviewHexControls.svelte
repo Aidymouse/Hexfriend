@@ -1,7 +1,7 @@
 <!-- Wrapper for controls that handle a preview hex controls -->
 
 <script lang="ts">
-  import { type PreviewHexInfo } from '../helpers/iconFns'
+  import { type PreviewHexInfo } from '../types'
   import ColorInput from './ColorInput.svelte'
   import * as PIXI from 'pixi.js'
   import { DEFAULT_BLANK_HEX_COLOR } from '../types/defaults'
@@ -14,9 +14,9 @@
 </script>
 
 <label for="hex-width">{$tl.settings.hexes.width}</label>
-<input id="hex-width" type="number" bind:value={preview_hex_info.hexWidth} />
+<input id="hex-width" type="number" bind:value={preview_hex_info.width} />
 <label for="hex-height">{$tl.settings.hexes.height}</label>
-<input id="hex-height" type="number" bind:value={preview_hex_info.hexHeight} />
+<input id="hex-height" type="number" bind:value={preview_hex_info.height} />
 <label for="hex-color">{$tl.preview_hex_controls.color}</label>
 <div style="display: flex; gap: 0.5em">
   <ColorInput name="hex-color" bind:value={preview_hex_info.color} />

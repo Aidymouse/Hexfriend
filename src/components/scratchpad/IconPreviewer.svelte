@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as PIXI from 'pixi.js'
   import { generate_icon_preview, generate_ordered_icon_preview } from '../../helpers/iconFns'
-  import { HexOrientation } from '../../types/terrain'
+  import { HexOrientation, type PreviewHexInfo } from '../../types/terrain'
   import { load_icon_texture } from '../../lib/texture_loader'
   import { type Iconset } from '../../types/icon'
   import { testIconset } from './testiconsetfaces'
@@ -20,7 +20,7 @@
 
   let phex: number = 100
   let rot: number = 0
-  let hexInfo = { hexHeight: 45 * 2, hexWidth: 50 * 2, orientation: HexOrientation.FLATTOP, color: '#f2f2f2' }
+  let hexInfo: PreviewHexInfo = { height: 45 * 2, width: 50 * 2, orientation: HexOrientation.FLATTOP, color: '#f2f2f2' }
   let imgs = []
   let dualImgs = []
 
@@ -31,7 +31,14 @@
     const previewPromises = testIconset.icons.map(
       (i) =>
         new Promise(async (res, rej) => {
-          const preview = await generate_icon_preview({ ...i, pHex: phex, rotation: rot }, hexInfo, grph, spr, cont, app)
+          const preview = await generate_icon_preview(
+            { ...i, pHex: phex, rotation: rot },
+            hexInfo,
+            grph,
+            spr,
+            cont,
+            app,
+          )
           res(preview)
         }),
     )
@@ -50,10 +57,10 @@
           const preview = await generate_icon_preview(
             { ...i, scaleMode: ScaleMode.BYDIMENSION, pWidth: pHor, pHeight: pVert, rotation: rot },
             hexInfo,
-	    grph,
-	    spr,
-	    cont,
-	    app
+            grph,
+            spr,
+            cont,
+            app,
           )
           res(preview)
         }),
@@ -101,7 +108,7 @@
       <input type="number" bind:value={rot} on:input={genPreviews} style="width: 4em" /> deg
     </div>
 
-	<hr />
+    <hr />
 
     <div style="display: flex">
       Phex
@@ -140,26 +147,26 @@
       />
       {pVert}%
     </div>
-	<hr />
+    <hr />
 
     <div style="display: flex">
       Hex Width
-      <input type="range" id="icon-hexwidth" min={0} max={100} bind:value={hexInfo.hexWidth} on:input={genPreviews} />
-      {hexInfo.hexWidth}
+      <input type="range" id="icon-hexwidth" min={0} max={100} bind:value={hexInfo.width} on:input={genPreviews} />
+      {hexInfo.width}
     </div>
 
     <div style="display: flex">
       Hex Height
-      <input type="range" id="icon-hexheight" min={0} max={100} bind:value={hexInfo.hexHeight} on:input={genPreviews} />
-      {hexInfo.hexHeight}
+      <input type="range" id="icon-hexheight" min={0} max={100} bind:value={hexInfo.height} on:input={genPreviews} />
+      {hexInfo.height}
     </div>
 
     <button
       on:click={() => {
         hexInfo = {
           ...hexInfo,
-          hexWidth: hexInfo.hexHeight,
-          hexHeight: hexInfo.hexWidth,
+          width: hexInfo.height,
+          height: hexInfo.width,
           orientation:
             hexInfo.orientation === HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP,
         }
@@ -172,17 +179,16 @@
       on:click={() => {
         const dims =
           hexInfo.orientation === HexOrientation.FLATTOP
-            ? get_width_height_from_radius(hexInfo.hexWidth / 2, hexInfo.orientation)
-            : get_width_height_from_radius(hexInfo.hexHeight / 2, hexInfo.orientation)
+            ? get_width_height_from_radius(hexInfo.width / 2, hexInfo.orientation)
+            : get_width_height_from_radius(hexInfo.height / 2, hexInfo.orientation)
         hexInfo = {
           ...hexInfo,
-          hexWidth: dims.width,
-          hexHeight: dims.height,
+          width: dims.width,
+          height: dims.height,
         }
 
         genPreviews()
       }}>Turn to Perfect Hex</button
     >
-
   </div>
 </div>

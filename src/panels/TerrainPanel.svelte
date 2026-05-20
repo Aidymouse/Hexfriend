@@ -61,8 +61,8 @@
     return generate_tile_preview(
       $data_terrain.tile,
       {
-        hexWidth: $tfield.hexWidth,
-        hexHeight: $tfield.hexHeight,
+        width: $tfield.hexWidth,
+        height: $tfield.hexHeight,
         color: new PIXI.Color($data_terrain.tile.bgColor).toHex(),
         orientation: $tfield.orientation,
       },

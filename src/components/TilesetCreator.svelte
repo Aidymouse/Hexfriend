@@ -2,13 +2,14 @@
   import { LATEST_TILESET_FORMAT_VERSION, type Tile, type Tileset } from '../types/tilesets'
   import { DEFAULT_BLANK_HEX_COLOR } from '../types/defaults'
   import { get_icon_scale_for_hex } from '../helpers/imageSizing'
-  import { generate_icon_preview, type PreviewHexInfo } from '../helpers/iconFns'
+  import { type PreviewHexInfo } from '../types'
+  import { generate_icon_preview } from '../helpers/iconFns'
   import { generate_tile_previews } from '../helpers/tileFns'
   import { load_tileset_textures } from '../lib/texture_loader'
 
   let preview_hex_info: PreviewHexInfo = {
-    hexWidth: 50 * 6,
-    hexHeight: 43.3 * 6,
+    height: 50 * 6,
+    width: 43.3 * 6,
     orientation: HexOrientation.FLATTOP,
     color: new PIXI.Color(DEFAULT_BLANK_HEX_COLOR).toHex(),
   }
@@ -145,7 +146,15 @@
   }
 
   const get_tile_previews = async (tile: Tile) => {
-    const previews = await generate_tile_previews(tile, preview_hex_info, previewSprite, previewGraphics, previewContainer, app, true)
+    const previews = await generate_tile_previews(
+      tile,
+      preview_hex_info,
+      previewSprite,
+      previewGraphics,
+      previewContainer,
+      app,
+      true,
+    )
     return previews
   }
 
@@ -248,7 +257,7 @@
     if (tile.id == phantomTileButtonId) return
 
     let draggedOverIndex = workingTileset.tiles.indexOf(tile)
-    const draggedTile = workingTileset.tiles.find(t => t.id === phantomTileButtonId)
+    const draggedTile = workingTileset.tiles.find((t) => t.id === phantomTileButtonId)
     workingTileset.tiles = workingTileset.tiles.filter((i) => i.id != phantomTileButtonId)
 
     // If phantom is on the left, switch them. Otherwise, proceed as normal
@@ -267,12 +276,12 @@
     delete (selectedTile.symbol as ByDimensionIcon).pHeight
 
     if (new_mode === ScaleMode.RELATIVE) {
-      selectedTile.symbol.scaleMode = new_mode;
-      (selectedTile.symbol as RelativeIcon).pHex = 80;
+      selectedTile.symbol.scaleMode = new_mode
+      ;(selectedTile.symbol as RelativeIcon).pHex = 80
     } else {
-      selectedTile.symbol.scaleMode = new_mode as ScaleMode;
-      (selectedTile.symbol as ByDimensionIcon).pWidth = 100;
-      (selectedTile.symbol as ByDimensionIcon).pHeight = 100;
+      selectedTile.symbol.scaleMode = new_mode as ScaleMode
+      ;(selectedTile.symbol as ByDimensionIcon).pWidth = 100
+      ;(selectedTile.symbol as ByDimensionIcon).pHeight = 100
     }
   }
 
@@ -311,7 +320,6 @@
         selectedTile.preview_pointyTop = newpreviews.pointyTop
         workingTileset = workingTileset
       }
-
     }
   })
 </script>
@@ -367,46 +375,46 @@
     </div>
 
     <div id="tile-buttons-ctr">
-    <div
-      id="tile-buttons"
-      on:dragover={(e) => {
-        e.preventDefault()
-      }}
-      on:dragenter={(e) => {
-        e.preventDefault()
-      }}
-      on:drop={dropButton}
-    >
-      {#each workingTileset.tiles as tile (tile.id)}
+      <div
+        id="tile-buttons"
+        on:dragover={(e) => {
+          e.preventDefault()
+        }}
+        on:dragenter={(e) => {
+          e.preventDefault()
+        }}
+        on:drop={dropButton}
+      >
+        {#each workingTileset.tiles as tile (tile.id)}
+          <button
+            class="tile-button"
+            class:selected={selectedTile == tile}
+            style={tile.id == phantomTileButtonId ? 'opacity: 0' : ''}
+            on:click={() => {
+              selectedTile = tile
+              local_tile_color = new PIXI.Color(tile.bgColor).toHex()
+              if (tile.symbol) local_symbol_color = new PIXI.Color(tile.symbol.color).toHex()
+            }}
+            draggable={true}
+            on:dragstart={(e) => {
+              dragButton(e, tile)
+            }}
+            on:dragenter={(e) => {
+              draggedOverButton(e, tile)
+            }}
+            title={tile.display}
+          >
+            <img src={tile[`preview_${preview_hex_info.orientation}`]} draggable="false" alt={tile.display} />
+          </button>
+        {/each}
+
         <button
           class="tile-button"
-          class:selected={selectedTile == tile}
-          style={tile.id == phantomTileButtonId ? 'opacity: 0' : ''}
           on:click={() => {
-            selectedTile = tile
-            local_tile_color = new PIXI.Color(tile.bgColor).toHex()
-            if (tile.symbol) local_symbol_color = new PIXI.Color(tile.symbol.color).toHex()
-          }}
-          draggable={true}
-          on:dragstart={(e) => {
-            dragButton(e, tile)
-          }}
-          on:dragenter={(e) => {
-            draggedOverButton(e, tile)
-          }}
-          title={tile.display}
+            newTile()
+          }}>+</button
         >
-          <img src={tile[`preview_${preview_hex_info.orientation}`]} draggable="false" alt={tile.display} />
-        </button>
-      {/each}
-
-      <button
-        class="tile-button"
-        on:click={() => {
-          newTile()
-        }}>+</button
-      >
-    </div>
+      </div>
     </div>
   </nav>
 

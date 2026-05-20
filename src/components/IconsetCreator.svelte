@@ -3,7 +3,6 @@
   import { LATEST_ICONSET_FORMAT_VERSION, type Icon, type Iconset } from '../types/icon'
   import ColorInput from './ColorInput.svelte'
   import { convert_iconset_to_latest } from '../lib/iconsetConverter'
-  import { load_iconset_textures } from '../lib/texture_loader.ts'
 
   import { tl } from '../stores/translation'
 
@@ -13,7 +12,8 @@
   import CanvasHolder from './CanvasHolder.svelte'
   import * as PIXI from 'pixi.js'
   import { afterUpdate, tick } from 'svelte'
-  import { generate_icon_preview, type PreviewHexInfo } from '../helpers/iconFns'
+  import { generate_icon_preview } from '../helpers/iconFns'
+  import { type PreviewHexInfo } from '../types'
   import { get_icon_scale_for_hex, ScaleMode } from '../helpers/imageSizing'
   import { DEFAULT_BLANK_HEX_COLOR } from '../types/defaults'
   import PreviewHexControls from './PreviewHexControls.svelte'
@@ -27,8 +27,8 @@
   export let appState
 
   let preview_hex_info: PreviewHexInfo = {
-    hexWidth: 50 * 6,
-    hexHeight: 43.3 * 6,
+    width: 50 * 6,
+    height: 43.3 * 6,
     orientation: HexOrientation.FLATTOP,
     color: '#f2f2f2',
   }
@@ -92,7 +92,7 @@
   let newIconFiles: FileList
 
   async function loadTexture(texId, result) {
-	console.log("Now real Loading Texture for", texId, result)
+    console.log('Now real Loading Texture for', texId, result)
     let newTexture = await PIXI.Assets.load(result)
     loadedTextures[texId] = newTexture
     return newTexture
@@ -202,7 +202,7 @@
 
       setToImport = await convert_iconset_to_latest(setToImport)
 
-      console.log("Importing Iconset to Builder", setToImport)
+      console.log('Importing Iconset to Builder', setToImport)
 
       icon_previews = {}
 
@@ -231,9 +231,9 @@
   function dragButton(e: DragEvent, icon: Icon) {
     phantomIconButtonId = icon.id
     const s = JSON.stringify(icon)
-    console.log("Stringified", s)
-    e.dataTransfer.setData("text/json", s)
-    console.log("Retrieved", e.dataTransfer.getData("text/json"))
+    console.log('Stringified', s)
+    e.dataTransfer.setData('text/json', s)
+    console.log('Retrieved', e.dataTransfer.getData('text/json'))
   }
 
   function dropButton(e: DragEvent) {
@@ -241,10 +241,12 @@
   }
 
   function draggedOverButton(e: DragEvent, icon: Icon) {
-    if (icon.id == phantomIconButtonId) { return }
+    if (icon.id == phantomIconButtonId) {
+      return
+    }
 
     let draggedOverIndex = workingIconset.icons.indexOf(icon)
-    const draggedIcon = workingIconset.icons.find(i => i.id === phantomIconButtonId)
+    const draggedIcon = workingIconset.icons.find((i) => i.id === phantomIconButtonId)
     workingIconset.icons = workingIconset.icons.filter((i) => i.id != phantomIconButtonId)
 
     // If phantom is on the left, switch them. Otherwise, proceed as normal
@@ -267,7 +269,7 @@
       grph_background_hex.clear()
       grph_background_hex.beginFill(preview_hex_info.color)
       grph_background_hex.drawPolygon(
-        getHexPath(preview_hex_info.hexWidth, preview_hex_info.hexHeight, preview_hex_info.orientation, 150, 150),
+        getHexPath(preview_hex_info.width, preview_hex_info.height, preview_hex_info.orientation, 150, 150),
       )
       grph_background_hex.endFill()
 
@@ -361,50 +363,50 @@
 
     <!-- ICON BUTTONS -->
     <div id="icon-buttons-ctr">
-    <div
-      id="icon-buttons"
-      on:dragover={(e) => {
-        e.preventDefault()
-      }}
-      on:dragenter={(e) => {
-        e.preventDefault()
-      }}
-      on:drop={dropButton}
-    >
-      {#each workingIconset.icons as icon (icon.id)}
-        <button
-          class="icon-button"
-          class:selected={selectedIcon == icon}
-          style={icon.id == phantomIconButtonId ? 'opacity: 0' : ''}
-          on:click={() => {
-            selectedIcon = icon
-          }}
-          draggable={true}
-          on:dragstart={(e) => {
-            dragButton(e, icon)
-          }}
-          on:dragenter={(e) => {
-            draggedOverButton(e, icon)
-          }}
-          title={icon.display}
-        >
-          <img src={icon_previews[icon.id]} draggable="false" alt="Button for {icon.display}" />
-        </button>
-      {/each}
+      <div
+        id="icon-buttons"
+        on:dragover={(e) => {
+          e.preventDefault()
+        }}
+        on:dragenter={(e) => {
+          e.preventDefault()
+        }}
+        on:drop={dropButton}
+      >
+        {#each workingIconset.icons as icon (icon.id)}
+          <button
+            class="icon-button"
+            class:selected={selectedIcon == icon}
+            style={icon.id == phantomIconButtonId ? 'opacity: 0' : ''}
+            on:click={() => {
+              selectedIcon = icon
+            }}
+            draggable={true}
+            on:dragstart={(e) => {
+              dragButton(e, icon)
+            }}
+            on:dragenter={(e) => {
+              draggedOverButton(e, icon)
+            }}
+            title={icon.display}
+          >
+            <img src={icon_previews[icon.id]} draggable="false" alt="Button for {icon.display}" />
+          </button>
+        {/each}
 
-      <button class="icon-button file-input-button">
-        +
-        <input
-          type="file"
-          multiple
-          accept="image/*"
-          bind:files={newIconFiles}
-          on:change={() => {
-            newIcon()
-          }}
-        />
-      </button>
-    </div>
+        <button class="icon-button file-input-button">
+          +
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            bind:files={newIconFiles}
+            on:change={() => {
+              newIcon()
+            }}
+          />
+        </button>
+      </div>
     </div>
   </nav>
 
@@ -428,8 +430,8 @@
           on:click={() => {
             preview_hex_info = {
               ...preview_hex_info,
-              hexWidth: preview_hex_info.hexHeight,
-              hexHeight: preview_hex_info.hexWidth,
+              width: preview_hex_info.height,
+              height: preview_hex_info.width,
               orientation:
                 preview_hex_info.orientation === HexOrientation.FLATTOP
                   ? HexOrientation.POINTYTOP

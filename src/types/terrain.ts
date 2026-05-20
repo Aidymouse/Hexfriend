@@ -55,7 +55,7 @@ export type TerrainField = {
   columns: number
   raised: HexRaised
 
-  // TODO: put hex size params into their own hex size param object, HexSizeInfo
+  // TODO: put hex size params into their own hex size param object
   orientation: HexOrientation
   blankHexColor: number
   gap: number
@@ -63,4 +63,6 @@ export type TerrainField = {
   hexes: { [key: HexId]: TerrainHex }
 }
 
-export type HexSizeInfo = Omit<PreviewHexInfo, 'color'> & { gap: number }
+export type HexSizeParams = { width: number; height: number; orientation: HexOrientation }
+export type HexGridParams = HexSizeParams & { gap: number; raised: HexRaised }
+export type PreviewHexInfo = HexSizeParams & { color: string }
