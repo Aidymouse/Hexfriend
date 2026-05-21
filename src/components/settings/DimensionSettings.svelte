@@ -15,6 +15,8 @@
   import { completeUndoState, startUndoState } from '../../lib'
   import { type SaveData, type UndoData } from '../../types'
 
+  import { getShiftForSquareExpansion } from '../../helpers'
+  import { getHexGridParams } from '../../helpers/hexHelpers'
   export let comp_terrainLayer: TerrainLayer
   export let comp_iconLayer: IconLayer
   export let comp_pathLayer: PathLayer
@@ -26,42 +28,18 @@
 
   function square_expandMapDimension(direction: 'left' | 'top' | 'right' | 'bottom', amount: number) {
 
-    let xMod = 0
-    let yMod = 0
-
-    switch (direction) {
-      case 'left': {
-        if ($tfield.orientation == HexOrientation.FLATTOP) {
-          xMod = $tfield.hexWidth * 0.75 * amount
-          if (amount % 2 == 1) yMod = -$tfield.hexHeight * 0.5 * ($tfield.raised == 'odd' ? -1 : 1)
-        } else {
-          xMod = $tfield.hexWidth * amount
-        }
-        break
-      }
-
-      case 'top': {
-        if ($tfield.orientation == HexOrientation.FLATTOP) {
-          yMod = $tfield.hexHeight * amount
-        } else {
-          yMod = $tfield.hexHeight * 0.75 * amount
-          if (amount % 2 == 1) xMod = -$tfield.hexWidth * 0.5 * ($tfield.raised == 'odd' ? -1 : 1)
-        }
-        break
-      }
-    }
-
     let undoBefore: UndoData = {
 	TerrainField: {hexes: $tfield.hexes},
     }
-    if (xMod !== 0 || yMod !== 0) {
-      comp_iconLayer.moveAllIcons(xMod, yMod)
-      comp_pathLayer.moveAllPaths(xMod, yMod)
-      comp_textLayer.moveAllTexts(xMod, yMod)
+    if (direction === 'top' || direction === 'left') {
+      const shift = getShiftForSquareExpansion(direction, amount, getHexGridParams($tfield))
       undoBefore.icons = loaded_save.icons
       undoBefore.paths = loaded_save.paths
       undoBefore.texts = loaded_save.texts
-    }  
+      comp_iconLayer.moveAllIcons(shift.x_shift, shift.y_shift)
+      comp_pathLayer.moveAllPaths(shift.x_shift, shift.y_shift)
+      comp_textLayer.moveAllTexts(shift.x_shift, shift.y_shift)
+    }
 
     startUndoState(undoBefore, `Expand Square Map by ${amount}`)
 
@@ -70,12 +48,11 @@
     let undoAfter: UndoData = {
 	TerrainField: {hexes: $tfield.hexes},
     }
-    if (xMod !== 0 || yMod !== 0) {
+    if (direction === 'top' || direction === 'left') {
       undoAfter.icons = loaded_save.icons
       undoAfter.paths = loaded_save.paths
       undoAfter.texts = loaded_save.texts
     }  
-
 
     completeUndoState(undoAfter)
 

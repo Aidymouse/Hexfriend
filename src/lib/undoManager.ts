@@ -31,7 +31,7 @@ export const startUndoState = (
     return
   }
 
-  const new_state: UndoState = { label, before: structuredClone(data), after: {} }
+  const new_state: UndoState = { label, before: structuredClone(preProcessUndoState(data)), after: {} }
 
   if (get(store_undo).awaiting_completion) {
     if (options.bounce) {
@@ -65,7 +65,7 @@ export const completeUndoState = (data: UndoData, label?: string) => {
 
   store_undo.update((u) => {
     const push_state = u.prospective_state
-    push_state.after = structuredClone(data)
+    push_state.after = structuredClone(preProcessUndoState(data))
     u.undo_stack.splice(u.undo_pointer + 1)
     u.undo_stack.push(push_state)
     u.undo_pointer += 1
@@ -73,6 +73,15 @@ export const completeUndoState = (data: UndoData, label?: string) => {
     u.prospective_state = null
     return u
   })
+}
+
+
+const preProcessUndoState = (data: UndoData): UndoData => {
+  if (data.TerrainField.hexes === undefined) {
+    delete data.TerrainField.hexes
+  }
+
+  return data
 }
 
 export const cancelProspectiveUndoState = () => {
@@ -151,6 +160,7 @@ export const redo = (layers: LayerComponents, panels: PanelComponents) => {
 export const apply_state_data = (applied_data: UndoData, layers: LayerComponents, panels: PanelComponents) => {
   if (applied_data.TerrainField) {
     layers.terrainLayer.applyTerrainField(applied_data.TerrainField)
+
   }
 
   if (applied_data.tiles) {

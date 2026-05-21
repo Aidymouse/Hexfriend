@@ -2,6 +2,7 @@
   // Small random bug that i'll come investigate later: if you change orientation, then raised col/indented row, then change orientation again, hex at (col.row) (1.0) or (1.1) will be duplicated??
   import { coords_cubeToWorld, genHexId } from '../helpers/hexHelpers'
   import { coords_cubeToq, coords_cubeTor } from '../helpers/hexHelpers'
+  import { breakDownHexID } from '../helpers/hexHelpers'
 
   import { data_coordinates } from '../stores/data'
 
@@ -36,10 +37,6 @@
   let cont_textContainer = new PIXI.Container()
   cont_coordinates.addChild(cont_textContainer)
 
-  function breakDownHexID(hexId: HexId) {
-    let brokenId = hexId.split(':')
-    return { q: Number(brokenId[0]), r: Number(brokenId[1]), s: Number(brokenId[2]) }
-  }
 
   function coordTextExists(hexId: HexId) {
     return coordTexts[hexId] != null
@@ -92,6 +89,13 @@
     }
 
     $store_has_unsaved_changes = true
+  }
+
+  export function completeUpdate() {
+      cullUnusedCoordinates()
+      updateAllCoordPositions()
+      updateAllCoordsText()
+      populateBlankHexes()
   }
 
   function updateCoordPosition(hexId: HexId) {

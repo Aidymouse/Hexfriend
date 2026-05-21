@@ -9,7 +9,7 @@
   import { Tools } from '../types/toolData'
   import type CoordsLayer from './CoordsLayer.svelte'
 
-  import { data_terrain } from '../stores/data'
+  import { data_coordinates, data_terrain } from '../stores/data'
   import { data_overlay } from '../stores/data'
   import * as store_panning from '../stores/panning'
   import { tfield } from '../stores/tfield'
@@ -1234,9 +1234,16 @@
   export function applyTerrainField(newField: Partial<TerrainField>) {
     console.log('Applying terran field', newField, $tfield)
 
+    const should_rerender_coords = $data_coordinates.shown && ($tfield.blankHexColor === newField.blankHexColor || newField.blankHexColor === undefined)
+
     $tfield = { ...$tfield, ...newField }
     // TODO: only render all hexes if we change something related to the hexes (e.g. tiles, hex spacing, etc)
     renderAllHexes()
+
+    if (should_rerender_coords) {
+      comp_coordsLayer.completeUpdate()
+    }
+
     $data_terrain.genPreview = true
 
     // Orientation is kind of tricky because it messes with icons n stuff.

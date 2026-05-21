@@ -2,6 +2,7 @@ import TerrainLayer from '../layers/TerrainLayer.svelte'
 import IconLayer from '../layers/IconLayer.svelte'
 import TextLayer from '../layers/TextLayer.svelte'
 import PathLayer from '../layers/PathLayer.svelte'
+import CoordinatesLayer from '../layers/../layers/CoordsLayer.svelte'
 import OverlayLayer from '../panels/OverlayLayer.svelte'
 import TextPanel from '../panels/TextPanel.svelte'
 import PathPanel from '../panels/PathPanel.svelte'
@@ -16,6 +17,7 @@ export type LayerComponents = {
   textLayer: TextLayer
   pathLayer: PathLayer
   overlayLayer: OverlayLayer
+  coordsLayer: CoordinatesLayer
 }
 
 export type PanelComponents = {
@@ -35,6 +37,9 @@ export type UndoData = {
   selected_tool?: Tools
 
   path_data?: Partial<PathData>
+
+  // When the map is resized on the top or left, the camera is moved and the overlay is shifted. This tracks that bump. Added to camera, subtracted from overlay position
+  resize_bump?: { x: number, y: number }
 
   //tiles?: UndoDataTiles
   //path_point?: UndoDataPathPoint

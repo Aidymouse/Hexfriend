@@ -439,7 +439,8 @@
 	      iconLayer: comp_iconLayer,
 	      textLayer: comp_textLayer,
 	      pathLayer: comp_pathLayer,
-	      overlayLayer: comp_overlayLayer
+	      overlayLayer: comp_overlayLayer,
+	      coordsLayer: comp_coordsLayer
 	    }, {
 	    text_panel: comp_text_panel,
 	    path_panel: comp_path_panel,
@@ -452,7 +453,8 @@
 	      iconLayer: comp_iconLayer,
 	      textLayer: comp_textLayer,
 	      pathLayer: comp_pathLayer,
-	      overlayLayer: comp_overlayLayer
+	      overlayLayer: comp_overlayLayer,
+	      coordsLayer: comp_coordsLayer
 	    }, {
 	      text_panel: comp_text_panel,
 	      path_panel: comp_path_panel,
