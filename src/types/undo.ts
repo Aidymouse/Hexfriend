@@ -39,7 +39,7 @@ export type UndoData = {
   path_data?: Partial<PathData>
 
   // When the map is resized on the top or left, the camera is moved and the overlay is shifted. This tracks that bump. Added to camera, subtracted from overlay position
-  resize_bump?: { x: number, y: number }
+  resize_bump?: { x_shift: number, y_shift: number }
 
   //tiles?: UndoDataTiles
   //path_point?: UndoDataPathPoint

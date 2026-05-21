@@ -1,5 +1,5 @@
 import { Tools, type LayerComponents, type PanelComponents, type UndoData, type UndoState } from '../types'
-import { data_path, data_overlay, DefaultUndoStore } from '../stores'
+import { data_path, data_overlay, store_panning, DefaultUndoStore } from '../stores'
 import { get } from 'svelte/store'
 
 import { store_undo, store_selected_tool } from '../stores'
@@ -160,7 +160,23 @@ export const redo = (layers: LayerComponents, panels: PanelComponents) => {
 export const apply_state_data = (applied_data: UndoData, layers: LayerComponents, panels: PanelComponents) => {
   if (applied_data.TerrainField) {
     layers.terrainLayer.applyTerrainField(applied_data.TerrainField)
+  }
 
+  if (applied_data.resize_bump) {
+    const shift = applied_data.resize_bump
+    store_panning.store.update(p => {
+      p.offsetX += shift.x_shift * p.zoomScale,
+      p.offsetY += shift.y_shift * p.zoomScale
+      return p
+    })
+    data_overlay.update(d => {
+      d.x -= shift.x_shift
+      d.y -= shift.y_shift
+      return d
+    })
+    layers.iconLayer.moveAllIcons(-shift.x_shift, -shift.y_shift)
+    layers.pathLayer.moveAllPaths(-shift.x_shift, -shift.y_shift)
+    layers.textLayer.moveAllTexts(-shift.x_shift, -shift.y_shift)
   }
 
   if (applied_data.tiles) {

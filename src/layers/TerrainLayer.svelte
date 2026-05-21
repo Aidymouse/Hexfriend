@@ -50,7 +50,7 @@
 
   import { completeUndoState, startUndoState } from '../lib'
   import type { UndoDataTiles } from '../types'
-  import { getShiftForSquareExpansion } from '../helpers'
+  import { getShiftForSquareExpansion, type SquareDimensionShiftResults } from '../helpers'
   import { get } from 'svelte/store'
   export let cont_terrain: PIXI.Container
 
@@ -256,14 +256,6 @@
     renderAllHexes()
   }
 
-  type SquareDimensionShiftResults = {
-    // When we add to the left, we actually add to the right and move to maintain the illusion. Applies to all icons, paths, texts, and the overlay
-    x_shift: number
-    y_shift: number
-    // Transform distance the camera actually moved
-    cam_x_shift: number
-    cam_y_shift: number
-  }
 
   export function square_expandMapDimension(
     direction: 'left' | 'right' | 'top' | 'bottom',
@@ -271,15 +263,8 @@
   ): SquareDimensionShiftResults {
     $store_has_unsaved_changes = true
 
-    let shift_results: SquareDimensionShiftResults = {
-      x_shift: 0,
-      y_shift: 0,
-      cam_x_shift: 0,
-      cam_y_shift: 0,
-    }
+    let shift: SquareDimensionShiftResults ={ x_shift: 0, y_shift: 0, new_raised: $tfield.raised }
 
-    // Will come back here later...
-    // Why??
     switch (direction) {
       case 'right':
         square_expandRight(amount)
@@ -289,7 +274,7 @@
         square_expandRight(amount)
         square_moveAllHexesRight(amount)
 
-        const shift = getShiftForSquareExpansion('left', amount, getHexGridParams($tfield))
+        shift = getShiftForSquareExpansion('left', amount, getHexGridParams($tfield))
 	console.log(shift)
 
         if (shift.new_raised !== $tfield.raised) {
@@ -302,7 +287,8 @@
         $data_overlay.x -= shift.x_shift
         $data_overlay.y -= shift.y_shift
 
-        break
+	break
+
       }
 
       case 'bottom':
@@ -313,7 +299,7 @@
         square_expandDown(amount)
         square_moveAllHexesDown(amount)
 
-        const shift = getShiftForSquareExpansion('top', amount, getHexGridParams($tfield))
+        shift = getShiftForSquareExpansion('top', amount, getHexGridParams($tfield))
 
         if (shift.new_raised !== $tfield.raised) {
           $tfield.raised = shift.new_raised
@@ -335,7 +321,8 @@
 
     renderAllHexes()
 
-    return shift_results
+    return shift
+
   }
 
   function square_expandRight(amount: number) {

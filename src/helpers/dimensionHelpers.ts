@@ -1,7 +1,7 @@
 import type { HexSizeParams } from '../lib/map_resize'
 import { HexRaised, type HexGridParams } from '../types'
 
-type SquareDimensionShiftResults = {
+export type SquareDimensionShiftResults = {
   // When we add to the left, we actually add to the right and move to maintain the illusion. Applies to all icons, paths, texts, and the overlay
   x_shift: number
   y_shift: number
@@ -13,7 +13,7 @@ type SquareDimensionShiftResults = {
 
 /* returns an X and Y shift that can be added to pan's offset X and Y to create the illusion that the map is not moving */
 export const getShiftForSquareExpansion = (
-  direction: 'left' | 'top',
+  direction: 'left' | 'top' | 'right' | 'bottom',
   amount: number,
   hexInfo: HexGridParams,
 ): SquareDimensionShiftResults => {
@@ -25,6 +25,7 @@ export const getShiftForSquareExpansion = (
 
   switch (direction) {
     case 'left': {
+      // Offset moves map to the left, because a tile is actually being added to the right
       if (hexInfo.orientation == 'flatTop') {
         res.x_shift = -(hexInfo.width + hexInfo.gap) * 0.75 * amount
 
@@ -51,4 +52,6 @@ export const getShiftForSquareExpansion = (
       return res
     }
   }
+
+  return res
 }

@@ -29,16 +29,20 @@
   function square_expandMapDimension(direction: 'left' | 'top' | 'right' | 'bottom', amount: number) {
 
     let undoBefore: UndoData = {
-	TerrainField: {hexes: $tfield.hexes, rows: $tfield.rows, columns: $tfield.columns},
+	TerrainField: {hexes: $tfield.hexes, rows: $tfield.rows, columns: $tfield.columns, raised: $tfield.raised},
     }
+
+    // Shift must be retrieved before movement has been made, to ensure it's the same as in the fn call
+    const shift = getShiftForSquareExpansion(direction, amount, getHexGridParams($tfield))
+
     if (direction === 'top' || direction === 'left') {
-      const shift = getShiftForSquareExpansion(direction, amount, getHexGridParams($tfield))
-      undoBefore.icons = loaded_save.icons
-      undoBefore.paths = loaded_save.paths
-      undoBefore.texts = loaded_save.texts
-      comp_iconLayer.moveAllIcons(shift.x_shift, shift.y_shift)
-      comp_pathLayer.moveAllPaths(shift.x_shift, shift.y_shift)
-      comp_textLayer.moveAllTexts(shift.x_shift, shift.y_shift)
+      //undoBefore.icons = loaded_save.icons
+      //undoBefore.paths = loaded_save.paths
+      //undoBefore.texts = loaded_save.texts
+      undoBefore.resize_bump = {x_shift: -shift.x_shift, y_shift: -shift.y_shift}
+      comp_iconLayer.moveAllIcons(-shift.x_shift, -shift.y_shift)
+      comp_pathLayer.moveAllPaths(-shift.x_shift, -shift.y_shift)
+      comp_textLayer.moveAllTexts(-shift.x_shift, -shift.y_shift)
     }
 
     startUndoState(undoBefore, `Expand Square Map by ${amount}`)
@@ -46,12 +50,13 @@
     comp_terrainLayer.square_expandMapDimension(direction, amount)
 
     let undoAfter: UndoData = {
-	TerrainField: {hexes: $tfield.hexes, rows: $tfield.rows, columns: $tfield.columns},
+	TerrainField: {hexes: $tfield.hexes, rows: $tfield.rows, columns: $tfield.columns, raised: $tfield.raised},
     }
     if (direction === 'top' || direction === 'left') {
-      undoAfter.icons = loaded_save.icons
-      undoAfter.paths = loaded_save.paths
-      undoAfter.texts = loaded_save.texts
+      undoAfter.resize_bump = {x_shift: shift.x_shift, y_shift: shift.y_shift}
+      //undoAfter.icons = loaded_save.icons
+      //undoAfter.paths = loaded_save.paths
+      //undoAfter.texts = loaded_save.texts
     }  
 
     completeUndoState(undoAfter)
@@ -70,67 +75,42 @@
       if (amount == 0) return
     }
 
-
-    let xMod = 0
-    let yMod = 0
-
-    switch (direction) {
-      case 'left': {
-        if ($tfield.orientation == HexOrientation.FLATTOP) {
-          xMod = -$tfield.hexWidth * 0.75 * amount
-
-          if (amount % 2 == 1) {
-            yMod = -$tfield.hexHeight * 0.5 * ($tfield.raised == 'odd' ? -1 : 1)
-          }
-        } else {
-          xMod = -$tfield.hexWidth * amount
-        }
-        break
-      }
-
-      case 'top': {
-        if ($tfield.orientation == HexOrientation.FLATTOP) {
-          yMod = -$tfield.hexHeight * amount
-        } else {
-          yMod = -$tfield.hexHeight * 0.75 * amount
-
-          if (amount % 2 == 1) {
-            xMod = -$tfield.hexWidth * 0.5 * ($tfield.raised == 'odd' ? -1 : 1)
-          }
-        }
-        break
-      }
-    }
-
-    if (xMod !== 0 || yMod !== 0) {
-      comp_iconLayer.moveAllIcons(xMod, yMod)
-      comp_pathLayer.moveAllPaths(xMod, yMod)
-      comp_textLayer.moveAllTexts(xMod, yMod)
-    } 
     comp_terrainLayer.square_reduceMapDimension(direction, amount)
+
+    if (direction === 'left' || direction === 'top') {
+      // TODO:
+      const shift = getShiftForSquareExpansion(direction, amount, getHexGridParams($tfield))
+
+      comp_iconLayer.moveAllIcons(shift.x_shift, shift.y_shift)
+      comp_pathLayer.moveAllPaths(shift.x_shift, shift.y_shift)
+      comp_textLayer.moveAllTexts(shift.x_shift, shift.y_shift)
+    } 
+
 
     $store_has_unsaved_changes = true
   }
 
   function flower_expandHexesOut(amount: number) {
+    startUndoState({TerrainField: {hexes: $tfield.hexes, hexesOut: $tfield.hexesOut}}, "Expand Flower Hexes")
     comp_terrainLayer.flower_expandHexesOut(amount)
+    completeUndoState({TerrainField: {hexes: $tfield.hexes, hexesOut: $tfield.hexesOut}})
   }
 
   function flower_reduceHexesOut(amount: number) {
+    startUndoState({TerrainField: {hexes: $tfield.hexes, hexesOut: $tfield.hexesOut}}, "Reduce Flower Hexes")
     comp_terrainLayer.flower_reduceHexesOut(amount)
+    completeUndoState({TerrainField: {hexes: $tfield.hexes, hexesOut: $tfield.hexesOut}})
   }
 
   function changeMapShape() {
     // TODO: Update zoom when map shape is changed
 
-    if (comp_terrainLayer.areAllHexesBlank()) {
-      comp_terrainLayer.changeMapShape($tfield.mapShape)
-    } else {
-      let changeConfirm = confirm('Are you sure? Changing shape will erase all hexes.')
+    let changeConfirm = comp_terrainLayer.areAllHexesBlank() ? true : confirm('Are you sure? Changing shape will erase all hexes.') 
 
-      if (changeConfirm) {
-        comp_terrainLayer.changeMapShape($tfield.mapShape)
-      }
+    if (changeConfirm) {
+      startUndoState({TerrainField: {hexes: $tfield.hexes, mapShape: $tfield.mapShape}}, "Change Map Shape")
+      comp_terrainLayer.changeMapShape($tfield.mapShape)
+      completeUndoState({TerrainField: {hexes: $tfield.hexes, mapShape: $tfield.mapShape}})
     }
 
     $store_has_unsaved_changes = true
