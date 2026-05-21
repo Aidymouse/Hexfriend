@@ -190,6 +190,7 @@ export function cube_round(frac: cube_coords): cube_coords {
   return { q: q, r: r, s: s }
 }
 
+
 export function coords_worldToCube(
   worldX: number,
   worldY: number,
@@ -197,6 +198,7 @@ export function coords_worldToCube(
   hexWidth: number,
   hexHeight: number,
   gridGap: number,
+  round: boolean = true
 ): cube_coords {
   const hex_width = hexWidth + gridGap
   const hex_height = hexHeight + gridGap
@@ -207,9 +209,13 @@ export function coords_worldToCube(
     let q = worldX / (hex_width * 0.75)
     let r = ((2 * worldY) / hex_height - q) / 2
 
-    let roundedCoords = cube_round(AxialToCube(q, r))
+    if (round) {
+      let roundedCoords = cube_round(AxialToCube(q, r))
+      return roundedCoords
+    }
 
-    return roundedCoords
+    return AxialToCube(q, r)
+
   } else if (HexOrientation == 'pointyTop') {
     let r = worldY / (hex_height * 0.75)
     let q = ((2 * worldX) / hex_width - r) / 2

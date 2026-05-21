@@ -160,7 +160,7 @@
   export function placeIcon() {
     const { iconX, iconY } = get_icon_position()
 
-    const iconHexPos = coords_worldToCube(iconX, iconY, $tfield.orientation, $tfield.hexWidth, $tfield.hexHeight, $tfield.gap)
+    const iconHexPos = coords_worldToCube(iconX, iconY, $tfield.orientation, $tfield.hexWidth, $tfield.hexHeight, $tfield.gap, false)
 
     startUndoState({ icons }, "Place Icon")
     emplaceIcon($data_icon.icon, iconHexPos)
