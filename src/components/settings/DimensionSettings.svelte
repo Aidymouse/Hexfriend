@@ -29,7 +29,7 @@
   function square_expandMapDimension(direction: 'left' | 'top' | 'right' | 'bottom', amount: number) {
 
     let undoBefore: UndoData = {
-	TerrainField: {hexes: $tfield.hexes},
+	TerrainField: {hexes: $tfield.hexes, rows: $tfield.rows, columns: $tfield.columns},
     }
     if (direction === 'top' || direction === 'left') {
       const shift = getShiftForSquareExpansion(direction, amount, getHexGridParams($tfield))
@@ -46,7 +46,7 @@
     comp_terrainLayer.square_expandMapDimension(direction, amount)
 
     let undoAfter: UndoData = {
-	TerrainField: {hexes: $tfield.hexes},
+	TerrainField: {hexes: $tfield.hexes, rows: $tfield.rows, columns: $tfield.columns},
     }
     if (direction === 'top' || direction === 'left') {
       undoAfter.icons = loaded_save.icons
