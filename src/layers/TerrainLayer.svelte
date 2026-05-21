@@ -793,6 +793,7 @@
       terrainGraphics.endFill()
 
       if (terrainSprites[hexId]) {
+	// TODO: we don't *have* to destroy this... we could leave it around in memory for the lifetime of this program..?
         symbolsContainer.removeChild(terrainSprites[hexId])
         terrainSprites[hexId].destroy()
         delete terrainSprites[hexId]
@@ -1234,11 +1235,22 @@
   export function applyTerrainField(newField: Partial<TerrainField>) {
     console.log('Applying terran field', newField, $tfield)
 
-    const should_rerender_coords = $data_coordinates.shown && ($tfield.blankHexColor === newField.blankHexColor || newField.blankHexColor === undefined)
+    // TODO: something about reducing dimensions means we need to do this always. I think this will be a very extensive refactor of coordinates to maintain efficiency which I do not have time for right now
+    //const should_rerender_coords = $data_coordinates.shown && ($tfield.blankHexColor === newField.blankHexColor || newField.blankHexColor === undefined)
+    const should_rerender_coords = $tfield.blankHexColor === newField.blankHexColor || newField.blankHexColor === undefined
+
+    if (newField.hexes) {
+      for (let hexId of Object.keys($tfield.hexes)) {
+	if (newField.hexes[hexId] === undefined) {
+	  eliminateHex(hexId as HexId)
+	}
+      }
+    }
 
     $tfield = { ...$tfield, ...newField }
     // TODO: only render all hexes if we change something related to the hexes (e.g. tiles, hex spacing, etc)
     renderAllHexes()
+
 
     if (should_rerender_coords) {
       comp_coordsLayer.completeUpdate()
