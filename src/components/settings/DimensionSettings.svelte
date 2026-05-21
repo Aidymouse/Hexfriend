@@ -15,7 +15,7 @@
   import { completeUndoState, startUndoState } from '../../lib'
   import { type SaveData, type UndoData } from '../../types'
 
-  import { getShiftForSquareExpansion } from '../../helpers'
+  import { getShiftForSquareExpansion, getShiftForSquareReduction } from '../../helpers'
   import { getHexGridParams } from '../../helpers/hexHelpers'
   export let comp_terrainLayer: TerrainLayer
   export let comp_iconLayer: IconLayer
@@ -54,9 +54,6 @@
     }
     if (direction === 'top' || direction === 'left') {
       undoAfter.resize_bump = {x_shift: shift.x_shift, y_shift: shift.y_shift}
-      //undoAfter.icons = loaded_save.icons
-      //undoAfter.paths = loaded_save.paths
-      //undoAfter.texts = loaded_save.texts
     }  
 
     completeUndoState(undoAfter)
@@ -75,16 +72,27 @@
       if (amount == 0) return
     }
 
+    const shift = getShiftForSquareReduction(direction, amount, getHexGridParams($tfield))
+
+    let undoBeforeReduce: UndoData = { TerrainField: {hexes: $tfield.hexes, rows: $tfield.rows, columns: $tfield.columns, raised: $tfield.raised} }
+    if (direction === 'top' || direction === 'left') {
+      undoBeforeReduce.resize_bump = {x_shift: -shift.x_shift, y_shift: -shift.y_shift }
+    }
+
+    startUndoState(undoBeforeReduce, "Reduce Square Map")
+
     comp_terrainLayer.square_reduceMapDimension(direction, amount)
 
-    if (direction === 'left' || direction === 'top') {
-      // TODO:
-      const shift = getShiftForSquareExpansion(direction, amount, getHexGridParams($tfield))
+    let undoAfterReduce: UndoData = { TerrainField: {hexes: $tfield.hexes, rows: $tfield.rows, columns: $tfield.columns, raised: $tfield.raised} }
 
-      comp_iconLayer.moveAllIcons(shift.x_shift, shift.y_shift)
-      comp_pathLayer.moveAllPaths(shift.x_shift, shift.y_shift)
-      comp_textLayer.moveAllTexts(shift.x_shift, shift.y_shift)
+    if (direction === 'left' || direction === 'top') {
+      undoAfterReduce.resize_bump = {x_shift: shift.x_shift, y_shift: shift.y_shift }
+      comp_iconLayer.moveAllIcons(-shift.x_shift, -shift.y_shift)
+      comp_pathLayer.moveAllPaths(-shift.x_shift, -shift.y_shift)
+      comp_textLayer.moveAllTexts(-shift.x_shift, -shift.y_shift)
     } 
+
+    completeUndoState(undoAfterReduce)
 
 
     $store_has_unsaved_changes = true

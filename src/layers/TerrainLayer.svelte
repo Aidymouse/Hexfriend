@@ -50,7 +50,7 @@
 
   import { completeUndoState, startUndoState } from '../lib'
   import type { UndoDataTiles } from '../types'
-  import { getShiftForSquareExpansion, type SquareDimensionShiftResults } from '../helpers'
+  import { getShiftForSquareExpansion, getShiftForSquareReduction, type SquareDimensionShiftResults } from '../helpers'
   import { get } from 'svelte/store'
   export let cont_terrain: PIXI.Container
 
@@ -438,16 +438,16 @@
         square_removeRight(amount)
 
 	// Y needs to be negated on reduce for some math reason
-	const shift = getShiftForSquareExpansion('left', amount, getHexGridParams($tfield))
+	const shift = getShiftForSquareReduction('left', amount, getHexGridParams($tfield))
 
 	if (shift.new_raised !== $tfield.raised) {
 	  $tfield.raised = $tfield.raised == HexRaised.ODD ? HexRaised.EVEN : HexRaised.ODD
 	  square_updateRaisedColumn()
 	}
 
-	pan.offsetX += -shift.x_shift * pan.zoomScale
+	pan.offsetX += shift.x_shift * pan.zoomScale
 	pan.offsetY += shift.y_shift * pan.zoomScale
-        $data_overlay.x -= -shift.x_shift
+        $data_overlay.x -= shift.x_shift
         $data_overlay.y -= shift.y_shift
 
         break
@@ -464,7 +464,7 @@
         if (amount >= $tfield.rows) amount = $tfield.rows - 1
         if (amount == 0) return
 
-	const shift = getShiftForSquareExpansion('top', amount, getHexGridParams($tfield))
+	const shift = getShiftForSquareReduction('top', amount, getHexGridParams($tfield))
 
 	if (shift.new_raised !== $tfield.raised) {
 	  $tfield.raised = $tfield.raised == HexRaised.ODD ? HexRaised.EVEN : HexRaised.ODD
@@ -475,9 +475,9 @@
         square_removeBottom(amount)
 
 	pan.offsetX += shift.x_shift * pan.zoomScale
-	pan.offsetY += -shift.y_shift * pan.zoomScale
+	pan.offsetY += shift.y_shift * pan.zoomScale
         $data_overlay.x -= shift.x_shift
-        $data_overlay.y -= -shift.y_shift
+        $data_overlay.y -= shift.y_shift
 
         break
     }

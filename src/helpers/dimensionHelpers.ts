@@ -12,6 +12,21 @@ export type SquareDimensionShiftResults = {
 }
 
 /* returns an X and Y shift that can be added to pan's offset X and Y to create the illusion that the map is not moving */
+export const getShiftForSquareReduction = (
+  direction: 'left' | 'top' | 'right' | 'bottom',
+  amount: number,
+  hexInfo: HexGridParams,
+) => {
+
+  let shift = getShiftForSquareExpansion(direction, amount, hexInfo)
+  if (direction === 'left') {
+    shift.x_shift = -shift.x_shift
+  } else if (direction === 'top') {
+    shift.y_shift = -shift.y_shift
+  }
+  return shift
+}
+
 export const getShiftForSquareExpansion = (
   direction: 'left' | 'top' | 'right' | 'bottom',
   amount: number,
