@@ -1,5 +1,5 @@
 import { type Icon } from '../types/icon'
-import { type PreviewHexInfo } from '../types'
+import { type HexSizeParams, type PreviewHexInfo } from '../types'
 
 /** I better make sure I like these names because they can NEVER CHANGE! Or old save versions will need to know what they used to be */
 export enum ScaleMode {
@@ -51,7 +51,7 @@ export const get_image_scaled_for_hex_bydimension = (
 }
 
 /** Wraps the image scaling functions but takes in an icon. Defaults to relative scale mode if none is present */
-export const get_icon_scale_for_hex = (icon: Icon, hexInfo: PreviewHexInfo): { x: number; y: number } => {
+export const get_icon_scale_for_hex = (icon: Icon, hexInfo: HexSizeParams): { x: number; y: number } => {
   if (icon.scaleMode === ScaleMode.BYDIMENSION) {
     return get_image_scaled_for_hex_bydimension(
       icon.texWidth,

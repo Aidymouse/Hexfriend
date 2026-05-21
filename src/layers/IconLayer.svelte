@@ -24,6 +24,7 @@
     coords_qToCube,
     coords_rToCube,
     coords_worldToCube,
+    getHexSizeParams,
   } from '../helpers/hexHelpers'
   import * as PIXI from 'pixi.js'
   import { get_icon_texture } from '../lib/texture_loader'
@@ -92,7 +93,7 @@
   /** TODO: one day it would be nice if icons had their relative scales updated when you change hex size so that this could really be a retainment instead of a fresh calculation */
   export function retain_icon_scale(new_hex_size: HexSizeParams) {
     for (const icon of icons) {
-      const new_scale = get_icon_scale_for_hex(icon, { hexWidth: new_hex_size.width, hexHeight: new_hex_size.height })
+      const new_scale = get_icon_scale_for_hex(icon, new_hex_size)
       icon.scale.x = new_scale.x
       icon.scale.y = new_scale.y
     }
@@ -108,8 +109,8 @@
       store_panning.curWorldY(),
       {
 	orientation: $tfield.orientation,
-	hexWidth: $tfield.hexWidth,
-        hexHeight: $tfield.hexHeight,
+	width: $tfield.hexWidth,
+        height: $tfield.hexHeight,
         gap: $tfield.gap
       },
       $data_icon.snapToHex
@@ -145,7 +146,7 @@
       onLayerId: iconId,
       texId: icon.texId,
       rotation: icon.rotation,
-      scale: icon_scale ?? get_icon_scale_for_hex(icon, { hexWidth: $tfield.hexWidth, hexHeight: $tfield.hexHeight }),
+      scale: icon_scale ?? get_icon_scale_for_hex(icon, getHexSizeParams($tfield)),
     }
 
     icons.push(newIcon)
@@ -227,7 +228,7 @@
 
   function updateFloatingIcon() {
     const { iconX, iconY } = get_icon_position()
-    const icon_scale = get_icon_scale_for_hex($data_icon.icon, $tfield)
+    const icon_scale = get_icon_scale_for_hex($data_icon.icon, getHexSizeParams($tfield))
 
     //debugger
     //spr_floating_icon.visible = false

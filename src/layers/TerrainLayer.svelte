@@ -26,6 +26,7 @@
     genHexId_coordsObj,
     getHexGridParams,
     getHexPath,
+    getHexSizeParams,
     getNeighbours,
     getRing,
     id_to_coords,
@@ -45,7 +46,6 @@
 
   import { get_symbol_texture } from '../lib/texture_loader'
   import { get_icon_scale_for_hex } from '../helpers/imageSizing'
-  import type { PreviewHexInfo } from '../types'
   import { generate_tile_previews } from '../helpers/tileFns'
 
   import { completeUndoState, startUndoState } from '../lib'
@@ -831,7 +831,7 @@
     }
 
     ns.texture = get_symbol_texture(hex.tile)
-    ns.scale = get_icon_scale_for_hex(hex.tile.symbol, { hexWidth: $tfield.hexWidth, hexHeight: $tfield.hexHeight })
+    ns.scale = get_icon_scale_for_hex(hex.tile.symbol, getHexSizeParams($tfield))
     ns.tint = hex.tile.symbol.color
     ns.position.set(hexWorldCoords.x, hexWorldCoords.y) // Position is updated even though it's usually the same, but if hex has been resized since last draw the symbol position will be different
     ns.rotation = PIXI.DEG_TO_RAD * (hex.tile.symbol.rotation ?? 0)
