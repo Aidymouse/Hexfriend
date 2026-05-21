@@ -1,4 +1,5 @@
 import type { HexOrientation } from "./terrain";
+import * as PIXI from 'pixi.js'
 
 export enum coord_system {
 	CUBE,
@@ -7,15 +8,15 @@ export enum coord_system {
 	LETTERNUMBER
 }
 
-export interface cube_coords {
+export type cube_coords = {
 	q: number;
 	r: number;
 	s: number;
 }
 
-export interface hex_world_attributes {
-	orientation: HexOrientation;
-	hex_width: number;
-	hex_height: number;
-	grid_gap: number;
+export type CoordText = {
+	/* The pixi text object displayed on the screen */
+	pixiText: PIXI.Text
+	/* The individual parts of the coordinate that are assembled into text */
+	parts: number[]
 }

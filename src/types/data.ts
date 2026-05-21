@@ -23,16 +23,18 @@ export type icon_data = {
   dragMode: boolean
 }
 
-export interface coordinates_data {
+export type CoordinateOffsets = {
+    row_col: { row: number; col: number }
+    cube: { q: number; r: number; s: number }
+  }
+
+export type CoordinatesData = {
   shown: boolean
   style: Partial<PIXI.Text['style']>
   system: coord_system
   seperator: string
   gap: number
-  offsets: {
-    row_col: { row: number; col: number }
-    cube: { q: number; r: number; s: number }
-  }
+  offsets: CoordinateOffsets
 }
 
 export type text_data = {

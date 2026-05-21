@@ -1,5 +1,5 @@
 import type {
-  coordinates_data,
+  CoordinatesData,
   eraser_data,
   icon_data,
   OverlayData,
@@ -77,7 +77,7 @@ export let data_overlay: Writable<OverlayData> = writable({
   opacity: 0.5,
 })
 
-export let data_coordinates: Writable<coordinates_data> = writable({
+export let data_coordinates: Writable<CoordinatesData> = writable({
   shown: true,
   style: { fill: 0x000000, fontSize: 10 },
   system: coord_system.ROWCOL,

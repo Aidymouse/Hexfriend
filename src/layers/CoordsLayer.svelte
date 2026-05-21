@@ -1,6 +1,5 @@
 <script lang="ts">
-  // Small random bug that i'll come investigate later: if you change orientation, then raised col/indented row, then change orientation again, hex at (col.row) (1.0) or (1.1) will be duplicated??
-  import { coords_cubeToWorld, genHexId } from '../helpers/hexHelpers'
+  import { coords_cubeToWorld, genHexId, getHexGridParams } from '../helpers/hexHelpers'
   import { coords_cubeToq, coords_cubeTor } from '../helpers/hexHelpers'
   import { breakDownHexID } from '../helpers/hexHelpers'
 
@@ -9,18 +8,20 @@
   import { tfield } from '../stores/tfield'
 
   import { store_has_unsaved_changes } from '../stores/flags'
-  import { coord_system } from '../types/coordinates'
-  import type { coordinates_data } from '../types/data'
-  import type { TerrainHex, TerrainField } from '../types/terrain'
+  import { coord_system, type CoordText } from '../types/coordinates'
   import type { HexId } from '../types/toolData'
   import * as PIXI from 'pixi.js'
   import { onMount } from 'svelte'
   import { map_shape } from '../types/settings'
-
-  interface coordText {
-    pixiText: PIXI.Text
-    parts: number[]
-  }
+  import {
+    genCoord_axial,
+    genCoord_cube,
+    genCoord_letterNumber,
+    genCoord_rowCol,
+    getHexCoordParams,
+    numToAlphabet,
+    type GenCoordFn,
+  } from '../helpers'
 
   $: {
     Object.entries(coordTexts).forEach(([hexId, text]) => {
@@ -31,12 +32,11 @@
     cont_textContainer.visible = $data_coordinates.shown
   }
 
-  let coordTexts: { [key: HexId]: coordText } = {} // hex id: coordText
+  let coordTexts: { [key: HexId]: CoordText } = {} // hex id: coordText
 
   export let cont_coordinates: PIXI.Container
   let cont_textContainer = new PIXI.Container()
   cont_coordinates.addChild(cont_textContainer)
-
 
   function coordTextExists(hexId: HexId) {
     return coordTexts[hexId] != null
@@ -51,7 +51,9 @@
 
   export function populateBlankHexes() {
     Object.keys($tfield.hexes).forEach((hexId: HexId) => {
-      if (!coordTextExists(hexId)) generateNewCoord(hexId)
+      if (!coordTextExists(hexId)) {
+        generateNewCoord(hexId)
+      }
     })
 
     if ($tfield.mapShape == map_shape.FLOWER && $data_coordinates.system == coord_system.LETTERNUMBER) {
@@ -63,6 +65,9 @@
   export function generateNewCoord(hexId: HexId, system: coord_system = $data_coordinates.system) {
     if (coordTextExists(hexId)) {
       console.log(`You already have a text at ${hexId}! Use updateCoord() instead, goofball.`)
+      updateCoordPosition(hexId)
+      updateCoordText(hexId)
+      return
     }
 
     coordTexts[hexId] = { pixiText: new PIXI.Text('', $data_coordinates.style), parts: [] }
@@ -92,10 +97,10 @@
   }
 
   export function completeUpdate() {
-      cullUnusedCoordinates()
-      updateAllCoordPositions()
-      updateAllCoordsText()
-      populateBlankHexes()
+    cullUnusedCoordinates()
+    updateAllCoordPositions()
+    updateAllCoordsText()
+    populateBlankHexes()
   }
 
   function updateCoordPosition(hexId: HexId) {
@@ -124,141 +129,71 @@
     $store_has_unsaved_changes = true
   }
 
+  function getGeneratorFn(): GenCoordFn {
+    switch ($data_coordinates.system) {
+      case coord_system.CUBE:
+        return genCoord_cube
+      case coord_system.AXIAL:
+        return genCoord_axial
+      case coord_system.ROWCOL:
+        return genCoord_rowCol
+      case coord_system.LETTERNUMBER:
+        return genCoord_letterNumber
+    }
+  }
+
+  /* @deprecated - fn to be found BEFORE generating coord texts */
   function generateCoordTextAndParts(
     hexId: HexId,
     system: coord_system = $data_coordinates.system,
   ): { parts: number[]; text: string } {
     switch (system) {
       case coord_system.CUBE: {
-        let idParts = breakDownHexID(hexId)
-
-        let parts = [
-          idParts.q + $data_coordinates.offsets.cube.q,
-          idParts.r + $data_coordinates.offsets.cube.r,
-          idParts.s + $data_coordinates.offsets.cube.s,
-        ]
-
-        return {
-          parts: [idParts.q, idParts.r, idParts.s],
-          text: `${parts[0]}${$data_coordinates.seperator}${parts[1]}${$data_coordinates.seperator}${parts[2]}`,
-        }
+        return genCoord_cube(hexId, $data_coordinates.seperator, $data_coordinates.offsets, getHexCoordParams($tfield))
       }
 
       case coord_system.ROWCOL: {
-        let cube = breakDownHexID(hexId)
-        let idParts =
-          $tfield.orientation == 'flatTop'
-            ? coords_cubeToq($tfield.raised, cube.q, cube.r, cube.s)
-            : coords_cubeTor($tfield.raised, cube.q, cube.r, cube.s)
-
-        let parts = [
-          idParts.col + $data_coordinates.offsets.row_col.row,
-          idParts.row + $data_coordinates.offsets.row_col.col,
-        ]
-
-        return {
-          parts: [idParts.col, idParts.row],
-          text: `${parts[0] < 10 && parts[0] >= 0 ? 0 : ''}${parts[0]}${$data_coordinates.seperator}${parts[1] < 10 && parts[1] >= 0 ? 0 : ''}${parts[1]}`,
-        }
+        return genCoord_rowCol(
+          hexId,
+          $data_coordinates.seperator,
+          $data_coordinates.offsets,
+          getHexCoordParams($tfield),
+        )
       }
 
       case coord_system.AXIAL: {
-        let cube = breakDownHexID(hexId)
-
-        let parts = [cube.q + $data_coordinates.offsets.cube.q, cube.r + $data_coordinates.offsets.cube.r]
-
-        return {
-          parts: [cube.q, cube.r],
-          text: `${parts[0]}${$data_coordinates.seperator}${parts[1]}`,
-        }
+        return genCoord_axial(hexId, $data_coordinates.seperator, $data_coordinates.offsets, getHexCoordParams($tfield))
       }
 
       case coord_system.LETTERNUMBER: {
-        let row_offset = 0
-        let col_offset = 0
-
-        if ($tfield.mapShape == map_shape.FLOWER) {
-          row_offset = $tfield.hexesOut
-          col_offset = $tfield.hexesOut
-        }
-
-        let cube = breakDownHexID(hexId)
-
-        let idParts =
-          $tfield.orientation == 'flatTop'
-            ? coords_cubeToq($tfield.raised, cube.q, cube.r, cube.s)
-            : coords_cubeTor($tfield.raised, cube.q, cube.r, cube.s)
-
-        // Convert column to letter
-        let parts = [
-          num_to_alphabet(idParts.col + col_offset + 1 + Math.max($data_coordinates.offsets.row_col.row, 0)),
-          idParts.row + row_offset + 1 + $data_coordinates.offsets.row_col.col,
-        ]
-
-        return {
-          parts: parts,
-          text: `${parts[0]}${$data_coordinates.seperator}${parts[1]}`,
-        }
+        return genCoord_letterNumber(
+          hexId,
+          $data_coordinates.seperator,
+          $data_coordinates.offsets,
+          getHexCoordParams($tfield),
+        )
       }
     }
-
-    $store_has_unsaved_changes = true
-  }
-
-  function num_to_alphabet(num) {
-    let n = num
-    let col_name = ''
-    let alphabet = [
-      'A',
-      'B',
-      'C',
-      'D',
-      'E',
-      'F',
-      'G',
-      'H',
-      'I',
-      'J',
-      'K',
-      'L',
-      'M',
-      'N',
-      'O',
-      'P',
-      'Q',
-      'R',
-      'S',
-      'T',
-      'U',
-      'V',
-      'W',
-      'X',
-      'Y',
-      'Z',
-    ]
-
-    while (n > 0) {
-      let mod = (n - 1) % 26
-      col_name = alphabet[mod] + col_name
-      n = Math.round((n - mod) / 26)
-      //console.log(n)
-    }
-
-    return col_name
   }
 
   export function updateAllCoordsText() {
+    const genFn: GenCoordFn = getGeneratorFn()
     Object.keys(coordTexts).forEach((hexId: HexId) => {
-      updateCoordText(hexId)
+      updateCoordText(hexId, genFn)
     })
     $store_has_unsaved_changes = true
   }
 
-  export function updateCoordText(hexId: HexId) {
-    let generated = generateCoordTextAndParts(hexId, $data_coordinates.system)
+  export function updateCoordText(hexId: HexId, genFn?: GenCoordFn) {
+    let coordGenerator = genFn ?? getGeneratorFn()
+    let generated = coordGenerator(
+      hexId,
+      $data_coordinates.seperator,
+      $data_coordinates.offsets,
+      getHexCoordParams($tfield),
+    )
     coordTexts[hexId].parts = [...generated.parts]
     coordTexts[hexId].pixiText.text = generated.text
-    $store_has_unsaved_changes = true
   }
 
   export function cullUnusedCoordinates() {

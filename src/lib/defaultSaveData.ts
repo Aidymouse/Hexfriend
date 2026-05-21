@@ -1,6 +1,6 @@
 import { coords_qToCube, genHexId } from '../helpers/hexHelpers'
 import { coord_system } from '../types/coordinates'
-import type { coordinates_data } from '../types/data'
+import type { CoordinatesData } from '../types/data'
 import type { Iconset } from '../types/icon'
 import type { SaveData } from '../types/savedata'
 import { LATESTSAVEDATAVERSION } from '../types/savedata'

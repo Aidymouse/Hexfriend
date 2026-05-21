@@ -1,4 +1,4 @@
-import type { coordinates_data, OverlayData } from './data'
+import type { CoordinatesData, OverlayData } from './data'
 import type { IconLayerIcon, Iconset } from './icon'
 import type { ListedPathStyle, PathLayerPath, PathStyle } from './path'
 import type { TerrainField } from './terrain'
@@ -12,7 +12,7 @@ export type SaveData = {
   saveVersion: number
   title: string
 
-  coords: coordinates_data
+  coords: CoordinatesData
 
   TerrainField: TerrainField
   tilesets: Tileset[]

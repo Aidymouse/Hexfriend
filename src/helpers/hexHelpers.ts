@@ -65,7 +65,7 @@ export function get_width_height_from_radius(radius: number, orientation: HexOri
 
 export function breakDownHexID(hexId: HexId) {
   let brokenId = hexId.split(':')
-  return { q: Number(brokenId[0]), r: Number(brokenId[1]), s: Number(brokenId[2]) }
+  return { q: parseInt(brokenId[0]), r: parseInt(brokenId[1]), s: parseInt(brokenId[2]) }
 }
 
 export function get_radius_from_width_height(width: number, height: number, orientation: HexOrientation) {
