@@ -11,6 +11,7 @@ type SquareDimensionShiftResults = {
   // cam_y_shift: number
 }
 
+/* returns an X and Y shift that can be added to pan's offset X and Y to create the illusion that the map is not moving */
 export const getShiftForSquareExpansion = (
   direction: 'left' | 'top',
   amount: number,
@@ -25,26 +26,26 @@ export const getShiftForSquareExpansion = (
   switch (direction) {
     case 'left': {
       if (hexInfo.orientation == 'flatTop') {
-        res.x_shift = (hexInfo.width + hexInfo.gap) * 0.75 * amount
+        res.x_shift = -(hexInfo.width + hexInfo.gap) * 0.75 * amount
 
         if (amount % 2 == 1) {
           res.new_raised = hexInfo.raised == HexRaised.ODD ? HexRaised.EVEN : HexRaised.ODD
-          res.y_shift = (hexInfo.height + hexInfo.gap) * 0.5 * (hexInfo.raised == HexRaised.ODD ? -1 : 1)
+          res.y_shift = -(hexInfo.height + hexInfo.gap) * 0.5 * (hexInfo.raised == HexRaised.ODD ? -1 : 1)
         }
       } else {
-        res.x_shift = (hexInfo.width + hexInfo.gap) * amount
+        res.x_shift = -(hexInfo.width + hexInfo.gap) * amount
       }
       return res
     }
     case 'top': {
       if (hexInfo.orientation == 'flatTop') {
-        res.y_shift = (hexInfo.height + hexInfo.gap) * amount
+        res.y_shift = -(hexInfo.height + hexInfo.gap) * amount
       } else {
-        res.y_shift = (hexInfo.height + hexInfo.gap) * 0.75 * amount
+        res.y_shift = -(hexInfo.height + hexInfo.gap) * 0.75 * amount
 
         if (amount % 2 == 1) {
           res.new_raised = hexInfo.raised == HexRaised.ODD ? HexRaised.EVEN : HexRaised.ODD
-          res.x_shift = (hexInfo.width + hexInfo.gap) * 0.5 * (hexInfo.raised == 'odd' ? -1 : 1)
+          res.x_shift = -(hexInfo.width + hexInfo.gap) * 0.5 * (hexInfo.raised == 'odd' ? -1 : 1)
         }
       }
       return res

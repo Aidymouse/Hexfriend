@@ -129,9 +129,7 @@
       comp_iconLayer.moveAllIcons(xMod, yMod)
       comp_pathLayer.moveAllPaths(xMod, yMod)
       comp_textLayer.moveAllTexts(xMod, yMod)
-    } else {
-    }
-
+    } 
     comp_terrainLayer.square_reduceMapDimension(direction, amount)
 
     $store_has_unsaved_changes = true

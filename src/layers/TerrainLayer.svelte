@@ -290,15 +290,16 @@
         square_moveAllHexesRight(amount)
 
         const shift = getShiftForSquareExpansion('left', amount, getHexGridParams($tfield))
+	console.log(shift)
 
         if (shift.new_raised !== $tfield.raised) {
           $tfield.raised = shift.new_raised
           square_updateRaisedColumn()
         }
 
-        pan.offsetX -= shift.x_shift * pan.zoomScale
-        pan.offsetY -= shift.y_shift * pan.zoomScale
-        $data_overlay.x += shift.x_shift
+        pan.offsetX += shift.x_shift * pan.zoomScale
+        pan.offsetY += shift.y_shift * pan.zoomScale
+        $data_overlay.x -= shift.x_shift
         $data_overlay.y -= shift.y_shift
 
         break
@@ -319,10 +320,10 @@
           square_changeIndentedRow()
         }
 
-        pan.offsetY -= shift.y_shift * pan.zoomScale
         pan.offsetX += shift.x_shift * pan.zoomScale
-        $data_overlay.y += shift.y_shift
+        pan.offsetY += shift.y_shift * pan.zoomScale
         $data_overlay.x -= shift.x_shift
+        $data_overlay.y -= shift.y_shift
 
         break
       }
@@ -441,7 +442,7 @@
 
         break
 
-      case 'left':
+      case 'left': {
         if (amount >= $tfield.columns) amount = $tfield.columns - 1
         if (amount == 0) return
 
@@ -449,29 +450,21 @@
         square_moveAllHexesLeft(amount)
         square_removeRight(amount)
 
-        if ($tfield.orientation == 'flatTop') {
-          if (amount % 2 == 1) {
-            $tfield.raised = $tfield.raised == HexRaised.ODD ? HexRaised.EVEN : HexRaised.ODD
-            square_updateRaisedColumn()
-          }
+	// Y needs to be negated on reduce for some math reason
+	const shift = getShiftForSquareExpansion('left', amount, getHexGridParams($tfield))
 
-          let delta_x = ($tfield.hexWidth + $tfield.gap) * 0.75 * amount
-          let delta_y =
-            ($tfield.hexHeight + $tfield.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1) * (amount % 2 == 0 ? 0 : 1)
+	if (shift.new_raised !== $tfield.raised) {
+	  $tfield.raised = $tfield.raised == HexRaised.ODD ? HexRaised.EVEN : HexRaised.ODD
+	  square_updateRaisedColumn()
+	}
 
-          pan.offsetX += delta_x * pan.zoomScale
-          pan.offsetY += delta_y * pan.zoomScale
-
-          $data_overlay.x -= delta_x
-          $data_overlay.y -= delta_y
-        } else {
-          let delta_x = ($tfield.hexWidth + $tfield.gap) * amount
-          pan.offsetX += delta_x * pan.zoomScale
-
-          $data_overlay.x -= delta_x
-        }
+	pan.offsetX += -shift.x_shift * pan.zoomScale
+	pan.offsetY += shift.y_shift * pan.zoomScale
+        $data_overlay.x -= -shift.x_shift
+        $data_overlay.y -= shift.y_shift
 
         break
+      }
 
       case 'bottom':
         if (amount >= $tfield.rows) amount = $tfield.rows - 1
@@ -484,27 +477,20 @@
         if (amount >= $tfield.rows) amount = $tfield.rows - 1
         if (amount == 0) return
 
+	const shift = getShiftForSquareExpansion('top', amount, getHexGridParams($tfield))
+
+	if (shift.new_raised !== $tfield.raised) {
+	  $tfield.raised = $tfield.raised == HexRaised.ODD ? HexRaised.EVEN : HexRaised.ODD
+	  square_changeIndentedRow()
+	}
+
         square_moveAllHexesUp(amount)
         square_removeBottom(amount)
 
-        if ($tfield.orientation == 'flatTop') {
-          let delta_y = $tfield.hexHeight * amount
-          pan.offsetY += delta_y * pan.zoomScale
-
-          $data_overlay.y -= delta_y
-        } else {
-          let delta_y = $tfield.hexHeight * 0.75 * amount
-          pan.offsetY += delta_y * pan.zoomScale
-          $data_overlay.y -= delta_y
-
-          if (amount % 2 == 1) {
-            $tfield.raised = $tfield.raised == HexRaised.ODD ? HexRaised.EVEN : HexRaised.ODD
-            square_changeIndentedRow()
-            let delta_x = ($tfield.hexWidth + $tfield.gap) * 0.5 * ($tfield.raised == 'odd' ? -1 : 1)
-            pan.offsetX += delta_x * pan.zoomScale
-            $data_overlay.x -= delta_x
-          }
-        }
+	pan.offsetX += shift.x_shift * pan.zoomScale
+	pan.offsetY += -shift.y_shift * pan.zoomScale
+        $data_overlay.x -= shift.x_shift
+        $data_overlay.y -= -shift.y_shift
 
         break
     }
