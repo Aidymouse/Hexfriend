@@ -31,7 +31,7 @@ export const startUndoState = (
     return
   }
 
-  const new_state: UndoState = { label, before: structuredClone(preProcessUndoState(data)), after: {} }
+  const new_state: UndoState = { label, before: preProcessUndoState(structuredClone(data)), after: {} }
 
   if (get(store_undo).awaiting_completion) {
     if (options.bounce) {
@@ -65,7 +65,7 @@ export const completeUndoState = (data: UndoData, label?: string) => {
 
   store_undo.update((u) => {
     const push_state = u.prospective_state
-    push_state.after = structuredClone(preProcessUndoState(data))
+    push_state.after = preProcessUndoState(structuredClone(data))
     u.undo_stack.splice(u.undo_pointer + 1)
     u.undo_stack.push(push_state)
     u.undo_pointer += 1
@@ -75,9 +75,9 @@ export const completeUndoState = (data: UndoData, label?: string) => {
   })
 }
 
-
+/* Simple helper for cleaning up undo states as we push them */
 const preProcessUndoState = (data: UndoData): UndoData => {
-  if (data.TerrainField.hexes === undefined) {
+  if (data.TerrainField !== undefined && data.TerrainField.hexes === undefined) {
     delete data.TerrainField.hexes
   }
 
