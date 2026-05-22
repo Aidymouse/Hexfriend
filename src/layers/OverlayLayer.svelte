@@ -60,11 +60,15 @@
 	      OG_height = tex_overlay.height
 	      loaded_base64 = base64
 
+	      $loading_texture = false
+	      loadedCallback?.()
 
+	      /*
 	      setTimeout(() => {
 		$loading_texture = false
 		loadedCallback?.()
 	      }, 2000) // simulates load time lol
+	      */
 	    })
 
         } else {
