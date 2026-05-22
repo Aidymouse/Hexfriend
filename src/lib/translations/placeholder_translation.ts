@@ -125,7 +125,6 @@ export const placeholder_translation: Translation = {
     annoyed_21: "TODO",
     annoyed_22: "TODO",
     annoyed_23: "TODO",
-    annoyed_24: "TODO",
   },
 
   eraser_panel: {
@@ -271,6 +270,7 @@ export const placeholder_translation: Translation = {
       /** @deprecated - Hexfriend 3.0 */
       already_loaded: 'TODO',
       make_copy_confirmation: 'TODO', // The prompt to import a copy of an icon set
+      remove_confirmation: 'TODO'
     },
 
     generators: {

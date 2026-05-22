@@ -7,6 +7,7 @@
   import type TextLayer from '../layers/TextLayer.svelte'
   import type OverlayLayer from '../layers/OverlayLayer.svelte'
   import type TerrainPanel from '../panels/TerrainPanel.svelte'
+  import type IconPanel from '../panels/IconPanel.svelte'
   import type { Iconset } from '../types/icon'
   import type { SaveData } from '../types/savedata'
   import type { Tileset } from '../types/tilesets'
@@ -64,7 +65,6 @@
   export let redrawEntireMap: Function
 
   //export let data_terrain: terrain_data
-  export let loadedIconsets: Iconset[]
 
   export let comp_terrainLayer: TerrainLayer
   export let comp_iconLayer: IconLayer
@@ -74,6 +74,7 @@
   export let comp_overlayLayer: OverlayLayer
 
   export let comp_terrain_panel: TerrainPanel
+  export let comp_icon_panel: IconPanel
 
   export let load: Function
 
@@ -391,7 +392,7 @@
     <SettingHeading text={$tl.settings.icon_sets.title} bind:toggle={hidden_settings.iconsets} />
     <div class="settings-hider" class:hidden={hidden_settings.iconsets}>
       <div class="hider">
-        <IconsetSettings bind:loadedSave bind:loadedIconsets bind:appState />
+        <IconsetSettings bind:comp_iconLayer bind:comp_icon_panel bind:appState />
       </div>
     </div>
   </div>

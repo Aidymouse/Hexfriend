@@ -14,10 +14,14 @@
 
   import { tfield } from '../stores/tfield'
   import { data_icon, data_terrain } from '../stores/data'
+  import { store_loaded_save } from '../stores'
   import { tl } from '../stores/translation'
   import Alert from '../components/Alert.svelte'
 
-  export let loadedIconsets: Iconset[]
+  let loadedIconsets: Iconset[]
+  store_loaded_save.subscribe(ls => {
+    loadedIconsets = ls.iconsets
+  })
   export let app: PIXI.Application
 
   let iconPreview: string
@@ -43,7 +47,8 @@
     get_icon_preview($data_icon.icon).then((p) => (iconPreview = p)) // Needed?
   })
 
-  function selectIcon(iconData: Icon) {
+  // exported for settings
+  export function selectIcon(iconData: Icon) {
     $data_icon.icon = { ...iconData }
     $data_icon.usingEraser = false
   }
@@ -64,7 +69,8 @@
   }
 
   afterUpdate(() => {
-    loadedIconsets = loadedIconsets
+    $store_loaded_save.iconsets = $store_loaded_save.iconsets
+
     $tfield.orientation = $tfield.orientation
     get_icon_preview($data_icon.icon).then((p) => (iconPreview = p))
   })

@@ -150,6 +150,7 @@
   let comp_shortcutList: ShortcutList
 
   let comp_terrain_panel: TerrainPanel
+  let comp_icon_panel: IconPanel
   let comp_text_panel: TextPanel
   let comp_path_panel: PathPanel
 
@@ -501,11 +502,11 @@
             changeTool(Tools.ERASER)
             break
           case 'changeTool_overlay':
-            if ($data_overlay.base64 != '') changeTool(Tools.OVERLAY)
+            if (loadedSave.overlay_base64 !== null) changeTool(Tools.OVERLAY)
             break
 
           case 'toggle_overlay':
-            if ($data_overlay.base64 != '') {
+            if (loadedSave.overlay_base64 !== null) {
               $data_overlay.shown = !$data_overlay.shown
               $store_has_unsaved_changes = true
             }
@@ -941,10 +942,11 @@
     {:else if $store_selected_tool == Tools.TERRAIN}
       <TerrainPanel bind:this={comp_terrain_panel} {app} />
     {:else if $store_selected_tool == Tools.ICON}
-      <IconPanel {app} {loadedIconsets} />
+      <IconPanel bind:this={comp_icon_panel} {app} />
     {:else if $store_selected_tool == Tools.PATH}
       <!-- Handled seperately, because this panel must always be instantiated for Undo purposes -->
     {:else if $store_selected_tool == Tools.TEXT}
+      <!-- Handled seperately, because this panel must always be instantiated for Undo purposes -->
     {:else if $store_selected_tool == Tools.ERASER}
       <EraserPanel bind:loaded_save={loadedSave} />
     {:else if $store_selected_tool == Tools.OVERLAY}
@@ -1025,8 +1027,6 @@
       bind:appState
       bind:showTerrainGenerator
       bind:show_icon_generator
-      bind:loadedTilesets
-      bind:loadedIconsets
       {comp_terrainLayer}
       {comp_coordsLayer}
       {comp_iconLayer}
@@ -1034,6 +1034,7 @@
       {comp_textLayer}
       {comp_overlayLayer}
       {comp_terrain_panel}
+      {comp_icon_panel}
       renderAllHexes={() => {
         comp_terrainLayer.renderAllHexes()
       }}

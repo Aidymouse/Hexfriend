@@ -234,5 +234,6 @@ export const apply_state_data = (applied_data: UndoData, layers: LayerComponents
   }
 
   if (applied_data.iconsets) {
+    store_loaded_save.update(ls => { ls.iconsets = structuredClone(applied_data.iconsets); return ls })
   }
 }

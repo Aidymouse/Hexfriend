@@ -177,7 +177,7 @@
       // Update previews
       const oldId = icon.id
 
-      icon.id = findID(icon.display)
+      icon.id = findID(`${workingIconset.id}:${icon.display}`)
 
       icon_previews[icon.id] = icon_previews[oldId]
       delete icon_previews[oldId]

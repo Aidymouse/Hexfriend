@@ -5,21 +5,48 @@
   import { type Iconset } from '../../types/icon'
 
   import { store_has_unsaved_changes } from '../../stores/flags'
+  import { store_loaded_save } from '../../stores'
   import { tl } from '../../stores/translation'
   import { copy_iconset } from '../../helpers/iconFns'
 
   import * as texture_loader from '../../lib/texture_loader'
 
+  import IconLayer from '../../layers/IconLayer.svelte'
+  import IconPanel from '../../panels/IconPanel.svelte'
+
   import { convert_iconset_to_latest } from '../../lib/iconsetConverter'
   import SettingHeading from './SettingHeading.svelte'
-  export let loadedSave: SaveData
-  export let loadedIconsets: Iconset[]
+  import { completeUndoState, startUndoState } from '../../lib'
+
+  export let comp_iconLayer: IconLayer
+  export let comp_icon_panel: IconPanel
+
+
+  let loadedIconsets: Iconset[]
+  store_loaded_save.subscribe(ls => {
+    loadedIconsets = ls.iconsets
+  })
 
   export let appState
 
   function removeIconset(setId: string) {
-    loadedIconsets = loadedIconsets.filter((is: Iconset) => is.id != setId)
-    loadedSave.iconsets = loadedIconsets
+
+    if (!confirm($tl.settings.icon_sets.remove_confirmation)) { return }
+
+    const iconsetToRemove = loadedIconsets.find((is: Iconset) => is.id === setId)
+
+    // TODO: this is very inefficient, but until loadedSave is depended on entirely for icons, it will do
+    const [icons_before_removal, icons_after_removal] = comp_iconLayer.removeAllIconsOfSet(iconsetToRemove)
+
+    startUndoState({iconsets: $store_loaded_save.iconsets, icons: icons_before_removal }, `Remove Iconset ${setId}`)
+
+    $store_loaded_save.iconsets = $store_loaded_save.iconsets.filter((is: Iconset) => is.id != setId)
+    loadedIconsets = $store_loaded_save.iconsets
+
+    comp_icon_panel.selectIcon(loadedIconsets[0].icons[0])
+
+    completeUndoState({iconsets: $store_loaded_save.iconsets, icons: icons_after_removal }, `Remove Iconset ${setId}`)
+
 
     $store_has_unsaved_changes = true
   }
@@ -38,13 +65,12 @@
       let setToImport = JSON.parse(eb.target.result as string)
 
       /* Check that set hasn't already been imported */
-      if (
-        loadedIconsets.find(
-          (is: Iconset) =>
-            is.id == setToImport.id ||
-            (is.id.split(':')[0] === 'default' && setToImport.id.split(':')[0] === 'default'),
-        ) != null
-      ) {
+      const existingIconset = loadedIconsets.find((is: Iconset) =>
+        is.id == setToImport.id ||
+        (is.id.split(':')[0] === 'default' && setToImport.id.split(':')[0] === 'default'),
+      ) 
+
+      if (existingIconset !== undefined) {
         if (confirm($tl.settings.icon_sets.make_copy_confirmation)) {
           let new_id = `${setToImport.id}_copy`
           let counter = 0
@@ -62,8 +88,12 @@
       //addIconsetTextures(setToImport, L);
       await texture_loader.load_iconset_textures(setToImport)
 
-      loadedIconsets.push(setToImport)
-      loadedIconsets = loadedIconsets
+      startUndoState({iconsets: $store_loaded_save.iconsets}, `Load Iconset ${setToImport.name} (${setToImport.id})`)
+
+      $store_loaded_save.iconsets.push(setToImport)
+      loadedIconsets = $store_loaded_save.iconsets
+
+      completeUndoState({iconsets: $store_loaded_save.iconsets})
 
       $store_has_unsaved_changes = true
     }

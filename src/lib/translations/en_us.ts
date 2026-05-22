@@ -266,6 +266,7 @@ export const en_us: Translation = {
       builder: 'Icon Set Builder',
       already_loaded: "You've already imported this icon set :)",
       make_copy_confirmation: 'You have already loaded an icon set with this ID. Import a copy?',
+      remove_confirmation: 'This will remove all icons in use from this set. Continue?',
     },
 
     generators: {

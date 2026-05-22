@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { eraser_data, icon_data } from '../types/data'
-  import type { IconLayerIcon, Icon } from '../types/icon'
+  import type { IconLayerIcon, Icon, Iconset } from '../types/icon'
   import type { shortcut_data } from '../types/inputs'
   import type { pan_state } from '../types/panning'
   import type { HexPosition, HexRaised, TerrainField } from '../types/terrain'
@@ -40,6 +40,7 @@
   import { getIconPositionFor, iconsMatch } from '../helpers/iconFns'
   import {  cancelProspectiveUndoState, completeUndoState, startUndoState } from '../lib'
   import type { SaveData } from '../types'
+
   export let icons: IconLayerIcon[] = []
   let pixi_icons: { [icon_id: number]: PIXI.Sprite } = {} // keeps up to date with icons
 
@@ -382,6 +383,34 @@
         })
       }
     }
+  }
+
+  /* Because I am a dunce, and icons DO NOT KNOW what set they're in, I resort to this. 
+  * Yes, if you're crafty, you could load an icon set with a name such that it will be erroneously deleted when you remove an iconset that it was not imported with.
+  * If you do this, you are very clever. Send me video proof and I'll give you $5 NZD.
+  */
+  export function removeAllIconsOfSet(set: Iconset): [IconLayerIcon[], IconLayerIcon[]] {
+    const ids = set.icons.map(i => i.id)
+
+    // TODO: not proud of this, but we need to get the icons to iconset settings somehow, and this will do until we depend on loaded save more
+    let icons_before_removal = structuredClone(icons)
+
+    // Since deleting icons removes them from a list, we have to go backwards
+    for (let iconIdx=icons.length-1; iconIdx >= 0; iconIdx--) {
+      const icon = icons[iconIdx]
+
+      if (ids.includes(icon.id)) {
+	console.log(`I think I am removing`, icon)
+	//removed_icons.push(structuredClone(icon))
+	deleteIcon(icon)
+      } else {
+	console.log(`I'm leaving`, icon)
+      }
+    }
+
+    let icons_after_removal = structuredClone(icons)
+
+    return [icons_before_removal, icons_after_removal]
   }
 
   afterUpdate(() => {

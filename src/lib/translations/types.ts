@@ -120,7 +120,6 @@ export type Translation = {
     annoyed_21: string
     annoyed_22: string
     annoyed_23: string
-    annoyed_24: string
   }
 
   eraser_panel: {
@@ -266,6 +265,7 @@ export type Translation = {
       /** @deprecated - Hexfriend 3.0 */
       already_loaded: string
       make_copy_confirmation: string // The prompt to import a copy of an icon set
+      remove_confirmation: string
     }
 
     generators: {

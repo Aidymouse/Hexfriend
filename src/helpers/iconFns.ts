@@ -102,8 +102,9 @@ export const copy_iconset = (set: Iconset, new_id: string) => {
   let new_iconset = { ...set }
 
   new_iconset.id = new_id
-  // for (const icon of new_iconset.icons) {
-  // }
+  for (const icon of new_iconset.icons) {
+    icon.id += `_${new_id}`
+  }
 
   return new_iconset
 }
