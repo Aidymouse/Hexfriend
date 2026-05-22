@@ -10,7 +10,7 @@ Hexfriend is a tool for building hexmaps for D&D type games. It aims to be as fr
 A list of neat things Hexfriend can do!
 
 -   Create square or flower shaped maps
--   Draw lines, plain and dotted
+-   Draw lines, plain and dotted, or fill them to make shapes
 -   Place text with a variety of styles
 -   Easily add and remove new hexes to the edge of the map
 -   Show large hexes for multi-scale maps
@@ -40,7 +40,6 @@ Make sure you use [Yarn](https://yarnpkg.com/) instead of NPM. Just type `yarn` 
 
 Hexfriend is never finished! Here's a list of stuff to do:
 
--   Undo and Redo
 -   Some fun easter eggs
 -   More to come!
 
