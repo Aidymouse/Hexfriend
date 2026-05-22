@@ -137,21 +137,20 @@
   {/each}
 
   <span>
-    <button class="file-input-button"
-      >{$tl.settings.tilesets.import}<input
-        type="file"
-        accept=".hfts"
-        bind:files={tilesetFiles}
-        on:change={() => {
-          importTileset()
-        }}
-      /></button
-    >
-    <button
-      on:click={() => {
-        appState = 'tilesetCreator'
-      }}>{$tl.settings.tilesets.builder}</button
-    >
+    <button class="file-input-button">
+    {$tl.settings.tilesets.import}
+    <input
+      type="file"
+      accept=".hfts"
+      bind:files={tilesetFiles}
+      on:change={() => {
+        importTileset()
+      }}
+    />
+    </button>
+    <button on:click={() => { appState = 'tilesetCreator' }} >
+      {$tl.settings.tilesets.builder}
+    </button>
   </span>
 </div>
 

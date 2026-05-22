@@ -378,7 +378,6 @@
     <div class="settings-hider" class:hidden={hidden_settings.tilesets}>
       <div class="hider">
         <TilesetSettings
-          bind:loadedSave
           bind:comp_terrainLayer
           bind:comp_terrain_panel
           bind:appState
