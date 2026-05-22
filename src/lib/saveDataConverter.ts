@@ -263,6 +263,13 @@ const convert_v13_to_v14 = (oldData: SaveData): SaveData => {
     icon.base64 = ""
   })
 
+  // Paths gained fill attribs in style
+  oldData.paths.forEach(path => {
+    path.style.filled = path.style.filled ?? false
+    path.style.fill_color = path.style.fill_color ?? path.style.color
+    path.style.fill_opacity = path.style.fill_opacity ?? 0.5
+  })
+
   oldData.saveVersion = 14
 
   return oldData

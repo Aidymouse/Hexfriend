@@ -67,6 +67,11 @@ export const en_us: Translation = {
     corners: 'Corners',
     dashed_line: 'Dashed Line',
 
+    filled: 'Filled',
+    fill_color: 'Fill Color',
+    fill_opacity: 'Fill Opacity',
+    fill_match_button: 'Match Stroke',
+
     switch_end: 'Switch End',
     deselect: 'Deselect Path',
     remove_last: 'Remove Last Point',

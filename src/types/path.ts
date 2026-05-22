@@ -8,6 +8,10 @@ export type PathStyle = {
   dashed: boolean
   dash_length: number
   dash_gap: number
+
+  filled: boolean
+  fill_color: PIXI.FillStyle['color']
+  fill_opacity: PIXI.FillStyle['alpha']
 }
 
 // The actual path object drawn on the screen

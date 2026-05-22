@@ -1,6 +1,6 @@
 import { type Icon } from './icon'
 import type { coord_system } from './coordinates'
-import type { PathLayerPath, PathStyle } from './path'
+import type { FillStyle, PathLayerPath, PathStyle } from './path'
 import type { TextLayerText, TextStyle } from './text'
 import type { Tile } from './tilesets'
 import type * as PIXI from 'pixi.js'

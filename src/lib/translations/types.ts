@@ -66,6 +66,11 @@ export type Translation = {
     corners: string
     dashed_line: string
 
+    filled: string
+    fill_color: string
+    fill_opacity: string
+    fill_match_button: string 
+
     switch_end: string
     deselect: string
     remove_last: string

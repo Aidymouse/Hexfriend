@@ -17,7 +17,7 @@
   import { store_selected_tool } from '../stores/tools'
   import { store_has_unsaved_changes } from '../stores/flags'
 
-  import { coords_cubeToWorld, coords_worldToCube, cube_round } from '../helpers/hexHelpers'
+  import { coords_cubeToWorld, coords_worldToCube, cube_round, getHexGridParams } from '../helpers/hexHelpers'
   import { Vector } from '../lib/vector2d'
   import * as PIXI from 'pixi.js'
   import { DashLine } from 'pixi-dashed-line'
@@ -231,12 +231,7 @@
     return getPathSnapPoint(
 	store_panning.curWorldX(), 
 	store_panning.curWorldY(),
-	{
-	  orientation: $tfield.orientation,
-	  hexWidth: $tfield.hexWidth,
-	  hexHeight: $tfield.hexHeight,
-	  gap: $tfield.gap,
-	}
+	getHexGridParams($tfield),
     )
   }
 
@@ -375,6 +370,8 @@
   export function applyPaths(new_paths: PathLayerPath[]) {
     paths = new_paths
 
+    $data_path.hoveredPath = null
+
     const path_that_was_selected = structuredClone($data_path.selectedPath)
     $data_path.selectedPath = null
 
@@ -402,6 +399,7 @@
   }
 
   function updatePathHandles() {
+    /* from the PIXI JS docs - "use clear sparingly" */
     grph_selected_path.clear()
 
     if ($data_path.selectedPath) {
@@ -455,10 +453,12 @@
         cont_pixi_paths.addChild(cont_path)
       }
 
+
+
       // Handle dashed lines
       // Make dashed line object if needed
       if (path.style.dashed) {
-        if (dashed_lines[path.id] != null) {
+        if (dashed_lines[path.id] !== null) {
           delete dashed_lines[path.id]
         }
 
@@ -477,10 +477,16 @@
       let cont_path = path_containers[path.id]
       cont_path.marked_for_death = false
       cont_path.eventMode = $store_selected_tool == 'path' && !$data_path.selectedPath ? 'static' : 'auto'
-      cont_path.hitArea = findHitArea(path)
+      cont_path.hitArea = path.style.filled ? new PIXI.Polygon(path.points) : findHitArea(path)
 
       let grph_path = cont_path.children[0] as PIXI.Graphics
       grph_path.clear()
+
+      if (path.style.filled) {
+	console.log("Path is filled", path.style)
+	grph_path.beginFill(path.style.fill_color, path.style.fill_opacity)
+      }
+
       grph_path.lineStyle(path.style)
 
       let draw_on = grph_path
@@ -489,6 +495,10 @@
       draw_on.moveTo(path.points[0], path.points[1])
       for (let pI = 0; pI < path.points.length; pI += 2) {
         draw_on.lineTo(path.points[pI], path.points[pI + 1])
+      }
+
+      if (path.style.filled) {
+	grph_path.endFill()
       }
     }
 

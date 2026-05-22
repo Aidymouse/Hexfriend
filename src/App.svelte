@@ -172,7 +172,7 @@
   })
 
   // Enable PixiJS dev tools in development
-  const DEV_MODE = process.env.NODE_ENV === 'development' && false
+  const DEV_MODE = process.env.NODE_ENV === 'development' && true
 
   if (process.env.NODE_ENV == 'development') {
     // @ts-ignore

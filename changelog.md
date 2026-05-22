@@ -4,11 +4,14 @@ For Techy People
 # Version 4.0 - Hexfriend through time
 
 ## Version 4.0
-_The text panel has some additional lines to translate + there is a new message about removing icons_
+_The text panel has some additional lines to translate + there is a new message about removing icons + new path panel controls_
 - Added undo / redo
+- Path tool now allows you to fill shapes
 - Save Data transitioned to version 14
    - Moved the Gap setting from grid settings into hex settings (+ altered the translation type, but changes have been applied to existing translations)
    - Overlay image data now stored on the map rather than in UI state
+   - Paths now store fill data
+   - Icons stored more efficiently
 
 # Version 3.0 - Found your feet, Hexfriend
 

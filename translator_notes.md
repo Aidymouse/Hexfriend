@@ -12,6 +12,11 @@ The following are notes about new translations required for specific version of 
 
 ### Version 4.0
  - `settings.icon_sets.removal_confirmation`
+ - Path Panel fill labels
+    - `path_panel.filled`
+    - `path_panel.fill_color`
+    - `path_panel.fill_opacity`
+    - `path_panel.fill_match_button`
  - Some lines in the text panel
 
 ### Version 3.0

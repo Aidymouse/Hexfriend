@@ -52,6 +52,8 @@
       {
         display: name,
         style: { ...$data_path.style },
+	filled: $data_path.filled,
+	fillStyle: { ...$data_path.fillStyle },
         id: pathID,
       },
     ]
@@ -132,13 +134,13 @@
     startUndoState({path_styles: loaded_path_styles}, "Duplicate path style")
 
     pathID += 1
+
+    let new_path_style = structuredClone(contextPathStyle)
+    new_path_style.id = pathID
+
     loaded_path_styles = [
       ...loaded_path_styles,
-      {
-        display: contextPathStyle.display,
-        style: { ...contextPathStyle.style },
-        id: pathID,
-      },
+      new_path_style,
     ]
 
     $data_path.contextPathId = null
@@ -148,14 +150,34 @@
     $store_has_unsaved_changes = true
   }
 
+
+  // Bit of state juggling here but this lets us do instant updates to styles on:input and then apply proper undo state changes on:change
+  // Just remember to follow up all on:inputs with on:change events!
+  let style_prior_to_input: PathStyle | null = null
+
+  const inputStyle = (style: Partial<PathStyle>) => {
+
+    $data_path.style = {...$data_path.style, ...style}
+    if ($data_path.selectedPath) {
+      if (style_prior_to_input === null) {
+	style_prior_to_input = structuredClone($data_path.selectedPath.style)
+      }
+      $data_path.selectedPath.style = {...$data_path.style}
+    }
+  }
+
   /* Applies provided style + keeps data up to date */
   const applyStyle = (style: Partial<PathStyle>) => {
     /* TODO: replace with real matching fn */
-    if (pathStylesMatch({...$data_path.style, ...style}, $data_path.style)) { return }
+    if (style_prior_to_input === null && pathStylesMatch({...$data_path.style, ...style}, $data_path.style)) { return }
 
     $data_path.style = {...$data_path.style, ...style}
 
     if ($data_path.selectedPath) {
+      if (style_prior_to_input !== null) { 
+	$data_path.selectedPath.style = style_prior_to_input 
+	style_prior_to_input = null
+      }
       comp_pathLayer.updatePathStylePanelControl($data_path.selectedPath, $data_path.style)
     }  
   }
@@ -170,7 +192,12 @@
 >
   <div id="controls">
     <span>
-      <ColorInputPixi value={$data_path.style.color} id={'pathColor'} on:change={e => {applyStyle({color: e.detail.number})}} />
+      <ColorInputPixi
+	value={$data_path.style.color}
+	id={'pathColor'} 
+	on:input={e => {inputStyle({color: e.detail.number})}} 
+	on:change={e => {applyStyle({color: e.detail.number})}}
+      />
       <input id="pathThickness" type="number" min={1} value={$data_path.style.width} on:change={e => applyStyle({width: e.target.valueAsNumber}) } />
     </span>
 
@@ -251,6 +278,45 @@
 	  applyStyle({dash_gap: e.target.valueAsNumber})
 	}} />
       </span>
+    {/if}
+
+    <span class="path-control-grid">
+      <label for="path-filled">{$tl.path_panel.filled}</label>
+      <Checkbox
+	id="path-filled"
+        checked={$data_path.style.filled}
+        on:change={(e) => { applyStyle({filled: !$data_path.style.filled}) }}
+      />
+    </span>
+
+    {#if $data_path.style.filled}
+    <span class="path-control-grid">
+      <label for="path-fill-color" class="left-center-text" >{$tl.path_panel.fill_color}</label>
+      <div style="display: flex; gap: 0.5em">
+	<ColorInputPixi
+	  id="path-fill-color"
+	  value={$data_path.style.fill_color}
+	  on:change={(e) => { applyStyle({fill_color: e.detail.number}) }}
+	/>
+
+	<button class="outline-button" on:click={e => {
+	  applyStyle({fill_color: $data_path.style.color})
+	}}>{$tl.path_panel.fill_match_button}</button>
+      </div>
+    </span>
+    <span class="path-control-grid">
+      <label for="path-fill-opacity">{$tl.path_panel.fill_opacity}</label>
+      <input 
+	id="path-fill-opacity" 
+	type="range" 
+	max="1" 
+	min="0.05" 
+	step="0.05" 
+	value={$data_path.style.fill_opacity} 
+	on:input={e => inputStyle({fill_opacity: e.target.valueAsNumber})} 
+	on:change={e => applyStyle({fill_opacity: e.target.valueAsNumber})} 
+      />
+    </span>
     {/if}
   </div>
 
