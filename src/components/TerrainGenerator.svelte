@@ -8,15 +8,17 @@
     key: hex_key
     weight: number
   }
-  type generation_ruleset = { [key: hex_key]: rule[] }
+  type GenerationRuleset = { [key: hex_key]: rule[] }
 
   // STORE
   import { store_has_unsaved_changes } from '../stores/flags'
   import { tfield } from '../stores/tfield'
   import { tl } from '../stores/translation'
+  import { store_loaded_save } from '../stores'
 
   // COMPONENT
   import Checkbox from '../components/Checkbox.svelte'
+  import TerrainLayer from '../layers/TerrainLayer.svelte' // for type
 
   // HELPER
   import { genHexId, genHexId_tfieldHex, getNeighbours } from '../helpers/hexHelpers'
@@ -27,9 +29,13 @@
   import { one_e_dmg_ruleset } from '../lib/generation_rulesets/one_e_dmg'
   import { icy } from '../lib/generation_rulesets/icy'
   import { jungle } from '../lib/generation_rulesets/jungle'
+  import type { HexId } from '../types'
+  import { completeUndoState, startUndoState } from '../lib'
 
-  export let loadedTilesets: Tileset[]
-  export let comp_terrainLayer
+  let loadedTilesets: Tileset[]
+  store_loaded_save.subscribe(ls => { loadedTilesets = ls.tilesets })
+
+  export let comp_terrainLayer: TerrainLayer
   export let showTerrainGenerator: boolean
 
   let importFiles: FileList
@@ -40,7 +46,7 @@
   let gen_config_use_seed = false
   let gen_seed = ''
 
-  let current_ruleset: generation_ruleset = {} //JSON.parse(JSON.stringify(one_e_dmg_ruleset));
+  let current_ruleset: GenerationRuleset = {} //JSON.parse(JSON.stringify(one_e_dmg_ruleset));
   let selector_ruleset = null //one_e_dmg_ruleset;
   // Populate the gen function
 
@@ -70,9 +76,10 @@
 
   // Wrapper for generation methods
   function generate() {
-    console.log(current_ruleset)
 
     $store_has_unsaved_changes = true
+
+    startUndoState({tiles: Object.fromEntries(Object.entries($tfield.hexes).map(([hexId, terrainHex]) => [hexId, terrainHex.tile])) }, "Run Terrain Generator")
 
     // Get length of empty hexes
     let blank_hexes = Object.keys($tfield.hexes).filter((hex_id) => $tfield.hexes[hex_id].tile == null)
@@ -84,7 +91,7 @@
 
     if (gen_config_clear || clear_override) {
       Object.keys($tfield.hexes).forEach((hex_id) => {
-        comp_terrainLayer.eraseHex(hex_id)
+        comp_terrainLayer.eraseHex(hex_id as HexId)
       })
     }
 
@@ -98,18 +105,20 @@
     if (total_weights == 0) {
       console.log('Random!')
       gen_completely_random($tfield.hexes)
-      return
+    } else {
+      gen_old_school_generate($tfield.hexes, current_ruleset)
     }
 
     //standardGen($tfield.hexes, current_ruleset)
-    gen_old_school_generate($tfield.hexes, current_ruleset)
     //comp_terrainLayer.renderAllHexes()
+
+    completeUndoState({tiles: Object.fromEntries(Object.entries($tfield.hexes).map(([hexId, terrainHex]) => [hexId, terrainHex.tile])) })
 
     $store_has_unsaved_changes = true
   }
 
-  function gen_old_school_generate(hexes, ruleset: generation_ruleset) {
-    // Meanders through hexes on random walks
+  // Meanders through hexes on random walks
+  function gen_old_school_generate(hexes, ruleset: GenerationRuleset) {
 
     // Find the random generation function (default rand unless seeded)
     let rand_func = get_min_max_rand_function(Math.random)

@@ -365,7 +365,7 @@ export const en_us: Translation = {
     clear: 'Clear',
     seed: 'Seed',
     seed_generation: 'Seed Generation',
-    clear_confirmation: 'Are you sure?',
+    clear_confirmation: 'Clear generator rules?',
     clear_before_generation: 'Clear Before Generation',
     icon_generator: {
       place_in_center: 'Place In Hex Center',
