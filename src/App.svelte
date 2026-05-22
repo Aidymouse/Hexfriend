@@ -646,6 +646,11 @@
 
     let p = await asyncExtract(app, offsetContainer)
 
+    // TEMP: at this stage, we trust the save data in store to have the most up to date iconsets and tilesets. at some point we'll want to transition to have everything update this store.
+
+    data_to_save.tilesets = $store_loaded_save.tilesets
+    data_to_save.iconsets = $store_loaded_save.iconsets
+
     return saveToDexie(data_to_save, save_id, preview_override ?? p)
   }
 
