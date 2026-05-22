@@ -48,7 +48,7 @@
       on:change={(e) => {
         startUndoState({ coords: $data_coordinates }, 'Change Coordinate System')
 
-        $data_coordinates.system = e.target.value
+        $data_coordinates.system = parseInt(e.target.value)
         comp_coordsLayer.updateAllCoordsText()
 
         completeUndoState({ coords: $data_coordinates })
@@ -85,18 +85,38 @@
     />
 
     <label for="coordsOutline">{$tl.settings.coordinates.text_labels.outline_color}</label>
-    <ColorInputPixi bind:value={$data_coordinates.style.stroke} id={'coordsOutline'} />
+    <ColorInputPixi 
+      value={$data_coordinates.style.stroke}
+      on:change={e => {
+	startUndoState({coords: {style: $data_coordinates.style}}, "Change Coordinates Outline Color")
+	$data_coordinates.style.stroke = e.detail.string
+	completeUndoState({coords: {style: $data_coordinates.style}})
+      }}
+      id={'coordsOutline'}
+    />
 
     <label for="coordsStrokeThickness">{$tl.settings.coordinates.text_labels.outline_thickness}</label>
-    <input id="coordsStrokeThickness" type="number" bind:value={$data_coordinates.style.strokeThickness} />
+    <input
+      id="coordsStrokeThickness"
+      type="number"
+      value={$data_coordinates.style.strokeThickness}
+      on:change={e => {
+	startUndoState({coords: {style: $data_coordinates.style}}, "Change Coord Stroke Width")
+	$data_coordinates.style.strokeThickness = e.target.valueAsNumber
+	completeUndoState({coords: {style: $data_coordinates.style}})
+      }}
+    />
 
     <label for="coordSeperator">{$tl.settings.coordinates.separator}</label>
     <input
       id="coordSeperator"
       type="text"
-      bind:value={$data_coordinates.seperator}
-      on:change={() => {
+      value={$data_coordinates.seperator}
+      on:change={(e) => {
+	startUndoState({coords: {seperator: $data_coordinates.seperator}}, "Change Coord Seperator")
+	$data_coordinates.seperator = e.target.value
         comp_coordsLayer.updateAllCoordsText()
+	completeUndoState({coords: {seperator: $data_coordinates.seperator}})
       }}
     />
 
@@ -104,9 +124,12 @@
     <input
       id="coordGap"
       type="number"
-      bind:value={$data_coordinates.gap}
-      on:change={() => {
+      value={$data_coordinates.gap}
+      on:change={(e) => {
+	startUndoState({coords: {gap: $data_coordinates.gap}}, "Change Coord Gap")
+	$data_coordinates.gap = e.target.valueAsNumber
         comp_coordsLayer.updateAllCoordPositions()
+	completeUndoState({coords: {gap: $data_coordinates.gap}})
       }}
     />
 
@@ -115,9 +138,12 @@
       <input
         id="coord-offset-rowcol-row"
         type="number"
-        bind:value={$data_coordinates.offsets.row_col.row}
-        on:change={() => {
+        value={$data_coordinates.offsets.row_col.row}
+        on:change={(e) => {
+	  startUndoState({coords: {offsets: $data_coordinates.offsets}}, "Change Coord Offset - Row")
+	  $data_coordinates.offsets.row_col.row = e.target.valueAsNumber
           comp_coordsLayer.updateAllCoordsText()
+	  completeUndoState({coords: {offsets: $data_coordinates.offsets}})
         }}
       />
 
@@ -125,9 +151,12 @@
       <input
         id="coord-offset-rowcol-col"
         type="number"
-        bind:value={$data_coordinates.offsets.row_col.col}
-        on:change={() => {
+        value={$data_coordinates.offsets.row_col.col}
+        on:change={(e) => {
+	  startUndoState({coords: {offsets: $data_coordinates.offsets}}, "Change Coord Offset - Col")
+	  $data_coordinates.offsets.row_col.col = e.target.valueAsNumber
           comp_coordsLayer.updateAllCoordsText()
+	  completeUndoState({coords: {offsets: $data_coordinates.offsets}})
         }}
       />
     {/if}
@@ -137,9 +166,12 @@
       <input
         id="coord-offset-cube-q"
         type="number"
-        bind:value={$data_coordinates.offsets.cube.q}
-        on:change={() => {
-          comp_coordsLayer.updateAllCoordsText()
+        value={$data_coordinates.offsets.cube.q}
+        on:change={(e) => {
+	  startUndoState({coords: {offsets: $data_coordinates.offsets}}, "Change Coord Offset - Q")
+	  $data_coordinates.offsets.cube.q = e.target.valueAsNumber
+	  comp_coordsLayer.updateAllCoordsText()
+	  completeUndoState({coords: {offsets: $data_coordinates.offsets}})
         }}
       />
 
@@ -147,9 +179,12 @@
       <input
         id="coord-offset-cube-r"
         type="number"
-        bind:value={$data_coordinates.offsets.cube.r}
-        on:change={() => {
+        value={$data_coordinates.offsets.cube.r}
+        on:change={(e) => {
+	  startUndoState({coords: {offsets: $data_coordinates.offsets}}, "Change Coord Offset - R")
+	  $data_coordinates.offsets.cube.r = e.target.valueAsNumber
           comp_coordsLayer.updateAllCoordsText()
+	  completeUndoState({coords: {offsets: $data_coordinates.offsets}})
         }}
       />
     {/if}
@@ -159,9 +194,12 @@
       <input
         id="coord-offset-cube-s"
         type="number"
-        bind:value={$data_coordinates.offsets.cube.s}
-        on:change={() => {
+        value={$data_coordinates.offsets.cube.s}
+        on:change={(e) => {
+	  startUndoState({coords: {offsets: $data_coordinates.offsets}}, "Change Coord Offset - S")
+	  $data_coordinates.offsets.cube.s = e.target.valueAsNumber
           comp_coordsLayer.updateAllCoordsText()
+	  completeUndoState({coords: {offsets: $data_coordinates.offsets}})
         }}
       />
     {/if}
