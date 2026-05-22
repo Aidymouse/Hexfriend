@@ -74,7 +74,7 @@
       $store_loaded_save.tilesets.push(setToImport)
       loadedTilesets = $store_loaded_save.tilesets
 
-      $store_loaded_save.tilesets = $store_loaded_save.tilesets
+      $store_loaded_save.tilesets = $store_loaded_save.tilesets // this line allows the terrainpanel to update instantly
 
       completeUndoState({tilesets: $store_loaded_save.tilesets})
 

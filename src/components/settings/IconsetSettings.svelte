@@ -91,6 +91,7 @@
       startUndoState({iconsets: $store_loaded_save.iconsets}, `Load Iconset ${setToImport.name} (${setToImport.id})`)
 
       $store_loaded_save.iconsets.push(setToImport)
+      $store_loaded_save.iconsets = $store_loaded_save.iconsets // inexplicably, this line makes the icon panel update instantly
       loadedIconsets = $store_loaded_save.iconsets
 
       completeUndoState({iconsets: $store_loaded_save.iconsets})

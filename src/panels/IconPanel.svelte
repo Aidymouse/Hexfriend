@@ -19,9 +19,6 @@
   import Alert from '../components/Alert.svelte'
 
   let loadedIconsets: Iconset[]
-  store_loaded_save.subscribe(ls => {
-    loadedIconsets = ls.iconsets
-  })
   export let app: PIXI.Application
 
   let iconPreview: string
@@ -68,16 +65,24 @@
     return true
   }
 
+  store_loaded_save.subscribe(ls => {
+    loadedIconsets = ls.iconsets
+  })
+
   afterUpdate(() => {
     $store_loaded_save.iconsets = $store_loaded_save.iconsets
+    loadedIconsets = loadedIconsets
 
     $tfield.orientation = $tfield.orientation
     get_icon_preview($data_icon.icon).then((p) => (iconPreview = p))
+
   })
 
+  /*
   onMount(async () => {
     //iconPreview = await getIconPreview(data_icon);
   })
+  */
 </script>
 
 <div class="panel">
@@ -147,7 +152,7 @@
   </div>
 
   <div id="buttons" class="scroll-container">
-    {#each loadedIconsets as iconset (iconset.id)}
+    {#each $store_loaded_save.iconsets as iconset (iconset.id)}
       {#if loadedIconsets.length > 1 || iconset.collapsed}
         <h2 class="iconset-heading">
           {iconset.name}
