@@ -215,6 +215,11 @@ export const apply_state_data = (applied_data: UndoData, layers: LayerComponents
     store_selected_tool.update((t) => applied_data.selected_tool)
   }
 
+  /* Coordinates */
+  if (applied_data.coords) {
+    layers.coordsLayer.applyCoordsData(applied_data.coords)
+  }
+
   /* Overlay */
   if (applied_data.overlay) {
     data_overlay.update((u) => ({ ...u, ...applied_data.overlay }))

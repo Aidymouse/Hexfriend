@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { coords_cubeToWorld, genHexId, getHexGridParams } from '../helpers/hexHelpers'
-  import { coords_cubeToq, coords_cubeTor } from '../helpers/hexHelpers'
+  import { coords_cubeToWorld } from '../helpers/hexHelpers'
   import { breakDownHexID } from '../helpers/hexHelpers'
 
   import { data_coordinates } from '../stores/data'
@@ -19,9 +18,9 @@
     genCoord_letterNumber,
     genCoord_rowCol,
     getHexCoordParams,
-    numToAlphabet,
     type GenCoordFn,
   } from '../helpers'
+  import type { CoordinatesData } from '../types'
 
   $: {
     Object.entries(coordTexts).forEach(([hexId, text]) => {
@@ -32,7 +31,7 @@
     cont_textContainer.visible = $data_coordinates.shown
   }
 
-  let coordTexts: { [key: HexId]: CoordText } = {} // hex id: coordText
+  let coordTexts: { [key: HexId]: CoordText } = {}
 
   export let cont_coordinates: PIXI.Container
   let cont_textContainer = new PIXI.Container()
@@ -208,6 +207,14 @@
     }
 
     $store_has_unsaved_changes = true
+  }
+
+  export const applyCoordsData = (newData: Partial<CoordinatesData>) => {
+    $data_coordinates = { ...$data_coordinates, ...newData }
+
+    // The most inefficient version of this possible
+    // TODO: conditionally re-render / reposition based on newData
+    completeUpdate()
   }
 
   onMount(() => {
