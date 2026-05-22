@@ -4,7 +4,7 @@ For Techy People
 # Version 4.0 - Hexfriend through time
 
 ## Version 4.0
-_The text panel has some additional lines to translate_
+_The text panel has some additional lines to translate + there is a new message about removing icons_
 - Added undo / redo
 - Save Data transitioned to version 14
    - Moved the Gap setting from grid settings into hex settings (+ altered the translation type, but changes have been applied to existing translations)
