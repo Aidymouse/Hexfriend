@@ -389,11 +389,11 @@
   * Yes, if you're crafty, you could load an icon set with a name such that it will be erroneously deleted when you remove an iconset that it was not imported with.
   * If you do this, you are very clever. Send me video proof and I'll give you $5 NZD.
   */
-  export function removeAllIconsOfSet(set: Iconset): [IconLayerIcon[], IconLayerIcon[]] {
+  export function removeAllIconsOfSet(set: Iconset) {
     const ids = set.icons.map(i => i.id)
 
     // TODO: not proud of this, but we need to get the icons to iconset settings somehow, and this will do until we depend on loaded save more
-    let icons_before_removal = structuredClone(icons)
+    //let icons_before_removal = structuredClone(icons)
 
     // Since deleting icons removes them from a list, we have to go backwards
     for (let iconIdx=icons.length-1; iconIdx >= 0; iconIdx--) {
@@ -408,9 +408,13 @@
       }
     }
 
-    let icons_after_removal = structuredClone(icons)
+    //let icons_after_removal = structuredClone(icons)
 
-    return [icons_before_removal, icons_after_removal]
+    //return [icons_before_removal, icons_after_removal]
+  }
+
+  export function getIconLayerIcons(): IconLayerIcon[] {
+    return icons
   }
 
   afterUpdate(() => {

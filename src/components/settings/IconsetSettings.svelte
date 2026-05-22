@@ -36,16 +36,17 @@
     const iconsetToRemove = loadedIconsets.find((is: Iconset) => is.id === setId)
 
     // TODO: this is very inefficient, but until loadedSave is depended on entirely for icons, it will do
-    const [icons_before_removal, icons_after_removal] = comp_iconLayer.removeAllIconsOfSet(iconsetToRemove)
+    startUndoState({iconsets: $store_loaded_save.iconsets, icons: comp_iconLayer.getIconLayerIcons() }, `Remove Iconset ${setId}`)
+    
+    comp_iconLayer.removeAllIconsOfSet(iconsetToRemove)
 
-    startUndoState({iconsets: $store_loaded_save.iconsets, icons: icons_before_removal }, `Remove Iconset ${setId}`)
 
     $store_loaded_save.iconsets = $store_loaded_save.iconsets.filter((is: Iconset) => is.id != setId)
     loadedIconsets = $store_loaded_save.iconsets
 
     comp_icon_panel.selectIcon(loadedIconsets[0].icons[0])
 
-    completeUndoState({iconsets: $store_loaded_save.iconsets, icons: icons_after_removal }, `Remove Iconset ${setId}`)
+    completeUndoState({iconsets: $store_loaded_save.iconsets, icons: comp_iconLayer.getIconLayerIcons() }, `Remove Iconset ${setId}`)
 
 
     $store_has_unsaved_changes = true

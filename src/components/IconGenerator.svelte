@@ -8,16 +8,19 @@
   import { tfield } from '../stores/tfield'
   import { tl } from '../stores/translation'
 
+  import IconLayer from '../layers/IconLayer.svelte'
+
   import type { TerrainHex, TerrainField } from '../types/terrain'
   import type { Tile, Tileset } from '../types/tilesets'
   import type { coords_cubeToWorld } from '../helpers/hexHelpers'
   import type { Iconset, Icon, RelativeIcon } from '../types/icon'
   import Checkbox from './Checkbox.svelte'
   import { get_image_scaled_for_hex_relative, ScaleMode } from '../helpers/imageSizing'
+  import { completeUndoState, startUndoState } from '../lib'
 
   export let loadedIconsets: Iconset[]
 
-  export let comp_iconLayer
+  export let comp_iconLayer: IconLayer
   export let show_icon_generator: boolean
 
   let importFiles: FileList
@@ -58,6 +61,9 @@
 
   // Wrapper for generation methods
   function generate() {
+
+    startUndoState({icons: comp_iconLayer.getIconLayerIcons()}, "Generate Icons")
+
     let icon_scale = get_image_scaled_for_hex_relative(100, 100, 50, 43.4, icon_phex)
     let rand_func = get_min_max_rand_function(Math.random)
     let rand_0_1 = Math.random
@@ -108,6 +114,8 @@
         comp_iconLayer.emplaceIcon(rand_icon, hex_pos, icon_scale)
       }
     })
+
+    completeUndoState({icons: comp_iconLayer.getIconLayerIcons()})
 
     $store_has_unsaved_changes = true
   }
