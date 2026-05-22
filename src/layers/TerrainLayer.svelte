@@ -921,14 +921,24 @@
   export function removeAllTilesOfSet(setId: string) {
     $store_has_unsaved_changes = true
 
+    let replaced: {[key: HexId]: Tile } = {}
+    let erasedIds: HexId[] = []
+
     Object.entries($tfield.hexes).forEach(([hexId, hex]: [HexId, TerrainHex]) => {
       if (!hex.tile) return
 
       let hexSetId = hex.tile.tileset_id
       if (setId == hexSetId) {
+
+	let hexId = genHexId(hex.q, hex.r, hex.s)
+	replaced[hexId] = structuredClone(hex.tile)
+
+	erasedIds.push(hexId)
         eraseHex(hexId)
       }
     })
+
+    return [erasedIds, replaced]
   }
 
   function eyedrop() {
