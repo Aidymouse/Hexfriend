@@ -258,6 +258,11 @@ const convert_v13_to_v14 = (oldData: SaveData): SaveData => {
   // @ts-ignore
   oldData.overlay_base64 = oldData.overlay.base64 === '' ? null : oldData.overlay.base64
 
+  // Strip base64 from icons stored on the map. We don't need all that !!!!
+  oldData.icons.forEach(icon => {
+    icon.base64 = ""
+  })
+
   oldData.saveVersion = 14
 
   return oldData
