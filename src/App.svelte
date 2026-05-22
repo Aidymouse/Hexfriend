@@ -108,7 +108,7 @@
   import Scratchpad from './components/scratchpad/Scratchpad.svelte'
   import { convert_iconset_to_latest } from './lib/iconsetConverter'
 
-  import { store_undo } from './stores'
+  import { store_loaded_save, store_undo } from './stores'
   /* STATE */
 
   let dataToLoad = {
@@ -709,11 +709,14 @@
 
   async function do_load(data: SaveData, id: number | null) {
     console.log('Initiate load', id)
+
+    $store_loaded_save = data
+
     loadedTilesets = data.tilesets
     loadedIconsets = data.iconsets
 
     // Load Textures
-    for (const tileset of loadedTilesets) {
+    for (const tileset of $store_loaded_save.tilesets) {
       if (!tileset.format_version || tileset.format_version < LATEST_TILESET_FORMAT_VERSION) {
         let updated_tileset = await convert_tileset_to_latest(tileset)
 
@@ -729,7 +732,7 @@
     }
 
     // Load Icons
-    for (const iconset of loadedIconsets) {
+    for (const iconset of $store_loaded_save.iconsets) {
       if (!iconset.format_version || iconset.format_version < LATEST_ICONSET_FORMAT_VERSION) {
         const updated_iconset = await convert_iconset_to_latest(iconset)
         loadedIconsets = loadedIconsets.filter((is) => is.id != iconset.id)
@@ -760,7 +763,8 @@
 
     loadedSave = data
 
-    push_undo_state(loadedSave, 'Initial Load')
+    // TODO: clear undo stack
+    //push_undo_state(loadedSave, 'Initial Load')
 
     loadedId = id
 
@@ -930,7 +934,7 @@
     {:else if show_icon_generator}
       <IconGenerator {loadedIconsets} {comp_iconLayer} bind:show_icon_generator />
     {:else if $store_selected_tool == Tools.TERRAIN}
-      <TerrainPanel bind:this={comp_terrain_panel} {loadedTilesets} {app} />
+      <TerrainPanel bind:this={comp_terrain_panel} {app} />
     {:else if $store_selected_tool == Tools.ICON}
       <IconPanel {app} {loadedIconsets} />
     {:else if $store_selected_tool == Tools.PATH}

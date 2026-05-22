@@ -17,14 +17,18 @@
   import { DEFAULTTILESET } from '../../lib/defaultTileset'
   import { copy_tileset } from '../../helpers/tileFns'
 
+  import { startUndoState, completeUndoState } from '../../lib'
+
+  import { store_loaded_save } from '../../stores'
   export let comp_terrainLayer
   export let comp_terrain_panel
 
-  export let loadedSave
-  export let loadedTilesets: Tileset[]
+  //export let loadedTilesets: Tileset[]
 
-
-  console.log(loadedTilesets)
+  let loadedTilesets: Tileset[]
+  store_loaded_save.subscribe(ls => {
+    loadedTilesets = ls.tilesets
+  })
 
   export let appState
 
@@ -58,30 +62,43 @@
 	}
       }
 
+
       setToImport = await convert_tileset_to_latest(setToImport)
+
+      startUndoState({tilesets: $store_loaded_save.tilesets}, `Import Tileset - ${setToImport.name} (${setToImport.id}) `)
 
       /* We also have to load all of these textures */
       //addTilesetTextures(setToImport, L);
       texture_loader.load_tileset_textures(setToImport)
 
-      loadedTilesets.push(setToImport)
-      loadedTilesets = loadedTilesets
+      $store_loaded_save.tilesets.push(setToImport)
+      loadedTilesets = $store_loaded_save.tilesets
+
+      $store_loaded_save.tilesets = $store_loaded_save.tilesets
+
+      completeUndoState({tilesets: $store_loaded_save.tilesets})
 
       $store_has_unsaved_changes = true
     }
   }
 
   function removeTileset(setId: string) {
-    if (!confirm($tl.settings.tilesets.remove_confirmation)) return
+    if (!confirm($tl.settings.tilesets.remove_confirmation)) { return }
 
-    comp_terrainLayer.removeAllTilesOfSet(setId)
+
+    
+    const [erasedIds, replaced] = comp_terrainLayer.removeAllTilesOfSet(setId)
     comp_terrain_panel.reset_tile()
 
     // This line will need to change if the default tileset ever gets removeable
     //data_terrain.tile = {...loadedTilesets[0].tiles[0]}
 
-    loadedTilesets = loadedTilesets.filter((ts: Tileset) => ts.id != setId)
-    loadedSave.tilesets = loadedTilesets
+    startUndoState({tilesets: loadedTilesets, tiles: replaced }, `Remove Tileset ${setId}`)
+
+    $store_loaded_save.tilesets = $store_loaded_save.tilesets.filter((ts: Tileset) => ts.id != setId)
+    loadedTilesets = $store_loaded_save.tilesets
+
+    completeUndoState({tilesets: loadedTilesets, tiles: Object.fromEntries(erasedIds.map(i => [i, null])) })
 
     $store_has_unsaved_changes = true
 

@@ -64,7 +64,6 @@
   export let redrawEntireMap: Function
 
   //export let data_terrain: terrain_data
-  export let loadedTilesets: Tileset[]
   export let loadedIconsets: Iconset[]
 
   export let comp_terrainLayer: TerrainLayer
@@ -85,7 +84,7 @@
 
   let exportType: 'Export As...' | 'image/png' | 'application/json' = 'Export As...'
 
-  let iconset_text = 'Icon Set'
+  // [[ let iconset_text = 'Icon Set' ]] - Encased in the museum, a historical artifact of Hexfriends whimsy
 
   function retain_positions_on_resize() {
     const old_hex_size: HexSizeParams = {
@@ -380,7 +379,6 @@
       <div class="hider">
         <TilesetSettings
           bind:loadedSave
-          bind:loadedTilesets
           bind:comp_terrainLayer
           bind:comp_terrain_panel
           bind:appState
@@ -394,7 +392,7 @@
     <SettingHeading text={$tl.settings.icon_sets.title} bind:toggle={hidden_settings.iconsets} />
     <div class="settings-hider" class:hidden={hidden_settings.iconsets}>
       <div class="hider">
-        <IconsetSettings bind:loadedSave bind:loadedIconsets bind:iconset_text bind:appState />
+        <IconsetSettings bind:loadedSave bind:loadedIconsets bind:appState />
       </div>
     </div>
   </div>

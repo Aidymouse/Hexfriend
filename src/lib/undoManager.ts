@@ -1,5 +1,5 @@
 import { Tools, type LayerComponents, type PanelComponents, type UndoData, type UndoState } from '../types'
-import { data_path, data_overlay, store_panning, DefaultUndoStore } from '../stores'
+import { data_path, data_overlay, store_panning, DefaultUndoStore, store_loaded_save } from '../stores'
 import { get } from 'svelte/store'
 
 import { store_undo, store_selected_tool } from '../stores'
@@ -227,5 +227,12 @@ export const apply_state_data = (applied_data: UndoData, layers: LayerComponents
 
   if (applied_data.overlay_base64 !== undefined) {
     layers.overlayLayer.changeOverlayImage(applied_data.overlay_base64)
+  }
+
+  if (applied_data.tilesets) {
+    store_loaded_save.update(ls => { ls.tilesets = structuredClone(applied_data.tilesets); return ls })
+  }
+
+  if (applied_data.iconsets) {
   }
 }
