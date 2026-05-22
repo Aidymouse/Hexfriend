@@ -144,6 +144,7 @@
       ...icon,
       x: icon_pos.x,
       y: icon_pos.y,
+      base64: '',
       onLayerId: iconId,
       texId: icon.texId,
       rotation: icon.rotation,
