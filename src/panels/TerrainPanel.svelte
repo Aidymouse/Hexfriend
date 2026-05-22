@@ -21,7 +21,9 @@
   import ColorInputPixi from '../components/ColorInputPixi.svelte'
   import { writable } from 'svelte/store'
 
-  export let loadedTilesets: Tileset[]
+  import { store_loaded_save } from '../stores'
+
+  let loadedTilesets: Tileset[]
 
   export let app: PIXI.Application
 
@@ -87,12 +89,16 @@
     return tiles_match(tile, $data_terrain.tile)
   }
 
-  afterUpdate(async () => {
-    loadedTilesets = loadedTilesets
+  store_loaded_save.subscribe(ls => {
+    loadedTilesets = ls.tilesets
+  })
+
+  afterUpdate(() => {
+    
+    $store_loaded_save.tilesets = $store_loaded_save.tilesets // Keeps the selected tile up to date. Don't ask me why.
+
     $tfield.orientation = $tfield.orientation
 
-    // tilePreview = await get_tile_previews()[$tfield.orientation]
-    // console.log(tilePreview)
   })
 
   onMount(async () => {
