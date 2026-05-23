@@ -103,7 +103,7 @@
   // Enums
   import { Tools } from './types/toolData'
   import * as PIXI from 'pixi.js'
-  import { afterUpdate, onMount } from 'svelte'
+  import { afterUpdate, onMount, tick } from 'svelte'
   import { Map_Exports } from './types/export'
   import Scratchpad from './components/scratchpad/Scratchpad.svelte'
   import { convert_iconset_to_latest } from './lib/iconsetConverter'
@@ -759,7 +759,9 @@
     // Overlay
     $data_overlay = data.overlay
     if (data.overlay_base64) {
-      comp_overlayLayer.changeOverlayImage(data.overlay_base64)
+			tick().then(r => {
+      	comp_overlayLayer.changeOverlayImage(data.overlay_base64)
+			})
     } else {
       if ($store_selected_tool == Tools.OVERLAY){
         $store_selected_tool = Tools.TERRAIN
