@@ -208,15 +208,24 @@ function convert_v12_to_v13(old_data: SaveData): SaveData {
   //@ts-ignore - Pre v13 it was called textStyles
   old_data.text_styles = old_data.textStyles.map((ts) => ({ ...ts, alpha: 1 }))
 
-  console.log(old_data.icons)
-
-  old_data.icons.forEach((i) => {
-    if (!i.scaleMode) i.scaleMode = ScaleMode.RELATIVE
-    if (typeof i.scale === 'number') i.scale = { x: i.scale, y: i.scale }
-    i.onLayerId = parseInt(i.id)
-  })
 
   /** Icon Scale Modes */
+  old_data.icons.forEach((i) => {
+    i.scaleMode = i.scaleMode ?? ScaleMode.RELATIVE
+    if (typeof i.scale === 'number') {
+			 i.scale = { x: i.scale, y: i.scale }
+		}
+    i.onLayerId = parseInt(i.id)
+		console.log(i.scaleMode)
+  })
+
+	old_data.iconsets.forEach( iconset => {
+		iconset.supported_orientations = iconset.supported_orientations ?? 'both'
+	})
+
+	/* Hex tiles with symbols also need scale modes now */
+	// TODO:
+
   old_data.saveVersion = 13
 
   return old_data
@@ -224,6 +233,8 @@ function convert_v12_to_v13(old_data: SaveData): SaveData {
 
 /* it occurs to me that the best thing to do would be save old versions of the save data types, but that means copying a LOT of other nested types. And I'm lazy. */
 const convert_v13_to_v14 = (oldData: SaveData): SaveData => {
+  console.log('Coverting save: v13 -> v14')
+
   // @ts-ignore
   oldData.TerrainField.gap = oldData.TerrainField.grid.gap
   // @ts-ignore
