@@ -4,7 +4,7 @@ For Techy People
 # Version 4.0 - Hexfriend through time
 
 ## Version 4.0
-_The text panel has some additional lines to translate + there is a new message about removing icons + new path panel controls_
+_The text panel has some additional lines to translate + there is a new message about removing icons + new path panel controls. I've also created the [Translator Notes](https://github.com/Aidymouse/Hexfriend/blob/master/translator_notes.md) so all updates are in one place._
 - Added undo / redo
 - Path tool now allows you to fill shapes
 - Save Data transitioned to version 14
