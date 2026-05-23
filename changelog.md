@@ -3,6 +3,9 @@ For Techy People
 
 # Version 4.0 - Hexfriend through time
 
+## Version 4.0.2
+- Properly await before loading overlay on load
+
 ## Version 4.0.1
 - Fix typo in save data convert that prevented loading maps
 - Ammend path styles in default save data
