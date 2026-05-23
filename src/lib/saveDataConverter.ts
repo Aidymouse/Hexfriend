@@ -246,10 +246,10 @@ const convert_v13_to_v14 = (oldData: SaveData): SaveData => {
   // Above text changes require update to text styles as well
   oldData.text_styles.forEach((ts) => {
     if (typeof ts.style.fill === 'string') {
-      ts.style.fill = PIXI.utils.string2hex(t.style.fill)
+      ts.style.fill = PIXI.utils.string2hex(ts.style.fill)
     }
     if (typeof ts.style.stroke === 'string') {
-      ts.style.stroke = PIXI.utils.string2hex(t.style.stroke)
+      ts.style.stroke = PIXI.utils.string2hex(ts.style.stroke)
     }
     ts.style.alpha = ts.style.alpha ?? 1
   })
