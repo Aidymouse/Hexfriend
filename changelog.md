@@ -3,6 +3,9 @@ For Techy People
 
 # Version 4.0 - Hexfriend through time
 
+## Version 4.1.2
+- Added Italian translation (thanks 7ede!)
+
 ## Version 4.0.2
 - Properly await before loading overlay on load
 
