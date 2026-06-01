@@ -3,7 +3,7 @@ For Techy People
 
 # Version 4.0 - Hexfriend through time
 
-## Version 4.1.2
+## Version 4.1.0
 - Added Italian translation (thanks 7ede!)
 
 ## Version 4.0.2
