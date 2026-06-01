@@ -90,7 +90,7 @@ export const IT_it: Translation = {
   text_panel: {
     align_left: 'Allinea a Sinistra',
     align_center: 'Centrato',
-    align_right: 'Allinea a Destra,
+    align_right: 'Allinea a Destra',
     outline: 'Bordo esterno',
     opacity: 'Opacità',
     delete_text: 'Cancella Testo selezionato',
@@ -183,10 +183,10 @@ export const IT_it: Translation = {
       blank_color: 'Colore Esagono vuoto',
       blank_color_reset: 'Reset',
       orientation: 'Orientamento Esagoni',
-      pointytop: 'Punta verso l'alto',
+      pointytop: `Punta verso l'alto`,
       flattop: 'Base piatta',
-      raised_column: 'Colonna rialzata,
-      indented_row: 'Riga rientrata,
+      raised_column: 'Colonna rialzata',
+      indented_row: 'Riga rientrata',
       width: 'Larghezza Esagono',
       height: 'Altezza Esagono',
       size_by_radius: 'Dimensioni in base al raggio',
@@ -194,13 +194,13 @@ export const IT_it: Translation = {
       gap: 'Margine',
       retain_position: 'Blocca posizione',
       retain_position_explanation:
-        'Gli oggetti selezionati manterranno la loro posizione rispetto al centro dell'esagono quando gli esagoni vengono ridimensionati..',
+        `Gli oggetti selezionati manterranno la loro posizione rispetto al centro dell'esagono quando gli esagoni vengono ridimensionati..`,
       retain_icons: 'Icone',
       retain_paths: 'Percorsi',
       retain_text: 'Testi',
       update_icon_scale: 'Aggiorna scala Icone',
       update_icon_scale_explanation:
-        'Le Icone aggiorneranno la loro scala per adattarsi alla nuova dimensione dell'esagono al momento del ridimensionamento. ATTENZIONE: la scala viene calcolata in base alla dimensione selezionata al momento del posizionamento dell'Icona. Se hai ridimensionato degli esagoni con questa opzione disattivata, la dimensione dell'Icona potrebbe assumere valori inaspettati.',
+        `Le Icone aggiorneranno la loro scala per adattarsi alla nuova dimensione dell'esagono al momento del ridimensionamento. ATTENZIONE: la scala viene calcolata in base alla dimensione selezionata al momento del posizionamento dell'Icona. Se hai ridimensionato degli esagoni con questa opzione disattivata, la dimensione dell'Icona potrebbe assumere valori inaspettati.`,
     },
 
     shape: {
@@ -224,7 +224,7 @@ export const IT_it: Translation = {
 
     coordinates: {
       title: 'Coordinate',
-      disclaimer: 'Le coordinate possono rallentare le modifiche alla mappa come l'aggiunta di esagoni o il cambio di orientamento.',
+      disclaimer: `Le coordinate possono rallentare le modifiche alla mappa come l'aggiunta di esagoni o il cambio di orientamento.`,
       show: 'Mostra Coordinate',
       system: 'Sistema di Coordinate',
       systems: {
@@ -240,7 +240,7 @@ export const IT_it: Translation = {
         outline_thickness: 'Spessore bordo',
       },
       separator: 'Separatore',
-      space: 'Spazio dal basso,
+      space: 'Spazio dal basso',
       offset: {
         row: 'Offset Riga',
         column: 'Offset Colonna',
@@ -299,7 +299,7 @@ export const IT_it: Translation = {
         end: '',
       },
       guts: {
-        start: 'Hexfriend è realizzato con Svelte, Pixi JS e Typescript. Dai un'occhiata su ',
+        start: `Hexfriend è realizzato con Svelte, Pixi JS e Typescript. Dai un'occhiata su `,
         github_link: 'Github',
         end: '',
       },
@@ -325,7 +325,7 @@ export const IT_it: Translation = {
     supported_orientations: 'Supporto',
     supported_orientations_options: {
       [HexOrientation.FLATTOP]: 'Base piatta',
-      [HexOrientation.POINTYTOP]: 'Punta verso l'alto',
+      [HexOrientation.POINTYTOP]: `Punta verso l'alto`,
       both: 'Entrambi',
     },
     rotation: 'Rotazione',
@@ -333,7 +333,7 @@ export const IT_it: Translation = {
     tileset_builder: {
       import_tileset: 'Importa Set di Tessere',
       export_tileset: 'Esporta Set di Tessere',
-      delete: 'Cancella questo Esagono,
+      delete: 'Cancella questo Esagono',
       exit: 'Esci dallo strumento di Crezione Set di Tessere',
       name: 'Nome del Set di Tessere',
       name_placeholder: 'Nuovo Set di Tessere',

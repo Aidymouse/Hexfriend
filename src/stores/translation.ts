@@ -3,12 +3,14 @@ import { persisted } from 'svelte-persisted-store';
 
 import { type Translation, en_us, pt_br } from '../lib/translations';
 import { placeholder_translation } from '../lib/translations/placeholder_translation';
+import { IT_it } from '../lib/translations/IT_it';
 
 export const tl = persisted('tl', en_us);
 
 export const translation_map: {[key: string]: { translation: Translation, label: string }} = {
     "en_us": {translation: en_us, label: "🇺🇸 English"},
-    "pt_br": {translation: pt_br, label: "🇧🇷 Portugues do Brasil"}
+    "pt_br": {translation: pt_br, label: "🇧🇷 Portugues do Brasil"},
+    "IT_it": {translation: IT_it, label: "🇮🇹 Italiano"}
 }
 
 const merge_translation = (translation: Translation, merge: Translation) => {
