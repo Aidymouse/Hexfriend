@@ -332,7 +332,7 @@
           bind:retainTextPosition
           bind:retainIconScale={retain_icon_scale}
           retain_positions={retain_positions_on_resize}
-	  loaded_save={loadedSave}
+          loaded_save={loadedSave}
           {save_old_resize_parameters}
           {renderAllHexes}
           {redrawEntireMap}
@@ -348,7 +348,13 @@
     <SettingHeading text={$tl.settings.shape.title} bind:toggle={hidden_settings.dimensions} />
     <div class="settings-hider" class:hidden={hidden_settings.dimensions}>
       <div class="hider">
-        <DimensionSettings bind:comp_terrainLayer bind:comp_iconLayer bind:comp_textLayer bind:comp_pathLayer loaded_save={loadedSave} />
+        <DimensionSettings
+          bind:comp_terrainLayer
+          bind:comp_iconLayer
+          bind:comp_textLayer
+          bind:comp_pathLayer
+          loaded_save={loadedSave}
+        />
       </div>
     </div>
   </div>
@@ -368,7 +374,7 @@
     <SettingHeading text={$tl.settings.overlay.title} bind:toggle={hidden_settings.overlay} />
     <div class="settings-hider" class:hidden={hidden_settings.overlay}>
       <div class="hider">
-        <OverlaySettings bind:showSettings {comp_overlayLayer} loaded_base64={loadedSave.overlay_base64}/>
+        <OverlaySettings bind:showSettings {comp_overlayLayer} loaded_base64={loadedSave.overlay_base64} />
       </div>
     </div>
   </div>
@@ -378,11 +384,7 @@
     <SettingHeading text={$tl.settings.tilesets.title} bind:toggle={hidden_settings.tilesets} />
     <div class="settings-hider" class:hidden={hidden_settings.tilesets}>
       <div class="hider">
-        <TilesetSettings
-          bind:comp_terrainLayer
-          bind:comp_terrain_panel
-          bind:appState
-        />
+        <TilesetSettings bind:comp_terrainLayer bind:comp_terrain_panel bind:appState />
       </div>
     </div>
   </div>
@@ -426,7 +428,7 @@
   <div class="setting-container">
     <h2>{$tl.settings.about.title}</h2>
     <p class="helper-text">
-      Hexfriend v4.1.0 - {$tl.settings.about.version_tagline}
+      Hexfriend v4.1.1 - {$tl.settings.about.version_tagline}
     </p>
 
     <p class="helper-text" style="margin-top: var(--small-radius)">

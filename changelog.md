@@ -3,6 +3,9 @@ For Techy People
 
 # Version 4.0 - Hexfriend through time
 
+## Version 4.1.1
+- Fix tile preview generation in Tileset Creator
+
 ## Version 4.1.0
 - Added Italian translation (thanks 7ede!)
 
