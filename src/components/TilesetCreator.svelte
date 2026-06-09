@@ -8,8 +8,8 @@
   import { load_tileset_textures } from '../lib/texture_loader'
 
   let preview_hex_info: PreviewHexInfo = {
-    height: 50 * 6,
-    width: 43.3 * 6,
+    width: 50 * 6,
+    height: 43.3 * 6,
     orientation: HexOrientation.FLATTOP,
     color: new PIXI.Color(DEFAULT_BLANK_HEX_COLOR).toHex(),
   }
@@ -107,18 +107,16 @@
     return proposedId
   }
 
-  async function newTile() {
-    let newTile: Tile = selectedTile
-      ? structuredClone(selectedTile)
-      : {
-          tileset_id: '', // Will be filled in on export
-          display: 'New Hex',
-          id: findID('New Hex'),
-          symbol: null,
-          bgColor: DEFAULT_BLANK_HEX_COLOR,
-          preview_flatTop: '',
-          preview_pointyTop: '',
-        }
+  async function newTile(tileIn?: Tile) {
+    let newTile: Tile = tileIn ?? {
+      tileset_id: '', // Will be filled in on export
+      display: 'New Hex',
+      id: findID('New Hex'),
+      symbol: null,
+      bgColor: DEFAULT_BLANK_HEX_COLOR,
+      preview_flatTop: '',
+      preview_pointyTop: '',
+    }
 
     newTile.id = findID(newTile.id)
 
@@ -132,13 +130,18 @@
   }
 
   function duplicateTile(tile: Tile) {
-    let newTile = structuredClone(tile)
+    const dupe_tile = structuredClone(tile)
+    dupe_tile.display = `Copy of ${dupe_tile.display}`
+    dupe_tile.id = findID(dupe_tile.display)
 
-    newTile.display = 'Copy of ' + tile.display
-    newTile.id = findID(newTile.display)
-
-    workingTileset.tiles = [...workingTileset.tiles, newTile]
-    selectedTile = workingTileset.tiles[workingTileset.tiles.length - 1]
+    newTile(dupe_tile)
+    // let newTile = structuredClone(tile)
+    //
+    // newTile.display = 'Copy of ' + tile.display
+    // newTile.id = findID(newTile.display)
+    //
+    // workingTileset.tiles = [...workingTileset.tiles, newTile]
+    // selectedTile = workingTileset.tiles[workingTileset.tiles.length - 1]
   }
 
   function removeTile(tile: Tile) {
@@ -146,6 +149,7 @@
   }
 
   const get_tile_previews = async (tile: Tile) => {
+    console.log('Getting previews', tile, preview_hex_info)
     const previews = await generate_tile_previews(
       tile,
       preview_hex_info,
@@ -438,6 +442,9 @@
           on:click={() => {
             preview_hex_info.orientation =
               preview_hex_info.orientation == HexOrientation.FLATTOP ? HexOrientation.POINTYTOP : HexOrientation.FLATTOP
+            const old_width = preview_hex_info.width
+            preview_hex_info.width = preview_hex_info.height
+            preview_hex_info.height = old_width
           }}
           title={$tl.builders.change_orientation}
         >
