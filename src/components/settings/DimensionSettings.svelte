@@ -143,6 +143,7 @@
 </div>
 
 {#if $tfield.mapShape == map_shape.SQUARE}
+
   <section id="map-dimensions-container">
     <div id="map-dimensions">
       {#if addOrRemoveMapDimensions == 'add'}
@@ -222,6 +223,13 @@
       {/if}
     </div>
   </section>
+	<div class="settings-grid">
+	<label>{$tl.settings.shape.squareRows}</label>
+	<label>{$tfield.rows}</label>
+
+	<label>{$tl.settings.shape.squareColumns}</label>
+	<label>{$tfield.columns}</label>
+	</div>
 {:else if $tfield.mapShape == map_shape.FLOWER}
   <section id="flower-dimensions-container">
     <p>{$tl.settings.shape.hexesout}</p>
