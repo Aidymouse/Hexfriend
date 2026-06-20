@@ -207,6 +207,8 @@ export type Translation = {
       flower: string
       square: string
       hexesout: string
+			squareRows: string
+			squareColumns: string
       addtop: string
       addbottom: string
       addleft: string

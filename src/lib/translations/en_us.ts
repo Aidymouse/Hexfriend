@@ -210,6 +210,8 @@ export const en_us: Translation = {
       flower: 'Flower',
       square: 'Square',
       hexesout: 'Hexes out from center',
+			squareRows: 'Rows',
+			squareColumns: 'Columns',
       addtop: 'Add Top',
       addbottom: 'Add Bottom',
       addleft: 'Add Left',
