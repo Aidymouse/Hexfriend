@@ -220,9 +220,12 @@ export function coords_worldToCube(
     let r = worldY / (hex_height * 0.75)
     let q = ((2 * worldX) / hex_width - r) / 2
 
-    let roundedCoords = cube_round(AxialToCube(q, r))
+		if (round) {
+			let roundedCoords = cube_round(AxialToCube(q, r))
+			return roundedCoords
+		}
 
-    return roundedCoords
+    return AxialToCube(q, r)
   }
 }
 
