@@ -32,12 +32,22 @@ export function tiles_match(tile1: Tile, tile2: Tile) {
 
 /** Copies the tile, leaving out the base 64 in the symbol, cos that would be CRAZY to store! **/
 export const getStoreableTile = (tile: Tile): Tile => {
-  return {
+  let storeable = {
     ...tile,
     preview_flatTop: '',
     preview_pointyTop: '',
     symbol: tile.symbol ? { ...tile.symbol, base64: '' } : null,
   }
+
+  delete storeable.preview_flatTop
+  delete storeable.preview_pointyTop
+  delete storeable.display
+
+  delete storeable.symbol.base64
+  delete storeable.symbol.display
+
+  return storeable
+
   // if (!tile.symbol) {
   //   return structuredClone(tile)
   // } else {
