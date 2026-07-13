@@ -37,9 +37,9 @@
     let grph_resizer: PIXI.Graphics;
 
     export function panelControl_changeOverlayImage (base64: string | null) {
-        startUndoState({overlay_base64: loaded_base64}, base64 === null ? "Remove Overlay" : "Change Overlay")
+        //startUndoState({overlay_base64: loaded_base64}, base64 === null ? "Remove Overlay" : "Change Overlay")
         changeOverlayImage(base64)
-        completeUndoState({overlay_base64: loaded_base64})
+        //completeUndoState({overlay_base64: loaded_base64})
     }
 
 
