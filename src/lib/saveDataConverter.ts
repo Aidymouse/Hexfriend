@@ -286,6 +286,16 @@ const convert_v13_to_v14 = (oldData: SaveData): SaveData => {
   return oldData
 }
 
+export const makeEfficient = (save_data: SaveData) => {
+
+  for (const [hexId, terrainHex] of Object.entries(save_data.TerrainField.hexes)) {
+    if (terrainHex.tile) {
+      delete terrainHex.tile.preview_flatTop
+      delete terrainHex.tile.preview_pointyTop
+    }
+  }
+}
+
 export function convertSaveDataToLatest(oldData: SaveData): SaveData {
   // Update to latest version
   let newData: SaveData = JSON.parse(JSON.stringify(oldData))
@@ -320,6 +330,9 @@ export function convertSaveDataToLatest(oldData: SaveData): SaveData {
   if (newData.saveVersion == 13) {
     newData = convert_v13_to_v14(newData)
   }
+
+  makeEfficient(newData)
+
 
   return newData
 }
