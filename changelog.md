@@ -3,6 +3,13 @@ For Techy People
 
 # Version 4.0 - Hexfriend through time
 
+## Version 4.1.1
+- Fix remove overlay button
+- Fix placing icons on pointy top maps always force snapping
+- Fix adding to top and left on square based maps crashing entirely
+- Add function to efficientize save data on load (removes preview base64) 
+- Updated Italian translation
+
 ## Version 4.1.0
 - Added Italian translation (thanks 7ede!)
 
