@@ -153,16 +153,16 @@ export const IT_it: Translation = {
     export_as: 'Esporta come...',
     exports: {
       png: 'PNG',
-      scaled_png: 'PNG compresso',
-      scale_request_dialog: 'Compresso di quale percentuale?',
-      hexfriend: 'Hexfriend',
+      scaled_png: 'PNG scalato',
+      scale_request_dialog: 'Scalato di quale percentuale? NB: usa valori maggiori di 100 per upscalare il PNG, consigliato 300%',
+      hexfriend: 'File di Hexfriend',
     },
 
     grid: {
       title: 'Griglia',
       show: 'Mostra Griglia',
-      thickness: 'Spessore della Griglia',
-      color: 'Colore della Griglia',
+      thickness: 'Spessore',
+      color: 'Colore',
       large_hexes: {
         title: 'Esagoni grandi',
         size: 'Dimensione',
@@ -180,15 +180,15 @@ export const IT_it: Translation = {
 
     hexes: {
       title: 'Esagoni',
-      blank_color: 'Colore Esagono vuoto',
+      blank_color: 'Colore da vuoto',
       blank_color_reset: 'Reset',
-      orientation: 'Orientamento Esagoni',
+      orientation: 'Orientamento',
       pointytop: `Punta verso l'alto`,
       flattop: 'Base piatta',
       raised_column: 'Colonna rialzata',
       indented_row: 'Riga rientrata',
-      width: 'Larghezza Esagono',
-      height: 'Altezza Esagono',
+      width: 'Larghezza',
+      height: 'Altezza',
       size_by_radius: 'Dimensioni in base al raggio',
       radius_set: 'Digita raggio',
       gap: 'Margine',
@@ -205,11 +205,11 @@ export const IT_it: Translation = {
 
     shape: {
       title: 'Forma e dimensione',
-      disclaimer: 'Gli esagoni rimossi a seguito di una riduzione delle dimensioni della mappa vengono completamente cancellati.',
+      disclaimer: 'Gli esagoni rimossi a seguito di un ridimensionamento della mappa vengono definitivamente cancellati.',
       mapshape: 'Forma della mappa',
       flower: 'Fiore',
       square: 'Quadrato',
-      hexesout: 'Esagoni patendo dal centro',
+      hexesout: 'Esagoni partendo dal centro',
       addtop: 'Aggiunti Sopra',
       addbottom: 'Aggiunti Sotto',
       addleft: 'Aggiungi a Sinistra',
@@ -305,7 +305,7 @@ export const IT_it: Translation = {
       },
       socials: {
         start: 'Hai trovato un bug? Hai delle idee? Vieni a salutarci su ',
-        discord_link: 'Hexfriend Discord',
+        discord_link: 'Discord',
         end: '',
       },
       money: {
