@@ -43,8 +43,8 @@ export const getStoreableTile = (tile: Tile): Tile => {
   delete storeable.preview_pointyTop
   delete storeable.display
 
-  delete storeable.symbol.base64
-  delete storeable.symbol.display
+  delete storeable.symbol?.base64
+  delete storeable.symbol?.display
 
   return storeable
 
