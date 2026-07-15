@@ -3,6 +3,9 @@ For Techy People
 
 # Version 4.0 - Hexfriend through time
 
+## Version 4.1.2
+- Fix placing terrain not working -_-
+
 ## Version 4.1.1
 - Fix remove overlay button
 - Fix placing icons on pointy top maps always force snapping
