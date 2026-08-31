@@ -10,6 +10,9 @@ Let Aidan (aidan.habedank@gmail.com) know if you'd like a credit on the website.
 
 The following are notes about new translations required for specific version of Hexfriend
 
+### Version 4.1.3
+ - `warnings.max_texture_size`
+
 ### Version 4.0
  - `settings.icon_sets.removal_confirmation`
  - Path Panel fill labels

@@ -3,6 +3,9 @@ For Techy People
 
 # Version 4.0 - Hexfriend through time
 
+## Version 4.1.3
+- Cap size of icon and symbol images to 2048 by 2048 pixels.
+
 ## Version 4.1.2
 - Fix placing terrain not working -_-
 

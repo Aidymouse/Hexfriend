@@ -5,6 +5,10 @@ export type Translation = {
   language: string
   save_indicator: string
 
+  warnings: {
+    max_texture_size: string
+  },
+
   general: {
     even: string
     odd: string

@@ -6,6 +6,10 @@ export const en_us: Translation = {
   language: 'en_us',
   save_indicator: 'Saving...',
 
+  warnings: {
+    max_texture_size: `Sorry, maximum image size is 2048 by 2048 pixels.`
+  },
+
   general: {
     even: 'Even',
     odd: 'Odd',

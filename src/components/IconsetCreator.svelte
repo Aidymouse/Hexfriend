@@ -14,9 +14,10 @@
   import { afterUpdate, tick } from 'svelte'
   import { generate_icon_preview } from '../helpers/iconFns'
   import { type PreviewHexInfo } from '../types'
-  import { get_icon_scale_for_hex, ScaleMode } from '../helpers/imageSizing'
+  import { get_icon_scale_for_hex, getImageDimensions, ScaleMode } from '../helpers/imageSizing'
   import { DEFAULT_BLANK_HEX_COLOR } from '../types/defaults'
   import PreviewHexControls from './PreviewHexControls.svelte'
+  import { Config } from '../Config'
 
   let app = new PIXI.Application({
     width: 300,
@@ -91,7 +92,7 @@
 
   let newIconFiles: FileList
 
-  async function loadTexture(texId, result) {
+  async function loadTexture(texId: string, result: string) {
     console.log('Now real Loading Texture for', texId, result)
     let newTexture = await PIXI.Assets.load(result)
     loadedTextures[texId] = newTexture
@@ -99,7 +100,6 @@
   }
 
   async function newIcon() {
-    //console.log(newIconFiles)
 
     for (const file of Array.from(newIconFiles)) {
       let r = new FileReader()
@@ -109,7 +109,14 @@
         const iconName = file.name.split('.')[0]
         const texId = findID(IDify(iconName))
 
-        const newTexture = await loadTexture(texId, r.result)
+	const { width, height } = await getImageDimensions(r.result as string)
+
+	if (width > Config.max_texture_size || height > Config.max_texture_size) {
+	  alert($tl.warnings.max_texture_size)
+	  return
+	}
+
+        const newTexture = await loadTexture(texId, r.result as string)
 
         const stockIcon: Icon = {
           color: 0xffffff,
@@ -156,7 +163,7 @@
   }
 
   async function get_icon_generator_preview(icon: Icon) {
-    if (icon === null) return
+    if (icon === null) { return }
 
     return generate_icon_preview(
       icon,

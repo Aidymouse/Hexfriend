@@ -3,9 +3,10 @@
   import { DEFAULT_BLANK_HEX_COLOR } from '../types/defaults'
   import { get_icon_scale_for_hex } from '../helpers/imageSizing'
   import { type PreviewHexInfo } from '../types'
-  import { generate_icon_preview } from '../helpers/iconFns'
+  import { getImageDimensions, generate_icon_preview } from '../helpers'
   import { generate_tile_previews } from '../helpers/tileFns'
   import { load_tileset_textures } from '../lib/texture_loader'
+  import { Config } from '../Config'
 
   let preview_hex_info: PreviewHexInfo = {
     height: 50 * 6,
@@ -68,24 +69,7 @@
 
   /** Keep local color copies so you can edit the text boxes */
   let local_tile_color: string = new PIXI.Color(DEFAULT_BLANK_HEX_COLOR).toHex()
-  // $: {
-  //   if (selectedTile) {
-  //     try {
-  //       let c = new PIXI.Color(local_tile_color).toNumber()
-  //       selectedTile.bgColor = c
-  //     } catch {}
-  //   }
-  // }
-
   let local_symbol_color: string = '#ffffff'
-  // $: {
-  //   if (selectedTile?.symbol) {
-  //     try {
-  //       let c = new PIXI.Color(local_symbol_color).toNumber()
-  //       selectedTile.symbol.color = c
-  //     } catch {}
-  //   }
-  // }
 
   let previewSprite = new PIXI.Sprite()
   previewSprite.anchor.set(0.5)
@@ -168,6 +152,13 @@
     let r = new FileReader()
     r.readAsDataURL(symbolFiles[0])
     r.onload = async (eb) => {
+
+      const { width, height } = await getImageDimensions(r.result as string)
+      if (width > Config.max_texture_size || height > Config.max_texture_size) {
+	  alert($tl.warnings.max_texture_size)
+	  return
+      }
+
       let new_texture = await PIXI.Assets.load(r.result as string)
 
       selectedTile.symbol = {
