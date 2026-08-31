@@ -68,3 +68,16 @@ export const get_icon_scale_for_hex = (icon: Icon, hexInfo: HexSizeParams): { x:
   }
   return get_image_scaled_for_hex_relative(icon.texWidth, icon.texHeight, hexInfo.width, hexInfo.height, icon.pHex)
 }
+
+/* Pretty useful helper */
+export const getImageDimensions = async (base64: string): Promise<{width: number, height: number}> => {
+    const imgPromise = new Promise<{width: number, height: number}>((res,rej) => {
+      const img = new Image()
+      img.onload = () => {
+	res({width: img.width, height: img.height})
+      }
+      img.src = base64
+    })
+    return imgPromise
+  }
+
