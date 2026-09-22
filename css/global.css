@@ -1,0 +1,22 @@
+* {
+  /* Light Theme */
+
+  /* Dark Theme */
+  --text-main: #f2f2f2;
+  --bg-main: #333333;
+
+  color: var(--text-main);
+}
+
+html {
+  background-color: var(--bg-main);
+
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}

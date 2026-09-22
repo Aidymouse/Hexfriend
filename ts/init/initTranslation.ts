@@ -1,4 +1,4 @@
-import { en_us } from '../translations'
+import { en_us } from '../translations/index.js'
 
 const Translations = {
   'en_us': en_us

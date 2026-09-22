@@ -1,2 +1,2 @@
-export * from './initCanvas'
-export * from './initTranslation'
+export * from './initTranslation.js'
+export * from './initCanvas.js'

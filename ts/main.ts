@@ -1,10 +1,10 @@
-import { initCanvas } from './init'
-import type { Translation } from './types'
+import { initCanvas, initTranslation } from './init/index.js'
+import type { Translation } from './types/translationTypes'
 
+/* Global state that is ASSUMED TO ALWAYS BE INITED!!! */
 declare global {
   var ctx: CanvasRenderingContext2D
   var tl: Translation
-
 }
 
 /* 
@@ -12,4 +12,5 @@ declare global {
  */
 export const initHexfriend = () => {
   initCanvas()
+  initTranslation()
 }
