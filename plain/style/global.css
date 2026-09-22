@@ -1,0 +1,9 @@
+* {
+
+	/* Light Theme */
+
+	/* Dark Theme */
+	--text-main: #f2f2f2;
+
+	color: var(--text-main);
+}
