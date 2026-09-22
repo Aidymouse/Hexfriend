@@ -1,8 +1,19 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-	<head>
-		<link rel="stylesheet" href="style/global.css">
-		<link rel="stylesheet" href="style/main.css">
-	</head>
-	<body></body>
+  <head>
+    <link rel="stylesheet" href="style/global.css" />
+    <link rel="stylesheet" href="style/main.css" />
+
+    <script type="module">
+      import { initHexfriend } from './js/main.js'
+      window.addEventListener('load', () => {
+        initHexfriend()
+      })
+    </script>
+
+    <script></script>
+  </head>
+  <body>
+    <canvas id="main-canvas" width="500" height="500"></canvas>
+  </body>
 </html>

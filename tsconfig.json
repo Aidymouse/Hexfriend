@@ -6,8 +6,10 @@
     "removeComments": true,
     "preserveConstEnums": true,
     "sourceMap": true,
-    "outDir": "js"
+    "outDir": "js",
+    "moduleResolution": "bundler"
   },
 
-    "include": ["./ts/**/*.ts"]
+    "include": ["./ts/**/*.ts"],
+		"ignore": ["./node_modules/**/*"]
 }
