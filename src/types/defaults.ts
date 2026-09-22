@@ -1,3 +1,0 @@
-
-export const DEFAULT_BLANK_HEX_COLOR = 0xf2f2f2
-export const DEFAULT_BLANK_HEX_COLOR_STRING = "#f2f2f2"

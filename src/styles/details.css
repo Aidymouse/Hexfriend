@@ -1,9 +1,0 @@
-details {
-  border: solid 1px var(--light-background);
-  border-radius: var(--small-radius);
-}
-
-details summary {
-  padding: 0.5em;
-  background-color: var(--light-background);
-}
