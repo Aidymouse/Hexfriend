@@ -1,15 +1,24 @@
 * {
+  /** COLORS **/
   /* Light Theme */
 
   /* Dark Theme */
   --text-main: #f2f2f2;
+  --bg-dark: #000000;
   --bg-main: #333333;
+  --bg-light: #555555;
 
+  /** OTHER **/
+  --gap-small: 0.5em;
+  --gap: 2em;
+  --gap-large: 3em;
+
+  /** GLOBAL DEFAULTS **/
   color: var(--text-main);
 }
 
 html {
-  background-color: var(--bg-main);
+  background-color: var(--bg-dark);
 
   width: 100%;
   height: 100%;
@@ -19,4 +28,5 @@ body {
   width: 100%;
   height: 100%;
   margin: 0;
+
 }

@@ -1,0 +1,27 @@
+#ui-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+
+  display: flex;
+  flex-direction: row;
+}
+
+/* for testing */
+#ui-container * {
+  background-color: var(--bg-main);
+}
+
+#settings {
+  flex-grow: 1;
+}
+
+#ui-center {
+  flex-grow: 4;
+}
+
+#tools {
+  flex-grow: 1;
+}
